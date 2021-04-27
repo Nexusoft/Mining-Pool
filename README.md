@@ -1,2 +1,2 @@
-# LLL-POOL
-A multi-channel mining pool software for mining either the hash or prime channel. Based on new LLL templates
+# LLL-HPP
+A multi-channel mining pool software for mining either the Hash (H), Prime (P), as a Pool (P).
