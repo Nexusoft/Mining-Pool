@@ -1,0 +1,6 @@
+1. Copy PrimePool user defined objects into LLP folder
+2. Build a user defined LLD object to inherit base templates for user management
+3. Build a user defined HTTP-LLP object using apinode.cpp as base class, follow API handling for LLL-TAO
+4. Define the API calls that will drive the frontend data, we don't need too many
+5. Add messages to allow hash shares in Pool LLP, and have a message set that channel when beginning mining.
+6... more to be added
