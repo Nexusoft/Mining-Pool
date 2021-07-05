@@ -1,0 +1,2 @@
+#define NexusPool_VERSION_MAJOR @NexusPool_VERSION_MAJOR@
+#define NexusPool_VERSION_MINOR @NexusPool_VERSION_MINOR@
