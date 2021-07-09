@@ -46,6 +46,10 @@ namespace config
 		{
 			j.at("local_port").get_to(m_local_port);
 		}
+		if (j.count("local_listen_port") != 0)
+		{
+			j.at("local_listen_port").get_to(m_local_listen_port);
+		}
 
 		std::string mining_mode = j["mining_mode"];
 		std::for_each(mining_mode.begin(), mining_mode.end(), [](char & c) {

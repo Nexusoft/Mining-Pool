@@ -2,8 +2,7 @@
 #include "network/create_component.hpp"
 #include "network/component.hpp"
 #include "config/validator.hpp"
-
-#include "chrono/timer_factory.hpp"
+#include "pool_manager.hpp"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/rotating_file_sink.h>
@@ -68,37 +67,14 @@ namespace nexuspool
 
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
-		auto socket_factory = m_network_component->get_socket_factory();
-
-		network::Endpoint listen_endpoint{ network::Transport_protocol::tcp, "127.0.0.1", m_config.get_local_port() };
-		m_listen_socket = socket_factory->create_socket(listen_endpoint);
+		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, m_config, m_network_component->get_socket_factory());
 
 		return true;
 	}
 
 	void Pool::run()
 	{
-		// connect daemon to wallet	
-		if (!m_daemon_connection->connect(network::Endpoint{ network::Transport_protocol::tcp, m_config.get_wallet_ip(), m_config.get_port() }))
-		{
-			m_logger->critical("Couldn't connect to wallet using ip {} and port {}", m_config.get_wallet_ip(), m_config.get_wallet_port());
-			return;
-		}
-
-
-		// on listen/accept, save created connection to pool_conenctions and call the connection_handler of created pool connection object
-		auto socket_handler = [this](network::Connection::Sptr&& connection)
-		{
-			//auto pool_connection = std::make_shared<Pool_connection>(std::move(connection), m_daemon_connection, m_data_registry);
-
-			//std::lock_guard<std::mutex> lk(m_pool_connections_mutex);
-			//m_pool_connections.push_back(pool_connection);
-			//return pool_connection->init_connection_handler();
-			return network::Connection::Handler{};
-		};
-
-		m_listen_socket->listen(socket_handler);
-
+		m_pool_manager->start();
 		m_io_context->run();
 	}
 }

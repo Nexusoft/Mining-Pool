@@ -38,7 +38,9 @@ add_subdirectory(src/config)
 add_executable(NexusPool 
                 src/main.cpp 
                 src/pool.cpp
-                src/wallet_connection.cpp)
+                src/wallet_connection.cpp
+                src/timer_manager.cpp 
+                src/pool_manager.cpp)
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 

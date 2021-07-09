@@ -3,11 +3,6 @@
 #include "config/config.hpp"
 #include "config/types.hpp"
 #include "LLP/block.hpp"
-#include "stats/stats_printer_console.hpp"
-#include "stats/stats_printer_file.hpp"
-#include "stats/stats_collector.hpp"
-#include "protocol/solo.hpp"
-#include "protocol/pool.hpp"
 #include <variant>
 
 namespace nexuspool
@@ -18,7 +13,6 @@ Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_contex
     , m_config{ config }
     , m_socket{ std::move(socket) }
     , m_logger{ spdlog::get("logger") }
-    , m_stats_collector{ std::make_shared<stats::Collector>(m_config) }
     , m_timer_manager{ std::move(timer_factory) }
     , m_current_height{0}
 {
@@ -35,8 +29,6 @@ void Wallet_connection::stop()
 void Wallet_connection::retry_connect(network::Endpoint const& wallet_endpoint)
 {
     m_connection = nullptr;		// close connection (socket etc)
-    m_miner_protocol->reset();
-    m_stats_collector->connection_retry_attempt();
 
     // retry connect
     auto const connection_retry_interval = m_config.get_connection_retry_interval();
@@ -64,17 +56,14 @@ bool Wallet_connection::connect(network::Endpoint const& wallet_endpoint)
                 {
                     self->m_logger->info("Connection to wallet established");
 
-                    // login
                     Packet packet;
                     packet.m_header = Packet::SET_CHANNEL;
                     packet.m_length = 4;
                     packet.m_data = std::make_shared<network::Payload>(uint2bytes(self->m_config.get_mining_mode() == config::Mining_mode::PRIME ? 1U : 2U));
                     self->m_connection->transmit(packet.get_bytes());
 
-                    // only solo miner uses GET_HEIGHT message
-
-                   // auto const get_height_interval = self->m_config.get_height_interval();
-                    //self->m_timer_manager.start_get_height_timer(get_height_interval, self->m_connection);             
+                    auto const get_height_interval = self->m_config.get_height_interval();
+                    self->m_timer_manager.start_get_height_timer(get_height_interval, self->m_connection);             
                 }
                 else
                 {	// data received
