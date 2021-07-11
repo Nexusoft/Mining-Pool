@@ -11,13 +11,14 @@
 
 namespace nexuspool
 {
+class Session;
+
 class Miner_connection : public std::enable_shared_from_this<Miner_connection>
 {
 public:
 
-    Miner_connection(chrono::Timer_factory::Sptr timer_factory, network::Connection::Sptr&& connection);
+    Miner_connection(chrono::Timer_factory::Sptr timer_factory, network::Connection::Sptr&& connection, Session& session);
 
-    // stop the component and destroy all workers
     void stop();
 
     network::Connection::Handler connection_handler();
@@ -32,6 +33,7 @@ private:
     std::uint32_t m_current_height;
     std::string m_remote_address;
     bool m_connection_closed;	// indicator for server if the network connection has been closed
+    Session& m_session;
 };
 }
 

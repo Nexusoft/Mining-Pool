@@ -5,6 +5,7 @@
 #include "network/types.hpp"
 #include <spdlog/spdlog.h>
 #include "chrono/timer_factory.hpp"
+#include "session.hpp"
 
 #include <memory>
 
@@ -34,6 +35,8 @@ private:
 
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
     network::Socket::Sptr m_listen_socket;
+
+    Session_registry m_session_registry;
 };
 }
 

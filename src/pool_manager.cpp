@@ -13,6 +13,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, config:
 	, m_socket_factory{std::move(socket_factory)}
 	, m_logger{ spdlog::get("logger") }
 	, m_listen_socket{}
+	, m_session_registry{}
 {
 }
 
@@ -38,10 +39,12 @@ void Pool_manager::start()
 	// on listen/accept, save created connection to pool_conenctions and call the connection_handler of created pool connection object
 	auto socket_handler = [this](network::Connection::Sptr&& connection)
 	{
-		auto miner_connection = std::make_shared<Miner_connection>(m_timer_factory, std::move(connection));
+		auto& session = m_session_registry.create_session();
+		auto miner_connection = std::make_shared<Miner_connection>(m_timer_factory, std::move(connection), session);
 
-		//std::lock_guard<std::mutex> lk(m_pool_connections_mutex);
-		//m_pool_connections.push_back(pool_connection);
+	
+		session.update_connection(miner_connection);
+
 		return miner_connection->connection_handler();
 	};
 
