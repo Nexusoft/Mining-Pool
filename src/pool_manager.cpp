@@ -39,11 +39,12 @@ void Pool_manager::start()
 	// on listen/accept, save created connection to pool_conenctions and call the connection_handler of created pool connection object
 	auto socket_handler = [this](network::Connection::Sptr&& connection)
 	{
-		auto& session = m_session_registry.create_session();
-		auto miner_connection = std::make_shared<Miner_connection>(m_timer_factory, std::move(connection), session);
+		auto const session_key = m_session_registry.create_session();
+		auto miner_connection = std::make_shared<Miner_connection>(m_timer_factory, std::move(connection), session_key, m_session_registry);
 
-	
+		auto session = m_session_registry.get_session(session_key);
 		session.update_connection(miner_connection);
+		m_session_registry.update_session(session_key, session);
 
 		return miner_connection->connection_handler();
 	};

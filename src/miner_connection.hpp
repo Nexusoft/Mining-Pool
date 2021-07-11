@@ -5,19 +5,22 @@
 #include <spdlog/spdlog.h>
 #include "chrono/timer_factory.hpp"
 #include "timer_manager.hpp"
+#include "session.hpp"
 
 #include <memory>
 #include <string>
 
 namespace nexuspool
 {
-class Session;
 
 class Miner_connection : public std::enable_shared_from_this<Miner_connection>
 {
 public:
 
-    Miner_connection(chrono::Timer_factory::Sptr timer_factory, network::Connection::Sptr&& connection, Session& session);
+    Miner_connection(chrono::Timer_factory::Sptr timer_factory, 
+        network::Connection::Sptr&& connection, 
+        Session_key session_key,
+        Session_registry& session_registry);
 
     void stop();
 
@@ -33,7 +36,8 @@ private:
     std::uint32_t m_current_height;
     std::string m_remote_address;
     bool m_connection_closed;	// indicator for server if the network connection has been closed
-    Session& m_session;
+    Session_key m_session_key;
+    Session_registry& m_session_registry;
 };
 }
 

@@ -1,10 +1,11 @@
 #ifndef NEXUSPOOL_SESSION_HPP
 #define NEXUSPOOL_SESSION_HPP
 
-#include <vector>
+#include <map>
 #include <memory>
 #include <string>
-#include <cstdint>
+#include <mutex>
+#include "LLC/types/uint1024.h"
 
 namespace nexuspool
 {
@@ -16,21 +17,21 @@ struct Session_user
 	bool m_logged_in{ false };
 };
 
+using Session_key = uint256_t;
+
 // Holds relevant user data and miner_connection
 class Session
 {
 public:
 
-	explicit Session(std::uint64_t internal_id);
+	Session();
 
 	void update_connection(std::shared_ptr<Miner_connection> miner_connection);
 	std::weak_ptr<Miner_connection> get_connection() { return m_miner_connection; }
-	void update_user_data(Session_user const& user_data);
 	Session_user& get_user_data() { return m_user_data;  }
 
 private:
 
-	std::uint64_t m_internal_id;
 	Session_user m_user_data;
 	std::shared_ptr<Miner_connection> m_miner_connection;
 	// creation_time
@@ -46,12 +47,14 @@ public:
 
 	Session_registry();
 
-	Session& create_session();
+	Session_key create_session();
+	Session get_session(Session_key key);
+	void update_session(Session_key key, Session const& session);
 
 private:
 
-	std::uint64_t m_internal_id_counter;
-	std::vector<Session> m_sessions;
+	std::mutex m_sessions_mutex;
+	std::map<Session_key, Session> m_sessions;
 
 };
 

@@ -1,18 +1,21 @@
 #include "miner_connection.hpp"
 #include "packet.hpp"
 #include "LLP/block.hpp"
-#include "session.hpp"
 
 namespace nexuspool
 {
-Miner_connection::Miner_connection(chrono::Timer_factory::Sptr timer_factory, network::Connection::Sptr&& connection, Session& session)
+Miner_connection::Miner_connection(chrono::Timer_factory::Sptr timer_factory, 
+	network::Connection::Sptr&& connection, 
+	Session_key session_key,
+	Session_registry& session_registry)
     : m_connection{ std::move(connection) }
     , m_logger{ spdlog::get("logger") }
     , m_timer_manager{ std::move(timer_factory) }
     , m_current_height{ 0 }
 	, m_remote_address{""}
 	, m_connection_closed{true}
-	, m_session{session}
+	, m_session_key{session_key}
+	, m_session_registry{session_registry}
 {
 }
 
@@ -70,11 +73,12 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 	else if (packet.m_header == Packet::LOGIN)
 	{
-		auto user_data = m_session.get_user_data();
+		auto session = m_session_registry.get_session(m_session_key);
+		auto user_data = session.get_user_data();
 		// check if already logged in
 		if (user_data.m_logged_in)
 		{
-			m_logger->warn("Multiple loggin attempts of user {} with ip {} ", user_data.m_nxs_address, m_remote_address);
+			m_logger->warn("Multiple login attempts of user {} with ip {} ", user_data.m_nxs_address, m_remote_address);
 			// increase ddos score
 			return;
 		}
@@ -93,6 +97,8 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		user_data.m_logged_in = true;
 		response = response.get_packet(Packet::LOGIN_SUCCESS);
 		m_connection->transmit(response.get_bytes());
+
+		m_session_registry.update_session(m_session_key, session);
 	}
     else
     {
