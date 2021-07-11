@@ -40,7 +40,8 @@ add_executable(NexusPool
                 src/pool.cpp
                 src/wallet_connection.cpp
                 src/timer_manager.cpp 
-                src/pool_manager.cpp)
+                src/pool_manager.cpp
+                src/miner_connection.cpp)
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 

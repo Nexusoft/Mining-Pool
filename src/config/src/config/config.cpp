@@ -14,6 +14,7 @@ namespace config
 		: m_wallet_ip{ "127.0.0.1" }
 		, m_wallet_port{9325}
 		, m_local_port{ 0 }
+		, m_local_listen_port{ 0 }
 		, m_local_ip{"127.0.0.1"}
 		, m_mining_mode{ Mining_mode::HASH}
 		, m_pool_config{}

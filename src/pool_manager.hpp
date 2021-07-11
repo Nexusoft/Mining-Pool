@@ -22,6 +22,7 @@ public:
     Pool_manager(std::shared_ptr<asio::io_context> io_context, config::Config& config, network::Socket_factory::Sptr socket_factory);
 
     void start();
+    void stop();
 
 private:
 
@@ -31,7 +32,8 @@ private:
     network::Socket_factory::Sptr m_socket_factory;
     std::shared_ptr<spdlog::logger> m_logger;
 
-    std::shared_ptr<Wallet_connection> m_wallet_connection;
+    std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
+    network::Socket::Sptr m_listen_socket;
 };
 }
 

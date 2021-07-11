@@ -32,6 +32,7 @@ namespace nexuspool
 		m_signals->async_wait([this](auto, auto)
 		{
 			m_logger->info("Shutting down NexusPool");
+			m_pool_manager->stop();
 			m_io_context->stop();
 			exit(1);
 		});
