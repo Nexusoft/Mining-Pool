@@ -13,7 +13,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, config:
 	, m_socket_factory{std::move(socket_factory)}
 	, m_logger{ spdlog::get("logger") }
 	, m_listen_socket{}
-	, m_session_registry{}
+	, m_session_registry{m_config.get_session_expiry_time()}
 {
 }
 

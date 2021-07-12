@@ -136,6 +136,13 @@ bool Validator::check(std::string const& config_file)
                 m_optional_fields.push_back(Validator_error{"get_height_interval", "Not a number"});
             }
 		}
+        if (j.count("session_expiry_time") != 0)
+        {
+            if (!j.at("session_expiry_time").is_number())
+            {
+                m_optional_fields.push_back(Validator_error{ "session_expiry_time", "Not a number" });
+            }
+        } 
     }
     catch(const std::exception& e)
     {

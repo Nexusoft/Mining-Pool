@@ -65,6 +65,8 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
         return;
     }
 
+	auto session = m_session_registry.get_session(m_session_key);
+
     if (packet.m_header == Packet::PING)
     {
         Packet response;
@@ -73,7 +75,6 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 	else if (packet.m_header == Packet::LOGIN)
 	{
-		auto session = m_session_registry.get_session(m_session_key);
 		auto user_data = session.get_user_data();
 		// check if already logged in
 		if (user_data.m_logged_in)
@@ -97,12 +98,14 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		user_data.m_logged_in = true;
 		response = response.get_packet(Packet::LOGIN_SUCCESS);
 		m_connection->transmit(response.get_bytes());
-
-		m_session_registry.update_session(m_session_key, session);
 	}
     else
     {
         m_logger->error("Invalid header received.");
+		return; // exit early
     }
+
+	// received a valid paket from miner -> update session
+	m_session_registry.update_session(m_session_key, session);
 }
 }

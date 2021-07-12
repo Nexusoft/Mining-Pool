@@ -30,6 +30,7 @@ public:
 	std::uint16_t get_connection_retry_interval() const { return m_connection_retry_interval; }
 	std::uint16_t get_print_statistics_interval() const { return m_print_statistics_interval; }
 	std::uint16_t get_height_interval() const { return m_get_height_interval; }
+	std::uint16_t get_session_expiry_time() const { return m_session_expiry_time; }
 	std::vector<Stats_printer_config>& get_stats_printer_config() { return m_stats_printer_config; }
 	Pool const& get_pool_config() const { return m_pool_config; }
 
@@ -53,6 +54,7 @@ private:
 	std::uint16_t m_connection_retry_interval;
 	std::uint16_t m_print_statistics_interval;
 	std::uint16_t m_get_height_interval;
+	std::uint16_t m_session_expiry_time;
 
 };
 }
