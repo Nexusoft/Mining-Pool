@@ -1,15 +1,19 @@
 #include "wallet_connection.hpp"
+#include "pool_manager.hpp"
 #include "packet.hpp"
 #include "config/config.hpp"
 #include "config/types.hpp"
 #include "LLP/block.hpp"
-#include <variant>
 
 namespace nexuspool
 {
-Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_context, config::Config& config,
-    chrono::Timer_factory::Sptr timer_factory, network::Socket::Sptr socket)
+Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_context,
+    std::weak_ptr<Pool_manager> pool_manager,
+    config::Config& config,
+    chrono::Timer_factory::Sptr timer_factory, 
+    network::Socket::Sptr socket)
     : m_io_context{ std::move(io_context) }
+    , m_pool_manager{std::move(pool_manager)}
     , m_config{ config }
     , m_socket{ std::move(socket) }
     , m_logger{ spdlog::get("logger") }
@@ -104,6 +108,12 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
         {
             m_current_height = height;
             m_logger->info("Nexus Network: New Block");
+            auto pool_manager_shared = m_pool_manager.lock();
+            if (!pool_manager_shared)
+                return;
+
+            // update height at pool_manager
+            pool_manager_shared->set_current_height(m_current_height);
 
             // get new block from wallet
             Packet packet_get_block;
@@ -117,13 +127,8 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
         auto block = deserialize_block(std::move(packet.m_data));
         if (block.nHeight == m_current_height)
         {
-           // if (m_set_block_handler)
-           // {
-           //     m_set_block_handler(block, 0);
-          ////  else
-          //  {
-          //      m_logger->error("No Block handler set");
-         //   }
+            // transfer block to pool_manager
+
         }
         else
         {
@@ -147,6 +152,11 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
     {
         m_logger->error("Invalid header received.");
     }
+}
+
+void Wallet_connection::submit_block(LLP::CBlock const& block)
+{
+
 }
 
 LLP::CBlock Wallet_connection::deserialize_block(network::Shared_payload data)

@@ -62,7 +62,7 @@ chrono::Timer::Handler Timer_manager::get_height_handler(std::uint16_t get_heigh
         if(connection_shared)
         {
             Packet packet_get_height;
-            packet_get_height.m_header = Packet::NEW_BLOCK;
+            packet_get_height.m_header = Packet::GET_HEIGHT;
             connection_shared->transmit(packet_get_height.get_bytes());
 
             // restart timer

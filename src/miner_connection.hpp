@@ -12,6 +12,7 @@
 
 namespace nexuspool
 {
+class Pool_manager;
 
 class Miner_connection : public std::enable_shared_from_this<Miner_connection>
 {
@@ -19,6 +20,7 @@ public:
 
     Miner_connection(chrono::Timer_factory::Sptr timer_factory, 
         network::Connection::Sptr&& connection, 
+        std::weak_ptr<Pool_manager> pool_manager,
         Session_key session_key,
         Session_registry& session_registry);
 
@@ -31,6 +33,7 @@ private:
     void process_data(network::Shared_payload&& receive_buffer);
 
     network::Connection::Sptr m_connection;
+    std::weak_ptr<Pool_manager> m_pool_manager;
     std::shared_ptr<spdlog::logger> m_logger;
     Timer_manager m_timer_manager;
     std::uint32_t m_current_height;

@@ -16,18 +16,24 @@ namespace asio { class io_context; }
 namespace nexuspool
 {
 namespace config { class Config; }
+class Pool_manager;
 
 class Wallet_connection : public std::enable_shared_from_this<Wallet_connection>
 {
 public:
 
-    Wallet_connection(std::shared_ptr<asio::io_context> io_context, config::Config& config,
-        chrono::Timer_factory::Sptr timer_factory, network::Socket::Sptr socket);
+    Wallet_connection(std::shared_ptr<asio::io_context> io_context,
+        std::weak_ptr<Pool_manager> pool_manager,
+        config::Config& config,
+        chrono::Timer_factory::Sptr timer_factory, 
+        network::Socket::Sptr socket);
 
     bool connect(network::Endpoint const& wallet_endpoint);
 
-    // stop the component and destroy all workers
+    // Close connection
     void stop();
+
+    void submit_block(LLP::CBlock const& block);
 
 private:
 
@@ -39,6 +45,7 @@ private:
     void retry_connect(network::Endpoint const& wallet_endpoint);
 
     std::shared_ptr<::asio::io_context> m_io_context;
+    std::weak_ptr<Pool_manager> m_pool_manager;
     config::Config& m_config;
     network::Socket::Sptr m_socket;
     network::Connection::Sptr m_connection;

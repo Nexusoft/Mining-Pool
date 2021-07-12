@@ -32,8 +32,8 @@ namespace nexuspool
 
 			/** REQUEST PACKETS **/
 			GET_BLOCK = 129,
-			NEW_BLOCK = 130,
-			GET_BALANCE = 131,
+			GET_HEIGHT = 130,
+			GET_REWARD = 131,
 			GET_PAYOUT = 132,
 
 			//POOL RELATED
@@ -46,6 +46,10 @@ namespace nexuspool
 			REJECT = 201,
 			BLOCK = 202,
 			STALE = 203,
+
+			/** ROUND VALIDATIONS. **/
+			NEW_ROUND = 204,
+			OLD_ROUND = 205,
 
 
 			/** GENERIC **/
@@ -120,7 +124,7 @@ namespace nexuspool
 		inline Packet get_height(uint32_t height) const
 		{
 			Packet packet;
-			packet.m_header = NEW_BLOCK; // on client mienrs often called GET_HEIGHT (same enum value)
+			packet.m_header = GET_HEIGHT;
 			packet.m_length = 4;
 			packet.m_data = std::make_shared<std::vector<uint8_t>>(uint2bytes(height));
 

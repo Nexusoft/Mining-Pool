@@ -8,6 +8,7 @@
 #include "session.hpp"
 
 #include <memory>
+#include <mutex>
 
 namespace asio { class io_context; }
 
@@ -25,6 +26,12 @@ public:
     void start();
     void stop();
 
+    // Methods towards wallet_connection
+    void set_current_height(std::uint32_t height) { m_current_height = height; }
+
+    // Methods towards miner_connection
+    std::uint32_t get_current_height() const { return m_current_height; }
+
 private:
 
     chrono::Timer::Handler session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval);
@@ -40,6 +47,9 @@ private:
 
     Session_registry m_session_registry;    // holds all sessions -> each session contains a miner_connection
     chrono::Timer::Uptr m_session_registry_maintenance;
+
+    // connection variables
+    std::atomic<std::uint32_t> m_current_height;
 };
 }
 

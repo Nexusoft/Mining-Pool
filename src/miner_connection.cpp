@@ -1,4 +1,5 @@
 #include "miner_connection.hpp"
+#include "pool_manager.hpp"
 #include "packet.hpp"
 #include "LLP/block.hpp"
 
@@ -6,9 +7,11 @@ namespace nexuspool
 {
 Miner_connection::Miner_connection(chrono::Timer_factory::Sptr timer_factory, 
 	network::Connection::Sptr&& connection, 
+	std::weak_ptr<Pool_manager> pool_manager,
 	Session_key session_key,
 	Session_registry& session_registry)
     : m_connection{ std::move(connection) }
+	, m_pool_manager{std::move(pool_manager)}
     , m_logger{ spdlog::get("logger") }
     , m_timer_manager{ std::move(timer_factory) }
     , m_current_height{ 0 }
@@ -97,6 +100,20 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		// update session
 		user_data.m_logged_in = true;
 		response = response.get_packet(Packet::LOGIN_SUCCESS);
+		m_connection->transmit(response.get_bytes());
+	}
+	else if (packet.m_header == Packet::GET_HEIGHT)
+	{
+		auto pool_manager_shared = m_pool_manager.lock();
+		if (!pool_manager_shared)
+			return;
+
+		m_current_height = pool_manager_shared->get_current_height();
+		Packet response;
+		response.m_header = Packet::BLOCK_HEIGHT;
+		response.m_data = std::make_shared<std::vector<uint8_t>>(uint2bytes(m_current_height));
+		response.m_length = packet.m_data->size();
+
 		m_connection->transmit(response.get_bytes());
 	}
     else
