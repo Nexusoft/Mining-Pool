@@ -24,6 +24,13 @@ Session_registry::Session_registry(std::uint32_t session_expiry_time)
 	, m_session_expiry_time{session_expiry_time}
 {}
 
+void Session_registry::stop()
+{
+	std::scoped_lock lock(m_sessions_mutex);
+
+	m_sessions.clear();
+}
+
 Session_key Session_registry::create_session()
 {
 	std::scoped_lock lock(m_sessions_mutex);
@@ -53,12 +60,8 @@ void Session_registry::clear_unused_sessions()
 	auto iter = m_sessions.begin();
 	while (iter != m_sessions.end()) 
 	{
-		// delete sessions where the miner_connection is invalid
-		// or the session is expired
-		auto weak_connection = iter->second.get_connection();
-		if((!weak_connection.owner_before(std::weak_ptr<Miner_connection>{}) && 
-			!std::weak_ptr<Miner_connection>{}.owner_before(weak_connection))
-			|| std::chrono::duration_cast<std::chrono::seconds>(time_now - iter->second.get_update_time()).count() > m_session_expiry_time)
+		// delete sessions were the session is expired
+		if(std::chrono::duration_cast<std::chrono::seconds>(time_now - iter->second.get_update_time()).count() > m_session_expiry_time)
 		{
 			iter = m_sessions.erase(iter);
 		}

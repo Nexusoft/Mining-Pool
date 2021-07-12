@@ -49,6 +49,8 @@ public:
 
 	explicit Session_registry(std::uint32_t session_expiry_time);
 
+	void stop();
+
 	Session_key create_session();
 	Session get_session(Session_key key);
 	void update_session(Session_key key, Session& session);

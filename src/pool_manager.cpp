@@ -15,6 +15,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, config:
 	, m_listen_socket{}
 	, m_session_registry{m_config.get_session_expiry_time()}
 {
+	m_session_registry_maintenance = m_timer_factory->create_timer();
 }
 
 void Pool_manager::start()
@@ -50,13 +51,35 @@ void Pool_manager::start()
 	};
 
 	m_listen_socket->listen(socket_handler);
+
+	m_session_registry_maintenance->start(chrono::Seconds(m_config.get_session_expiry_time()), 
+		session_registry_maintenance_handler(m_config.get_session_expiry_time()));
 	
 }
 
 void Pool_manager::stop()
 {
+	m_session_registry_maintenance->cancel();
+	m_session_registry.stop();	// clear sessions and deletes miner_connection objects
 	m_listen_socket->stop_listen();
 }
 
+chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
+{
+	return[this, session_registry_maintenance_interval](bool canceled)
+	{
+		if (canceled)	// don't do anything if the timer has been canceled
+		{
+			return;
+		}
+
+		m_session_registry.clear_unused_sessions();
+
+		// restart timer
+		m_session_registry_maintenance->start(chrono::Seconds(session_registry_maintenance_interval),
+			session_registry_maintenance_handler(session_registry_maintenance_interval));
+	};
+
+}
 
 }

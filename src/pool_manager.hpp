@@ -27,6 +27,8 @@ public:
 
 private:
 
+    chrono::Timer::Handler session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval);
+
     std::shared_ptr<::asio::io_context> m_io_context;
     config::Config& m_config;
     chrono::Timer_factory::Sptr m_timer_factory;
@@ -36,7 +38,8 @@ private:
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
     network::Socket::Sptr m_listen_socket;
 
-    Session_registry m_session_registry;
+    Session_registry m_session_registry;    // holds all sessions -> each session contains a miner_connection
+    chrono::Timer::Uptr m_session_registry_maintenance;
 };
 }
 
