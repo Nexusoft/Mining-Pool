@@ -162,6 +162,21 @@ namespace LLC
 		return keccak;
 	}
 
+	/** SK256
+	*
+	*  256-bit hashing template for strings.
+	*
+	*  @param[in] str The string to hash
+	*
+	*  @return uint256_t hashSkein/hashKeccak hash of the string
+	*
+	**/
+
+	inline uint256_t SK256(const std::string& str)
+	{
+		return SK256(str.begin(), str.end());
+	}
+
 
 	/** SK512
 	 *

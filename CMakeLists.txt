@@ -33,6 +33,7 @@ add_subdirectory(src/chrono)
 add_subdirectory(src/network)
 add_subdirectory(src/LLP)
 add_subdirectory(src/LLC)
+add_subdirectory(src/TAO)
 add_subdirectory(src/config)
 
 add_executable(NexusPool 
@@ -42,11 +43,11 @@ add_executable(NexusPool
                 src/timer_manager.cpp 
                 src/pool_manager.cpp
                 src/miner_connection.cpp
-                src/session.cpp)
+                src/session.cpp "src/TAO/inc/Util/encoding.h" "src/TAO/src/Util/encoding.cpp")
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
-target_link_libraries(NexusPool chrono network config LLP)
+target_link_libraries(NexusPool chrono network config LLP TAO)
 
 target_link_libraries(NexusPool ${OPENSSL_LIBRARIES})
 target_link_libraries(NexusPool Threads::Threads)

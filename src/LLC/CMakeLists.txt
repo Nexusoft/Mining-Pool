@@ -7,7 +7,8 @@ add_library(LLC STATIC  src/LLC/hash/SK/skein.cpp
                         src/LLC/types/base_uint.cpp 
                         src/LLC/hash/SK/Keccak-compact64.cpp
                         src/LLC/types/bignum.cpp 
-                        src/LLC/random.cpp)
+                        src/LLC/random.cpp 
+                        src/LLC/aes/aes.c)
                     
 target_include_directories(LLC
     PUBLIC 

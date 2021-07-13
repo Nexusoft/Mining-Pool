@@ -16,6 +16,11 @@ ________________________________________________________________________________
 #include <cstdint>
 #include <cmath>
 
+//forward declarations
+namespace TAO
+{
+    namespace Register { class Address; }
+}
 
 /** base_uint
  *
@@ -254,6 +259,25 @@ public:
      **/
     void SetHex(const std::string& str);
 
+    /** SetType
+  *
+  *  Set a type byte into base_uint.
+  *
+  *  @param[in] nType The type byte for address.
+  *
+  **/
+    void SetType(const uint8_t nType);
+
+
+    /** GetType
+     *
+     *  Get the type byte from base_uint.
+     *
+     *  @param[in] nType The type byte for address.
+     *
+     **/
+    uint8_t GetType() const;
+
     /** GetBytes
      *
      *  Converts the corresponding 32-bit radix integer into bytes.
@@ -463,6 +487,7 @@ public:
 
 
     /* Needed for specialized copy and assignment constructors. */
+    friend class TAO::Register::Address;
 
     friend class base_uint<1088>;
     friend class base_uint<1056>;
