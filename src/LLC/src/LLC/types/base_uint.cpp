@@ -618,6 +618,24 @@ void base_uint<BITS>::SetHex(const std::string& str)
     SetHex(str.c_str());
 }
 
+/* Set the type byte into base_uint.*/
+template<uint32_t BITS>
+void base_uint<BITS>::SetType(const uint8_t nType)
+{
+    /* Mask off most significant byte (little endian). */
+    pn[WIDTH - 1] = (pn[WIDTH - 1] & 0x00ffffff) + (nType << 24);
+}
+
+
+/*  Get the type byte from base_uint.*/
+template<uint32_t BITS>
+uint8_t base_uint<BITS>::GetType() const
+{
+    /* Get type from hash. */
+    uint8_t nType = (pn[WIDTH - 1] >> 24);
+
+    return nType;
+}
 
 /**  Converts the corresponding 32-bit radix integer into bytes.
   *  Used for serializing in Miner LLP **/

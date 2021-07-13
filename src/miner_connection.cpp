@@ -2,6 +2,7 @@
 #include "pool_manager.hpp"
 #include "packet.hpp"
 #include "LLP/block.hpp"
+#include "TAO/inc/Register/types/address.h"
 
 namespace nexuspool
 {
@@ -87,12 +88,23 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 			return;
 		}
 
-		auto const nxs_address = std::string(packet.m_data->begin(), packet.m_data->end());
-		// check if valid nxs address
 		Packet response;
 
 		Packet login_fail_response;
 		login_fail_response = login_fail_response.get_packet(Packet::LOGIN_FAIL);
+		
+		auto const nxs_address = std::string(packet.m_data->begin(), packet.m_data->end());
+		TAO::Register::Address address_check{ nxs_address };
+		if (!address_check.IsValid())
+		{
+			m_logger->warn("Bad Account {}", nxs_address);
+			//if (m_isDDOS)
+			//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
+
+			m_connection->transmit(login_fail_response.get_bytes());
+			return;
+		}
+
 		// check if banned ip/user
 
 		// check if user already exists in db
