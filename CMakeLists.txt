@@ -43,7 +43,7 @@ add_executable(NexusPool
                 src/timer_manager.cpp 
                 src/pool_manager.cpp
                 src/miner_connection.cpp
-                src/session.cpp "src/TAO/inc/Util/encoding.h" "src/TAO/src/Util/encoding.cpp")
+                src/session.cpp)
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
