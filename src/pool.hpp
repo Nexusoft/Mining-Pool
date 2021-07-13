@@ -13,6 +13,7 @@ namespace nexuspool
 {
 namespace network { class Socket; class Component; }
 namespace chrono { class Timer; }
+namespace api { class Server; }
 class Pool_manager;
 
 class Pool
@@ -35,6 +36,7 @@ private:
 	std::shared_ptr<Pool_manager> m_pool_manager;
 
 	config::Config m_config;
+	std::unique_ptr<api::Server> m_api_server;
 
 	std::shared_ptr<::asio::signal_set> m_signals;
 };

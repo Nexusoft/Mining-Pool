@@ -15,6 +15,7 @@ namespace config
 		, m_wallet_port{9325}
 		, m_local_port{ 0 }
 		, m_local_listen_port{ 0 }
+		, m_api_listen_port{0}
 		, m_local_ip{"127.0.0.1"}
 		, m_mining_mode{ Mining_mode::HASH}
 		, m_pool_config{}
@@ -52,7 +53,11 @@ namespace config
 		{
 			j.at("local_listen_port").get_to(m_local_listen_port);
 		}
-
+		if (j.count("api_listen_port") != 0)
+		{
+			j.at("api_listen_port").get_to(m_api_listen_port);
+		}
+		
 		std::string mining_mode = j["mining_mode"];
 		std::for_each(mining_mode.begin(), mining_mode.end(), [](char & c) {
         	c = ::tolower(c);

@@ -24,6 +24,7 @@ public:
 	std::uint16_t get_wallet_port() const { return m_wallet_port; }
 	std::uint16_t get_local_port() const { return m_local_port; }
 	std::uint16_t get_local_listen_port() const { return m_local_listen_port; }
+	std::uint16_t get_api_listen_port() const { return m_api_listen_port; }
 	std::string const& get_local_ip() const { return m_local_ip; }
 	Mining_mode get_mining_mode() const { return m_mining_mode; }
 	std::string const& get_logfile() const { return m_logfile; }
@@ -42,6 +43,7 @@ private:
 	std::uint16_t m_wallet_port;
 	std::uint16_t m_local_port;
 	std::uint16_t m_local_listen_port;
+	std::uint16_t m_api_listen_port;
 	std::string m_local_ip;
 	Mining_mode	 m_mining_mode;
 	Pool 		 m_pool_config; 

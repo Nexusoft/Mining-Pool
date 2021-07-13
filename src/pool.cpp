@@ -2,6 +2,7 @@
 #include "network/create_component.hpp"
 #include "network/component.hpp"
 #include "config/validator.hpp"
+#include "api/server.hpp"
 #include "pool_manager.hpp"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -32,6 +33,7 @@ namespace nexuspool
 		m_signals->async_wait([this](auto, auto)
 		{
 			m_logger->info("Shutting down NexusPool");
+			m_api_server->stop();
 			m_pool_manager->stop();
 			m_io_context->stop();
 			exit(1);
@@ -69,12 +71,14 @@ namespace nexuspool
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
 		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, m_config, m_network_component->get_socket_factory());
+		m_api_server = std::make_unique<api::Server>(m_config, m_network_component->get_socket_factory());
 
 		return true;
 	}
 
 	void Pool::run()
 	{
+		m_api_server->start();
 		m_pool_manager->start();
 		m_io_context->run();
 	}
