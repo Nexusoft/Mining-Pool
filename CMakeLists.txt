@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 
-project(NexusPool VERSION 1.0 LANGUAGES CXX)
+project(NexusPool VERSION 1.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 configure_file(src/version.h.in version.h)
 
 include_directories(${CMAKE_SOURCE_DIR}/include/)
+
+option(WITH_TESTS "Build with unit tests" OFF)
 
 find_package(Threads REQUIRED)
 
@@ -37,6 +39,10 @@ add_subdirectory(src/LLP)
 add_subdirectory(src/LLC)
 add_subdirectory(src/TAO)
 add_subdirectory(src/persistance)
+
+if(WITH_TESTS)
+    add_subdirectory(tests)
+endif()
 
 add_executable(NexusPool 
                 src/main.cpp 

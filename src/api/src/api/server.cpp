@@ -10,6 +10,7 @@ Server::Server(persistance::Data_storage::Sptr data_storage, std::string local_i
 	: m_data_storage{std::move(data_storage)}
 	, m_local_ip{ std::move(local_ip) }
 	, m_api_listen_port{ api_listen_port }
+	, m_local_endpoint{ network::Transport_protocol::tcp, m_local_ip, m_api_listen_port }
 	, m_socket_factory{ std::move(socket_factory) }
 	, m_logger{ spdlog::get("logger") }
 	, m_listen_socket{}
@@ -19,8 +20,7 @@ Server::Server(persistance::Data_storage::Sptr data_storage, std::string local_i
 void Server::start()
 {
 	// listen
-	network::Endpoint api_listen_endpoint{ network::Transport_protocol::tcp, m_local_ip, m_api_listen_port };
-	m_listen_socket = m_socket_factory->create_socket(api_listen_endpoint);
+	m_listen_socket = m_socket_factory->create_socket(m_local_endpoint);
 
 
 	// on listen/accept, save created connection to pool_conenctions and call the connection_handler of created pool connection object

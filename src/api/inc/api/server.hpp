@@ -3,6 +3,7 @@
 
 #include "network/socket_factory.hpp"
 #include "network/types.hpp"
+#include "network/endpoint.hpp"
 #include "persistance/data_storage.hpp"
 #include <spdlog/spdlog.h>
 
@@ -27,12 +28,14 @@ public:
 
     void start();
     void stop();
+    network::Endpoint const& local_endpoint() const { return m_local_endpoint; }
 
 private:
 
     persistance::Data_storage::Sptr m_data_storage;
     std::string m_local_ip;
     std::uint16_t m_api_listen_port;
+    network::Endpoint m_local_endpoint;
     network::Socket_factory::Sptr m_socket_factory;
     std::shared_ptr<spdlog::logger> m_logger;
     network::Socket::Sptr m_listen_socket;
