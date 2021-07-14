@@ -31,11 +31,12 @@ endif()
 # add submodules
 add_subdirectory(src/chrono)
 add_subdirectory(src/network)
+add_subdirectory(src/config)
 add_subdirectory(src/api)
 add_subdirectory(src/LLP)
 add_subdirectory(src/LLC)
 add_subdirectory(src/TAO)
-add_subdirectory(src/config)
+add_subdirectory(src/persistance)
 
 add_executable(NexusPool 
                 src/main.cpp 
@@ -48,7 +49,7 @@ add_executable(NexusPool
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
-target_link_libraries(NexusPool chrono network config LLP TAO api)
+target_link_libraries(NexusPool chrono network config LLP TAO api persistance)
 
 target_link_libraries(NexusPool ${OPENSSL_LIBRARIES})
 target_link_libraries(NexusPool Threads::Threads)

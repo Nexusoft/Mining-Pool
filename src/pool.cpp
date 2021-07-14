@@ -1,6 +1,7 @@
 #include "pool.hpp"
 #include "network/create_component.hpp"
 #include "network/component.hpp"
+#include "persistance/create_component.hpp"
 #include "config/validator.hpp"
 #include "api/server.hpp"
 #include "pool_manager.hpp"
@@ -68,10 +69,13 @@ namespace nexuspool
 			return false;
 		}
 
+		// data storage initialisation
+		m_persistance_component = persistance::create_component(m_config);
+		auto data_storage = m_persistance_component->get_data_storage_factory()->create_data_storage();
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
 		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, m_config, m_network_component->get_socket_factory());
-		m_api_server = std::make_unique<api::Server>(m_config, m_network_component->get_socket_factory());
+		m_api_server = std::make_unique<api::Server>(data_storage, m_config.get_local_ip(), m_config.get_api_listen_port(), m_network_component->get_socket_factory());
 
 		return true;
 	}

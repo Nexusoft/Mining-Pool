@@ -12,6 +12,7 @@ namespace asio { class io_context; }
 namespace nexuspool
 {
 namespace network { class Socket; class Component; }
+namespace persistance { class Component; }
 namespace chrono { class Timer; }
 namespace api { class Server; }
 class Pool_manager;
@@ -30,6 +31,7 @@ public:
 private:
 
 	std::unique_ptr<network::Component> m_network_component;
+	std::unique_ptr<persistance::Component> m_persistance_component;
 	std::shared_ptr<network::Socket> m_listen_socket;
 	std::shared_ptr<::asio::io_context> m_io_context;
 	std::shared_ptr<spdlog::logger> m_logger;
