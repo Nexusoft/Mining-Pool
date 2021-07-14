@@ -50,7 +50,7 @@ void Connection::process_data(network::Shared_payload&& receive_buffer)
 	// check if banned ip
 
 	jsonrpcpp::entity_ptr entity =
-		jsonrpcpp::Parser::do_parse(std::string{ receive_buffer->begin(), receive_buffer->end() });
+		jsonrpcpp::Parser::do_parse(nlohmann::json::parse(std::string{ receive_buffer->begin(), receive_buffer->end() }));
 
 	if (entity && entity->is_request())
 	{
@@ -59,20 +59,31 @@ void Connection::process_data(network::Shared_payload&& receive_buffer)
 		// lookup request
 		if (request->method() == "test")
 		{
-
 			nlohmann::json result;
 			std::vector<std::string> blocks;
-			for (auto i = 0U; i << request->params().get<int>("param1"); i++)
+			if (request->params().is_array())
 			{
-				blocks.push_back("Big block data");
+				result = request->params().get<int>(0) - request->params().get<int>(1);
+				for (auto i = 0U; i < request->params().get<int>(0); i++)
+				{
+					blocks.push_back("Big block data");
+				}
 			}
+			else
+			{
+
+			}
+
 			nlohmann::json block_array(blocks);
-			result["num_blocks"] = request->params().get<int>("param2");
-			result["blocks"] = block_array;
+			nlohmann::json test;
+			test["blocks"] = block_array;
+			test["number"] = result;
 
-
-			jsonrpcpp::Response response(*request, result);
-			m_logger->debug("Response: {}", response.to_json().dump());
+			jsonrpcpp::Response response(*request, test);
+			std::string response_string{ response.to_json().dump() };
+			m_logger->debug("Response: {}", response_string);
+			network::Shared_payload payload{ std::make_shared<network::Payload>(response_string.begin(), response_string.end()) };
+			m_connection->transmit(payload);
 		}
 
 	}

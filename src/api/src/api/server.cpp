@@ -1,18 +1,23 @@
 #include "api/server.hpp"
 #include "api/connection.hpp"
+#include <spdlog/spdlog.h>
 
 namespace nexuspool
 {
 namespace api
 {
 
-Server::Server(persistance::Data_storage::Sptr data_storage, std::string local_ip, std::uint16_t api_listen_port, network::Socket_factory::Sptr socket_factory)
-	: m_data_storage{std::move(data_storage)}
+Server::Server(std::shared_ptr<spdlog::logger> logger, 
+	persistance::Data_storage::Sptr data_storage,
+	std::string local_ip,
+	std::uint16_t api_listen_port, 
+	network::Socket_factory::Sptr socket_factory)
+	: m_logger{std::move(logger)}
+	, m_data_storage{std::move(data_storage)}
 	, m_local_ip{ std::move(local_ip) }
 	, m_api_listen_port{ api_listen_port }
 	, m_local_endpoint{ network::Transport_protocol::tcp, m_local_ip, m_api_listen_port }
 	, m_socket_factory{ std::move(socket_factory) }
-	, m_logger{ spdlog::get("logger") }
 	, m_listen_socket{}
 {
 }
