@@ -9,8 +9,8 @@ ________________________________________________________________________________
 #include <LLC/types/bignum.h>
 #include <LLC/hash/SK.h>
 
-#include "Util/encoding.h"
-#include <Util/memory.h>
+#include "TAO/Util/encoding.h"
+#include <TAO/Util/memory.h>
 
 #include <openssl/bn.h>
 #include <algorithm>

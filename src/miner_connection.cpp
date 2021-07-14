@@ -2,7 +2,7 @@
 #include "pool_manager.hpp"
 #include "packet.hpp"
 #include "LLP/block.hpp"
-#include "TAO/inc/Register/types/address.h"
+#include "TAO/Register/types/address.h"
 
 namespace nexuspool
 {

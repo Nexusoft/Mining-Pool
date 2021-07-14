@@ -5,7 +5,7 @@
             file COPYING or http://www.opensource.org/licenses/mit-license.php.
             "ad vocem populi" - To the Voice of the People
 ____________________________________________________________________________________________*/
-#include "Util/memory.h"
+#include "TAO/Util/memory.h"
 
 namespace memory
 {

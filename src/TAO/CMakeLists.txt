@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 
-add_library(TAO STATIC  src/Util/encoding.cpp
-                        src/Util/memory.cpp 
-                        src/Register/types/address.cpp)
+add_library(TAO STATIC  src/TAO/Util/encoding.cpp
+                        src/TAO/Util/memory.cpp 
+                        src/TAO/Register/types/address.cpp)
                     
 target_include_directories(TAO
     PUBLIC 

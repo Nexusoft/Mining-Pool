@@ -9,9 +9,9 @@ ________________________________________________________________________________
 #include <LLC/random.h>
 #include <LLC/hash/SK.h>
 
-#include <Register/types/address.h>
+#include <TAO/Register/types/address.h>
 
-#include <Util/encoding.h>
+#include <TAO/Util/encoding.h>
 
 namespace TAO
 {
