@@ -1,4 +1,6 @@
 #include "api/connection.hpp"
+#include <json/jsonrpcpp.hpp>
+#include <json/json.hpp>
 
 namespace nexuspool
 {
@@ -45,6 +47,40 @@ network::Connection::Handler Connection::connection_handler()
 
 void Connection::process_data(network::Shared_payload&& receive_buffer)
 {
+	// check if banned ip
+
+	jsonrpcpp::entity_ptr entity =
+		jsonrpcpp::Parser::do_parse(std::string{ receive_buffer->begin(), receive_buffer->end() });
+
+	if (entity && entity->is_request())
+	{
+		jsonrpcpp::request_ptr request = std::dynamic_pointer_cast<jsonrpcpp::Request>(entity);
+		m_logger->debug("Request: {}, id: {}, has params: {} ", request->method(), request->id().int_id(), !request->params().is_null() );
+		// lookup request
+		if (request->method() == "test")
+		{
+
+			nlohmann::json result;
+			std::vector<std::string> blocks;
+			for (auto i = 0U; i << request->params().get<int>("param1"); i++)
+			{
+				blocks.push_back("Big block data");
+			}
+			nlohmann::json block_array(blocks);
+			result["num_blocks"] = request->params().get<int>("param2");
+			result["blocks"] = block_array;
+
+
+			jsonrpcpp::Response response(*request, result);
+			m_logger->debug("Response: {}", response.to_json().dump());
+		}
+
+	}
+	else
+	{
+		// increase ddos
+		m_logger->warn("Received invalid jsonrpc request from {}", m_remote_address);
+	}
 }
 
 }

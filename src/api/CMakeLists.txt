@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 
 add_library(api STATIC  src/api/server.cpp
-                        src/api/connection.cpp)
+                        src/api/connection.cpp
+                        src/api/data_access.cpp)
                     
 target_include_directories(api
     PUBLIC 
@@ -10,4 +11,4 @@ target_include_directories(api
     PRIVATE src
 )
 
-target_link_libraries(api network config)
+target_link_libraries(api network persistance)

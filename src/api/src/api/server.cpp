@@ -1,14 +1,15 @@
 #include "api/server.hpp"
 #include "api/connection.hpp"
-#include "config/config.hpp"
 
 namespace nexuspool
 {
 namespace api
 {
 
-Server::Server(config::Config& config, network::Socket_factory::Sptr socket_factory)
-	: m_config{ config }
+Server::Server(persistance::Data_storage::Sptr data_storage, std::string local_ip, std::uint16_t api_listen_port, network::Socket_factory::Sptr socket_factory)
+	: m_data_storage{std::move(data_storage)}
+	, m_local_ip{ std::move(local_ip) }
+	, m_api_listen_port{ api_listen_port }
 	, m_socket_factory{ std::move(socket_factory) }
 	, m_logger{ spdlog::get("logger") }
 	, m_listen_socket{}
@@ -18,7 +19,7 @@ Server::Server(config::Config& config, network::Socket_factory::Sptr socket_fact
 void Server::start()
 {
 	// listen
-	network::Endpoint api_listen_endpoint{ network::Transport_protocol::tcp, m_config.get_local_ip(), m_config.get_api_listen_port() };
+	network::Endpoint api_listen_endpoint{ network::Transport_protocol::tcp, m_local_ip, m_api_listen_port };
 	m_listen_socket = m_socket_factory->create_socket(api_listen_endpoint);
 
 
@@ -31,6 +32,7 @@ void Server::start()
 	};
 
 	m_listen_socket->listen(socket_handler);
+	m_logger->info("API server started");
 
 }
 
@@ -38,6 +40,7 @@ void Server::stop()
 {
 	m_listen_socket->stop_listen();
 	m_api_connections.clear();
+	m_logger->info("API server stopped");
 }
 
 
