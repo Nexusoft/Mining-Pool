@@ -116,11 +116,6 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 	}
 	else if (packet.m_header == Packet::GET_HEIGHT)
 	{
-		auto pool_manager_shared = m_pool_manager.lock();
-		if (!pool_manager_shared)
-			return;
-
-		m_current_height = pool_manager_shared->get_current_height();
 		Packet response;
 		response.m_header = Packet::BLOCK_HEIGHT;
 		response.m_data = std::make_shared<std::vector<uint8_t>>(uint2bytes(m_current_height));
@@ -137,4 +132,10 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 	// received a valid paket from miner -> update session
 	m_session_registry.update_session(m_session_key, session);
 }
+
+void Miner_connection::set_current_height(std::uint32_t height)
+{
+	m_current_height = height;
+}
+
 }

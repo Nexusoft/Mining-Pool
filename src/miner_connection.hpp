@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <atomic>
 
 namespace nexuspool
 {
@@ -27,6 +28,7 @@ public:
     void stop();
 
     network::Connection::Handler connection_handler();
+    void set_current_height(std::uint32_t height);
 
 private:
 
@@ -36,7 +38,7 @@ private:
     std::weak_ptr<Pool_manager> m_pool_manager;
     std::shared_ptr<spdlog::logger> m_logger;
     Timer_manager m_timer_manager;
-    std::uint32_t m_current_height;
+    std::atomic<std::uint32_t> m_current_height;
     std::string m_remote_address;
     bool m_connection_closed;	// indicator for server if the network connection has been closed
     Session_key m_session_key;

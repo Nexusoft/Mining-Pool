@@ -27,7 +27,7 @@ public:
     void stop();
 
     // Methods towards wallet_connection
-    void set_current_height(std::uint32_t height) { m_current_height = height; }
+    void set_current_height(std::uint32_t height);
 
     // Methods towards miner_connection
     std::uint32_t get_current_height() const { return m_current_height; }

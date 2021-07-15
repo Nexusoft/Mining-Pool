@@ -70,9 +70,20 @@ void Session_registry::clear_unused_sessions()
 			++iter;
 		}
 	}
-
 }
 
+void Session_registry::update_height(std::uint32_t height)
+{
+	std::scoped_lock lock(m_sessions_mutex);
 
-
+	for (auto& session : m_sessions)
+	{
+		auto miner_connection = session.second.get_connection();
+		auto miner_connection_shared = miner_connection.lock();
+		if (miner_connection_shared)
+		{
+			miner_connection_shared->set_current_height(height);
+		}
+	}
+}
 }

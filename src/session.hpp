@@ -56,6 +56,9 @@ public:
 	void update_session(Session_key key, Session& session);
 	void clear_unused_sessions();
 
+	// update height on active sessions
+	void update_height(std::uint32_t height);
+
 private:
 
 	std::mutex m_sessions_mutex;

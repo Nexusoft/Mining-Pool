@@ -66,6 +66,16 @@ void Pool_manager::stop()
 	m_listen_socket->stop_listen();
 }
 
+void Pool_manager::set_current_height(std::uint32_t height) 
+{ 
+	if (height > m_current_height)
+	{
+		m_current_height = height;
+		// give the miners the new height
+		m_session_registry.update_height(m_current_height);
+	}
+}
+
 chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
 {
 	return[this, session_registry_maintenance_interval](bool canceled)
