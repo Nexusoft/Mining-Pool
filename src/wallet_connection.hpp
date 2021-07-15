@@ -10,6 +10,7 @@
 #include "block.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace asio { class io_context; }
 
@@ -33,7 +34,7 @@ public:
     // Close connection
     void stop();
 
-    void submit_block(LLP::CBlock const& block);
+    void submit_block(std::vector<std::uint8_t> const& block_data, std::vector<std::uint8_t> const& nonce);
     void get_block();
 
 private:

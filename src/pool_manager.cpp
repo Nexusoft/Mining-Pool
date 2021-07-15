@@ -93,7 +93,7 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 	m_pending_get_block_handlers.clear();
 }
 
-void Pool_manager::get_block(Session_key key, Get_block_handler handler)
+void Pool_manager::get_block(Get_block_handler handler)
 {
 	std::scoped_lock(m_block_mutex);
 	if (m_block.nHeight == m_current_height)
@@ -115,6 +115,12 @@ void Pool_manager::get_block(Session_key key, Get_block_handler handler)
 
 		}
 	}
+}
+
+void Pool_manager::submit_block(std::vector<std::uint8_t> const& block_data, std::uint64_t nonce, Submit_block_handler handler)
+{
+	// calc if reached difficulty threshold
+	// m_wallet_connection->submit_block(block_data, nonce, std::move(handler));
 }
 
 chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)

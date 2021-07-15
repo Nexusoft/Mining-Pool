@@ -127,7 +127,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		auto pool_manager_shared = m_pool_manager.lock();
 		if (pool_manager_shared)
 		{
-			pool_manager_shared->get_block(m_session_key, [self = shared_from_this()](auto block)
+			pool_manager_shared->get_block([self = shared_from_this()](auto block)
 			{
 				Packet response;
 				response.m_header = Packet::BLOCK_DATA;
@@ -136,6 +136,34 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 				response.m_data = std::make_shared<network::Payload>(block_data);
 
 				self->m_connection->transmit(response.get_bytes());
+			});
+		}
+	}
+	else if (packet.m_header == Packet::SUBMIT_BLOCK)
+	{
+		auto pool_manager_shared = m_pool_manager.lock();
+		if (pool_manager_shared)
+		{
+			std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };
+			std::uint64_t nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
+			pool_manager_shared->submit_block(block_data, nonce, [self = shared_from_this()](auto result)
+			{
+				Packet response;
+				if (result == Pool_manager::accept)
+				{
+					response = response.get_packet(Packet::ACCEPT);
+					self->m_connection->transmit(response.get_bytes());
+				}
+				else if(result == Pool_manager::reject)
+				{
+					response = response.get_packet(Packet::REJECT);
+					self->m_connection->transmit(response.get_bytes());
+				}
+				else
+				{
+					response = response.get_packet(Packet::BLOCK);
+					self->m_connection->transmit(response.get_bytes());
+				}
 			});
 		}
 	}

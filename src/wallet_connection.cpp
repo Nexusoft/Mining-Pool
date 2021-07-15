@@ -158,9 +158,18 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 }
 
-void Wallet_connection::submit_block(LLP::CBlock const& block)
+void Wallet_connection::submit_block(std::vector<std::uint8_t> const& block_data, std::vector<std::uint8_t> const& nonce)
 {
+    m_logger->info("Submitting Block...");
 
+    Packet packet;
+    packet.m_header = Packet::SUBMIT_BLOCK;
+
+    packet.m_data = std::make_shared<std::vector<std::uint8_t>>(block_data);
+    packet.m_data->insert(packet.m_data->end(), nonce.begin(), nonce.end());
+    packet.m_length = 72;
+
+    m_connection->transmit(packet.get_bytes());
 }
 
 void Wallet_connection::get_block()
