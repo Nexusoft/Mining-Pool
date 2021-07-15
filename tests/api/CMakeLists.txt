@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 
+link_directories(${CMAKE_SOURCE_DIR}/libs)
+
 enable_testing()
 
 add_executable(api_test "api_test.cpp" "api_fixture.hpp")
@@ -10,6 +12,7 @@ target_link_libraries(
   api
   persistance
   config
+  sqlite3
 )
 
 include(GoogleTest)

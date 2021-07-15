@@ -14,7 +14,7 @@ public:
 
 	virtual ~Data_storage() = default;
 
-	virtual void init() = 0;
+	virtual bool init() = 0;
 	virtual void close() = 0;
 	virtual bool execute_command(std::string command) = 0;
 

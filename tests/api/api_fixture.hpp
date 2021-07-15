@@ -26,11 +26,11 @@ public:
 		: m_config{}
 		, m_io_context{ std::make_shared<::asio::io_context>() }
 		, m_network_component{ network::create_component(m_io_context) }
-		, m_persistance_component{ persistance::create_component(m_config) }
 		{
 			m_logger = spdlog::stdout_color_mt("logger");
 			m_logger->set_level(spdlog::level::debug);
 
+			m_persistance_component = persistance::create_component(m_logger, m_config);
 			auto data_storage = m_persistance_component->get_data_storage_factory()->create_data_storage();
 			m_api_server = std::make_unique<api::Server>(m_logger, data_storage, "127.0.0.1", 0, m_network_component->get_socket_factory());
 		}

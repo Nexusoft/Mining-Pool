@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 
-add_library(persistance STATIC  src/persistance/data_storage_impl.cpp
+add_library(persistance STATIC  src/persistance/sqlite/data_storage_impl.cpp
                                 src/persistance/create_component.cpp)
                     
 target_include_directories(persistance
@@ -10,4 +10,4 @@ target_include_directories(persistance
     PRIVATE src
 )
 
-target_link_libraries(persistance config)
+target_link_libraries(persistance config sqlite3)

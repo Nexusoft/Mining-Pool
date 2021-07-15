@@ -2,7 +2,6 @@
 #define NEXUSPOOL_PERSISTANCE_COMPONENT_HPP
 
 #include "persistance/data_storage_factory.hpp"
-
 #include <memory>
 
 namespace nexuspool {

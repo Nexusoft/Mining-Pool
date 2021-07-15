@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 configure_file(src/version.h.in version.h)
 
 include_directories(${CMAKE_SOURCE_DIR}/include/)
+link_directories(${CMAKE_SOURCE_DIR}/libs)
 
 option(WITH_TESTS "Build with unit tests" OFF)
 
@@ -57,5 +58,4 @@ target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
 target_link_libraries(NexusPool chrono network config LLP TAO api persistance)
 
-target_link_libraries(NexusPool ${OPENSSL_LIBRARIES})
 target_link_libraries(NexusPool Threads::Threads)
