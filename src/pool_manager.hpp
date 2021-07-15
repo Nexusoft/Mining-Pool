@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <mutex>
+#include <atomic>
 
 namespace asio { class io_context; }
 
@@ -29,6 +30,7 @@ public:
 
     // Methods towards wallet_connection
     void set_current_height(std::uint32_t height);
+    void set_block(LLP::CBlock const& block);
 
     // Methods towards miner_connection
     using Get_block_handler = std::function<void(LLP::CBlock const& block)>;
@@ -53,7 +55,10 @@ private:
 
     // connection variables
     std::atomic<std::uint32_t> m_current_height;
+    std::mutex m_block_mutex;
     LLP::CBlock m_block;
+    std::atomic<bool> m_get_block_pending;
+    std::vector< Get_block_handler> m_pending_get_block_handlers;
 };
 }
 

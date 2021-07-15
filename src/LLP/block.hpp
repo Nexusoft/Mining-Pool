@@ -19,27 +19,15 @@ public:
 	using Sptr = std::shared_ptr<CBlock>;
 
 	/** Begin of Header.   BEGIN(nVersion) **/
-	unsigned int  nVersion;
-	uint1024_t hashPrevBlock;
-	uint512_t hashMerkleRoot;
-	unsigned int  nChannel;
-	unsigned int   nHeight;
-	unsigned int     nBits;
-	uint64_t         nNonce;
+	unsigned int  nVersion{ 0 };
+	uint1024_t hashPrevBlock{ 0 };
+	uint512_t hashMerkleRoot{ 0 };
+	unsigned int  nChannel{ 0 };
+	unsigned int   nHeight{ 0 };
+	unsigned int     nBits{ 0 };
+	uint64_t         nNonce{ 0 };
 	/** End of Header.     END(nNonce).
 		All the components to build an SK1024 Block Hash. **/
-
-
-	CBlock()
-	{
-		nVersion = 0;
-		hashPrevBlock = 0;
-		hashMerkleRoot = 0;
-		nChannel = 0;
-		nHeight = 0;
-		nBits = 0;
-		nNonce = 0;
-	}
 
 	std::vector<uint8_t> CBlock::Serialize() const
 	{

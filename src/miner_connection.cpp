@@ -109,7 +109,6 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 
 		// check if user already exists in db
 		// update db
-		// update session
 		user_data.m_logged_in = true;
 		response = response.get_packet(Packet::LOGIN_SUCCESS);
 		m_connection->transmit(response.get_bytes());

@@ -128,7 +128,11 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
         if (block.nHeight == m_current_height)
         {
             // transfer block to pool_manager
+            auto pool_manager_shared = m_pool_manager.lock();
+            if (!pool_manager_shared)
+                return;
 
+            pool_manager_shared->set_block(block);
         }
         else
         {
@@ -157,6 +161,13 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
 void Wallet_connection::submit_block(LLP::CBlock const& block)
 {
 
+}
+
+void Wallet_connection::get_block()
+{
+    Packet packet_get_block;
+    packet_get_block.m_header = Packet::GET_BLOCK;
+    m_connection->transmit(packet_get_block.get_bytes());
 }
 
 LLP::CBlock Wallet_connection::deserialize_block(network::Shared_payload data)

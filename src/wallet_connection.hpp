@@ -34,6 +34,7 @@ public:
     void stop();
 
     void submit_block(LLP::CBlock const& block);
+    void get_block();
 
 private:
 
