@@ -76,6 +76,19 @@ void Pool_manager::set_current_height(std::uint32_t height)
 	}
 }
 
+void Pool_manager::get_block(Session_key key, Get_block_handler handler)
+{
+	if (m_block.nHeight == m_current_height)
+	{
+		handler(m_block);
+	}
+	else
+	{
+		// need a fresh block
+
+	}
+}
+
 chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
 {
 	return[this, session_registry_maintenance_interval](bool canceled)

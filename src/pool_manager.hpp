@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 #include "chrono/timer_factory.hpp"
 #include "session.hpp"
+#include "block.hpp"
 
 #include <memory>
 #include <mutex>
@@ -30,7 +31,9 @@ public:
     void set_current_height(std::uint32_t height);
 
     // Methods towards miner_connection
-    std::uint32_t get_current_height() const { return m_current_height; }
+    using Get_block_handler = std::function<void(LLP::CBlock const& block)>;
+    void get_block(Session_key key, Get_block_handler handler);
+
 
 private:
 
@@ -50,6 +53,7 @@ private:
 
     // connection variables
     std::atomic<std::uint32_t> m_current_height;
+    LLP::CBlock m_block;
 };
 }
 

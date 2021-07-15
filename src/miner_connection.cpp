@@ -123,6 +123,23 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 
 		m_connection->transmit(response.get_bytes());
 	}
+	else if (packet.m_header == Packet::GET_BLOCK)
+	{
+		auto pool_manager_shared = m_pool_manager.lock();
+		if (pool_manager_shared)
+		{
+			pool_manager_shared->get_block(m_session_key, [self = shared_from_this()](auto block)
+			{
+				Packet response;
+				response.m_header = Packet::BLOCK_DATA;
+				auto block_data = block.Serialize();
+				response.m_length = block_data.size();
+				response.m_data = std::make_shared<network::Payload>(block_data);
+
+				self->m_connection->transmit(response.get_bytes());
+			});
+		}
+	}
     else
     {
         m_logger->error("Invalid header received.");

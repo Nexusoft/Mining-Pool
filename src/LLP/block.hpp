@@ -3,6 +3,7 @@
 
 //#include "../hash/templates.h"
 #include "LLC/types/uint1024.h"
+#include "utils.hpp"
 #include <memory>
 
 #define BEGIN(a)            ((char*)&(a))
@@ -38,6 +39,28 @@ public:
 		nHeight = 0;
 		nBits = 0;
 		nNonce = 0;
+	}
+
+	std::vector<uint8_t> CBlock::Serialize() const
+	{
+		auto const VERSION = nexuspool::uint2bytes(nVersion);
+		auto const PREVIOUS = hashPrevBlock.GetBytes();
+		auto const MERKLE = hashMerkleRoot.GetBytes();
+		auto const  CHANNEL = nexuspool::uint2bytes(nChannel);
+		auto const HEIGHT = nexuspool::uint2bytes(nHeight);
+		auto const BITS = nexuspool::uint2bytes(nBits);
+		auto const NONCE = nexuspool::uint2bytes64(nNonce);
+
+		std::vector<uint8_t> vData;
+		vData.insert(vData.end(), VERSION.begin(), VERSION.end());
+		vData.insert(vData.end(), PREVIOUS.begin(), PREVIOUS.end());
+		vData.insert(vData.end(), MERKLE.begin(), MERKLE.end());
+		vData.insert(vData.end(), CHANNEL.begin(), CHANNEL.end());
+		vData.insert(vData.end(), HEIGHT.begin(), HEIGHT.end());
+		vData.insert(vData.end(), BITS.begin(), BITS.end());
+		vData.insert(vData.end(), NONCE.begin(), NONCE.end());
+
+		return vData;
 	}
 
 	//inline uint1024 GetHash() const { return SK1024(BEGIN(nVersion), END(nBits)); }
