@@ -40,6 +40,7 @@ add_subdirectory(src/LLP)
 add_subdirectory(src/LLC)
 add_subdirectory(src/TAO)
 add_subdirectory(src/persistance)
+add_subdirectory(src/reward)
 
 if(WITH_TESTS)
     add_subdirectory(tests)
@@ -52,10 +53,10 @@ add_executable(NexusPool
                 src/timer_manager.cpp 
                 src/pool_manager.cpp
                 src/miner_connection.cpp
-                src/session.cpp)
+                src/session.cpp "tests/reward/reward_test.cpp" "src/reward/inc/reward/manager.hpp" "src/reward/inc/reward/manager_impl.hpp" "src/reward/src/reward/manager_impl.cpp")
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
-target_link_libraries(NexusPool chrono network config LLP TAO api persistance)
+target_link_libraries(NexusPool chrono network config LLP TAO api persistance reward)
 
 target_link_libraries(NexusPool Threads::Threads)
