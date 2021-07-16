@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load render_table from django_tables2 %}
+
+<style>
+    table {class: "table table-striped"}
+</style>
+
+{% block body_block %}
+
+    <h1>Overview:</h1>
+    <hr>
+
+
+     <div class="row row-cols-1 row-cols-md-4 mb-3 text-center">
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Pool Hashrate</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ pool_hashrate }}<small class="text-muted fw-light"> GH/s</small></h1>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Network Hashrate</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ network_hashrate }}<small class="text-muted fw-light"> H/s</small></h1>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3 text-white bg-primary">
+            <h4 class="my-0 fw-normal">Payout Threshold</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ payout_threshold }}<small class="text-muted fw-light"> NXS</small></h1>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3 text-white bg-primary">
+            <h4 class="my-0 fw-normal">Fee</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ fee }}<small class="text-muted fw-light"> %</small></h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% render_table table %}
+
+{% endblock %}
