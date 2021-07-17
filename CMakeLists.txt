@@ -24,6 +24,10 @@ include_directories(${CMAKE_SOURCE_DIR}/include/asio-1.18.1/include)
 
 if(UNIX)
     add_definitions(-DUNIX)
+    find_package(SQLite3 REQUIRED)
+    if (SQLITE3_FOUND)
+        include_directories(${SQLITE3_INCLUDE_DIRS})
+    endif (SQLITE3_FOUND)
 endif()
 
 if(WIN32)

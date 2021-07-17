@@ -29,7 +29,7 @@ public:
 	/** End of Header.     END(nNonce).
 		All the components to build an SK1024 Block Hash. **/
 
-	std::vector<uint8_t> CBlock::Serialize() const
+	std::vector<uint8_t> Serialize() const
 	{
 		auto const VERSION = nexuspool::uint2bytes(nVersion);
 		auto const PREVIOUS = hashPrevBlock.GetBytes();

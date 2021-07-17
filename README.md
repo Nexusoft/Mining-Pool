@@ -28,15 +28,16 @@ Ensure you are on latest wallet daemon release 5.0.x or greater. Ensure wallet h
 
 ## BUILDING
 
-Optional cmake build options are  \
+Optional cmake build options are  
 * WITH_TESTS          to also build unit tests
 
 ### Windows
 
-* SQLite:   build sqlite as static lib (VS Studio x64 command prompt, cl /c /EHsc sqlite3.c, lib sqlite3.obj)  \
-            copy sqlite3.lib to NexusPool/libs folder  \
+* SQLite:   build sqlite as static lib (VS Studio x64 command prompt, cl /c /EHsc sqlite3.c, lib sqlite3.obj)  
+            copy sqlite3.lib to NexusPool/libs folder  
 * OpenSSL: 
 
 ### Ubuntu/Debian
 
-* OpenSSL:                          sudo apt-get install libssl-dev  \
+* SQLite:                           sudo apt-get install sqlite3 libsqlite3-dev  
+* OpenSSL:                          sudo apt-get install libssl-dev  
