@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.19)
 
 add_library(api STATIC  src/api/server.cpp
                         src/api/connection.cpp
-                        src/api/data_access.cpp)
+                        src/api/data_access_impl.cpp
+                        src/api/parser_impl.cpp
+                        src/api/method_impl.cpp)
                     
 target_include_directories(api
     PUBLIC 

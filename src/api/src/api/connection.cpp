@@ -1,14 +1,17 @@
 #include "api/connection.hpp"
+#include "api/parser_impl.hpp"
 #include <json/jsonrpcpp.hpp>
 #include <json/json.hpp>
+#include <spdlog/spdlog.h>
 
 namespace nexuspool
 {
 namespace api
 {
-Connection::Connection(network::Connection::Sptr&& connection)
+Connection::Connection(std::shared_ptr<spdlog::logger> logger, network::Connection::Sptr&& connection, Parser::Sptr parser)
 	: m_connection{ std::move(connection) }
-	, m_logger{ spdlog::get("logger") }
+	, m_logger{ std::move(logger)}
+	, m_parser{std::move(parser)}
 	, m_remote_address{ "" }
 {
 }
@@ -49,45 +52,26 @@ void Connection::process_data(network::Shared_payload&& receive_buffer)
 {
 	// check if banned ip
 
-	jsonrpcpp::entity_ptr entity =
-		jsonrpcpp::Parser::do_parse(nlohmann::json::parse(std::string{ receive_buffer->begin(), receive_buffer->end() }));
-
-	if (entity && entity->is_request())
+	try
 	{
-		jsonrpcpp::request_ptr request = std::dynamic_pointer_cast<jsonrpcpp::Request>(entity);
-		m_logger->debug("Request: {}, id: {}, has params: {} ", request->method(), request->id().int_id(), !request->params().is_null() );
-		// lookup request
-		if (request->method() == "test")
+		jsonrpcpp::entity_ptr entity =
+			jsonrpcpp::Parser::do_parse(nlohmann::json::parse(std::string{ receive_buffer->begin(), receive_buffer->end() }));
+
+		jsonrpcpp::Response response{};
+		auto result = m_parser->parse(entity, response);
+		if (!result)
 		{
-			nlohmann::json result;
-			std::vector<std::string> blocks;
-			if (request->params().is_array())
-			{
-				result = request->params().get<int>(0) - request->params().get<int>(1);
-				for (auto i = 0U; i < request->params().get<int>(0); i++)
-				{
-					blocks.push_back("Big block data");
-				}
-			}
-			else
-			{
-
-			}
-
-			nlohmann::json block_array(blocks);
-			nlohmann::json test;
-			test["blocks"] = block_array;
-			test["number"] = result;
-
-			jsonrpcpp::Response response(*request, test);
-			std::string response_string{ response.to_json().dump() };
-			m_logger->debug("Response: {}", response_string);
-			network::Shared_payload payload{ std::make_shared<network::Payload>(response_string.begin(), response_string.end()) };
-			m_connection->transmit(payload);
+			m_logger->error("Error while parsing api method");
+			return;
 		}
 
+		std::string response_string{ response.to_json().dump() };
+		m_logger->debug("Response: {}", response_string);
+
+		network::Shared_payload payload{ std::make_shared<network::Payload>(response_string.begin(), response_string.end()) };
+		m_connection->transmit(payload);
 	}
-	else
+	catch (...)
 	{
 		// increase ddos
 		m_logger->warn("Received invalid jsonrpc request from {}", m_remote_address);

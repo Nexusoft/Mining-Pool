@@ -2,10 +2,11 @@
 #define NEXUSPOOL_API_CONNECTION_HPP
 
 #include "network/connection.hpp"
-#include <spdlog/spdlog.h>
+#include "api/parser.hpp"
 
 #include <memory>
 
+namespace spdlog { class logger; }
 namespace nexuspool
 {
 namespace api
@@ -15,7 +16,7 @@ class Connection : public std::enable_shared_from_this<Connection>
 {
 public:
 
-    Connection(network::Connection::Sptr&& connection);
+    Connection(std::shared_ptr<spdlog::logger> logger, network::Connection::Sptr&& connection, Parser::Sptr parser);
 
     void stop();
 
@@ -27,6 +28,7 @@ private:
 
     network::Connection::Sptr m_connection;
     std::shared_ptr<spdlog::logger> m_logger;
+    Parser::Sptr m_parser;
     std::string m_remote_address;
 };
 

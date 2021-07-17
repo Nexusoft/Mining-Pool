@@ -5,7 +5,8 @@
 #include "network/types.hpp"
 #include "network/endpoint.hpp"
 #include "persistance/data_storage.hpp"
-
+#include "api/parser.hpp"
+#include "api/data_access.hpp"
 
 #include <memory>
 #include <vector>
@@ -36,11 +37,13 @@ private:
 
     std::shared_ptr<spdlog::logger> m_logger;
     persistance::Data_storage::Sptr m_data_storage;
+    Data_access::Sptr m_data_access;
     std::string m_local_ip;
     std::uint16_t m_api_listen_port;
     network::Endpoint m_local_endpoint;
     network::Socket_factory::Sptr m_socket_factory;
     network::Socket::Sptr m_listen_socket;
+    Parser::Sptr m_parser;
     std::vector<std::shared_ptr<api::Connection>> m_api_connections;
 };
 

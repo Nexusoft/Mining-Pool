@@ -406,9 +406,19 @@ namespace jsonrpcpp
             return id_;
         }
 
+        void setId(Id id)
+        {
+            id_ = id;
+        }
+
         const Json& result() const
         {
             return result_;
+        }
+
+        void setResult(Json const& result)
+        {
+            result_ = result;
         }
 
         const Error& error() const

@@ -1,5 +1,8 @@
 #include "api/server.hpp"
 #include "api/connection.hpp"
+#include "api/parser_impl.hpp"
+#include "api/method_impl.hpp"
+#include "api/data_access_impl.hpp"
 #include <spdlog/spdlog.h>
 
 namespace nexuspool
@@ -14,11 +17,13 @@ Server::Server(std::shared_ptr<spdlog::logger> logger,
 	network::Socket_factory::Sptr socket_factory)
 	: m_logger{std::move(logger)}
 	, m_data_storage{std::move(data_storage)}
+	, m_data_access{std::make_shared<Data_access_impl>(m_logger, m_data_storage)}
 	, m_local_ip{ std::move(local_ip) }
 	, m_api_listen_port{ api_listen_port }
 	, m_local_endpoint{ network::Transport_protocol::tcp, m_local_ip, m_api_listen_port }
 	, m_socket_factory{ std::move(socket_factory) }
 	, m_listen_socket{}
+	, m_parser{std::make_shared<Parser_impl>(m_logger, std::make_shared<Methods_factory_impl>(m_logger, m_data_access))}
 {
 }
 
@@ -31,7 +36,7 @@ void Server::start()
 	// on listen/accept, save created connection to pool_conenctions and call the connection_handler of created pool connection object
 	auto socket_handler = [this](network::Connection::Sptr&& connection)
 	{
-		m_api_connections.emplace_back(std::make_shared<api::Connection>(std::move(connection)));
+		m_api_connections.emplace_back(std::make_shared<api::Connection>(m_logger, std::move(connection), m_parser));
 
 		return m_api_connections.back()->connection_handler();
 	};
