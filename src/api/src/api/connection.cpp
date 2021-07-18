@@ -71,8 +71,9 @@ void Connection::process_data(network::Shared_payload&& receive_buffer)
 		network::Shared_payload payload{ std::make_shared<network::Payload>(response_string.begin(), response_string.end()) };
 		m_connection->transmit(payload);
 	}
-	catch (...)
+	catch (jsonrpcpp::ParseErrorException& e)
 	{
+		m_logger->debug("{} Reason: {}", e.error().message(), e.error().data().dump() );
 		// increase ddos
 		m_logger->warn("Received invalid jsonrpc request from {}", m_remote_address);
 	}
