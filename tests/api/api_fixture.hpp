@@ -48,6 +48,11 @@ protected:
 	io_state m_current_state{ io_state::init };
 	Result::Code m_connect_handler_result{ Result::Code::error };
 
+	void TearDown() override
+	{
+		spdlog::drop("logger");
+	}
+
 	void wait_for_state(const io_state& target_state, int timeout_ms = 5000)
 	{
 		std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();

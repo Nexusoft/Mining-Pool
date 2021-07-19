@@ -419,6 +419,7 @@ namespace jsonrpcpp
         void setResult(Json const& result)
         {
             result_ = result;
+            error_ = Error{ nullptr };
         }
 
         const Error& error() const
