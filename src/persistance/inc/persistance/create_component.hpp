@@ -9,9 +9,9 @@ namespace nexuspool {
 namespace config { class Config; }
 namespace persistance {
 
-	// Component factory
+// Component factory
 
-	Component::Uptr create_component(std::shared_ptr<spdlog::logger> logger, config::Config& config);
+Component::Uptr create_component(std::shared_ptr<spdlog::logger> logger, config::Config& config);
 
 }
 }

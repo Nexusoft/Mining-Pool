@@ -35,7 +35,7 @@ void Data_storage_impl::close()
 	sqlite3_shutdown();
 }
 
-bool Data_storage_impl::execute_command(std::string command)
+bool Data_storage_impl::execute_command(std::any& command)
 {
 	return true;
 }

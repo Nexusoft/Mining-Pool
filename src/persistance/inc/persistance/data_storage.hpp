@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <any>
 
 namespace nexuspool {
 namespace persistance {
@@ -16,7 +17,7 @@ public:
 
 	virtual bool init() = 0;
 	virtual void close() = 0;
-	virtual bool execute_command(std::string command) = 0;
+	virtual bool execute_command(std::any& command) = 0;
 
 };
 

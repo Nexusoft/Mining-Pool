@@ -20,7 +20,7 @@ public:
 
 	bool init() override;
 	void close() override;
-	bool execute_command(std::string command) override;
+	bool execute_command(std::any& command) override;
 
 private:
 
