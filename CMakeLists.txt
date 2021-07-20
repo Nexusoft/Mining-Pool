@@ -57,7 +57,7 @@ add_executable(NexusPool
                 src/timer_manager.cpp 
                 src/pool_manager.cpp
                 src/miner_connection.cpp
-                src/session.cpp "tests/reward/reward_test.cpp" "src/reward/inc/reward/manager.hpp" "src/reward/inc/reward/manager_impl.hpp" "src/reward/src/reward/manager_impl.cpp")
+                src/session.cpp)
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
