@@ -55,7 +55,7 @@ void Connection::process_data(network::Shared_payload&& receive_buffer)
 	try
 	{
 		jsonrpcpp::entity_ptr entity =
-			jsonrpcpp::Parser::do_parse(nlohmann::json::parse(std::string{ receive_buffer->begin(), receive_buffer->end() }));
+			jsonrpcpp::Parser::do_parse_json(nlohmann::json::from_bson(*receive_buffer));
 
 		jsonrpcpp::Response response{};
 		auto result = m_parser->parse(entity, response);
@@ -75,6 +75,11 @@ void Connection::process_data(network::Shared_payload&& receive_buffer)
 	{
 		m_logger->debug("{} Reason: {}", e.error().message(), e.error().data().dump() );
 		// increase ddos
+		m_logger->warn("Received invalid jsonrpc request from {}", m_remote_address);
+	}
+	catch (std::exception& e)
+	{
+		m_logger->debug("{}", e.what());
 		m_logger->warn("Received invalid jsonrpc request from {}", m_remote_address);
 	}
 }

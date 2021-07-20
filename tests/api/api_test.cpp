@@ -4,14 +4,13 @@
 
 std::vector< nlohmann::json> const requests_input
 {
-	R"({"jsonrpc": "2.0", "method": "get_meta_info", "id": 1})",
-	R"({"jsonrpc": "2.0", "method": "get_latest_blocks", "id": 2})"
+	R"({"jsonrpc": "2.0", "method": "get_meta_info", "id": 1})"_json,
+	R"({"jsonrpc": "2.0", "method" : "get_latest_blocks", "id" : 2})"_json
 };
 
-std::vector< nlohmann::json> const invalid_requests_input
+std::vector<std::string> const invalid_requests_input
 {
-	R"(INVALID)",
-	R"({"jsonrpc": "2.0", "method": "get_latest_blocks" "id": 2})"
+	"INVALID"
 };
 
 TEST_F(Api_fixture, simple_request_response) 
@@ -32,8 +31,8 @@ TEST_F(Api_fixture, simple_request_response)
 	// send requests
 	for (auto& request : requests_input)
 	{
-		std::string request_string{ request.dump() };
-		network::Shared_payload payload{ std::make_shared<network::Payload>(request_string.begin(), request_string.end()) };
+		std::vector<std::uint8_t> request_buffer = nlohmann::json::to_bson(request);
+		network::Shared_payload payload{ std::make_shared<network::Payload>(request_buffer.begin(), request_buffer.end()) };
 
 		connection->transmit(payload);
 
@@ -65,8 +64,7 @@ TEST_F(Api_fixture, invalid_request)
 	// send requests
 	for (auto& request : invalid_requests_input)
 	{
-		std::string request_string{ request.dump() };
-		network::Shared_payload payload{ std::make_shared<network::Payload>(request_string.begin(), request_string.end()) };
+		network::Shared_payload payload{ std::make_shared<network::Payload>(request.begin(), request.end()) };
 
 		connection->transmit(payload);
 
