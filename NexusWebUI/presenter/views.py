@@ -20,20 +20,26 @@ def block_overview_list(request):
 
     # Get the Data for the Main Table
     latest_block_json = get_latest_blocks(_url=url)
+
+    print("Latest Block Result:")
+    print(latest_block_json)
+    print("Result:")
+    print(latest_block_json['result'][0])
+
     table_data = OverviewTable(latest_block_json['result'])
 
     # Get the Meta Info
-    meta_info_json = get_meta_info(_url=url)
-    pool_hashrate = meta_info_json['result'][0]['pool_hashrate']
-    network_hashrate = meta_info_json['result'][0]['network_hashrate']
-    payout_threshold = meta_info_json['result'][0]['payout_threshold']
-    fee = meta_info_json['result'][0]['fee']
+    # meta_info_json = get_meta_info(_url=url)
+    # pool_hashrate = meta_info_json['result'][0]['pool_hashrate']
+    # network_hashrate = meta_info_json['result'][0]['network_hashrate']
+    # payout_threshold = meta_info_json['result'][0]['payout_threshold']
+    # fee = meta_info_json['result'][0]['fee']
 
     return render(request, template_name, {'table': table_data,
-                                           'pool_hashrate': pool_hashrate,
-                                           'network_hashrate': network_hashrate,
-                                           'payout_threshold': payout_threshold,
-                                           'fee': fee,
+                                           # 'pool_hashrate': pool_hashrate,
+                                           # 'network_hashrate': network_hashrate,
+                                           # 'payout_threshold': payout_threshold,
+                                           # 'fee': fee,
                                            })
 
 

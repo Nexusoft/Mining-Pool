@@ -1,26 +1,24 @@
 import json
 import socket
 import requests
-import pjrpc
-from pjrpc.client.backend import requests as pjrpc_client
+import pybson
+import bson
 
 
 def get_latest_blocks(_url):
     payload = {"jsonrpc": "2.0", "method": "get_latest_blocks", "id": 1}
 
-    # response = requests.request(method='get_latest_blocks', url=_url)
-
     s = socket.socket()
     s.connect(('127.0.0.1', 5000))
-    s.send(json.dumps(payload).encode('utf-8'))
+    s.send(pybson.dumps(payload))
 
-    response = s.recv(1024)
+    response = s.recv(20000)
 
-    json_data = json.loads(response.text)
-    sorted_obj = dict(json_data)
-    sorted_obj['result'] = sorted(json_data['result'], key=lambda x: x['height'], reverse=True)
+    json_data = bson.loads(response)
 
-    return sorted_obj
+    print(f"Result: {json_data['result']}")
+
+    return json_data
 
 
 def get_meta_info(_url):
