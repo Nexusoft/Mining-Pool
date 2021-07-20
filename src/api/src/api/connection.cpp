@@ -65,10 +65,8 @@ void Connection::process_data(network::Shared_payload&& receive_buffer)
 			return;
 		}
 
-		std::string response_string{ response.to_json().dump() };
-		m_logger->debug("Response: {}", response_string);
-
-		network::Shared_payload payload{ std::make_shared<network::Payload>(response_string.begin(), response_string.end()) };
+		std::vector<std::uint8_t> response_buffer{ nlohmann::json::to_bson(response.to_json()) };
+		network::Shared_payload payload{ std::make_shared<network::Payload>(response_buffer.begin(), response_buffer.end()) };
 		m_connection->transmit(payload);
 	}
 	catch (jsonrpcpp::ParseErrorException& e)
