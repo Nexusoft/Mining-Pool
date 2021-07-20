@@ -75,7 +75,6 @@ def block_detail(request, block_id):
     #                                        'merkle',
     #                                        })
 
-
 def wallet_detail(request):
     template_name = 'presenter/wallet_detail.html'
 
@@ -83,6 +82,14 @@ def wallet_detail(request):
     url = "http://127.0.0.1:5000/"
 
     wallet_id = request.POST.get('wallet_id')
+    # Todo Get Infos for Wallet (params)
 
-    return render(request, template_name, {'json_object': wallet_id})
+    last_day_recv = 5
+    unpaid_balance = 10
+    total_revenue = 0.2341234
+
+    return render(request, template_name, {'wallet_id': wallet_id,
+                                           'last_day_recv': last_day_recv,
+                                           'unpaid_balance': unpaid_balance,
+                                           'total_revenue': total_revenue})
 

@@ -6,11 +6,9 @@ import bson
 
 
 def socket_connect(_ip, _port):
-
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((_ip, _port))
     return s
-
 
 
 def socket_disconnect(_socket):
@@ -23,12 +21,7 @@ def get_latest_blocks(_socket):
 
     payload = {"jsonrpc": "2.0", "method": "get_latest_blocks", "id": 1}
 
-    # s = socket.socket()
-    # s.connect(('127.0.0.1', 5000))
-    # s.send(pybson.dumps(payload))
     _socket.send(pybson.dumps(payload))
-
-    # response = s.recv(20000)
     response = _socket.recv(20000)
     json_data = bson.loads(response)
 
@@ -46,6 +39,11 @@ def get_meta_info(_socket):
 
 
 def get_block_details(_url):
+    """
+    Link to external block detail page: https://explorer.nexus.io/search/3946243
+    :param _url:
+    :return:
+    """
     payload = {"jsonrpc": "2.0", "method": "get_block_details", "id": 1}
 
     response = requests.post(url=_url, json=payload)
