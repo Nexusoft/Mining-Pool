@@ -2,6 +2,7 @@
 #define NEXUSPOOL_PERSISTANCE_COMPONENT_HPP
 
 #include "persistance/data_storage_factory.hpp"
+#include "persistance/command/command_factory.hpp"
 #include <memory>
 
 namespace nexuspool {
@@ -13,8 +14,8 @@ public:
 
     virtual ~Component() = default;
 
-    // Get the Socket_factory interface
     virtual Data_storage_factory::Sptr get_data_storage_factory() = 0;
+    virtual command::Command_factory::Sptr get_command_factory() = 0;
 };
 
 

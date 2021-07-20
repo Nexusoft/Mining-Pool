@@ -19,6 +19,7 @@ namespace config
 		, m_local_ip{"127.0.0.1"}
 		, m_mining_mode{ Mining_mode::HASH}
 		, m_pool_config{}
+		, m_persistance_config{}
 		, m_logfile{""}		// no logfile usage, default
 		, m_connection_retry_interval{5}
 		, m_print_statistics_interval{5}
@@ -75,6 +76,18 @@ namespace config
 		m_pool_config.m_address = j.at("pool")["address"];
 		m_pool_config.m_fee = j.at("pool")["fee"];
 		m_pool_config.m_min_share = j.at("pool")["min_share"];
+
+		auto persistance_type = j.at("persistance")["type"];
+		m_persistance_config.m_file = j.at("persistance")["file"];
+
+		if (persistance_type == "database")
+		{
+			m_persistance_config.m_type = Persistance_type::database;
+		}
+		else
+		{
+			m_persistance_config.m_type = Persistance_type::sqlite;
+		}
 
 		// read stats printer config
 		if(!read_stats_printer_config(j))

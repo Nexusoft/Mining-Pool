@@ -5,7 +5,6 @@
 #include <vector>
 #include "json/json.hpp"
 #include "config/stats_printer_config.hpp"
-#include "config/pool.hpp"
 #include "config/types.hpp"
 
 namespace nexuspool
@@ -33,7 +32,8 @@ public:
 	std::uint16_t get_height_interval() const { return m_get_height_interval; }
 	std::uint16_t get_session_expiry_time() const { return m_session_expiry_time; }
 	std::vector<Stats_printer_config>& get_stats_printer_config() { return m_stats_printer_config; }
-	Pool const& get_pool_config() const { return m_pool_config; }
+	Pool_config const& get_pool_config() const { return m_pool_config; }
+	Persistance_config const& get_persistance_config() const { return m_persistance_config; }
 
 private:
 
@@ -46,7 +46,8 @@ private:
 	std::uint16_t m_api_listen_port;
 	std::string m_local_ip;
 	Mining_mode	 m_mining_mode;
-	Pool 		 m_pool_config; 
+	Pool_config  m_pool_config; 
+	Persistance_config m_persistance_config;
 	std::string  m_logfile;
 
 	// stats printers

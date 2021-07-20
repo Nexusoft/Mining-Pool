@@ -93,6 +93,16 @@ bool Validator::check(std::string const& config_file)
             }
         }
 
+        // persistance config
+        if (j.count("persistance")["type"] == 0)
+        {
+            m_mandatory_fields.push_back(Validator_error{ "persistance/type", "" });
+        }
+        if (j.count("persistance")["file"] == 0)
+        {
+            m_mandatory_fields.push_back(Validator_error{ "persistance/file", "" });
+        }
+
 
         //stats printers
         for (auto& stats_printers_json : j["stats_printers"])
