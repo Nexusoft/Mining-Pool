@@ -23,9 +23,12 @@ public:
 			"SELECT * FROM banned_user_ip WHERE user = ':user' AND ip = ':ip';",
 			-1, &m_banned_user_and_ip_stmt, NULL);
 	}
+	~Command_banned_user_and_ip_impl()
+	{
+		sqlite3_finalize(m_banned_user_and_ip_stmt);
+	}
+
 	Class get_class() const override { return Class::database_sqlite; }
-
-
 	CommandType get_command() const override
 	{
 		return m_banned_user_and_ip_stmt;

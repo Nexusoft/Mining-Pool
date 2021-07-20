@@ -3,6 +3,7 @@
 
 #include "persistance/command/command_factory.hpp"
 #include "persistance/command/command_impl.hpp"
+#include "persistance/storage_manager.hpp"
 #include <spdlog/spdlog.h>
 #include "sqlite/sqlite3.h"
 #include <map>
@@ -18,19 +19,20 @@ class Command_factory_impl : public Command_factory
 {
 public:
 
-    Command_factory_impl(std::shared_ptr<spdlog::logger> logger, config::Config& config, sqlite3* handle)
+    Command_factory_impl(std::shared_ptr<spdlog::logger> logger, config::Config& config, Storage_manager::Sptr storage_manager)
         : m_logger{std::move(logger)}
+        , m_storage_manager{std::move(storage_manager)}
         , m_config{ config }
-        , m_handle(handle)
     {
         m_commands.emplace(std::make_pair(Type::get_banned_user_and_ip, 
-            std::make_shared<Command_banned_user_and_ip_impl<std::vector<std::string>, sqlite3_stmt*>>(m_handle)));
+            std::make_shared<Command_banned_user_and_ip_impl<std::vector<std::string>, sqlite3_stmt*>>
+                (m_storage_manager->get_handle<sqlite3*>())));
     }
 
 
 private:
     std::shared_ptr<spdlog::logger> m_logger;
-    sqlite3* m_handle;
+    Storage_manager::Sptr m_storage_manager;
     config::Config& m_config;
     std::map<Type, std::any> m_commands;
 
