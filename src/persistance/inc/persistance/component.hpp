@@ -14,6 +14,9 @@ public:
 
     virtual ~Component() = default;
 
+    virtual void start() = 0;
+    virtual void stop() = 0;
+
     virtual Data_storage_factory::Sptr get_data_storage_factory() = 0;
     virtual command::Command_factory::Sptr get_command_factory() = 0;
 };

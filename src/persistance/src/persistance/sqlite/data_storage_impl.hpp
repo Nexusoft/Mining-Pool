@@ -19,7 +19,6 @@ public:
 	Data_storage_impl(std::shared_ptr<spdlog::logger> logger, std::string db_name);
 
 	bool init() override;
-	void close() override;
 	bool execute_command(std::any& command) override;
 
 private:

@@ -16,25 +16,6 @@ Data_storage_impl::Data_storage_impl(std::shared_ptr<spdlog::logger> logger, std
 {
 }
 
-void Data_storage_impl::close()
-{
-	m_init_complete = false;
-
-	sqlite3_finalize(m_update_pool_data_stmt);
-	sqlite3_finalize(m_save_connection_data_stmt);
-	sqlite3_finalize(m_add_round_data_stmt);
-	sqlite3_finalize(m_flag_round_as_orphan_stmt);
-	sqlite3_finalize(m_update_account_data_stmt);
-	sqlite3_finalize(m_clear_account_round_shares_stmt);
-	sqlite3_finalize(m_add_account_earnings_stmt);
-	sqlite3_finalize(m_delete_account_earnings_stmt);
-	sqlite3_finalize(m_add_account_payment_stmt);
-	sqlite3_finalize(m_delete_account_payment_stmt);
-
-	sqlite3_close(m_handle);
-	sqlite3_shutdown();
-}
-
 bool Data_storage_impl::execute_command(std::any& command)
 {
 	return true;
@@ -126,15 +107,6 @@ bool Data_storage_impl::init()
 {
 	char* error_msg = nullptr;
 	int result;
-
-	sqlite3_initialize();
-	result = sqlite3_open_v2(m_db_name.c_str(), &m_handle, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
-
-	if (result)
-	{
-		m_logger->error("Can't open database: {}", sqlite3_errmsg(m_handle));
-		return false;
-	}
 
 	if (!run_simple_query("CREATE DATABASE IF NOT EXISTS nxspool;"))
 		return false;

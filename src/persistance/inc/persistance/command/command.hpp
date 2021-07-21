@@ -43,6 +43,23 @@ protected:
 	Result m_result;
 };
 
+template<typename Result, typename CommandType>
+class Command_create_db_schema : Command<Result, CommandType>
+{
+public:
+
+	virtual ~Command_create_db_schema() = default;
+
+	Class get_class() const override { return Class::database; }
+	Type get_type() const override { return Type::create_db_schema; }
+	Result get_result() const override { return m_result; }
+	void set_result(Result result) override { m_result = result; }
+
+protected:
+
+	Result m_result;
+};
+
 }
 }
 }

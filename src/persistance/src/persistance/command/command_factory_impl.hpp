@@ -27,6 +27,9 @@ public:
         m_commands.emplace(std::make_pair(Type::get_banned_user_and_ip, 
             std::make_shared<Command_banned_user_and_ip_impl<std::vector<std::string>, sqlite3_stmt*>>
                 (m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::create_db_schema,
+            std::make_shared<Command_create_db_schema_impl<std::string, sqlite3_stmt*>>
+            (m_storage_manager->get_handle<sqlite3*>())));   
     }
 
 

@@ -20,7 +20,8 @@ enum class Class : std::uint8_t
 // List of available commands
 enum class Type : std::uint8_t
 {
-	get_banned_user_and_ip = 0
+	get_banned_user_and_ip = 0,
+	create_db_schema
 
 };
 
