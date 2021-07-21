@@ -36,6 +36,7 @@ namespace nexuspool
 			m_logger->info("Shutting down NexusPool");
 			m_api_server->stop();
 			m_pool_manager->stop();
+			m_persistance_component->stop();
 			m_io_context->stop();
 			exit(1);
 		});
@@ -71,6 +72,7 @@ namespace nexuspool
 
 		// data storage initialisation
 		m_persistance_component = persistance::create_component(m_logger, m_config);
+		m_persistance_component->start();
 		auto data_storage = m_persistance_component->get_data_storage_factory()->create_data_storage();
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);

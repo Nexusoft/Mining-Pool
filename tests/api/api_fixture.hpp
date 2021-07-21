@@ -31,6 +31,7 @@ public:
 			m_logger->set_level(spdlog::level::debug);
 
 			m_persistance_component = persistance::create_component(m_logger, m_config);
+			m_persistance_component->start();
 			auto data_storage = m_persistance_component->get_data_storage_factory()->create_data_storage();
 			m_api_server = std::make_unique<api::Server>(m_logger, data_storage, "127.0.0.1", 0, m_network_component->get_socket_factory());
 		}
@@ -50,6 +51,7 @@ protected:
 
 	void TearDown() override
 	{
+		m_persistance_component->stop();
 		spdlog::drop("logger");
 	}
 
