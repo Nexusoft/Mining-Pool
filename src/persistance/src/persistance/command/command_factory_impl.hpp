@@ -19,10 +19,9 @@ class Command_factory_impl : public Command_factory
 {
 public:
 
-    Command_factory_impl(std::shared_ptr<spdlog::logger> logger, config::Config& config, Storage_manager::Sptr storage_manager)
+    Command_factory_impl(std::shared_ptr<spdlog::logger> logger, Storage_manager::Sptr storage_manager)
         : m_logger{std::move(logger)}
         , m_storage_manager{std::move(storage_manager)}
-        , m_config{ config }
     {
         m_commands.emplace(std::make_pair(Type::get_banned_user_and_ip, 
             std::make_shared<Command_banned_user_and_ip_impl<std::vector<std::string>, sqlite3_stmt*>>
@@ -36,7 +35,6 @@ public:
 private:
     std::shared_ptr<spdlog::logger> m_logger;
     Storage_manager::Sptr m_storage_manager;
-    config::Config& m_config;
     std::map<Type, std::any> m_commands;
 
     std::any create_command_impl(Type command_type) override

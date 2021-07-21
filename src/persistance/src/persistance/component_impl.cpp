@@ -1,14 +1,13 @@
 #include "persistance/component_impl.hpp"
 #include "persistance/storage_manager_impl.hpp"
-#include "config/config.hpp"
 #include <spdlog/spdlog.h>
 
 namespace nexuspool {
 namespace persistance {
 
-Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, config::Config& config)
+Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, config::Persistance_config config)
     : m_logger{std::move(logger)}
-    , m_config{config}
+    , m_config{std::move(config)}
 {
 }
 
@@ -24,20 +23,19 @@ command::Command_factory::Sptr Component_impl::get_command_factory()
 
 void Component_impl::start()
 {
-    m_data_storage_factory = std::make_shared<Data_storage_factory_impl>(m_logger, m_config);
+    m_data_storage_factory = std::make_shared<Data_storage_factory_impl>(m_logger);
 
-    auto persistance_config = m_config.get_persistance_config();
-    switch (persistance_config.m_type)
+    switch (m_config.m_type)
     {
     case config::Persistance_type::database:
     case config::Persistance_type::sqlite:
     {
-        m_storage_manager = std::make_shared<Storage_manager_sqlite>(m_logger, persistance_config.m_file);
+        m_storage_manager = std::make_shared<Storage_manager_sqlite>(m_logger, m_config.m_file);
         break;
     }
     }
     m_storage_manager->start();
-    m_command_factory = std::make_shared<command::Command_factory_impl>(m_logger, m_config, m_storage_manager);
+    m_command_factory = std::make_shared<command::Command_factory_impl>(m_logger, m_storage_manager);
 }
 
 void Component_impl::stop()

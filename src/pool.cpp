@@ -71,7 +71,7 @@ namespace nexuspool
 		}
 
 		// data storage initialisation
-		m_persistance_component = persistance::create_component(m_logger, m_config);
+		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
 		m_persistance_component->start();
 		auto data_storage = m_persistance_component->get_data_storage_factory()->create_data_storage();
 		// network initialisation

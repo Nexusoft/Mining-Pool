@@ -5,9 +5,9 @@
 namespace nexuspool {
 namespace persistance {
 
-Component::Uptr create_component(std::shared_ptr<spdlog::logger> logger, config::Config& config)
+Component::Uptr create_component(std::shared_ptr<spdlog::logger> logger, config::Persistance_config config)
 {
-    return std::make_unique<Component_impl>(std::move(logger), config);
+    return std::make_unique<Component_impl>(std::move(logger), std::move(config));
 }
 
 }
