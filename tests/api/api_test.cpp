@@ -15,7 +15,6 @@ std::vector<std::string> const invalid_requests_input
 
 TEST_F(Api_fixture, simple_request_response) 
 {
-
 	network::Shared_payload received_payload{};
 
 	m_api_server->start();
@@ -28,6 +27,7 @@ TEST_F(Api_fixture, simple_request_response)
 
 	wait_for_state(io_state::connected);
 
+	auto response_id = 1U;
 	// send requests
 	for (auto& request : requests_input)
 	{
@@ -41,7 +41,13 @@ TEST_F(Api_fixture, simple_request_response)
 		EXPECT_EQ(m_connect_handler_result, Result::Code::receive_ok);
 
 		// compare request
+		auto result_json = nlohmann::json::from_bson(*received_payload);
+		EXPECT_EQ(result_json.at("jsonrpc"), "2.0");
+		EXPECT_TRUE(result_json.count("id") != 0);
+		EXPECT_EQ(result_json.at("id"), response_id);
+		EXPECT_TRUE(result_json.count("result") != 0);
 
+		response_id++;
 		m_current_state = io_state::connected;
 	}
 }
@@ -70,6 +76,7 @@ TEST_F(Api_fixture, invalid_request)
 
 		m_io_context->poll();
 
+		EXPECT_FALSE(received_payload);	// no answer from server
 		m_current_state = io_state::connected;
 	}
 }
