@@ -20,7 +20,6 @@ class Persistance_fixture : public ::testing::Test
 public:
 
 	Persistance_fixture()
-		: m_config{}
 	{
 		m_logger = spdlog::stdout_color_mt("logger");
 		m_logger->set_level(spdlog::level::debug);
@@ -30,7 +29,7 @@ public:
 protected:
 
 	std::shared_ptr<spdlog::logger> m_logger;
-	config::Persistance_config m_config;
+	config::Persistance_config m_config{};
 	persistance::Component::Uptr m_persistance_component;
 
 	void TearDown() override

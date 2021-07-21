@@ -16,20 +16,18 @@ public:
 
     using Sptr = std::shared_ptr<Command_factory>;
 
-    template<typename Result, typename CommandType>
-    std::shared_ptr<Command<Result, CommandType>> create_command(Type command_type);
+    std::any create_command(Type command_type);
 
 private:
 
     virtual std::any create_command_impl(Type command_type) = 0;
 };
 
-template<typename Result, typename CommandType>
-inline std::shared_ptr<Command<Result, CommandType>> Command_factory::create_command(Type command_type)
+inline std::any Command_factory::create_command(Type command_type)
 {
     // implements
     std::any result = create_command_impl(command_type);
-    return std::any_cast<std::shared_ptr<Command<Result, CommandType>>>(result);
+    return result;
 }
 
 }

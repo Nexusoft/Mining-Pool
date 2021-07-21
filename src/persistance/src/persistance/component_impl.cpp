@@ -33,6 +33,11 @@ void Component_impl::start()
         m_storage_manager = std::make_shared<Storage_manager_sqlite>(m_logger, m_config.m_file);
         break;
     }
+    default:
+    {
+        m_logger->critical("Unsupported persistance type!");
+        std::exit(1);       // cant do anything without persistance module
+    }
     }
     m_storage_manager->start();
     m_command_factory = std::make_shared<command::Command_factory_impl>(m_logger, m_storage_manager);

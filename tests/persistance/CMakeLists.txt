@@ -7,6 +7,7 @@ target_link_libraries(
   persistance_test
   gtest_main
   persistance
+  sqlite3
 )
 
 include(GoogleTest)

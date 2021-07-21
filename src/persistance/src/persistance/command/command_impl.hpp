@@ -12,7 +12,7 @@ namespace command {
 
 
 template<typename Result, typename CommandType>
-class Command_banned_user_and_ip_impl : Command_banned_user_and_ip<Result, CommandType>
+class Command_banned_user_and_ip_impl : public Command<Result, CommandType>
 {
 public:
 
@@ -35,21 +35,27 @@ public:
 		return m_banned_user_and_ip_stmt;
 	}
 
+	Type get_type() const override { return Type::get_banned_user_and_ip; }
+	Result get_result() const override { return m_result; }
+	void set_result(Result result) override { m_result = result; }
+
 private:
 	sqlite3* m_handle;
 	sqlite3_stmt* m_banned_user_and_ip_stmt;
+	Result m_result;
 
 
 };
 
 template<typename Result, typename CommandType>
-class Command_create_db_schema_impl : Command_create_db_schema<Result, CommandType>
+class Command_create_db_schema_impl : public Command<Result, CommandType>
 {
 public:
 
 	Command_create_db_schema_impl(sqlite3* handle)
 		: m_handle{ handle }
 		, m_create_tables_stmt{ nullptr }
+		, m_result{}
 	{
 		std::string create_tables{R"("CREATE TABLE IF NOT EXISTS round(
 			  id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -107,9 +113,14 @@ public:
 		return m_create_tables_stmt;
 	}
 
+	Type get_type() const override { return Type::create_db_schema; }
+	Result get_result() const override { return m_result; }
+	void set_result(Result result) override { m_result = result; }
+
 private:
 	sqlite3* m_handle;
 	sqlite3_stmt* m_create_tables_stmt;
+	Result m_result;
 
 
 };
