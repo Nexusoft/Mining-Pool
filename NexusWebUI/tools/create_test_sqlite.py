@@ -19,19 +19,66 @@ def create_db_and_connect(full_path):
     return conn
 
 def create_table_structure(connection):
+
+    sql_round = f"""
+    CREATE TABLE IF NOT EXISTS round ( 
+      id INTEGER PRIMARY KEY AUTOINCREMENT, 
+      round_number INTEGER NOT NULL, 
+      total_shares REAL, 
+      total_reward REAL, 
+      blocks INTEGER, 
+      connection_count INTEGER 
+    ); """
+
+    sql_block = f"""
+     CREATE TABLE IF NOT EXISTS block ( 
+      id INTEGER PRIMARY KEY AUTOINCREMENT, 
+      hash TEXT NOT NULL, 
+      height INTEGER NOT NULL, 
+      type TEXT NOT NULL, 
+      reward INTEGER NOT NULL, 
+      difficulty REAL NOT NULL, 
+      orphan INTEGER NOT NULL, 
+      block_finder TEXT NOT NULL, 
+      round INTEGER NOT NULL, 
+      block_found_time TEXT NOT NULL, 
+      FOREIGN KEY(round) REFERENCES round(id), 
+      FOREIGN KEY(block_finder) REFERENCES account(name) 
+    ); 
+     """
+
     sql_account = f"""
-    CREATE TABLE account (
-	name TEXT PRIMARY KEY,
-	created_at TEXT NOT NULL,
-	last_active TEXT NOT NULL,
-	connection_count REAL NOT NULL UNIQUE,
-	round REAL NOT NULL UNIQUE,
-	shares REAL NOT NULL UNIQUE,
-	reward REAL NOT NULL UNIQUE,
-	hashrate REAL NOT NULL UNIQUE
-    );
+    CREATE TABLE IF NOT EXISTS account ( 
+      name TEXT PRIMARY KEY, 
+      created_at TEXT NOT NULL, 
+      last_active TEXT, 
+      connection_count INTEGER, 
+      shares REAL, 
+      reward REAL, 
+      hashrate REAL 
+    ); 
     """
-    connection.execute
+
+    banned_connections_api = f"""
+     CREATE TABLE IF NOT EXISTS banned_connections_api ( 
+      id INTEGER PRIMARY KEY AUTOINCREMENT, 
+      ip TEXT NOT NULL 
+     ); 
+     """
+
+    sql_banned_users_connections = f"""
+     CREATE TABLE IF NOT EXISTS banned_users_connections ( 
+      user TEXT, 
+      ip TEXT, 
+      PRIMARY KEY (user, ip) 
+    );
+     """
+
+    connection.execute(sql_round)
+    connection.execute(sql_block)
+    connection.execute(banned_connections_api)
+    connection.execute(sql_banned_users_connections)
+
 
 ###################################
 con = None
@@ -43,11 +90,13 @@ if __name__ == '__main__':
 
         print("Creating new DB")
         script_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
-        create_db_and_connect(os.path.join(script_dir, db_name))
+        db_con = create_db_and_connect(os.path.join(script_dir, db_name))
         print("DB created")
 
+        create_table_structure(connection=db_con)
+
     except Exception as ex:
-        print(Exception)
+        print(ex)
         exit(-1)
     finally:
         if con:
