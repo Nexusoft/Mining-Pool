@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS round (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  round_number INTEGER NOT NULL,
   total_shares REAL,
   total_reward REAL,
   blocks INTEGER,
@@ -14,10 +15,11 @@ CREATE TABLE IF NOT EXISTS block (
   reward INTEGER NOT NULL,
   difficulty REAL NOT NULL,
   orphan INTEGER NOT NULL,
-  account TEXT NOT NULL,
+  block_finder TEXT NOT NULL,
   round INTEGER NOT NULL,
+  block_found_time TEXT NOT NULL,
   FOREIGN KEY(round) REFERENCES round(id),
-  FOREIGN KEY(account) REFERENCES account(name)
+  FOREIGN KEY(block_finder) REFERENCES account(name)
 );
 
 CREATE TABLE IF NOT EXISTS account (
@@ -25,11 +27,9 @@ CREATE TABLE IF NOT EXISTS account (
   created_at TEXT NOT NULL,
   last_active TEXT,
   connection_count INTEGER,
-  round INTEGER,
   shares REAL,
   reward REAL,
-  hashrate REAL,
-  FOREIGN KEY(round) REFERENCES round(id),
+  hashrate REAL
 );
 
 CREATE TABLE IF NOT EXISTS banned_connections_api (
