@@ -74,10 +74,12 @@ namespace nexuspool
 		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
 		m_persistance_component->start();
 		auto data_storage = m_persistance_component->get_data_storage_factory()->create_data_storage();
+		auto command_factory = m_persistance_component->get_command_factory();
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
 		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, m_config, m_network_component->get_socket_factory());
-		m_api_server = std::make_unique<api::Server>(m_logger, data_storage, m_config.get_local_ip(), m_config.get_api_listen_port(), m_network_component->get_socket_factory());
+		m_api_server = std::make_unique<api::Server>(m_logger, std::move(data_storage), std::move(command_factory), 
+			m_config.get_local_ip(), m_config.get_api_listen_port(), m_network_component->get_socket_factory());
 
 		return true;
 	}

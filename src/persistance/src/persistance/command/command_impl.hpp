@@ -12,7 +12,7 @@ namespace command {
 
 
 template<typename Result, typename CommandType>
-class Command_banned_user_and_ip_impl : public Command<Result, CommandType>
+class Command_banned_user_and_ip_impl : public Command_base_database<Result, CommandType>
 {
 public:
 
@@ -21,7 +21,7 @@ public:
 		, m_banned_user_and_ip_stmt{nullptr}
 	{
 		sqlite3_prepare_v2(m_handle,
-			"SELECT * FROM banned_user_ip WHERE user = ':user' AND ip = ':ip';",
+			"SELECT * FROM banned_users_connections WHERE user = ':user' AND ip = ':ip';",
 			-1, &m_banned_user_and_ip_stmt, NULL);
 	}
 	~Command_banned_user_and_ip_impl()
@@ -36,26 +36,49 @@ public:
 	}
 
 	Type get_type() const override { return Type::get_banned_user_and_ip; }
-	Result get_result() const override { return m_result; }
-	void set_result(Result result) override { m_result = result; }
 
 private:
 	sqlite3* m_handle;
 	sqlite3_stmt* m_banned_user_and_ip_stmt;
-	Result m_result;
-
 
 };
 
 template<typename Result, typename CommandType>
-class Command_create_db_schema_impl : public Command<Result, CommandType>
+class Command_banned_api_ip_impl : public Command_base_database<Result, CommandType>
+{
+public:
+
+	Command_banned_api_ip_impl(sqlite3* handle)
+		: m_handle{ handle }
+		, m_banned_api_ip_stmt{ nullptr }
+	{
+		sqlite3_prepare_v2(m_handle,
+			"SELECT * FROM banned_connections_api WHERE ip = ':ip';",
+			-1, &m_banned_api_ip_stmt, NULL);
+	}
+	~Command_banned_api_ip_impl()
+	{
+		sqlite3_finalize(m_banned_api_ip_stmt);
+	}
+
+	Class get_class() const override { return Class::database_sqlite; }
+	CommandType get_command() const override { return m_banned_api_ip_stmt; }
+	Type get_type() const override { return Type::get_banned_api_ip; }
+
+private:
+	sqlite3* m_handle;
+	sqlite3_stmt* m_banned_api_ip_stmt;
+
+};
+
+template<typename Result, typename CommandType>
+class Command_create_db_schema_impl : public Command_base_database<Result, CommandType>
 {
 public:
 
 	Command_create_db_schema_impl(sqlite3* handle)
 		: m_handle{ handle }
 		, m_create_tables_stmt{ nullptr }
-		, m_result{}
 	{
 		std::string create_tables{R"("CREATE TABLE IF NOT EXISTS round (
 				  id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -118,13 +141,10 @@ public:
 	}
 
 	Type get_type() const override { return Type::create_db_schema; }
-	Result get_result() const override { return m_result; }
-	void set_result(Result result) override { m_result = result; }
 
 private:
 	sqlite3* m_handle;
 	sqlite3_stmt* m_create_tables_stmt;
-	Result m_result;
 
 
 };

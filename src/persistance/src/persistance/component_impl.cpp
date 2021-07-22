@@ -1,5 +1,7 @@
 #include "persistance/component_impl.hpp"
 #include "persistance/storage_manager_impl.hpp"
+#include "persistance/data_storage_factory_impl.hpp"
+#include "persistance/command/command_factory_impl.hpp"
 #include <spdlog/spdlog.h>
 
 namespace nexuspool {

@@ -5,6 +5,7 @@
 #include "network/types.hpp"
 #include "network/endpoint.hpp"
 #include "persistance/data_storage.hpp"
+#include "persistance/command/command_factory.hpp"
 #include "api/parser.hpp"
 #include "api/data_access.hpp"
 
@@ -25,6 +26,7 @@ public:
 
     Server(std::shared_ptr<spdlog::logger> logger,
         persistance::Data_storage::Sptr data_storage, 
+        persistance::command::Command_factory::Sptr command_factory,
         std::string local_ip, 
         std::uint16_t api_listen_port, 
         network::Socket_factory::Sptr socket_factory);
@@ -36,7 +38,6 @@ public:
 private:
 
     std::shared_ptr<spdlog::logger> m_logger;
-    persistance::Data_storage::Sptr m_data_storage;
     Data_access::Sptr m_data_access;
     std::string m_local_ip;
     std::uint16_t m_api_listen_port;

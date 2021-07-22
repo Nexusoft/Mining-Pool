@@ -17,7 +17,6 @@ public:
 
     virtual ~Data_access() = default;
 
-    virtual bool is_user_banned(std::string user) = 0;
     virtual bool is_connection_banned(std::string address) = 0;
 };
 }

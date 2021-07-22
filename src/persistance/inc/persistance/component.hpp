@@ -8,7 +8,8 @@
 namespace nexuspool {
 namespace persistance {
 
-class Component {
+class Component 
+{
 public:
     using Uptr = std::unique_ptr<Component>;
 
@@ -19,6 +20,7 @@ public:
 
     virtual Data_storage_factory::Sptr get_data_storage_factory() = 0;
     virtual command::Command_factory::Sptr get_command_factory() = 0;
+
 };
 
 

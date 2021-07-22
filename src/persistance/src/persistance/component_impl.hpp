@@ -2,8 +2,6 @@
 #define NEXUSPOOL_PERSISTANCE_COMPONENT_IMPL_HPP
 
 #include "persistance/component.hpp"
-#include "persistance/data_storage_factory_impl.hpp"
-#include "persistance/command/command_factory_impl.hpp"
 #include "persistance/storage_manager.hpp"
 #include "config/types.hpp"
 #include <memory>

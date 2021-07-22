@@ -16,7 +16,7 @@ Data_storage_impl::Data_storage_impl(std::shared_ptr<spdlog::logger> logger, std
 {
 }
 
-bool Data_storage_impl::execute_command(std::any& command)
+bool Data_storage_impl::execute_command(std::any command)
 {
 	return true;
 }

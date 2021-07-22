@@ -24,6 +24,22 @@ public:
 	virtual CommandType get_command() const = 0;
 };
 
+template<typename Result, typename CommandType>
+class Command_base_database : public Command<Result, CommandType>
+{
+public:
+	virtual ~Command_base_database() = default;
+
+	Class get_class() const override { return Class::database; }
+	void set_result(Result result) override { m_result = std::move(result); }
+	Result get_result() const override { return m_result; }
+
+protected:
+
+	Result m_result;
+};
+
+
 }
 }
 }

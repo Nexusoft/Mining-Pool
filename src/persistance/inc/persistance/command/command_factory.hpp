@@ -1,17 +1,16 @@
 #ifndef NEXUSPOOL_PERSISTANCE_COMMAND_COMMAND_FACTORY_HPP
 #define NEXUSPOOL_PERSISTANCE_COMMAND_COMMAND_FACTORY_HPP
 
-#include "persistance/command/command.hpp"
-
+#include "persistance/command/types.hpp"
 #include <memory>
 #include <any>
-#include <cassert>
 
 namespace nexuspool {
 namespace persistance {
 namespace command {
 
-class Command_factory {
+class Command_factory 
+{
 public:
 
     using Sptr = std::shared_ptr<Command_factory>;
