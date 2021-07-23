@@ -34,6 +34,7 @@ TEST_F(Persistance_fixture, simple_data_access)
 {
 	auto data_access = m_persistance_component->get_data_access_factory()->create_data_access();
 
+	data_access->is_user_and_connection_banned("test", "test");
 	auto result = data_access->create_tables();
 	EXPECT_TRUE(result);
 }

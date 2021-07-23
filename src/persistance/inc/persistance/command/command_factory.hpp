@@ -4,7 +4,6 @@
 #include "persistance/command/types.hpp"
 #include "persistance/command/command.hpp"
 #include <memory>
-#include <any>
 
 namespace nexuspool {
 namespace persistance {

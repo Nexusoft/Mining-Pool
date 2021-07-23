@@ -4,7 +4,6 @@
 #include "persistance/command/types.hpp"
 #include <memory>
 #include <any>
-#include <sqlite/sqlite3.h>
 
 namespace spdlog { class logger; }
 namespace nexuspool {
