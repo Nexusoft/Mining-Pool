@@ -42,7 +42,10 @@ private:
 
     std::any create_command_impl(Type command_type) override
     {
-        return m_commands[command_type];
+       auto result = m_commands[command_type];
+       std::string test = result.type().name();
+
+       return result;
     }
 };
 }

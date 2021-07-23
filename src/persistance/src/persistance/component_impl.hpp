@@ -20,6 +20,7 @@ public:
 
     Data_storage_factory::Sptr get_data_storage_factory() override;
     command::Command_factory::Sptr get_command_factory() override;
+    Data_access_factory::Sptr get_data_access_factory() override;
 
 private:
 
@@ -28,6 +29,7 @@ private:
     Data_storage_factory::Sptr m_data_storage_factory;
     Storage_manager::Sptr m_storage_manager;
     command::Command_factory::Sptr m_command_factory;
+    Data_access_factory::Sptr m_data_access_factory;
 };
 
 }

@@ -1,12 +1,12 @@
-#ifndef NEXUSPOOL_API_DATA_ACCESS_HPP
-#define NEXUSPOOL_API_DATA_ACCESS_HPP
+#ifndef NEXUSPOOL_PERSISTANCE_DATA_ACCESS_HPP
+#define NEXUSPOOL_PERSISTANCE_DATA_ACCESS_HPP
 
 #include <memory>
 #include <string>
 
 namespace nexuspool
 {
-namespace api
+namespace persistance
 {
 
 class Data_access

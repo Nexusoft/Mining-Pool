@@ -2,7 +2,6 @@
 #include "api/connection.hpp"
 #include "api/parser_impl.hpp"
 #include "api/method_impl.hpp"
-#include "api/data_access_impl.hpp"
 #include <spdlog/spdlog.h>
 
 namespace nexuspool
@@ -11,13 +10,12 @@ namespace api
 {
 
 Server::Server(std::shared_ptr<spdlog::logger> logger, 
-	persistance::Data_storage::Sptr data_storage,
-	persistance::command::Command_factory::Sptr command_factory,
+	persistance::Data_access::Sptr data_access,
 	std::string local_ip,
 	std::uint16_t api_listen_port, 
 	network::Socket_factory::Sptr socket_factory)
 	: m_logger{std::move(logger)}
-	, m_data_access{std::make_shared<Data_access_impl>(m_logger, std::move(data_storage), std::move(command_factory))}
+	, m_data_access{std::move(data_access)}
 	, m_local_ip{ std::move(local_ip) }
 	, m_api_listen_port{ api_listen_port }
 	, m_local_endpoint{ network::Transport_protocol::tcp, m_local_ip, m_api_listen_port }
