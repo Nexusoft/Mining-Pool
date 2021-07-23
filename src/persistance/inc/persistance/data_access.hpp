@@ -17,7 +17,9 @@ public:
 
     virtual ~Data_access() = default;
 
+    virtual bool create_tables() = 0;
     virtual bool is_connection_banned(std::string address) = 0;
+    virtual bool is_user_and_connection_banned(std::string user, std::string address) = 0;
 };
 }
 }

@@ -1,4 +1,5 @@
 #include "persistance/sqlite/data_storage_impl.hpp"
+#include "persistance/command/command.hpp"
 #include "persistance/types.hpp"
 #include <spdlog/spdlog.h>
 
@@ -18,20 +19,19 @@ Data_storage_impl::Data_storage_impl(std::shared_ptr<spdlog::logger> logger, std
 
 bool Data_storage_impl::execute_command(std::any command)
 {
-	return true;
+	auto casted_command = std::any_cast<std::shared_ptr<command::Command>>(command);
+	exec_statement(std::any_cast<sqlite3_stmt*>(casted_command->get_command()));
+	return false;
 }
 
 
 void Data_storage_impl::exec_statement(sqlite3_stmt* stmt)
 {
-	if (!m_init_complete)
-		return;
-
-	int ret = sqlite3_step(m_update_pool_data_stmt);
+	int ret = sqlite3_step(stmt);
 	while (ret == SQLITE_BUSY)
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		ret = sqlite3_step(m_update_pool_data_stmt);
+		ret = sqlite3_step(stmt);
 	}
 }
 

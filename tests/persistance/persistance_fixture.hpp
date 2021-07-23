@@ -30,7 +30,7 @@ public:
 protected:
 
 	std::shared_ptr<spdlog::logger> m_logger;
-	config::Persistance_config m_config{};
+	config::Persistance_config m_config{ config::Persistance_type::sqlite, "test.db"};
 	persistance::Component::Uptr m_persistance_component;
 
 	void TearDown() override

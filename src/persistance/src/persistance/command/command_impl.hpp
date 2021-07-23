@@ -5,6 +5,7 @@
 #include "sqlite/sqlite3.h"
 #include <memory>
 #include <string>
+#include <iostream>
 
 namespace spdlog { class logger; }
 namespace nexuspool {
@@ -61,9 +62,11 @@ public:
 		: Command_base_database_sqlite{ handle }
 		, m_banned_api_ip_stmt{ nullptr }
 	{
-		sqlite3_prepare_v2(m_handle,
-			"SELECT * FROM banned_connections_api WHERE ip = ':ip';",
-			-1, &m_banned_api_ip_stmt, NULL);
+		if (sqlite3_prepare_v2(m_handle, "SELECT * FROM banned_connections_api WHERE ip = ':ip';", -1, &m_banned_api_ip_stmt, NULL) != SQLITE_OK)
+		{
+			auto message = sqlite3_errmsg(m_handle);
+			std::cout << message << std::endl;
+		}
 	}
 
 	~Command_banned_api_ip_impl() { sqlite3_finalize(m_banned_api_ip_stmt); }
@@ -85,7 +88,7 @@ public:
 		: Command_base_database_sqlite{ handle }
 		, m_create_tables_stmt{ nullptr }
 	{
-		std::string create_tables{ R"("CREATE TABLE IF NOT EXISTS round (
+		std::string create_tables{ R"(CREATE TABLE IF NOT EXISTS round (
 				  id INTEGER PRIMARY KEY AUTOINCREMENT,
 				  round_number INTEGER NOT NULL,
 				  total_shares REAL,
@@ -131,7 +134,11 @@ public:
 				);)"
 		};
 
-		sqlite3_prepare_v2(m_handle, create_tables.c_str(), -1, &m_create_tables_stmt, NULL);
+		if(sqlite3_prepare_v2(m_handle, create_tables.c_str(), -1, &m_create_tables_stmt, NULL) != SQLITE_OK)
+		{
+			auto message = sqlite3_errmsg(m_handle);
+			std::cout << message << std::endl;
+		}
 	}
 
 	~Command_create_db_schema_impl() { sqlite3_finalize(m_create_tables_stmt); }
