@@ -34,8 +34,8 @@ private:
     std::shared_ptr<persistance::command::Command_factory> m_command_factory;
 
     // needed commands
-    std::shared_ptr<Command<std::string, sqlite3_stmt*>> m_create_tables_cmd;
-    std::shared_ptr<Command<std::vector<std::string>, sqlite3_stmt*>> m_get_banned_ip_cmd;
+    std::shared_ptr<Command> m_create_tables_cmd;
+    std::shared_ptr<Command> m_get_banned_ip_cmd;
 
 
 };

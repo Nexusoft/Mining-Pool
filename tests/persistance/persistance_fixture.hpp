@@ -24,6 +24,7 @@ public:
 		m_logger = spdlog::stdout_color_mt("logger");
 		m_logger->set_level(spdlog::level::debug);
 		m_persistance_component = persistance::create_component(m_logger, m_config);
+		m_persistance_component->start();
 	}
 
 protected:
@@ -34,6 +35,7 @@ protected:
 
 	void TearDown() override
 	{
+		m_persistance_component->stop();
 		spdlog::drop("logger");
 	}
 };

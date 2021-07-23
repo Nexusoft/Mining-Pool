@@ -55,53 +55,6 @@ bool Data_storage_impl::run_simple_query(std::string query)
 	return true;
 }
 
-void Data_storage_impl::bind_param(sqlite3_stmt* stmt, const char* name, std::string const& value)
-{
-	int index = sqlite3_bind_parameter_index(stmt, name);
-	if (index == 0)
-	{
-		m_logger->error("Database: bind_param index not found, Name: {}", name);
-		return;
-	}
-
-	sqlite3_bind_text(stmt, index, value.c_str(), -1, SQLITE_TRANSIENT);
-}
-
-void Data_storage_impl::bind_param(sqlite3_stmt* stmt, const char* name, int value)
-{
-	int index = sqlite3_bind_parameter_index(stmt, name);
-	if (index == 0)
-	{
-		m_logger->error("Database: bind_param index not found, Name: {}", name);
-		return;
-	}
-
-	sqlite3_bind_int(stmt, index, value);
-}
-
-void Data_storage_impl::bind_param(sqlite3_stmt* stmt, const char* name, int64_t value)
-{
-	int index = sqlite3_bind_parameter_index(stmt, name);
-	if (index == 0)
-	{
-		m_logger->error("Database: bind_param index not found, Name: {}", name);
-		return;
-	}
-
-	sqlite3_bind_int64(stmt, index, value);
-}
-
-void Data_storage_impl::bind_param(sqlite3_stmt* stmt, const char* name, double value)
-{
-	int index = sqlite3_bind_parameter_index(stmt, name);
-	if (index == 0)
-	{
-		m_logger->error("Database: bind_param index not found, Name: {}", name);
-		return;
-	}
-
-	sqlite3_bind_double(stmt, index, value);
-}
 
 bool Data_storage_impl::init()
 {

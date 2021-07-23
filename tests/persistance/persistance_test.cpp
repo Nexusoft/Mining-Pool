@@ -20,7 +20,7 @@ TEST(Persistance, initialisation)
 TEST_F(Persistance_fixture, command_factory)
 {
 	auto command_factory = m_persistance_component->get_command_factory();
-	auto command = std::any_cast<std::shared_ptr<command::Command<std::vector<std::string>, sqlite3_stmt*>>>(
-		command_factory->create_command(command::Type::create_db_schema));
+	auto command = 
+		command_factory->create_command(command::Type::create_db_schema);
 
 }

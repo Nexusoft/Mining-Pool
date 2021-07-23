@@ -1,6 +1,8 @@
 #ifndef NEXUSPOOL_PERSISTANCE_COMMAND_TYPES_HPP
 #define NEXUSPOOL_PERSISTANCE_COMMAND_TYPES_HPP
 
+#include <cstdint>
+
 namespace nexuspool {
 namespace persistance {
 namespace command {

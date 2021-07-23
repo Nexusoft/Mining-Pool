@@ -25,10 +25,7 @@ private:
 
 	bool run_simple_query(std::string query);
 	void exec_statement(sqlite3_stmt* stmt);
-	void bind_param(sqlite3_stmt* stmt, const char* name, std::string const& value);
-	void bind_param(sqlite3_stmt* stmt, const char* name, int value);
-	void bind_param(sqlite3_stmt* stmt, const char* name, int64_t value);
-	void bind_param(sqlite3_stmt* stmt, const char* name, double value);
+
 
 	std::shared_ptr<spdlog::logger> m_logger;
 	bool m_init_complete;

@@ -24,26 +24,34 @@ public:
         , m_storage_manager{std::move(storage_manager)}
     {
         m_commands.emplace(std::make_pair(Type::get_banned_user_and_ip, 
-            std::make_shared<Command_banned_user_and_ip_impl<std::vector<std::string>, sqlite3_stmt*>>
-                (m_storage_manager->get_handle<sqlite3*>())));
+            std::make_shared<Command_banned_user_and_ip_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::get_banned_api_ip,
-            std::make_shared<Command_banned_api_ip_impl<std::vector<std::string>, sqlite3_stmt*>>
-            (m_storage_manager->get_handle<sqlite3*>())));
+            std::make_shared<Command_banned_api_ip_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::create_db_schema,
-            std::make_shared<Command_create_db_schema_impl<std::string, sqlite3_stmt*>>
-            (m_storage_manager->get_handle<sqlite3*>())));   
+            std::make_shared<Command_create_db_schema_impl>(m_storage_manager->get_handle<sqlite3*>())));   
     }
-
 
 private:
     std::shared_ptr<spdlog::logger> m_logger;
     Storage_manager::Sptr m_storage_manager;
     std::map<Type, std::any> m_commands;
 
-    std::any create_command_impl(Type command_type) override
+    Command::Sptr create_command_impl(Type command_type) override
     {
-       auto result = m_commands[command_type];
-       std::string test = result.type().name();
+        Command::Sptr result{};
+        switch (command_type)
+        {
+        case Type::get_banned_user_and_ip:
+            result = std::any_cast<std::shared_ptr<Command_banned_user_and_ip_impl>>(m_commands[command_type]); 
+            break;
+        case Type::get_banned_api_ip: 
+            result = std::any_cast<std::shared_ptr<Command_banned_api_ip_impl>>(m_commands[command_type]); 
+            break;
+        case Type::create_db_schema: 
+            result = std::any_cast<std::shared_ptr<Command_create_db_schema_impl>>(m_commands[command_type]); 
+            break;
+        }
+        
 
        return result;
     }
