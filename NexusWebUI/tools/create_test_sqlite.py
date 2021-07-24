@@ -18,6 +18,7 @@ def create_db_and_connect(full_path):
 
     return conn
 
+
 def create_table_structure(connection):
 
     sql_round = f"""
