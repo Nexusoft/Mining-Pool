@@ -76,6 +76,7 @@ def create_table_structure(connection):
 
     connection.execute(sql_round)
     connection.execute(sql_block)
+    connection.execute(sql_account)
     connection.execute(banned_connections_api)
     connection.execute(sql_banned_users_connections)
 
