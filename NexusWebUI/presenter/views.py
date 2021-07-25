@@ -1,9 +1,10 @@
 import json
 import requests
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.views.generic import TemplateView
-
 from .tables import OverviewTable, AccountWorksTable, AccountPayoutsTable
+from .forms import WalletSearchForm
 from .rpc_requests import get_latest_blocks, get_meta_info, socket_connect, socket_disconnect, get_account_header, \
     get_account_works, get_account_payouts
 
@@ -82,6 +83,13 @@ def block_detail(request, block_id):
 def wallet_detail(request):
     template_name = 'presenter/wallet_detail.html'
 
+    form = WalletSearchForm(request.POST)
+
+    if not form.is_valid():
+        print(f"Form is invalid")
+        messages.error(request, "The Wallet ID you entered is unknown")
+        return redirect('presenter:index')
+
     # Todo Get from .env
     url = "http://127.0.0.1:5000/"
 
@@ -121,15 +129,22 @@ def wallet_detail(request):
 
     account_works_json = json.loads(account_works_json)
 
-    print(account_works_json['result'])
-    print(type(account_works_json))
+    account_payouts_json = json.dumps({'id': 1, 'jsonrpc': '2.0', 'result': [
+        {'time': 15, 'amount': 5, 'state': 10, 'txhash': 10},
+        {'time': 15, 'amount': 5, 'state': 10, 'txhash': 10},
+        {'time': 15, 'amount': 5, 'state': 10, 'txhash': 10},
+    ]})
+
+    account_payouts_json = json.loads(account_payouts_json)
+
     table_account_works = AccountWorksTable(account_works_json['result'])
-    print(type(table_account_works))
+    table_account_payouts = AccountPayoutsTable(account_payouts_json['result'])
 
     return render(request, template_name, {'wallet_id': wallet_id,
                                            'last_day_recv': last_day_recv,
                                            'unpaid_balance': unpaid_balance,
                                            'total_revenue': total_revenue,
-                                           'table_account_works': table_account_works
+                                           'table_account_works': table_account_works,
+                                           'table_account_payouts': table_account_payouts
                                            })
 
