@@ -17,17 +17,14 @@ class IndexView(TemplateView):
 
 def block_overview_list(request):
     template_name = 'presenter/overview_list.html'
-    # Todo Get from .env
-    url = "http://127.0.0.1:5000/"
 
+    # Todo Get from .env
     socket = socket_connect(_ip='127.0.0.1', _port=5000)
 
     # Todo if Socket = None send Message to User
 
     # Get the Data for the Main Table
     latest_block_json = get_latest_blocks(_socket=socket)
-    print(latest_block_json)
-    print(type(latest_block_json))
     table_data = OverviewTable(latest_block_json['result'])
 
     # Get the Meta Info
