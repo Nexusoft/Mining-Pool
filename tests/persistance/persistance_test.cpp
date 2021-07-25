@@ -13,11 +13,9 @@ TEST(Persistance, initialisation)
 	config::Persistance_config config{};
 	auto component = persistance::create_component(logger, config);
 	EXPECT_TRUE(component);
-
-	component->start();
-	component->stop();
 }
 
+/*
 TEST_F(Persistance_fixture, command_factory_create_all_commands)
 {
 	std::vector<command::Type> command_types_input = {Type::create_db_schema, Type::get_banned_api_ip, Type::get_banned_user_and_ip};
@@ -29,6 +27,7 @@ TEST_F(Persistance_fixture, command_factory_create_all_commands)
 		EXPECT_EQ(command->get_type(), command_type);
 	}
 }
+*/
 
 TEST_F(Persistance_fixture, simple_data_access)
 {

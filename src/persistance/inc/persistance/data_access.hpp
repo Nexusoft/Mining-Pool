@@ -13,7 +13,7 @@ class Data_access
 {
 public:
 
-    using Sptr = std::shared_ptr<Data_access>;
+    using Uptr = std::unique_ptr<Data_access>;
 
     virtual ~Data_access() = default;
 

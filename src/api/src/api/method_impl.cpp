@@ -7,7 +7,7 @@ namespace nexuspool
 namespace api
 {
 
-Method_meta_infos::Method_meta_infos(std::shared_ptr<spdlog::logger> logger, persistance::Data_access::Sptr data_access)
+Method_meta_infos::Method_meta_infos(std::shared_ptr<spdlog::logger> logger, Shared_data_access::Sptr data_access)
 	: m_logger{ std::move(logger) }
     , m_data_access{ std::move(data_access) }
 {
@@ -25,7 +25,7 @@ nlohmann::json Method_meta_infos::execute(Method_params const& params)
     return result;
 }
 
-Method_latest_blocks::Method_latest_blocks(std::shared_ptr<spdlog::logger> logger, persistance::Data_access::Sptr data_access)
+Method_latest_blocks::Method_latest_blocks(std::shared_ptr<spdlog::logger> logger, Shared_data_access::Sptr data_access)
     : m_logger{ std::move(logger) }
     , m_data_access{ std::move(data_access) }
 {
@@ -53,7 +53,7 @@ nlohmann::json Method_latest_blocks::execute(Method_params const& params)
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
-Methods_factory_impl::Methods_factory_impl(std::shared_ptr<spdlog::logger> logger, persistance::Data_access::Sptr data_access)
+Methods_factory_impl::Methods_factory_impl(std::shared_ptr<spdlog::logger> logger, Shared_data_access::Sptr data_access)
 	: m_logger{ std::move(logger) }
     , m_data_access{std::move(data_access)}
 {

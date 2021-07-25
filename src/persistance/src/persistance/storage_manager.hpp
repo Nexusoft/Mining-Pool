@@ -10,7 +10,7 @@ namespace persistance {
 class Storage_manager
 {
 public:
-    using Sptr = std::shared_ptr<Storage_manager>;
+    using Uptr = std::unique_ptr<Storage_manager>;
             
     virtual ~Storage_manager() = default;
 

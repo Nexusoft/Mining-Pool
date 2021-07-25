@@ -14,14 +14,14 @@ public:
 
     using Sptr = std::shared_ptr<Data_access_factory>;
 
-    Data_access::Sptr create_data_access();
+    Data_access::Uptr create_data_access();
 
 private:
-    virtual Data_access::Sptr create_data_access_impl() = 0;
+    virtual Data_access::Uptr create_data_access_impl() = 0;
 };
 
 
-inline Data_access::Sptr Data_access_factory::create_data_access()
+inline Data_access::Uptr Data_access_factory::create_data_access()
 {
     // implements
     return create_data_access_impl();

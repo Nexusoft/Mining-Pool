@@ -36,7 +36,6 @@ namespace nexuspool
 			m_logger->info("Shutting down NexusPool");
 			m_api_server->stop();
 			m_pool_manager->stop();
-			m_persistance_component->stop();
 			m_io_context->stop();
 			exit(1);
 		});
@@ -72,7 +71,6 @@ namespace nexuspool
 
 		// data storage initialisation
 		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
-		m_persistance_component->start();
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
 		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, m_config, m_network_component->get_socket_factory());

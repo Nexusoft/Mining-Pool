@@ -3,6 +3,10 @@
 
 #include "persistance/data_access_factory.hpp"
 #include "persistance/data_access_impl.hpp"
+#include "persistance/storage_manager_impl.hpp"
+#include "persistance/data_storage_factory_impl.hpp"
+#include "persistance/command/command_factory_impl.hpp"
+#include "config/types.hpp"
 #include <spdlog/spdlog.h>
 
 namespace nexuspool {
@@ -12,27 +16,40 @@ class Data_access_factory_impl : public Data_access_factory
 {
 public:
 
-    Data_access_factory_impl(std::shared_ptr<spdlog::logger> logger, persistance::Data_storage::Sptr data_storage,
-        std::shared_ptr<persistance::command::Command_factory> command_factory)
+    Data_access_factory_impl(std::shared_ptr<spdlog::logger> logger, config::Persistance_config config)
         : m_logger{ std::move(logger) }
-        , m_data_storage{std::move(data_storage)}
-        , m_command_factory{std::move(command_factory)}
+        , m_config{std::move(config)}
+        , m_data_storage_factory{ std::make_shared<Data_storage_factory_impl>(m_logger)}
     {
     }
 
 
 private:
     std::shared_ptr<spdlog::logger> m_logger;
-    persistance::Data_storage::Sptr m_data_storage;
-    std::shared_ptr<persistance::command::Command_factory> m_command_factory;
+    config::Persistance_config m_config;
+    persistance::Data_storage_factory::Sptr m_data_storage_factory;
 
-    Data_access::Sptr create_data_access_impl() override
+    Data_access::Uptr create_data_access_impl() override
     {
-        Data_access::Sptr result{};
+        std::unique_ptr<Storage_manager> storage_manager;
+        switch (m_config.m_type)
+        {
+        case config::Persistance_type::database:
+        case config::Persistance_type::sqlite:
+        {
+            storage_manager = std::make_unique<Storage_manager_sqlite>(m_logger, m_config.m_file);
+            break;
+        }
+        default:
+        {
+            m_logger->critical("Unsupported persistance type!");
+            std::exit(1);       // cant do anything without persistance module
+        }
+        }
+        storage_manager->start();
 
-        result = std::make_shared<Data_access_impl>(m_logger, m_data_storage, m_command_factory);
-
-        return result;
+        return std::make_unique<Data_access_impl>(m_logger, m_data_storage_factory->create_data_storage(), 
+            std::make_shared<command::Command_factory_impl>(m_logger, std::move(storage_manager)));
     }
 };
 

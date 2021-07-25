@@ -19,7 +19,7 @@ class Command_factory_impl : public Command_factory
 {
 public:
 
-    Command_factory_impl(std::shared_ptr<spdlog::logger> logger, Storage_manager::Sptr storage_manager)
+    Command_factory_impl(std::shared_ptr<spdlog::logger> logger, Storage_manager::Uptr storage_manager)
         : m_logger{std::move(logger)}
         , m_storage_manager{std::move(storage_manager)}
     {
@@ -31,9 +31,14 @@ public:
             std::make_shared<Command_create_db_schema_impl>(m_storage_manager->get_handle<sqlite3*>())));   
     }
 
+    ~Command_factory_impl()
+    {
+        m_storage_manager->stop();
+    }
+
 private:
     std::shared_ptr<spdlog::logger> m_logger;
-    Storage_manager::Sptr m_storage_manager;
+    Storage_manager::Uptr m_storage_manager;
     std::map<Type, std::any> m_commands;
 
     Command::Sptr create_command_impl(Type command_type) override
