@@ -12,4 +12,4 @@ target_include_directories(api
     PRIVATE src
 )
 
-target_link_libraries(api network persistance)
+target_link_libraries(api network persistance TAO)

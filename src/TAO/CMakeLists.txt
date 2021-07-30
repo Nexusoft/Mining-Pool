@@ -12,3 +12,6 @@ target_include_directories(TAO
 )
 
 target_link_libraries(TAO LLC OpenSSL::Crypto)
+if(WIN32)
+    target_link_libraries(TAO crypt32.lib)
+endif()
