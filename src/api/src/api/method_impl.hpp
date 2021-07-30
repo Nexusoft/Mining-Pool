@@ -39,6 +39,61 @@ private:
 
 };
 
+class Method_account : public Method
+{
+public:
+
+    Method_account(std::shared_ptr<spdlog::logger> logger, Shared_data_access::Sptr data_access);
+    nlohmann::json execute(Method_params const& params) override;
+
+private:
+
+    std::shared_ptr<spdlog::logger> m_logger;
+    Shared_data_access::Sptr m_data_access;
+
+};
+
+class Method_account_header : public Method
+{
+public:
+
+    Method_account_header(std::shared_ptr<spdlog::logger> logger, Shared_data_access::Sptr data_access);
+    nlohmann::json execute(Method_params const& params) override;
+
+private:
+
+    std::shared_ptr<spdlog::logger> m_logger;
+    Shared_data_access::Sptr m_data_access;
+
+};
+
+class Method_account_works : public Method
+{
+public:
+
+    Method_account_works(std::shared_ptr<spdlog::logger> logger, Shared_data_access::Sptr data_access);
+    nlohmann::json execute(Method_params const& params) override;
+
+private:
+
+    std::shared_ptr<spdlog::logger> m_logger;
+    Shared_data_access::Sptr m_data_access;
+
+};
+
+class Method_account_payouts: public Method
+{
+public:
+
+    Method_account_payouts(std::shared_ptr<spdlog::logger> logger, Shared_data_access::Sptr data_access);
+    nlohmann::json execute(Method_params const& params) override;
+
+private:
+
+    std::shared_ptr<spdlog::logger> m_logger;
+    Shared_data_access::Sptr m_data_access;
+
+};
 
 class Methods_factory_impl : public Methods_factory
 {
