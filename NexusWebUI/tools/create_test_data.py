@@ -1,9 +1,11 @@
 import os
 import random
-
+import hashlib
 import sqlalchemy
 import pandas as pd
+from skein import skein256
 from faker import Faker
+
 
 
 def connect_to_db(_file):
@@ -78,7 +80,7 @@ def create_account_test_data(connection):
         names.add(fake.user_name())
 
     for x in range(accounts):
-        name = list(names)[x]
+        name = skein256((list(names)[x]).encode('ascii') ).hexdigest()
         created_at = fake.date()
         last_active = fake.date()
         connection_count = random.randint(1, 100)
