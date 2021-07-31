@@ -18,12 +18,12 @@ bool Data_storage_impl::execute_command(std::any command)
 {
 	auto casted_command = std::any_cast<std::shared_ptr<command::Command>>(command);
 	command::Result_sqlite result;
-	exec_statement_with_result(std::any_cast<command::Command_type_sqlite>(casted_command->get_command()), result);
+	auto return_value = exec_statement_with_result(std::any_cast<command::Command_type_sqlite>(casted_command->get_command()), result);
 	casted_command->set_result(std::move(result));
-	return true;
+	return return_value;
 }
 
-void Data_storage_impl::exec_statement_with_result(command::Command_type_sqlite sql_command, command::Result_sqlite& result)
+bool Data_storage_impl::exec_statement_with_result(command::Command_type_sqlite sql_command, command::Result_sqlite& result)
 {
 	int ret = 0;
 	while ((ret = sqlite3_step(sql_command.m_statement)) == SQLITE_ROW)
@@ -70,7 +70,9 @@ void Data_storage_impl::exec_statement_with_result(command::Command_type_sqlite 
 	if (ret != SQLITE_DONE) 
 	{
 		m_logger->error("Sqlite step failure");
+		return false;
 	}
+	return true;
 }
 
 

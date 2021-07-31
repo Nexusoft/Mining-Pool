@@ -28,6 +28,7 @@ public:
     bool create_tables() override;
     bool is_connection_banned(std::string address) override;
     bool is_user_and_connection_banned(std::string user, std::string address) override;
+    bool does_account_exists(std::string account) override;
 
 private:
 
@@ -39,6 +40,7 @@ private:
     std::shared_ptr<Command> m_create_tables_cmd;
     std::shared_ptr<Command> m_get_banned_ip_cmd;
     std::shared_ptr<Command> m_get_banned_user_ip_cmd;
+    std::shared_ptr<Command> m_account_exists_cmd;
 
 
 };

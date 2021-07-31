@@ -154,6 +154,27 @@ Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
 	sqlite3_prepare_v2(m_handle, create_tables.c_str(), -1, &m_create_tables_stmt, NULL);
 }
 
+// -----------------------------------------------------------------------------------------------
+
+Command_account_exists_impl::Command_account_exists_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+	, m_account_exists_stmt{ nullptr }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT COUNT(name) FROM account WHERE name = ':name';", -1, &m_account_exists_stmt, NULL);
+}
+
+std::any Command_account_exists_impl::get_command() const
+{
+	Command_type_sqlite command{ m_account_exists_stmt, {{Column_sqlite::int32}} };
+	return command;
+}
+
+void Command_account_exists_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<std::string>(m_params);
+	bind_param(m_account_exists_stmt, ":name", casted_params);
+}
 
 
 }

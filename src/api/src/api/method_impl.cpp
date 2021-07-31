@@ -88,8 +88,18 @@ Method_result Method_account::execute(Method_params const& params)
         return result;
     }
 
-    return result;
+    if (m_data_access->does_account_exists(account))
+    {
+        result.m_result = nlohmann::json{};
+    }
+    else
+    {
+        result.m_is_error = true;
+        result.m_error_message = "Account doesn't exist";
+        result.m_error_code = -11;
+    }
 
+    return result;
 }
 
 Method_account_header::Method_account_header(std::shared_ptr<spdlog::logger> logger, Shared_data_access::Sptr data_access)
@@ -100,8 +110,14 @@ Method_account_header::Method_account_header(std::shared_ptr<spdlog::logger> log
 
 Method_result Method_account_header::execute(Method_params const& params)
 {
-    // get meta data from data_access
     Method_result result;
+    std::string const account{ params.at(0) };
+    // is account a valid nxs address  
+    if (!is_address_valid(account, result))
+    {
+        return result;
+    }
+
     return result;
 
 }
@@ -114,8 +130,14 @@ Method_account_works::Method_account_works(std::shared_ptr<spdlog::logger> logge
 
 Method_result Method_account_works::execute(Method_params const& params)
 {
-    // get meta data from data_access
     Method_result result;
+    std::string const account{ params.at(0) };
+    // is account a valid nxs address  
+    if (!is_address_valid(account, result))
+    {
+        return result;
+    }
+
     return result;
 
 }
@@ -128,8 +150,14 @@ Method_account_payouts::Method_account_payouts(std::shared_ptr<spdlog::logger> l
 
 Method_result Method_account_payouts::execute(Method_params const& params)
 {
-    // get meta data from data_access
     Method_result result;
+    std::string const account{ params.at(0) };
+    // is account a valid nxs address  
+    if (!is_address_valid(account, result))
+    {
+        return result;
+    }
+
     return result;
 
 }

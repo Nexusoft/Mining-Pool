@@ -88,7 +88,6 @@ public:
 
 private:
 	sqlite3_stmt* m_banned_api_ip_stmt;
-
 };
 
 
@@ -105,9 +104,24 @@ public:
 private:
 
 	sqlite3_stmt* m_create_tables_stmt;
-
-
 };
+
+class Command_account_exists_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_account_exists_impl(sqlite3* handle);
+
+	~Command_account_exists_impl() { sqlite3_finalize(m_account_exists_stmt); }
+	std::any get_command() const override;
+	Type get_type() const override { return Type::account_exists; }
+	void set_params(std::any params) override;
+
+private:
+
+	sqlite3_stmt* m_account_exists_stmt;
+};
+
 
 
 }
