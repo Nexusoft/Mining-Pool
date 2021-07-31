@@ -4,11 +4,20 @@
 #include "api/types.hpp"
 #include <json/json.hpp>
 #include <memory>
+#include <string>
 
 namespace nexuspool
 {
 namespace api
 {
+struct Method_result
+{
+    nlohmann::json m_result{ nullptr };
+    bool m_is_error{ false };
+    std::string m_error_message{};
+    int m_error_code{ -1 };
+
+};
 
 class Method
 {
@@ -18,7 +27,7 @@ public:
 
     virtual ~Method() = default;
 
-    virtual nlohmann::json execute(Method_params const& params) = 0;
+    virtual Method_result execute(Method_params const& params) = 0;
 };
 
 

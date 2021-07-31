@@ -3,6 +3,15 @@
 #include <json/json.hpp>
 #include <spdlog/spdlog.h>
 
+namespace
+{
+bool is_address_valid(std::string const& address)
+{
+    TAO::Register::Address address_check{ address };
+    return address_check.IsValid();
+}
+}
+
 namespace nexuspool
 {
 namespace api
@@ -14,14 +23,14 @@ Method_meta_infos::Method_meta_infos(std::shared_ptr<spdlog::logger> logger, Sha
 {
 }
 
-nlohmann::json Method_meta_infos::execute(Method_params const& params)
+Method_result Method_meta_infos::execute(Method_params const& params)
 {
     // get meta data from data_access
-    nlohmann::json result;
-    result["pool_hashrate"] = 95.3;
-    result["network_hashrate"] = 40.1;
-    result["payout_threshold"] = 0.1;
-    result["fee"] = 5;
+    Method_result result;
+    result.m_result["pool_hashrate"] = 95.3;
+    result.m_result["network_hashrate"] = 40.1;
+    result.m_result["payout_threshold"] = 0.1;
+    result.m_result["fee"] = 5;
 
     return result;
 }
@@ -32,9 +41,10 @@ Method_latest_blocks::Method_latest_blocks(std::shared_ptr<spdlog::logger> logge
 {
 }
 
-nlohmann::json Method_latest_blocks::execute(Method_params const& params)
+Method_result Method_latest_blocks::execute(Method_params const& params)
 {
-    nlohmann::json result = nlohmann::json::array();
+    Method_result result;
+    result.m_result = nlohmann::json::array();
     for (auto i = 0U; i < 100; i++)
     {
         nlohmann::json block;
@@ -44,7 +54,7 @@ nlohmann::json Method_latest_blocks::execute(Method_params const& params)
         block["time"] = "2021-07-16 10:12:33.239719";
         block["network_diff"] = 1000.12;
         block["payment_method"] = "test";
-        result.push_back(block);
+        result.m_result.push_back(block);
     }
 
     return result;
@@ -57,16 +67,19 @@ Method_account::Method_account(std::shared_ptr<spdlog::logger> logger, Shared_da
 {
 }
 
-nlohmann::json Method_account::execute(Method_params const& params)
+Method_result Method_account::execute(Method_params const& params)
 {
+    Method_result result;
     std::string const account{ params["_account"] };
-    // is account a valid nxs address
-    TAO::Register::Address address_check{ account };
-    if (!address_check.IsValid())
+    // is account a valid nxs address  
+    if (!is_address_valid(account))
     {
-        // return error
+        result.m_is_error = true;
+        result.m_error_message = "invalid account";
+        result.m_error_code = -10;
+        return result;
     }
-    nlohmann::json result = nlohmann::json::array();
+
     return result;
 
 }
@@ -77,10 +90,10 @@ Method_account_header::Method_account_header(std::shared_ptr<spdlog::logger> log
 {
 }
 
-nlohmann::json Method_account_header::execute(Method_params const& params)
+Method_result Method_account_header::execute(Method_params const& params)
 {
     // get meta data from data_access
-    nlohmann::json result = nlohmann::json::array();
+    Method_result result;
     return result;
 
 }
@@ -91,10 +104,10 @@ Method_account_works::Method_account_works(std::shared_ptr<spdlog::logger> logge
 {
 }
 
-nlohmann::json Method_account_works::execute(Method_params const& params)
+Method_result Method_account_works::execute(Method_params const& params)
 {
     // get meta data from data_access
-    nlohmann::json result = nlohmann::json::array();
+    Method_result result;
     return result;
 
 }
@@ -105,10 +118,10 @@ Method_account_payouts::Method_account_payouts(std::shared_ptr<spdlog::logger> l
 {
 }
 
-nlohmann::json Method_account_payouts::execute(Method_params const& params)
+Method_result Method_account_payouts::execute(Method_params const& params)
 {
     // get meta data from data_access
-    nlohmann::json result = nlohmann::json::array();
+    Method_result result;
     return result;
 
 }

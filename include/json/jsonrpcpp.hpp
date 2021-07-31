@@ -422,6 +422,11 @@ namespace jsonrpcpp
             error_ = Error{ nullptr };
         }
 
+        void setError(const std::string& message, int code, const Json& data)
+        {
+            error_ = Error{ message, code, data };
+        }
+
         const Error& error() const
         {
             return error_;
