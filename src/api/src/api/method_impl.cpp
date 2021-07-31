@@ -5,11 +5,21 @@
 
 namespace
 {
-bool is_address_valid(std::string const& address)
+bool is_address_valid(std::string const& address, ::nexuspool::api::Method_result& result)
 {
     TAO::Register::Address address_check{ address };
-    return address_check.IsValid();
+    if (!address_check.IsValid())
+    {
+        result.m_is_error = true;
+        result.m_error_message = "invalid account";
+        result.m_error_code = -10;
+        return false;
+    }
+
+    return true;
 }
+
+
 }
 
 namespace nexuspool
@@ -27,6 +37,7 @@ Method_result Method_meta_infos::execute(Method_params const& params)
 {
     // get meta data from data_access
     Method_result result;
+    result.m_result = nlohmann::json{};
     result.m_result["pool_hashrate"] = 95.3;
     result.m_result["network_hashrate"] = 40.1;
     result.m_result["payout_threshold"] = 0.1;
@@ -70,13 +81,10 @@ Method_account::Method_account(std::shared_ptr<spdlog::logger> logger, Shared_da
 Method_result Method_account::execute(Method_params const& params)
 {
     Method_result result;
-    std::string const account{ params["_account"] };
+    std::string const account{ params.at(0) };
     // is account a valid nxs address  
-    if (!is_address_valid(account))
+    if (!is_address_valid(account, result))
     {
-        result.m_is_error = true;
-        result.m_error_message = "invalid account";
-        result.m_error_code = -10;
         return result;
     }
 
