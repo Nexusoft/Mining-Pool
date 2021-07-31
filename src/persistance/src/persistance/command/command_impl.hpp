@@ -122,6 +122,20 @@ private:
 	sqlite3_stmt* m_account_exists_stmt;
 };
 
+class Command_get_blocks_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_blocks_impl(sqlite3* handle);
+
+	~Command_get_blocks_impl() { sqlite3_finalize(m_get_blocks_stmt); }
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_blocks; }
+
+private:
+
+	sqlite3_stmt* m_get_blocks_stmt;
+};
 
 
 }

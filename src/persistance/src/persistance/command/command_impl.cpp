@@ -176,6 +176,28 @@ void Command_account_exists_impl::set_params(std::any params)
 	bind_param(m_account_exists_stmt, ":name", casted_params);
 }
 
+// -----------------------------------------------------------------------------------------------
+
+Command_get_blocks_impl::Command_get_blocks_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+	, m_get_blocks_stmt{ nullptr }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT hash, height, type, reward, difficulty, orphan, block_found_time FROM block ORDER BY height LIMIT 100;", -1, &m_get_blocks_stmt, NULL);
+}
+
+std::any Command_get_blocks_impl::get_command() const
+{
+	Command_type_sqlite command{ m_get_blocks_stmt, 
+		{{Column_sqlite::string}, 
+		{Column_sqlite::int32}, 
+		{Column_sqlite::string}, 
+		{Column_sqlite::string}, 
+		{Column_sqlite::int32}, 
+		{Column_sqlite::double_t}, 
+		{Column_sqlite::int32},
+		{Column_sqlite::string}} };
+	return command;
+}
 
 }
 }
