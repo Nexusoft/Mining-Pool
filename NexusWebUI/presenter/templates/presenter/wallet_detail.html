@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load render_table from django_tables2 %}
+
+
+{% block body_block %}
+
+    <h1>Wallet Detail Page Test</h1>
+    <br>
+    {{ wallet_id }}
+
+     <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Last Day Recv</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ last_day_recv }}<small class="text-muted fw-light"> NXS</small></h1>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Unpaid Balance</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ unpaid_balance }}<small class="text-muted fw-light"> NXS</small></h1>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3 text-white bg-primary">
+            <h4 class="my-0 fw-normal">Total Revenue</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ total_revenue }}<small class="text-muted fw-light"> NXS</small></h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+        <!-- Tabs navs -->
+        <ul class="nav nav-tabs nav-fill mb-3" id="ex-2" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a
+               class="nav-link active"
+               id="ex-2-tab-1"
+               data-mdb-toggle="pill"
+               href="#ex-2-tabs-1"
+               role="tab"
+               aria-controls="pills-1"
+               aria-selected="true"
+               >Works</a
+              >
+          </li>
+          <li class="nav-item" role="presentation">
+            <a
+               class="nav-link"
+               id="ex-2-tab-2"
+               data-mdb-toggle="pill"
+               href="#ex-2-tabs-2"
+               role="tab"
+               aria-controls="pills-2"
+               aria-selected="false"
+               >Payouts</a
+              >
+          </li>
+        </ul>
+        <!-- Tabs navs -->
+
+        <!-- Tabs content-->
+        <div class="tab-content" id="ex-2-content">
+          <div
+               class="tab-pane fade show active"
+               id="ex-2-tabs-1"
+               role="tabpanel"
+               aria-labelledby="pills-1-tab"
+               >
+            {% render_table table_account_works %}
+          </div>
+          <div
+               class="tab-pane fade"
+               id="ex-2-tabs-2"
+               role="tabpanel"
+               aria-labelledby="pills-2-tab"
+               >
+            {% render_table table_account_payouts %}
+          </div>
+        </div>
+
+{% endblock %}

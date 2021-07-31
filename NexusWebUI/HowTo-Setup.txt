@@ -1,0 +1,27 @@
+1.)Download & Install Python (3.6 or higher)
+
+Recommendation:
+Setup a Virtual Environment in the NexusWebUI Folder
+Example Usage:
+https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/26/python-virtual-env/
+
+2.)Open a shell capable of running Python in the NexusWebUI Folder
+
+3.) Install required Python Libraries
+pip install -r requirements.txt
+(This downloads the necessary Dependencies)
+
+4.) Run the necessary Migrations (from NexusWebUI Folder)
+python manage.py migrate
+
+5.) Generate the Secret Key (This should stay secret in Prod as the name suggests)
+Create a File called .env in the same folder as manage.py
+Open it in the a Text Editor
+Run the following command in the shell:
+python -c "import secrets; print(secrets.token_urlsafe())"
+Create a line with the secret key you got from above command in the .env file
+Example:
+SECRET_KEY=123123$%/$%ghjhghjk
+
+6.) Run Testserver
+python manage.py runserver
