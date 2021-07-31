@@ -67,12 +67,12 @@ def get_account(_socket, _account):
     return json_data
 
 
-def get_account_header(_socket):
+def get_account_header(_socket, _account):
     """
     :param _url:
     :return:
     """
-    payload = {"jsonrpc": "2.0", "method": "get_account_header", "id": 1}
+    payload = {"jsonrpc": "2.0", "method": "get_account_header", "params": [_account], "id": 1}
 
     _socket.send(pybson.dumps(payload))
     response = _socket.recv(1024)
@@ -85,7 +85,7 @@ def get_account_works(_socket):
     # Todo Documentation
     # Todo Error Handling
 
-    payload = {"jsonrpc": "2.0", "method": "get_account_works", "id": 1}
+    payload = {"jsonrpc": "2.0", "method": "get_account_works", "params": [_account], "id": 1}
 
     _socket.send(pybson.dumps(payload))
     response = _socket.recv(20000)
