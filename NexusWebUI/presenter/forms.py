@@ -12,8 +12,12 @@ class WalletSearchForm(forms.Form):
         get_account_json = get_account(_socket=socket, _account=cleaned_data['wallet_id'])
 
         if 'error' in get_account_json:
+            print("Error when validating Wallet ID:")
             print(get_account_json)
             if get_account_json['error']['code'] == -10:
                 raise forms.ValidationError(f'The Wallet ID you entered is not valid!')
             if get_account_json['error']['code'] == -11:
                 raise forms.ValidationError(f'The Wallet ID you entered does not exist')
+        else:
+            print("Wallet ID valid")
+            print((get_account_json))
