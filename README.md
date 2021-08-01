@@ -33,8 +33,8 @@ Optional cmake build options are
 
 ### Windows
 
-* SQLite:   build sqlite as static lib (VS Studio x64 command prompt, cl /c /EHsc sqlite3.c, lib sqlite3.obj)  
-            copy sqlite3.lib to NexusPool/libs folder  
+* SQLite:   build sqlite as static lib (VS Studio x64 command prompt, cl /c /EHsc sqlite3.c && lib sqlite3.obj)  
+            copy sqlite3.lib to /libs folder  
 * OpenSSL: 
 
 ### Ubuntu/Debian
