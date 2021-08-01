@@ -2,10 +2,8 @@
 #define NEXUSPOOL_API_TYPES_HPP
 
 #include <memory>
-#include <vector>
 #include <map>
 #include <string>
-#include <cstdint>
 #include <json/json.hpp>
 
 namespace nexuspool {

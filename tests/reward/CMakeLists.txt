@@ -6,6 +6,7 @@ add_executable(reward_test reward_test.cpp)
 target_link_libraries(
   reward_test
   gtest_main
+  reward
 )
 
 include(GoogleTest)

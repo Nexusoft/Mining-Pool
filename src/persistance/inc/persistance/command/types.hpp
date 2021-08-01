@@ -1,8 +1,7 @@
 #ifndef NEXUSPOOL_PERSISTANCE_COMMAND_TYPES_HPP
 #define NEXUSPOOL_PERSISTANCE_COMMAND_TYPES_HPP
 
-#include "persistance/component.hpp"
-#include <memory>
+#include <cstdint>
 
 namespace nexuspool {
 namespace persistance {
@@ -20,7 +19,11 @@ enum class Class : std::uint8_t
 // List of available commands
 enum class Type : std::uint8_t
 {
-	get_banned_user_and_ip = 0
+	get_banned_user_and_ip = 0,
+	get_banned_api_ip,
+	create_db_schema,
+	account_exists,
+	get_blocks
 
 };
 

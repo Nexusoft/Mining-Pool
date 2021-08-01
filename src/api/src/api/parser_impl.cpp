@@ -35,7 +35,14 @@ bool Parser_impl::parse(jsonrpcpp::entity_ptr request, jsonrpcpp::Response& resp
 		auto result = m_methods[request_ptr->method()]->execute(params);
 
 		response.setId(request_ptr->id());
-		response.setResult(result);
+		if (result.m_is_error)
+		{
+			response.setError(result.m_error_message, result.m_error_code, result.m_result);
+		}
+		else
+		{
+			response.setResult(result.m_result);
+		}
 
 		return true;
 	}

@@ -19,26 +19,56 @@ class Command_factory_impl : public Command_factory
 {
 public:
 
-    Command_factory_impl(std::shared_ptr<spdlog::logger> logger, config::Config& config, Storage_manager::Sptr storage_manager)
+    Command_factory_impl(std::shared_ptr<spdlog::logger> logger, Storage_manager::Uptr storage_manager)
         : m_logger{std::move(logger)}
         , m_storage_manager{std::move(storage_manager)}
-        , m_config{ config }
     {
         m_commands.emplace(std::make_pair(Type::get_banned_user_and_ip, 
-            std::make_shared<Command_banned_user_and_ip_impl<std::vector<std::string>, sqlite3_stmt*>>
-                (m_storage_manager->get_handle<sqlite3*>())));
+            std::make_shared<Command_banned_user_and_ip_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::get_banned_api_ip,
+            std::make_shared<Command_banned_api_ip_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::create_db_schema,
+            std::make_shared<Command_create_db_schema_impl>(m_storage_manager->get_handle<sqlite3*>())));   
+        m_commands.emplace(std::make_pair(Type::account_exists,
+            std::make_shared<Command_account_exists_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::get_blocks,
+            std::make_shared<Command_get_blocks_impl>(m_storage_manager->get_handle<sqlite3*>())));
     }
 
+    ~Command_factory_impl()
+    {
+        m_storage_manager->stop();
+    }
 
 private:
     std::shared_ptr<spdlog::logger> m_logger;
-    Storage_manager::Sptr m_storage_manager;
-    config::Config& m_config;
+    Storage_manager::Uptr m_storage_manager;
     std::map<Type, std::any> m_commands;
 
-    std::any create_command_impl(Type command_type) override
+    Command::Sptr create_command_impl(Type command_type) override
     {
-        return m_commands[command_type];
+        Command::Sptr result{};
+        switch (command_type)
+        {
+        case Type::get_banned_user_and_ip:
+            result = std::any_cast<std::shared_ptr<Command_banned_user_and_ip_impl>>(m_commands[command_type]); 
+            break;
+        case Type::get_banned_api_ip: 
+            result = std::any_cast<std::shared_ptr<Command_banned_api_ip_impl>>(m_commands[command_type]); 
+            break;
+        case Type::create_db_schema: 
+            result = std::any_cast<std::shared_ptr<Command_create_db_schema_impl>>(m_commands[command_type]); 
+            break;
+        case Type::account_exists:
+            result = std::any_cast<std::shared_ptr<Command_account_exists_impl>>(m_commands[command_type]);
+            break;
+        case Type::get_blocks:
+            result = std::any_cast<std::shared_ptr<Command_get_blocks_impl>>(m_commands[command_type]);
+            break;
+        }
+        
+
+       return result;
     }
 };
 }

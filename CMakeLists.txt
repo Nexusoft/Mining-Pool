@@ -15,6 +15,7 @@ option(WITH_TESTS "Build with unit tests" OFF)
 find_package(Threads REQUIRED)
 
 # OpenSSL
+set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
 
@@ -64,3 +65,4 @@ target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 target_link_libraries(NexusPool chrono network config LLP TAO api persistance reward)
 
 target_link_libraries(NexusPool Threads::Threads)
+

@@ -17,3 +17,6 @@ sqlparse==0.4.1
 typing-extensions==3.10.0.0
 urllib3==1.26.6
 zipp==3.5.0
+pybson~=0.5.9
+bson~=0.5.10
+sqlite3

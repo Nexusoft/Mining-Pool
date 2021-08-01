@@ -98,6 +98,14 @@ bool Validator::check(std::string const& config_file)
         {
             m_mandatory_fields.push_back(Validator_error{ "persistance/type", "" });
         }
+        else
+        {
+            if (j.at("persistance")["type"] != "database" &&
+                j.at("persistance")["type"] != "sqlite")
+            {
+                m_mandatory_fields.push_back(Validator_error{ "persistance/type", "unsupported persistance type! Must be 'database' or 'sqlite'" });
+            }
+        }
         if (j.count("persistance")["file"] == 0)
         {
             m_mandatory_fields.push_back(Validator_error{ "persistance/file", "" });

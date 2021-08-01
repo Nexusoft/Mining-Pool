@@ -3,7 +3,6 @@
 
 #include "persistance/data_storage_factory.hpp"
 #include "persistance/sqlite/data_storage_impl.hpp"
-#include "config/config.hpp"
 #include <spdlog/spdlog.h>
 
 namespace nexuspool {
@@ -13,15 +12,14 @@ class Data_storage_factory_impl : public Data_storage_factory
 {
 public:
 
-    Data_storage_factory_impl(std::shared_ptr<spdlog::logger> logger, config::Config& config)
-        : m_config{ config }
+    Data_storage_factory_impl(std::shared_ptr<spdlog::logger> logger)
+        : m_logger{ std::move(logger) }
     {
     }
 
 
 private:
     std::shared_ptr<spdlog::logger> m_logger;
-    config::Config& m_config;
 
     Data_storage::Sptr create_data_storage_impl() override
     {

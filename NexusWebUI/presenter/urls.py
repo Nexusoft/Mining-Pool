@@ -8,9 +8,9 @@ from . import views
 app_name = 'presenter'
 
 urlpatterns = [
-                  path('', views.IndexView.as_view(), name='index'),
+                  path('', views.block_overview_list, name='index'),
                   path('overview/', views.block_overview_list, name='overview'),
-                  path('block_detail/<str:block_id>', views.block_detail, name='block_detail'),
+                  path('error/', views.ErrorView.as_view(), name='error'),
                   path('wallet/', views.wallet_detail, name='wallet'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
