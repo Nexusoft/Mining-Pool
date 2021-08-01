@@ -20,12 +20,16 @@ def block_overview_list(request):
         latest_block_json = get_latest_blocks(_socket=socket)
         table_data = OverviewTable(latest_block_json['result'])
 
+        print(latest_block_json)
+
         # Get the Meta Info
         meta_info_json = get_meta_info(_socket=socket)
         pool_hashrate = meta_info_json['result']['pool_hashrate']
         network_hashrate = meta_info_json['result']['network_hashrate']
         payout_threshold = meta_info_json['result']['payout_threshold']
         fee = meta_info_json['result']['fee']
+
+        print(meta_info_json)
 
         socket_disconnect(_socket=socket)
 
@@ -38,6 +42,7 @@ def block_overview_list(request):
 
     except Exception as ex:
         # Todo log Exception
+        print(ex)
         messages.error(request, 'Could not establish connection to the Backend Server')
         return redirect('presenter:error')
 
@@ -53,7 +58,9 @@ def wallet_detail(request):
 
     if not form.is_valid():
         print(f"Form is invalid")
-        messages.error(request, "The Wallet ID you entered is unknown")
+        errors_json = json.loads(form.errors.as_json())
+        error_message = errors_json['__all__'][0]['message']
+        messages.error(request, error_message)
         return redirect('presenter:index')
 
     # Todo Get from .env
@@ -113,4 +120,8 @@ def wallet_detail(request):
                                            'table_account_works': table_account_works,
                                            'table_account_payouts': table_account_payouts
                                            })
+
+
+def block_detail(request, hash):
+    return redirect(f'https://explorer.nexus.io/search/{hash}')
 

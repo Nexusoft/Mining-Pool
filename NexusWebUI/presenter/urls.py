@@ -12,6 +12,7 @@ urlpatterns = [
                   path('overview/', views.block_overview_list, name='overview'),
                   path('error/', views.ErrorView.as_view(), name='error'),
                   path('wallet/', views.wallet_detail, name='wallet'),
+                  path('detail/<str:hash>/', views.block_detail, name='detail'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
