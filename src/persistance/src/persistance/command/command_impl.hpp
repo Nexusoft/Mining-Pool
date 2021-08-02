@@ -43,9 +43,10 @@ struct Result_sqlite
 class Command_base_database_sqlite : public Command_base_database
 {
 public:
-	virtual ~Command_base_database_sqlite() = default;
-	Command_base_database_sqlite(sqlite3* handle) : m_handle{handle} {}
+	virtual ~Command_base_database_sqlite() { sqlite3_finalize(m_stmt); }
+	Command_base_database_sqlite(sqlite3* handle) : m_handle{ handle }, m_stmt{ nullptr } {}
 	Class get_class() const override { return Class::database_sqlite; }
+	void reset() override;
 
 protected:
 
@@ -55,6 +56,7 @@ protected:
 	void bind_param(sqlite3_stmt* stmt, const char* name, double value);
 
 	sqlite3* m_handle;
+	sqlite3_stmt* m_stmt;
 
 };
 
@@ -65,14 +67,9 @@ public:
 
 	explicit Command_banned_user_and_ip_impl(sqlite3* handle);
 
-	~Command_banned_user_and_ip_impl() { sqlite3_finalize(m_banned_user_and_ip_stmt); }
 	std::any get_command() const override;
 	Type get_type() const override { return Type::get_banned_user_and_ip; }
 	void set_params(std::any params) override;
-
-private:
-	sqlite3_stmt* m_banned_user_and_ip_stmt;
-
 };
 
 class Command_banned_api_ip_impl : public Command_base_database_sqlite
@@ -81,13 +78,9 @@ public:
 
 	explicit Command_banned_api_ip_impl(sqlite3* handle);
 
-	~Command_banned_api_ip_impl() { sqlite3_finalize(m_banned_api_ip_stmt); }
 	std::any get_command() const override;
 	Type get_type() const override { return Type::get_banned_api_ip; }
 	void set_params(std::any params) override;
-
-private:
-	sqlite3_stmt* m_banned_api_ip_stmt;
 };
 
 
@@ -97,13 +90,8 @@ public:
 
 	explicit Command_create_db_schema_impl(sqlite3* handle);
 
-	~Command_create_db_schema_impl() { sqlite3_finalize(m_create_tables_stmt); }
-	std::any get_command() const override { return Command_type_sqlite{ m_create_tables_stmt }; }
+	std::any get_command() const override { return Command_type_sqlite{ m_stmt }; }
 	Type get_type() const override { return Type::create_db_schema; }
-
-private:
-
-	sqlite3_stmt* m_create_tables_stmt;
 };
 
 class Command_account_exists_impl : public Command_base_database_sqlite
@@ -112,14 +100,9 @@ public:
 
 	explicit Command_account_exists_impl(sqlite3* handle);
 
-	~Command_account_exists_impl() { sqlite3_finalize(m_account_exists_stmt); }
 	std::any get_command() const override;
 	Type get_type() const override { return Type::account_exists; }
 	void set_params(std::any params) override;
-
-private:
-
-	sqlite3_stmt* m_account_exists_stmt;
 };
 
 class Command_get_blocks_impl : public Command_base_database_sqlite
@@ -128,13 +111,8 @@ public:
 
 	explicit Command_get_blocks_impl(sqlite3* handle);
 
-	~Command_get_blocks_impl() { sqlite3_finalize(m_get_blocks_stmt); }
 	std::any get_command() const override;
 	Type get_type() const override { return Type::get_blocks; }
-
-private:
-
-	sqlite3_stmt* m_get_blocks_stmt;
 };
 
 

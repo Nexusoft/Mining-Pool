@@ -19,13 +19,11 @@ public:
 
 	Data_storage_impl(std::shared_ptr<spdlog::logger> logger, std::string db_name);
 
-	bool init() override;
 	bool execute_command(std::any command) override;
 
 private:
 
 	bool exec_statement_with_result(command::Command_type_sqlite sql_command, command::Result_sqlite& result);
-
 
 	std::shared_ptr<spdlog::logger> m_logger;
 	std::string m_db_name;

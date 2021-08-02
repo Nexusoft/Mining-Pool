@@ -20,6 +20,8 @@ void Storage_manager_sqlite::start()
         m_logger->critical("Can't open database: {}", sqlite3_errmsg(m_handle));
         std::exit(1);   // cant do anything without a db
     }
+
+    // config the db -> WAL mode, MT etc
 }
 
 void Storage_manager_sqlite::stop()
