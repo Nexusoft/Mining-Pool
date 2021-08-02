@@ -4,7 +4,7 @@
 #include "persistance/data_reader_factory.hpp"
 #include "persistance/data_reader_impl.hpp"
 #include "persistance/storage_manager_impl.hpp"
-#include "persistance/data_storage_factory_impl.hpp"
+
 #include "persistance/command/command_factory_impl.hpp"
 #include "config/types.hpp"
 #include <spdlog/spdlog.h>
@@ -16,10 +16,12 @@ class Data_reader_factory_impl : public Data_reader_factory
 {
 public:
 
-    Data_reader_factory_impl(std::shared_ptr<spdlog::logger> logger, config::Persistance_config config)
+    Data_reader_factory_impl(std::shared_ptr<spdlog::logger> logger, 
+        config::Persistance_config config, 
+        persistance::Data_storage_factory::Sptr data_storage_factory)
         : m_logger{ std::move(logger) }
         , m_config{std::move(config)}
-        , m_data_storage_factory{ std::make_shared<Data_storage_factory_impl>(m_logger)}
+        , m_data_storage_factory{ std::move(data_storage_factory)}
     {
     }
 

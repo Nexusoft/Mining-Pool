@@ -25,7 +25,6 @@ public:
         persistance::Data_storage::Sptr data_storage, 
         std::shared_ptr<persistance::command::Command_factory> command_factory);
 
-    bool create_tables() override;
     bool is_connection_banned(std::string address) override;
     bool is_user_and_connection_banned(std::string user, std::string address) override;
     bool does_account_exists(std::string account) override;

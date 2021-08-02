@@ -17,7 +17,6 @@ public:
 
     virtual ~Data_reader() = default;
 
-    virtual bool create_tables() = 0;
     virtual bool is_connection_banned(std::string address) = 0;
     virtual bool is_user_and_connection_banned(std::string user, std::string address) = 0;
     virtual bool does_account_exists(std::string account) = 0;

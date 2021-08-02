@@ -24,11 +24,6 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_account_exists_cmd = m_command_factory->create_command(Type::account_exists);
 }
 
-bool Data_reader_impl::create_tables()
-{
-	return m_data_storage->execute_command(m_create_tables_cmd);
-}
-
 bool Data_reader_impl::is_connection_banned(std::string address)
 {
 	m_get_banned_ip_cmd->set_params(std::move(address));
