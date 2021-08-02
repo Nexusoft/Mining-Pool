@@ -1,5 +1,5 @@
-#ifndef NEXUSPOOL_PERSISTANCE_DATA_ACCESS_HPP
-#define NEXUSPOOL_PERSISTANCE_DATA_ACCESS_HPP
+#ifndef NEXUSPOOL_PERSISTANCE_DATA_READER_HPP
+#define NEXUSPOOL_PERSISTANCE_DATA_READER_HPP
 
 #include <memory>
 #include <string>
@@ -9,13 +9,13 @@ namespace nexuspool
 namespace persistance
 {
 
-class Data_access
+class Data_reader
 {
 public:
 
-    using Uptr = std::unique_ptr<Data_access>;
+    using Uptr = std::unique_ptr<Data_reader>;
 
-    virtual ~Data_access() = default;
+    virtual ~Data_reader() = default;
 
     virtual bool create_tables() = 0;
     virtual bool is_connection_banned(std::string address) = 0;

@@ -74,7 +74,7 @@ namespace nexuspool
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
 		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, m_config, m_network_component->get_socket_factory());
-		m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_access_factory()->create_data_access(),
+		m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
 			m_config.get_local_ip(), m_config.get_api_listen_port(), m_network_component->get_socket_factory());
 
 		return true;

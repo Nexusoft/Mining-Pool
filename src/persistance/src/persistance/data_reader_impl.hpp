@@ -1,7 +1,7 @@
-#ifndef NEXUSPOOL_PERSISTANCE_DATA_ACCESS_IMPL_HPP
-#define NEXUSPOOL_PERSISTANCE_DATA_ACCESS_IMPL_HPP
+#ifndef NEXUSPOOL_PERSISTANCE_DATA_READER_IMPL_HPP
+#define NEXUSPOOL_PERSISTANCE_DATA_READER_IMPL_HPP
 
-#include "persistance/data_access.hpp"
+#include "persistance/data_reader.hpp"
 #include "persistance/data_storage.hpp"
 #include "persistance/command/command.hpp"
 #include <spdlog/spdlog.h>
@@ -17,11 +17,11 @@ namespace persistance
     namespace command { class Command_factory; }
     using ::nexuspool::persistance::command::Command;
 
-class Data_access_impl : public Data_access
+class Data_reader_impl : public Data_reader
 {
 public:
 
-    Data_access_impl(std::shared_ptr<spdlog::logger> logger, 
+    Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
         persistance::Data_storage::Sptr data_storage, 
         std::shared_ptr<persistance::command::Command_factory> command_factory);
 

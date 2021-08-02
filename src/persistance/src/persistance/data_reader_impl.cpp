@@ -1,4 +1,4 @@
-#include "persistance/data_access_impl.hpp"
+#include "persistance/data_reader_impl.hpp"
 #include "persistance/command/types.hpp"
 #include "persistance/command/command_factory.hpp"
 #include "persistance/command/command_impl.hpp"
@@ -11,7 +11,7 @@ namespace persistance
 
 using ::nexuspool::persistance::command::Type;
 
-Data_access_impl::Data_access_impl(std::shared_ptr<spdlog::logger> logger, 
+Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	persistance::Data_storage::Sptr data_storage,
 	std::shared_ptr<persistance::command::Command_factory> command_factory)
 	: m_logger{std::move(logger)}
@@ -24,25 +24,25 @@ Data_access_impl::Data_access_impl(std::shared_ptr<spdlog::logger> logger,
 	m_account_exists_cmd = m_command_factory->create_command(Type::account_exists);
 }
 
-bool Data_access_impl::create_tables()
+bool Data_reader_impl::create_tables()
 {
 	return m_data_storage->execute_command(m_create_tables_cmd);
 }
 
-bool Data_access_impl::is_connection_banned(std::string address)
+bool Data_reader_impl::is_connection_banned(std::string address)
 {
 	m_get_banned_ip_cmd->set_params(std::move(address));
 	return m_data_storage->execute_command(m_get_banned_ip_cmd);
 }
 
-bool Data_access_impl::is_user_and_connection_banned(std::string user, std::string address)
+bool Data_reader_impl::is_user_and_connection_banned(std::string user, std::string address)
 {
 	std::array<std::string, 2> params{ std::move(user), std::move(address) };
 	m_get_banned_user_ip_cmd->set_params(std::move(params));
 	return m_data_storage->execute_command(m_get_banned_user_ip_cmd);
 }
 
-bool Data_access_impl::does_account_exists(std::string account)
+bool Data_reader_impl::does_account_exists(std::string account)
 {
 	m_account_exists_cmd->set_params(std::move(account));
 	auto return_value = m_data_storage->execute_command(m_account_exists_cmd);

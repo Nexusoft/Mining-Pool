@@ -1,7 +1,7 @@
 #ifndef NEXUSPOOL_PERSISTANCE_COMPONENT_HPP
 #define NEXUSPOOL_PERSISTANCE_COMPONENT_HPP
 
-#include "persistance/data_access_factory.hpp"
+#include "persistance/data_reader_factory.hpp"
 
 namespace nexuspool {
 namespace persistance {
@@ -13,7 +13,7 @@ public:
 
     virtual ~Component() = default;
 
-    virtual Data_access_factory::Sptr get_data_access_factory() = 0;
+    virtual Data_reader_factory::Sptr get_data_reader_factory() = 0;
 
 };
 

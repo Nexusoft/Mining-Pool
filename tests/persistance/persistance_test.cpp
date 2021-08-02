@@ -29,11 +29,11 @@ TEST_F(Persistance_fixture, command_factory_create_all_commands)
 }
 */
 
-TEST_F(Persistance_fixture, simple_data_access)
+TEST_F(Persistance_fixture, simple_data_reader)
 {
-	auto data_access = m_persistance_component->get_data_access_factory()->create_data_access();
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 
-	data_access->is_user_and_connection_banned("test", "test");
-	auto result = data_access->create_tables();
+	data_reader->is_user_and_connection_banned("test", "test");
+	auto result = data_reader->create_tables();
 	EXPECT_TRUE(result);
 }

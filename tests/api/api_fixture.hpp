@@ -32,7 +32,7 @@ public:
 
 			m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
 
-			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_access_factory()->create_data_access(),
+			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
 				"127.0.0.1", 0, m_network_component->get_socket_factory());
 		}
 
