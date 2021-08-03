@@ -3,7 +3,7 @@
 
 #include "persistance/data_reader_factory.hpp"
 #include "persistance/data_reader_impl.hpp"
-#include "persistance/storage_manager_impl.hpp"
+#include "persistance/sqlite/storage_manager_impl.hpp"
 
 #include "persistance/command/command_factory_impl.hpp"
 #include "config/types.hpp"

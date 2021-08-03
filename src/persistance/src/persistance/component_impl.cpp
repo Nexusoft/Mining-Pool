@@ -1,7 +1,7 @@
 #include "persistance/component_impl.hpp"
 #include "persistance/data_reader_factory_impl.hpp"
 #include "persistance/data_writer_impl.hpp"
-#include "persistance/storage_manager_impl.hpp"
+#include "persistance/sqlite/storage_manager_impl.hpp"
 #include <spdlog/spdlog.h>
 
 namespace nexuspool {

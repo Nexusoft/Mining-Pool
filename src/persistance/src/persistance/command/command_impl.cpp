@@ -105,6 +105,50 @@ void Command_banned_api_ip_impl::set_params(std::any params)
 
 // -----------------------------------------------------------------------------------------------
 
+Command_account_exists_impl::Command_account_exists_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT COUNT(name) FROM account WHERE name = ':name';", -1, &m_stmt, NULL);
+}
+
+std::any Command_account_exists_impl::get_command() const
+{
+	Command_type_sqlite command{ m_stmt, {{Column_sqlite::int32}} };
+	return command;
+}
+
+void Command_account_exists_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<std::string>(m_params);
+	bind_param(m_stmt, ":name", casted_params);
+}
+
+// -----------------------------------------------------------------------------------------------
+
+Command_get_blocks_impl::Command_get_blocks_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT hash, height, type, reward, difficulty, orphan, block_found_time FROM block ORDER BY height LIMIT 100;", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_blocks_impl::get_command() const
+{
+	Command_type_sqlite command{ m_stmt,
+		{{Column_sqlite::string}, 
+		{Column_sqlite::int32}, 
+		{Column_sqlite::string}, 
+		{Column_sqlite::string}, 
+		{Column_sqlite::int32}, 
+		{Column_sqlite::double_t}, 
+		{Column_sqlite::int32},
+		{Column_sqlite::string}} };
+	return command;
+}
+
+// -----------------------------------------------------------------------------------------------
+// Write commands
+// -----------------------------------------------------------------------------------------------
 Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
@@ -156,48 +200,22 @@ Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
 
 	sqlite3_prepare_v2(m_handle, create_tables.c_str(), -1, &m_stmt, NULL);
 }
-
 // -----------------------------------------------------------------------------------------------
-
-Command_account_exists_impl::Command_account_exists_impl(sqlite3* handle)
+Command_create_account_impl::Command_create_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT COUNT(name) FROM account WHERE name = ':name';", -1, &m_stmt, NULL);
+	std::string create_account{R"(INSERT INTO account 
+		(name, created_at, last_active, connection_count,shares, reward, hashrate) 
+		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, 0)"};
+
+	sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL);
 }
 
-std::any Command_account_exists_impl::get_command() const
-{
-	Command_type_sqlite command{ m_stmt, {{Column_sqlite::int32}} };
-	return command;
-}
-
-void Command_account_exists_impl::set_params(std::any params)
+void Command_create_account_impl::set_params(std::any params)
 {
 	m_params = std::move(params);
 	auto casted_params = std::any_cast<std::string>(m_params);
 	bind_param(m_stmt, ":name", casted_params);
-}
-
-// -----------------------------------------------------------------------------------------------
-
-Command_get_blocks_impl::Command_get_blocks_impl(sqlite3* handle)
-	: Command_base_database_sqlite{ handle }
-{
-	sqlite3_prepare_v2(m_handle, "SELECT hash, height, type, reward, difficulty, orphan, block_found_time FROM block ORDER BY height LIMIT 100;", -1, &m_stmt, NULL);
-}
-
-std::any Command_get_blocks_impl::get_command() const
-{
-	Command_type_sqlite command{ m_stmt,
-		{{Column_sqlite::string}, 
-		{Column_sqlite::int32}, 
-		{Column_sqlite::string}, 
-		{Column_sqlite::string}, 
-		{Column_sqlite::int32}, 
-		{Column_sqlite::double_t}, 
-		{Column_sqlite::int32},
-		{Column_sqlite::string}} };
-	return command;
 }
 
 }

@@ -23,7 +23,8 @@ enum class Type : std::uint8_t
 	get_banned_api_ip,
 	create_db_schema,
 	account_exists,
-	get_blocks
+	get_blocks,
+	create_account
 
 };
 

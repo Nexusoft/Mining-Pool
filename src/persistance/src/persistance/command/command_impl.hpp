@@ -46,6 +46,7 @@ public:
 	virtual ~Command_base_database_sqlite() { sqlite3_finalize(m_stmt); }
 	Command_base_database_sqlite(sqlite3* handle) : m_handle{ handle }, m_stmt{ nullptr } {}
 	Class get_class() const override { return Class::database_sqlite; }
+	std::any get_command() const override { return Command_type_sqlite{ m_stmt }; }
 	void reset() override;
 
 protected:
@@ -83,17 +84,6 @@ public:
 	void set_params(std::any params) override;
 };
 
-
-class Command_create_db_schema_impl : public Command_base_database_sqlite
-{
-public:
-
-	explicit Command_create_db_schema_impl(sqlite3* handle);
-
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt }; }
-	Type get_type() const override { return Type::create_db_schema; }
-};
-
 class Command_account_exists_impl : public Command_base_database_sqlite
 {
 public:
@@ -114,6 +104,29 @@ public:
 	std::any get_command() const override;
 	Type get_type() const override { return Type::get_blocks; }
 };
+
+// ------------------------------------------------------------------------------------
+// Write commands
+
+class Command_create_db_schema_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_create_db_schema_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::create_db_schema; }
+};
+
+class Command_create_account_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_create_account_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::create_account; }
+	void set_params(std::any params) override;
+};
+
 
 
 }
