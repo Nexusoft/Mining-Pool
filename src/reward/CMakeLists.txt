@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 
-add_library(reward STATIC src/reward/manager_impl.cpp)
+add_library(reward STATIC src/reward/manager_impl.cpp
+                          src/reward/create_component.cpp)
                     
 target_include_directories(reward
     PUBLIC 

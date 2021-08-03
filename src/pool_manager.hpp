@@ -7,6 +7,8 @@
 #include "chrono/timer_factory.hpp"
 #include "session.hpp"
 #include "block.hpp"
+#include "reward/component.hpp"
+#include "reward/manager.hpp"
 
 #include <memory>
 #include <mutex>
@@ -48,6 +50,8 @@ private:
     chrono::Timer_factory::Sptr m_timer_factory;
     network::Socket_factory::Sptr m_socket_factory;
     std::shared_ptr<spdlog::logger> m_logger;
+    reward::Component::Uptr m_reward_component;
+    reward::Manager::Uptr m_reward_manager;
 
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
     network::Socket::Sptr m_listen_socket;

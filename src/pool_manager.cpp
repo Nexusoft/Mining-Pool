@@ -2,6 +2,7 @@
 #include "wallet_connection.hpp"
 #include "miner_connection.hpp"
 #include "config/config.hpp"
+#include "reward/create_component.hpp"
 
 namespace nexuspool
 {
@@ -12,6 +13,8 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, config:
 	, m_timer_factory{std::make_shared<chrono::Timer_factory>(m_io_context)}
 	, m_socket_factory{std::move(socket_factory)}
 	, m_logger{ spdlog::get("logger") }
+	, m_reward_component{reward::create_component()}
+	, m_reward_manager{m_reward_component->create_reward_manager()}
 	, m_listen_socket{}
 	, m_session_registry{m_config.get_session_expiry_time()}
 	, m_current_height{0}
@@ -119,8 +122,21 @@ void Pool_manager::get_block(Get_block_handler handler)
 
 void Pool_manager::submit_block(std::vector<std::uint8_t> const& block_data, std::uint64_t nonce, Submit_block_handler handler)
 {
-	// calc if reached difficulty threshold
-	// m_wallet_connection->submit_block(block_data, nonce, std::move(handler));
+	auto difficulty_result = m_reward_manager->check_difficulty(0, 0);
+	switch (difficulty_result)
+	{
+	case reward::Difficulty_result::accept:
+		// record share for this miner connection but don't submit block to wallet
+		handler(Submit_block_result::accept);
+		break;
+	case reward::Difficulty_result::block_found:
+		// submit the block to wallet
+		// m_wallet_connection->submit_block(block_data, nonce, std::move(handler));
+		break;
+	case reward::Difficulty_result::reject:
+		handler(Submit_block_result::reject);
+		break;
+	}	
 }
 
 chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
