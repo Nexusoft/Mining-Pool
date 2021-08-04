@@ -84,6 +84,8 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 {
 	std::scoped_lock(m_block_mutex);
 	m_block = block;
+	//TODO set the pool difficulty based on current diff
+	//m_pool_nBits = ...
 
 	// send the block to miner_connections if there are pending handlers
 	m_get_block_pending = false;
@@ -122,6 +124,8 @@ void Pool_manager::get_block(Get_block_handler handler)
 
 void Pool_manager::submit_block(std::vector<std::uint8_t> const& block_data, std::uint64_t nonce, Submit_block_handler handler)
 {
+	//TODO convert block_data to CBlock
+	//LLP::CBlock block_from_miner(block_data);
 	auto difficulty_result = m_reward_manager->check_difficulty(0, 0);
 	switch (difficulty_result)
 	{

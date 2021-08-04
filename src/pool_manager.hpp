@@ -63,6 +63,7 @@ private:
     std::atomic<std::uint32_t> m_current_height;
     std::mutex m_block_mutex;
     LLP::CBlock m_block;
+    uint32_t m_pool_nBits;
     std::atomic<bool> m_get_block_pending;
     std::vector< Get_block_handler> m_pending_get_block_handlers;
 };

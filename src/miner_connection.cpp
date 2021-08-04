@@ -139,11 +139,13 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 			});
 		}
 	}
+	//miner has submitted a block to the pool
 	else if (packet.m_header == Packet::SUBMIT_BLOCK)
 	{
 		auto pool_manager_shared = m_pool_manager.lock();
 		if (pool_manager_shared)
 		{
+			
 			std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };
 			std::uint64_t nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
 			pool_manager_shared->submit_block(block_data, nonce, [self = shared_from_this()](auto result)
