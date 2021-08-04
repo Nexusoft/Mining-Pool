@@ -41,9 +41,6 @@ private:
 
     void process_data(network::Shared_payload&& receive_buffer);
 
-    // Convert the Header of a Block into a Byte Stream for Reading and Writing Across Sockets
-    LLP::CBlock deserialize_block(network::Shared_payload data);
-
     void retry_connect(network::Endpoint const& wallet_endpoint);
 
     std::shared_ptr<::asio::io_context> m_io_context;

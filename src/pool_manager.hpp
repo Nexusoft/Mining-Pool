@@ -39,7 +39,7 @@ public:
     enum Submit_block_result { accept, reject, block_found};
     using Submit_block_handler = std::function<void(Submit_block_result result)>;
     void get_block(Get_block_handler handler);
-    void submit_block(std::vector<std::uint8_t> const& block_data, std::uint64_t nonce, Submit_block_handler handler);
+    void submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler);
 
 private:
 

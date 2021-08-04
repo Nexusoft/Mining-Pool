@@ -124,7 +124,7 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
     // Block from wallet received
     else if (packet.m_header == Packet::BLOCK_DATA)
     {
-        auto block = deserialize_block(std::move(packet.m_data));
+        auto block = LLP::deserialize_block(std::move(*packet.m_data));
         if (block.nHeight == m_current_height)
         {
             // transfer block to pool_manager
@@ -177,22 +177,6 @@ void Wallet_connection::get_block()
     Packet packet_get_block;
     packet_get_block.m_header = Packet::GET_BLOCK;
     m_connection->transmit(packet_get_block.get_bytes());
-}
-
-LLP::CBlock Wallet_connection::deserialize_block(network::Shared_payload data)
-{
-    LLP::CBlock block;
-    block.nVersion = bytes2uint(std::vector<uint8_t>(data->begin(), data->begin() + 4));
-
-    block.hashPrevBlock.SetBytes(std::vector<uint8_t>(data->begin() + 4, data->begin() + 132));
-    block.hashMerkleRoot.SetBytes(std::vector<uint8_t>(data->begin() + 132, data->end() - 20));
-
-    block.nChannel = bytes2uint(std::vector<uint8_t>(data->end() - 20, data->end() - 16));
-    block.nHeight = bytes2uint(std::vector<uint8_t>(data->end() - 16, data->end() - 12));
-    block.nBits = bytes2uint(std::vector<uint8_t>(data->end() - 12, data->end() - 8));
-    block.nNonce = bytes2uint64(std::vector<uint8_t>(data->end() - 8, data->end()));
-
-    return block;
 }
 
 }

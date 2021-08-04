@@ -122,10 +122,8 @@ void Pool_manager::get_block(Get_block_handler handler)
 	}
 }
 
-void Pool_manager::submit_block(std::vector<std::uint8_t> const& block_data, std::uint64_t nonce, Submit_block_handler handler)
+void Pool_manager::submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler)
 {
-	//TODO convert block_data to CBlock
-	//LLP::CBlock block_from_miner(block_data);
 	auto difficulty_result = m_reward_manager->check_difficulty(0, 0);
 	switch (difficulty_result)
 	{
