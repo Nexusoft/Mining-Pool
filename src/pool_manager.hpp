@@ -40,6 +40,9 @@ public:
     void get_block(Get_block_handler&& handler);
     void submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler);
 
+    std::uint32_t get_pool_nbits();
+    void set_pool_nbits(std::uint32_t nbits);
+
 private:
 
     chrono::Timer::Handler session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval);

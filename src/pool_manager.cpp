@@ -83,8 +83,7 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 {
 	std::scoped_lock(m_block_mutex);
 	m_block = block;
-	//TODO set the pool difficulty based on current diff
-	//m_pool_nBits = ...
+
 }
 
 void Pool_manager::get_block(Get_block_handler&& handler)
@@ -109,6 +108,22 @@ void Pool_manager::submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit
 		handler(Submit_block_result::reject);
 		break;
 	}	
+}
+
+std::uint32_t Pool_manager::get_pool_nbits()
+{
+	return m_pool_nBits;
+}
+
+//pool nbits determines the difficulty for the pool.  
+//For the hash channel, we set the difficulty to be a divided down version of the main net difficulty
+void Pool_manager::set_pool_nbits(std::uint32_t nbits)
+{
+	const int hash_channel_difficulty_divider = 4;  //TODO put this in the config file
+	uint1024_t target, pool_target;
+	target.SetCompact(nbits);
+	pool_target = pool_target << hash_channel_difficulty_divider;
+	m_pool_nBits = pool_target.GetCompact();
 }
 
 chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
