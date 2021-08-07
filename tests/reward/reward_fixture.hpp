@@ -3,6 +3,11 @@
 
 #include <gtest/gtest.h>
 #include "block.hpp"
+#include <persistance/create_component.hpp>
+#include <reward/create_component.hpp>
+#include <config/config.hpp>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <cstdint>
 #include <string>
 
@@ -10,6 +15,8 @@
 namespace
 {
 using namespace ::nexuspool;
+using ::nexuspool::reward::Component;
+using ::nexuspool::reward::Manager;
 
 class Reward_fixture : public ::testing::Test
 {
@@ -17,9 +24,20 @@ public:
 
 	Reward_fixture()
 	{
+		m_logger = spdlog::stdout_color_mt("logger");
+		m_logger->set_level(spdlog::level::debug);
+		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
+
+		m_component = reward::create_component(m_persistance_component->get_data_writer_factory()->create_shared_data_writer());
+		m_reward_manager = m_component->create_reward_manager();
 	}
 
 protected:
+	std::shared_ptr<spdlog::logger> m_logger;
+	config::Config m_config;
+	persistance::Component::Uptr m_persistance_component;
+	Component::Uptr m_component;
+	Manager::Uptr m_reward_manager;
 
 	LLP::CBlock create_test_block()
 	{
@@ -50,6 +68,7 @@ protected:
 
 	void TearDown() override
 	{
+		spdlog::drop("logger");
 	}
 
 };

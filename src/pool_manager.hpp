@@ -10,6 +10,7 @@
 #include "types.hpp"
 #include "reward/component.hpp"
 #include "reward/manager.hpp"
+#include "persistance/data_writer_factory.hpp"
 
 #include <memory>
 #include <mutex>
@@ -26,7 +27,10 @@ class Pool_manager : public std::enable_shared_from_this<Pool_manager>
 {
 public:
 
-    Pool_manager(std::shared_ptr<asio::io_context> io_context, config::Config& config, network::Socket_factory::Sptr socket_factory);
+    Pool_manager(std::shared_ptr<asio::io_context> io_context, 
+        config::Config& config, 
+        network::Socket_factory::Sptr socket_factory,
+        persistance::Data_writer_factory::Sptr data_writer_factory);
 
     void start();
     void stop();
@@ -49,6 +53,7 @@ private:
     chrono::Timer_factory::Sptr m_timer_factory;
     network::Socket_factory::Sptr m_socket_factory;
     std::shared_ptr<spdlog::logger> m_logger;
+    persistance::Data_writer_factory::Sptr m_data_writer_factory;
     reward::Component::Uptr m_reward_component;
     reward::Manager::Uptr m_reward_manager;
 

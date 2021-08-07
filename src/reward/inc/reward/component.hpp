@@ -7,7 +7,6 @@
 namespace nexuspool {
 namespace reward {
 
-
 class Component 
 {
 public:

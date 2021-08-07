@@ -4,9 +4,9 @@
 namespace nexuspool {
 namespace reward {
 
-Component::Uptr create_component()
+Component::Uptr create_component(persistance::Shared_data_writer::Sptr shared_data_writer)
 {
-    return std::make_unique<Component_impl>();
+    return std::make_unique<Component_impl>(std::move(shared_data_writer));
 }
 
 }

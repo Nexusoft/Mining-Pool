@@ -10,7 +10,9 @@ namespace reward {
 class Component_impl : public Component
 {
 public:
-    Component_impl() = default;
+    Component_impl(persistance::Shared_data_writer::Sptr shared_data_writer)
+        : m_shared_data_writer{std::move(shared_data_writer)}
+    {}
 
     Manager::Uptr create_reward_manager() override
     {
@@ -18,6 +20,8 @@ public:
     }
 
 private:
+
+    persistance::Shared_data_writer::Sptr m_shared_data_writer;
 
 };
 
