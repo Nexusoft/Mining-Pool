@@ -17,5 +17,7 @@ TEST(Reward, difficulty_test)
 	auto reward_component = reward::create_component();
 	auto reward_manager = reward_component->create_reward_manager();
 
-	auto result = reward_manager->check_difficulty(0, 0);
+	LLP::CBlock test_block;
+	std::uint32_t test_nbits;
+	auto result = reward_manager->check_difficulty(test_block, test_nbits);
 }

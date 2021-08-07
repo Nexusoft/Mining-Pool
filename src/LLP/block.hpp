@@ -3,6 +3,7 @@
 
 //#include "../hash/templates.h"
 #include "LLC/types/uint1024.h"
+#include "LLC/hash/SK.h"
 #include "utils.hpp"
 #include <memory>
 
@@ -51,8 +52,8 @@ public:
 		return vData;
 	}
 
-	//inline uint1024 GetHash() const { return SK1024(BEGIN(nVersion), END(nBits)); }
-	//inline uint1024 GetPrime() const { return GetHash() + nNonce; }
+	inline uint1024_t GetHash() const { return LLC::SK1024(BEGIN(nVersion), END(nBits)); }
+	inline uint1024_t GetPrime() const { return GetHash() + nNonce; }
 };
 
 

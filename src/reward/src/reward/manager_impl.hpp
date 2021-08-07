@@ -20,7 +20,7 @@ public:
 
     void clear_shares() override;
 
-    Difficulty_result check_difficulty(double difficulty, double target_difficulty) const override;
+    Difficulty_result check_difficulty(const LLP::CBlock& block, uint32_t pool_nbits) const override;
 
 private:
 

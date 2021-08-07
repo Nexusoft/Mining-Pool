@@ -94,7 +94,7 @@ void Pool_manager::get_block(Get_block_handler&& handler)
 
 void Pool_manager::submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler)
 {
-	auto difficulty_result = m_reward_manager->check_difficulty(0, 0);
+	auto difficulty_result = m_reward_manager->check_difficulty(block, m_pool_nBits);
 	switch (difficulty_result)
 	{
 	case reward::Difficulty_result::accept:
