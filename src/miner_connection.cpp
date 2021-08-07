@@ -3,6 +3,7 @@
 #include "packet.hpp"
 #include "LLP/block.hpp"
 #include "TAO/Register/types/address.h"
+#include "types.hpp"
 
 namespace nexuspool
 {
@@ -152,12 +153,12 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 			pool_manager_shared->submit_block(std::move(block), nonce, [self = shared_from_this()](auto result)
 			{
 				Packet response;
-				if (result == Pool_manager::accept)
+				if (result == Submit_block_result::accept)
 				{
 					response = response.get_packet(Packet::ACCEPT);
 					self->m_connection->transmit(response.get_bytes());
 				}
-				else if(result == Pool_manager::reject)
+				else if(result == Submit_block_result::reject)
 				{
 					response = response.get_packet(Packet::REJECT);
 					self->m_connection->transmit(response.get_bytes());

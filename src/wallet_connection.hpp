@@ -8,9 +8,13 @@
 #include "chrono/timer_factory.hpp"
 #include "timer_manager.hpp"
 #include "block.hpp"
+#include "types.hpp"
 
 #include <memory>
 #include <vector>
+#include <queue>
+#include <mutex>
+#include <atomic>
 
 namespace asio { class io_context; }
 
@@ -35,7 +39,7 @@ public:
     void stop();
 
     void submit_block(std::vector<std::uint8_t> const& block_data, std::vector<std::uint8_t> const& nonce);
-    void get_block();
+    void get_block(Get_block_handler&& handler);
 
 private:
 
@@ -51,6 +55,11 @@ private:
     std::shared_ptr<spdlog::logger> m_logger;
     Timer_manager m_timer_manager;
     std::uint32_t m_current_height;
+
+    // get_block variables
+    std::mutex m_get_block_mutex;
+    std::atomic<bool> m_get_block_pool_manager;
+    std::queue<Get_block_handler> m_pending_get_block_handlers;
 };
 }
 

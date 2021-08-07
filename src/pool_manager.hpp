@@ -7,6 +7,7 @@
 #include "chrono/timer_factory.hpp"
 #include "session.hpp"
 #include "block.hpp"
+#include "types.hpp"
 #include "reward/component.hpp"
 #include "reward/manager.hpp"
 
@@ -35,10 +36,8 @@ public:
     void set_block(LLP::CBlock const& block);
 
     // Methods towards miner_connection
-    using Get_block_handler = std::function<void(LLP::CBlock const& block)>;
-    enum Submit_block_result { accept, reject, block_found};
-    using Submit_block_handler = std::function<void(Submit_block_result result)>;
-    void get_block(Get_block_handler handler);
+
+    void get_block(Get_block_handler&& handler);
     void submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler);
 
 private:
@@ -63,9 +62,7 @@ private:
     std::atomic<std::uint32_t> m_current_height;
     std::mutex m_block_mutex;
     LLP::CBlock m_block;
-    uint32_t m_pool_nBits;
-    std::atomic<bool> m_get_block_pending;
-    std::vector< Get_block_handler> m_pending_get_block_handlers;
+    std::uint32_t m_pool_nBits;
 };
 }
 

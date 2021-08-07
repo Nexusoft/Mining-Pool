@@ -18,7 +18,6 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, config:
 	, m_listen_socket{}
 	, m_session_registry{m_config.get_session_expiry_time()}
 	, m_current_height{0}
-	, m_get_block_pending{false}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 }
@@ -86,40 +85,11 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 	m_block = block;
 	//TODO set the pool difficulty based on current diff
 	//m_pool_nBits = ...
-
-	// send the block to miner_connections if there are pending handlers
-	m_get_block_pending = false;
-	for (auto handler : m_pending_get_block_handlers)
-	{
-		m_io_context->post([handler = std::move(handler), self = shared_from_this()]() {
-			handler(self->m_block);
-		});
-	}
-	m_pending_get_block_handlers.clear();
 }
 
-void Pool_manager::get_block(Get_block_handler handler)
+void Pool_manager::get_block(Get_block_handler&& handler)
 {
-	std::scoped_lock(m_block_mutex);
-	if (m_block.nHeight == m_current_height)
-	{
-		handler(m_block);
-	}
-	else
-	{	// need a fresh block
-		if (m_get_block_pending)
-		{
-			// block request sent to wallet, waiting for new block
-			// store block request handler in pending list
-			m_pending_get_block_handlers.emplace_back(handler);
-		}
-		else
-		{
-			m_get_block_pending = true;
-			m_wallet_connection->get_block();
-
-		}
-	}
+	m_wallet_connection->get_block(std::move(handler));
 }
 
 void Pool_manager::submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler)

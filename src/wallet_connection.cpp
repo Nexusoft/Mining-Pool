@@ -4,6 +4,7 @@
 #include "config/config.hpp"
 #include "config/types.hpp"
 #include "LLP/block.hpp"
+#include <algorithm>
 
 namespace nexuspool
 {
@@ -19,6 +20,7 @@ Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_contex
     , m_logger{ spdlog::get("logger") }
     , m_timer_manager{ std::move(timer_factory) }
     , m_current_height{0}
+    , m_get_block_pool_manager{false}
 {
 }
 
@@ -115,10 +117,16 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
             // update height at pool_manager
             pool_manager_shared->set_current_height(m_current_height);
 
-            // get new block from wallet
+            // get new block from wallet for pool_manager
             Packet packet_get_block;
             packet_get_block.m_header = Packet::GET_BLOCK;
             m_connection->transmit(packet_get_block.get_bytes());
+            m_get_block_pool_manager = true; 
+
+            // clear pending get_block handlers
+            std::scoped_lock lock(m_get_block_mutex);
+            std::queue<Get_block_handler> empty_queue;
+            std::swap(m_pending_get_block_handlers, empty_queue);
         }
     }
     // Block from wallet received
@@ -127,12 +135,23 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
         auto block = LLP::deserialize_block(std::move(*packet.m_data));
         if (block.nHeight == m_current_height)
         {
-            // transfer block to pool_manager
-            auto pool_manager_shared = m_pool_manager.lock();
-            if (!pool_manager_shared)
-                return;
+            if (m_get_block_pool_manager) // pool_manager get_block has priority
+            {
+                auto pool_manager_shared = m_pool_manager.lock();
+                if (!pool_manager_shared)
+                    return;
 
-            pool_manager_shared->set_block(block);
+                pool_manager_shared->set_block(std::move(block));
+                m_get_block_pool_manager = false;
+            }
+            else
+            {
+                // get oldest pending_get_block handler from miner_connection and call it then pop()
+                std::scoped_lock lock(m_get_block_mutex);
+                auto handler = m_pending_get_block_handlers.front();
+                handler(block);
+                m_pending_get_block_handlers.pop();
+            }
         }
         else
         {
@@ -172,11 +191,15 @@ void Wallet_connection::submit_block(std::vector<std::uint8_t> const& block_data
     m_connection->transmit(packet.get_bytes());
 }
 
-void Wallet_connection::get_block()
+void Wallet_connection::get_block(Get_block_handler&& handler)
 {
     Packet packet_get_block;
     packet_get_block.m_header = Packet::GET_BLOCK;
     m_connection->transmit(packet_get_block.get_bytes());
+
+    // store block request handler in pending list (handler comes from miner_connection)
+    std::scoped_lock lock(m_get_block_mutex);
+    m_pending_get_block_handlers.emplace(handler);
 }
 
 }
