@@ -141,6 +141,7 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
                 if (!pool_manager_shared)
                     return;
 
+                pool_manager_shared->set_pool_nbits(block.nBits);
                 pool_manager_shared->set_block(std::move(block));
                 m_get_block_pool_manager = false;
             }
