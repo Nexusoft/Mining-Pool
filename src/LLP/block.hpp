@@ -52,7 +52,7 @@ public:
 		return vData;
 	}
 
-	inline uint1024_t GetHash() const { return LLC::SK1024(BEGIN(nVersion), END(nBits)); }
+	inline uint1024_t GetHash() const { return nChannel == 1?LLC::SK1024(BEGIN(nVersion), END(nBits)): LLC::SK1024(BEGIN(nVersion), END(nNonce)); }
 	inline uint1024_t GetPrime() const { return GetHash() + nNonce; }
 };
 
