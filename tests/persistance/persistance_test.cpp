@@ -15,6 +15,17 @@ TEST(Persistance, initialisation)
 	EXPECT_TRUE(component);
 }
 
+TEST_F(Persistance_fixture, create_shared_data_writer)
+{
+	auto data_writer_factory = m_persistance_component->get_data_writer_factory();
+	EXPECT_TRUE(data_writer_factory);
+	auto shared_data_writer = data_writer_factory->create_shared_data_writer();
+	EXPECT_EQ(shared_data_writer.use_count(), 2);	// factory stores one shared_ptr and gives one shared_ptr out
+
+	auto shared_data_writer_2 = data_writer_factory->create_shared_data_writer();
+	EXPECT_EQ(shared_data_writer_2.use_count(), 3);
+}
+
 /*
 TEST_F(Persistance_fixture, command_factory_create_all_commands)
 {
@@ -34,6 +45,4 @@ TEST_F(Persistance_fixture, simple_data_reader)
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 
 	data_reader->is_user_and_connection_banned("test", "test");
-	//auto result = data_reader->create_tables();
-	//EXPECT_TRUE(result);
 }

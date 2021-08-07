@@ -19,6 +19,18 @@ public:
 
     virtual bool create_tables() = 0;
 };
+
+// Wrapper for unique data_writer. Ensures thread safety
+class Shared_data_writer
+{
+public:
+
+    using Sptr = std::shared_ptr<Shared_data_writer>;
+
+    virtual ~Shared_data_writer() = default;
+
+    virtual bool create_tables() = 0;
+};
 }
 }
 

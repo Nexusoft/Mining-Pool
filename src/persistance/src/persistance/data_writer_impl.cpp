@@ -26,5 +26,18 @@ bool Data_writer_impl::create_tables()
 	return m_data_storage->execute_command(m_create_tables_cmd);
 }
 
+// --------------------------------------------------------------------------------------
+
+
+Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
+	: m_data_writer{std::move(data_writer)}
+{}
+
+bool Shared_data_writer_impl::create_tables()
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->create_tables();
+}
+
 }
 }

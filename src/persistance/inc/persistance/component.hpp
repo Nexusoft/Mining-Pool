@@ -2,7 +2,7 @@
 #define NEXUSPOOL_PERSISTANCE_COMPONENT_HPP
 
 #include "persistance/data_reader_factory.hpp"
-#include "persistance/data_writer.hpp"
+#include "persistance/data_writer_factory.hpp"
 
 namespace nexuspool {
 namespace persistance {
@@ -17,7 +17,7 @@ public:
     virtual ~Component() = default;
 
     virtual Data_reader_factory::Sptr get_data_reader_factory() = 0;
-    virtual Data_writer::Uptr create_data_writer() = 0;
+    virtual Data_writer_factory::Sptr get_data_writer_factory() = 0;
 
 };
 

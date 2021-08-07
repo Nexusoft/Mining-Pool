@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <mutex>
 
 namespace nexuspool
 {
@@ -37,6 +38,20 @@ private:
     std::shared_ptr<Command> m_create_tables_cmd;
 
 
+};
+
+class Shared_data_writer_impl : public Shared_data_writer
+{
+public:
+
+    Shared_data_writer_impl(Data_writer::Uptr data_writer);
+
+    bool create_tables() override;
+
+private:
+
+    std::mutex m_writer_mutex;
+    Data_writer::Uptr m_data_writer;
 };
 
 }
