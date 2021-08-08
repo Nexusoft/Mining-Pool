@@ -1,4 +1,6 @@
 import json
+import logging
+
 import requests
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -8,6 +10,7 @@ from .forms import WalletSearchForm
 from .rpc_requests import get_latest_blocks, get_meta_info, socket_connect, socket_disconnect, get_account_header, \
     get_account_works, get_account_payouts
 
+logger = logging.getLogger('django')
 
 def block_overview_list(request):
     template_name = 'presenter/overview_list.html'
