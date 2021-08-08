@@ -7,6 +7,8 @@ class WalletSearchForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(WalletSearchForm, self).clean()
+        
+        # Todo check if account was already validated and add it if it is new
 
         socket = socket_connect(_ip='127.0.0.1', _port=5000)
         get_account_json = get_account(_socket=socket, _account=cleaned_data['wallet_id'])
