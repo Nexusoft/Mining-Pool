@@ -10,13 +10,15 @@ namespace nexuspool
 Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, 
 	config::Config& config,
 	network::Socket_factory::Sptr socket_factory,
-	persistance::Data_writer_factory::Sptr data_writer_factory)
+	persistance::Data_writer_factory::Sptr data_writer_factory,
+	persistance::Data_reader_factory::Sptr data_reader_factory)
 	: m_io_context{std::move(io_context) }
 	, m_config{config}
 	, m_timer_factory{std::make_shared<chrono::Timer_factory>(m_io_context)}
 	, m_socket_factory{std::move(socket_factory)}
 	, m_logger{ spdlog::get("logger") }
 	, m_data_writer_factory{std::move(data_writer_factory)}
+	, m_data_reader_factory{std::move(data_reader_factory)}
 	, m_reward_component{reward::create_component(nullptr)}
 	, m_reward_manager{m_reward_component->create_reward_manager()}
 	, m_listen_socket{}

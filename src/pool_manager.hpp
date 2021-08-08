@@ -11,6 +11,7 @@
 #include "reward/component.hpp"
 #include "reward/manager.hpp"
 #include "persistance/data_writer_factory.hpp"
+#include "persistance/data_reader_factory.hpp"
 
 #include <memory>
 #include <mutex>
@@ -30,7 +31,8 @@ public:
     Pool_manager(std::shared_ptr<asio::io_context> io_context, 
         config::Config& config, 
         network::Socket_factory::Sptr socket_factory,
-        persistance::Data_writer_factory::Sptr data_writer_factory);
+        persistance::Data_writer_factory::Sptr data_writer_factory,
+        persistance::Data_reader_factory::Sptr data_reader_factory);
 
     void start();
     void stop();
@@ -57,6 +59,7 @@ private:
     network::Socket_factory::Sptr m_socket_factory;
     std::shared_ptr<spdlog::logger> m_logger;
     persistance::Data_writer_factory::Sptr m_data_writer_factory;
+    persistance::Data_reader_factory::Sptr m_data_reader_factory;
     reward::Component::Uptr m_reward_component;
     reward::Manager::Uptr m_reward_manager;
 
