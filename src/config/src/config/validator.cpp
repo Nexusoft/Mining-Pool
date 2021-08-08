@@ -92,6 +92,17 @@ bool Validator::check(std::string const& config_file)
                 m_mandatory_fields.push_back(Validator_error{ "pool/min_share", "Not a number" });
             }
         }
+        if (j.count("pool")["difficulty_divider"] == 0)
+        {
+            m_mandatory_fields.push_back(Validator_error{ "pool/difficulty_divider", "" });
+        }
+        else
+        {
+            if (!j.at("pool")["difficulty_divider"].is_number())
+            {
+                m_mandatory_fields.push_back(Validator_error{ "pool/difficulty_divider", "Not a number" });
+            }
+        }        
 
         // persistance config
         if (j.count("persistance")["type"] == 0)

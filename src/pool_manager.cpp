@@ -123,10 +123,9 @@ std::uint32_t Pool_manager::get_pool_nbits()
 //For the hash channel, we set the difficulty to be a divided down version of the main net difficulty
 void Pool_manager::set_pool_nbits(std::uint32_t nbits)
 {
-	const int hash_channel_difficulty_divider = 4;  //TODO put this in the config file
 	uint1024_t target, pool_target;
 	target.SetCompact(nbits);
-	pool_target = target >> hash_channel_difficulty_divider;
+	pool_target = target >> m_config.get_pool_config().m_difficulty_divider;
 	m_pool_nBits = pool_target.GetCompact();
 }
 
