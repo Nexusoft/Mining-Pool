@@ -22,6 +22,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_banned_ip_cmd = m_command_factory->create_command(Type::get_banned_api_ip);
 	m_get_banned_user_ip_cmd = m_command_factory->create_command(Type::get_banned_user_and_ip);
 	m_account_exists_cmd = m_command_factory->create_command(Type::account_exists);
+	m_get_account_cmd = m_command_factory->create_command(Type::get_account);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -43,6 +44,23 @@ bool Data_reader_impl::does_account_exists(std::string account)
 	auto return_value = m_data_storage->execute_command(m_account_exists_cmd);
 	auto result = std::any_cast<command::Result_sqlite>(m_account_exists_cmd->get_result());
 	return return_value ? (result.m_rows.empty() ? false : true) : false;
+}
+
+Account_data Data_reader_impl::get_account(std::string account)
+{
+	Account_data account_data{};
+	m_get_account_cmd->set_params(std::move(account));
+	if (!m_data_storage->execute_command(m_get_account_cmd))
+	{
+		return account_data;	// return empty result
+	}
+	auto result = std::any_cast<command::Result_sqlite>(m_get_account_cmd->get_result());
+	auto result_row = result.m_rows.front();
+
+	//account_data.m_address = result_row.
+
+	return account_data;
+
 }
 
 

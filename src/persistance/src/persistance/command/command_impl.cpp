@@ -125,6 +125,34 @@ void Command_account_exists_impl::set_params(std::any params)
 }
 
 // -----------------------------------------------------------------------------------------------
+Command_get_account_impl::Command_get_account_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT name, created_at, last_active, connection_count, shares, reward, hashrate FROM account WHERE name = ':name';", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_account_impl::get_command() const
+{
+	Command_type_sqlite command{ m_stmt, 
+		{{Column_sqlite::string},
+		{Column_sqlite::string},
+		{Column_sqlite::string},
+		{Column_sqlite::string},
+		{Column_sqlite::int32},
+		{Column_sqlite::double_t},
+		{Column_sqlite::double_t},
+		{Column_sqlite::double_t}} };
+	return command;
+}
+
+void Command_get_account_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<std::string>(m_params);
+	bind_param(m_stmt, ":name", casted_params);
+}
+
+// -----------------------------------------------------------------------------------------------
 
 Command_get_blocks_impl::Command_get_blocks_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }

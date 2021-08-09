@@ -8,34 +8,17 @@
 namespace nexuspool {
 namespace persistance {
 
-struct pool_data
+struct Account_data
 {
-public:
-	pool_data()
-	{
-		//nRound = Core::nCurrentRound;
-		//nBlockNumber = Core::nBestHeight;
-		//nRoundReward = Core::nRoundReward;
-		//nTotalShares = Core::TotalWeight();
-		//nConnectionCount = Core::nConnections;
-
-	}
-
-	uint32_t m_round;
-	uint32_t m_block_number;
-	uint64_t m_round_reward;
-	uint64_t m_total_shares;
-	uint32_t m_connection_count;
+	std::string m_address;
+	std::uint16_t m_connections;
+	std::string m_created_at;
+	std::string m_last_active;
+	double m_shares;
+	double m_balance;
+	double m_hashrate;
 };
 
-struct account_data
-{
-	std::string m_account_address;
-	int m_connections;
-	uint64_t m_shares;
-	uint64_t m_balance;
-	uint64_t m_pending_payout;
-};
 
 struct round_data
 {

@@ -29,6 +29,8 @@ public:
             std::make_shared<Command_banned_api_ip_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::account_exists,
             std::make_shared<Command_account_exists_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::get_account,
+            std::make_shared<Command_get_account_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::get_blocks,
             std::make_shared<Command_get_blocks_impl>(m_storage_manager->get_handle<sqlite3*>())));
         // Write commands
@@ -61,6 +63,9 @@ private:
             break;
         case Type::account_exists:
             result = std::any_cast<std::shared_ptr<Command_account_exists_impl>>(m_commands[command_type]);
+            break;
+        case Type::get_account:
+            result = std::any_cast<std::shared_ptr<Command_get_account_impl>>(m_commands[command_type]);
             break;
         case Type::get_blocks:
             result = std::any_cast<std::shared_ptr<Command_get_blocks_impl>>(m_commands[command_type]);
