@@ -28,7 +28,8 @@ public:
 		m_logger->set_level(spdlog::level::debug);
 		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
 
-		m_component = reward::create_component(m_persistance_component->get_data_writer_factory()->create_shared_data_writer());
+		m_component = reward::create_component(m_persistance_component->get_data_writer_factory()->create_shared_data_writer(),
+			m_persistance_component->get_data_reader_factory()->create_data_reader());
 		m_reward_manager = m_component->create_reward_manager();
 	}
 

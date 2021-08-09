@@ -19,7 +19,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	, m_logger{ spdlog::get("logger") }
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
-	, m_reward_component{reward::create_component(nullptr)}
+	, m_reward_component{reward::create_component(m_data_writer_factory->create_shared_data_writer(), m_data_reader_factory->create_data_reader())}
 	, m_reward_manager{m_reward_component->create_reward_manager()}
 	, m_listen_socket{}
 	, m_session_registry{m_config.get_session_expiry_time()}
