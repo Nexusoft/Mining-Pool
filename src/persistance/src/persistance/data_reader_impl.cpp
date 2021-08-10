@@ -1,7 +1,7 @@
 #include "persistance/data_reader_impl.hpp"
 #include "persistance/command/types.hpp"
 #include "persistance/command/command_factory.hpp"
-#include "persistance/command/command_impl.hpp"
+#include "persistance/sqlite/command/command_impl.hpp"
 #include <array>
 
 namespace nexuspool
@@ -42,7 +42,7 @@ bool Data_reader_impl::does_account_exists(std::string account)
 {
 	m_account_exists_cmd->set_params(std::move(account));
 	auto return_value = m_data_storage->execute_command(m_account_exists_cmd);
-	auto result = std::any_cast<command::Result_sqlite>(m_account_exists_cmd->get_result());
+	auto result = std::any_cast<Result_sqlite>(m_account_exists_cmd->get_result());
 	return return_value ? (result.m_rows.empty() ? false : true) : false;
 }
 
@@ -54,7 +54,7 @@ Account_data Data_reader_impl::get_account(std::string account)
 	{
 		return account_data;	// return empty result
 	}
-	auto result = std::any_cast<command::Result_sqlite>(m_get_account_cmd->get_result());
+	auto result = std::any_cast<Result_sqlite>(m_get_account_cmd->get_result());
 	auto result_row = result.m_rows.front();
 
 	//account_data.m_address = result_row.

@@ -1,7 +1,8 @@
-#ifndef NEXUSPOOL_PERSISTANCE_COMMAND_COMMAND_IMPL_HPP
-#define NEXUSPOOL_PERSISTANCE_COMMAND_COMMAND_IMPL_HPP
+#ifndef NEXUSPOOL_PERSISTANCE_SQLITE_COMMAND_COMMAND_IMPL_HPP
+#define NEXUSPOOL_PERSISTANCE_SQLITE_COMMAND_COMMAND_IMPL_HPP
 
 #include "persistance/command/command.hpp"
+#include "persistance/sqlite/types.hpp"
 #include "sqlite/sqlite3.h"
 #include <memory>
 #include <string>
@@ -13,32 +14,6 @@ namespace spdlog { class logger; }
 namespace nexuspool {
 namespace persistance {
 namespace command {
-
-
-struct Column_sqlite
-{
-	enum Datatype :std::uint8_t
-	{
-		string = 0,
-		int32,
-		int64,
-		double_t
-	};
-
-	Datatype m_type;
-	std::variant<std::string, std::int32_t, std::int64_t, double> m_data;
-};
-struct Command_type_sqlite
-{
-	sqlite3_stmt* m_statement;
-	std::vector<Column_sqlite> m_columns;
-};
-
-struct Result_sqlite
-{
-	using Result_columns = std::vector<Column_sqlite>;
-	std::vector<Result_columns> m_rows;
-};
 
 class Command_base_database_sqlite : public Command_base_database
 {

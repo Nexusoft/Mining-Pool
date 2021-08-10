@@ -4,7 +4,7 @@
 #include "persistance/data_writer_factory.hpp"
 #include "persistance/data_writer_impl.hpp"
 #include "persistance/sqlite/storage_manager_impl.hpp"
-#include "persistance/command/command_factory_impl.hpp"
+#include "persistance/sqlite/command/command_factory_impl.hpp"
 #include "config/types.hpp"
 #include <spdlog/spdlog.h>
 

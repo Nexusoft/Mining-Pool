@@ -19,6 +19,11 @@ struct Account_data
 	double m_hashrate;
 };
 
+struct Block_data
+{
+
+};
+
 
 struct round_data
 {

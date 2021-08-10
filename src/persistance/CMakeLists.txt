@@ -5,8 +5,9 @@ add_library(persistance STATIC  src/persistance/sqlite/data_storage_impl.cpp
                                 src/persistance/component_impl.cpp 
                                 src/persistance/sqlite/storage_manager_impl.cpp
                                 src/persistance/data_reader_impl.cpp
-                                src/persistance/command/command_impl.cpp
-                                src/persistance/data_writer_impl.cpp  "inc/persistance/data_writer_factory.hpp" "src/persistance/data_writer_factory_impl.hpp")
+                                src/persistance/sqlite/command/command_impl.cpp
+                                src/persistance/data_writer_impl.cpp
+                                src/persistance/sqlite/utils.cpp)
                     
 target_include_directories(persistance
     PUBLIC 

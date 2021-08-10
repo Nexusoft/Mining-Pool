@@ -1,7 +1,7 @@
 #include "persistance/data_writer_impl.hpp"
 #include "persistance/command/types.hpp"
 #include "persistance/command/command_factory.hpp"
-#include "persistance/command/command_impl.hpp"
+#include "persistance/sqlite/command/command_impl.hpp"
 #include <array>
 
 namespace nexuspool

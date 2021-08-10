@@ -1,8 +1,8 @@
-#ifndef NEXUSPOOL_PERSISTANCE_COMMAND_COMMAND_FACTORY_IMPL_HPP
-#define NEXUSPOOL_PERSISTANCE_COMMAND_COMMAND_FACTORY_IMPL_HPP
+#ifndef NEXUSPOOL_PERSISTANCE_SQLITE_COMMAND_COMMAND_FACTORY_IMPL_HPP
+#define NEXUSPOOL_PERSISTANCE_SQLITE_COMMAND_COMMAND_FACTORY_IMPL_HPP
 
 #include "persistance/command/command_factory.hpp"
-#include "persistance/command/command_impl.hpp"
+#include "persistance/sqlite/command/command_impl.hpp"
 #include "persistance/storage_manager.hpp"
 #include <spdlog/spdlog.h>
 #include "sqlite/sqlite3.h"
