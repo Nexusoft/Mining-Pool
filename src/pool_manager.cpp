@@ -22,7 +22,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	, m_reward_component{reward::create_component(m_data_writer_factory->create_shared_data_writer(), m_data_reader_factory->create_data_reader())}
 	, m_reward_manager{m_reward_component->create_reward_manager()}
 	, m_listen_socket{}
-	, m_session_registry{m_config.get_session_expiry_time()}
+	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config.get_session_expiry_time()}
 	, m_current_height{0}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();

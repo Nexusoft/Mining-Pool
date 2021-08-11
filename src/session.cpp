@@ -19,8 +19,12 @@ void Session::update_connection(std::shared_ptr<Miner_connection> miner_connecti
 
 // ------------------------------------------------------------------------------------------------------------
 
-Session_registry::Session_registry(std::uint32_t session_expiry_time) 
-	: m_sessions{}
+Session_registry::Session_registry(persistance::Data_reader::Uptr data_reader,
+	persistance::Shared_data_writer::Sptr data_writer,
+	std::uint32_t session_expiry_time)
+	: m_data_reader{std::move(data_reader)}
+	, m_data_writer{std::move(data_writer)}
+	, m_sessions{}
 	, m_session_expiry_time{session_expiry_time}
 {}
 
@@ -86,4 +90,12 @@ void Session_registry::update_height(std::uint32_t height)
 		}
 	}
 }
+
+bool Session_registry::does_account_exists(std::string account)
+{
+	std::scoped_lock lock(m_data_reader_mutex);
+
+	return m_data_reader->does_account_exists(std::move(account));
+}
+
 }

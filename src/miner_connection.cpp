@@ -109,7 +109,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		// check if banned ip/user
 
 		// check if user already exists in db
-		// update db
+		user_data.m_new_account = !m_session_registry.does_account_exists(nxs_address);
 		user_data.m_logged_in = true;
 		response = response.get_packet(Packet::LOGIN_SUCCESS);
 		m_connection->transmit(response.get_bytes());
@@ -159,6 +159,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 				Packet response;
 				if (result == Submit_block_result::accept)
 				{
+					// TODO create new account if it not exists yet
 					response = response.get_packet(Packet::ACCEPT);
 					self->m_connection->transmit(response.get_bytes());
 				}
@@ -169,6 +170,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 				}
 				else
 				{
+					// TODO create new account if it not exists yet
 					response = response.get_packet(Packet::BLOCK);
 					self->m_connection->transmit(response.get_bytes());
 				}

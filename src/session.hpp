@@ -7,6 +7,8 @@
 #include <mutex>
 #include <chrono>
 #include "LLC/types/uint1024.h"
+#include "persistance/data_writer.hpp"
+#include "persistance/data_reader.hpp"
 
 namespace nexuspool
 {
@@ -16,6 +18,7 @@ struct Session_user
 {
 	std::string m_nxs_address{ "" };
 	bool m_logged_in{ false };
+	bool m_new_account{ true };
 };
 
 using Session_key = uint256_t;
@@ -47,10 +50,13 @@ class Session_registry
 {
 public:
 
-	explicit Session_registry(std::uint32_t session_expiry_time);
+	explicit Session_registry(persistance::Data_reader::Uptr data_reader, 
+		persistance::Shared_data_writer::Sptr data_writer,
+		std::uint32_t session_expiry_time);
 
 	void stop();
 
+	// Managment methods
 	Session_key create_session();
 	Session get_session(Session_key key);
 	void update_session(Session_key key, Session& session);
@@ -59,9 +65,14 @@ public:
 	// update height on active sessions
 	void update_height(std::uint32_t height);
 
+	bool does_account_exists(std::string account);
+
 private:
 
+	persistance::Data_reader::Uptr m_data_reader;			// hold ownership over data_reader/writer
+	persistance::Shared_data_writer::Sptr m_data_writer;
 	std::mutex m_sessions_mutex;
+	std::mutex m_data_reader_mutex;
 	std::map<Session_key, Session> m_sessions;
 	std::uint32_t m_session_expiry_time;
 
