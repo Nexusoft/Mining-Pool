@@ -34,6 +34,9 @@ private:
 
     void process_data(network::Shared_payload&& receive_buffer);
 
+    // checks if a new account should be created -> create it if necessary
+    void create_new_account();
+
     network::Connection::Sptr m_connection;
     std::weak_ptr<Pool_manager> m_pool_manager;
     std::shared_ptr<spdlog::logger> m_logger;

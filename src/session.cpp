@@ -1,12 +1,14 @@
 #include "session.hpp"
 #include "miner_connection.hpp"
 #include "LLC/random.h"
+#include <assert.h>
 
 namespace nexuspool
 {
 
-Session::Session()
-	: m_user_data{}
+Session::Session(persistance::Shared_data_writer::Sptr data_writer)
+	: m_data_writer{std::move(data_writer)}
+	, m_user_data{}
 	, m_miner_connection{}
 	, m_update_time{std::chrono::steady_clock::now()}
 {
@@ -15,6 +17,14 @@ Session::Session()
 void Session::update_connection(std::shared_ptr<Miner_connection> miner_connection)
 {
 	m_miner_connection = std::move(miner_connection);
+}
+
+bool Session::create_account()
+{
+	assert(m_user_data.m_new_account);
+	assert(!m_user_data.m_nxs_address.empty());
+
+	return m_data_writer->create_account(m_user_data.m_nxs_address);
 }
 
 // ------------------------------------------------------------------------------------------------------------
@@ -40,21 +50,15 @@ Session_key Session_registry::create_session()
 	std::scoped_lock lock(m_sessions_mutex);
 
 	auto const session_key = LLC::GetRand256();
-	m_sessions.emplace(std::make_pair(session_key, Session{}));
+	m_sessions.emplace(std::make_pair(session_key, std::make_shared<Session>(m_data_writer)));
 	return session_key;
 }
 
-Session Session_registry::get_session(Session_key key)
+std::shared_ptr<Session> Session_registry::get_session(Session_key key)
 {
 	std::scoped_lock lock(m_sessions_mutex);
 	return m_sessions[key];
 
-}
-void Session_registry::update_session(Session_key key, Session& session)
-{
-	std::scoped_lock lock(m_sessions_mutex);
-	session.set_update_time(std::chrono::steady_clock::now());
-	m_sessions[key] = session;
 }
 
 void Session_registry::clear_unused_sessions()
@@ -65,7 +69,7 @@ void Session_registry::clear_unused_sessions()
 	while (iter != m_sessions.end()) 
 	{
 		// delete sessions were the session is expired
-		if(std::chrono::duration_cast<std::chrono::seconds>(time_now - iter->second.get_update_time()).count() > m_session_expiry_time)
+		if(std::chrono::duration_cast<std::chrono::seconds>(time_now - iter->second->get_update_time()).count() > m_session_expiry_time)
 		{
 			iter = m_sessions.erase(iter);
 		}
@@ -82,7 +86,7 @@ void Session_registry::update_height(std::uint32_t height)
 
 	for (auto& session : m_sessions)
 	{
-		auto miner_connection = session.second.get_connection();
+		auto miner_connection = session.second->get_connection();
 		auto miner_connection_shared = miner_connection.lock();
 		if (miner_connection_shared)
 		{

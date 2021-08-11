@@ -55,8 +55,8 @@ void Pool_manager::start()
 		auto miner_connection = std::make_shared<Miner_connection>(self->m_timer_factory, std::move(connection), self, session_key, self->m_session_registry);
 
 		auto session = self->m_session_registry.get_session(session_key);
-		session.update_connection(miner_connection);
-		self->m_session_registry.update_session(session_key, session);
+		session->update_connection(miner_connection);
+		session->set_update_time(std::chrono::steady_clock::now());
 
 		return miner_connection->connection_handler();
 	};

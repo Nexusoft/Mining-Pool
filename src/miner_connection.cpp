@@ -80,7 +80,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 	else if (packet.m_header == Packet::LOGIN)
 	{
-		auto user_data = session.get_user_data();
+		auto user_data = session->get_user_data();
 		// check if already logged in
 		if (user_data.m_logged_in)
 		{
@@ -159,7 +159,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 				Packet response;
 				if (result == Submit_block_result::accept)
 				{
-					// TODO create new account if it not exists yet
+					self->create_new_account();
 					response = response.get_packet(Packet::ACCEPT);
 					self->m_connection->transmit(response.get_bytes());
 				}
@@ -170,7 +170,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 				}
 				else
 				{
-					// TODO create new account if it not exists yet
+					self->create_new_account();
 					response = response.get_packet(Packet::BLOCK);
 					self->m_connection->transmit(response.get_bytes());
 				}
@@ -184,12 +184,28 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 
 	// received a valid paket from miner -> update session
-	m_session_registry.update_session(m_session_key, session);
+	session->set_update_time(std::chrono::steady_clock::now());
 }
 
 void Miner_connection::set_current_height(std::uint32_t height)
 {
 	m_current_height = height;
+}
+
+void Miner_connection::create_new_account()
+{
+	auto session = m_session_registry.get_session(m_session_key);
+	auto user_data = session->get_user_data();
+	if(user_data.m_new_account)
+	{
+		m_logger->info("Creating new account for miner {}", user_data.m_nxs_address);
+		if (!session->create_account())
+		{
+			m_logger->error("Failed creating new account for miner {}", user_data.m_nxs_address);
+			user_data.m_new_account = false;
+		}
+	}
+	session->set_update_time(std::chrono::steady_clock::now());
 }
 
 }
