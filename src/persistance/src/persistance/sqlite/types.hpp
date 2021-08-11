@@ -12,7 +12,7 @@ namespace persistance {
 
 struct Column_sqlite
 {
-	enum Datatype :std::uint8_t
+	enum Datatype : std::uint8_t
 	{
 		string = 0,
 		int32,
@@ -28,8 +28,15 @@ using Row_sqlite = std::vector<Column_sqlite>;
 
 struct Command_type_sqlite
 {
-	sqlite3_stmt* m_statement;
-	Row_sqlite m_row;
+	enum Resulttype : std::uint8_t
+	{
+		result = 0,
+		no_result
+	};
+
+	sqlite3_stmt* m_statement{ nullptr };
+	Row_sqlite m_row{};
+	Resulttype m_type{ result };
 };
 
 struct Result_sqlite

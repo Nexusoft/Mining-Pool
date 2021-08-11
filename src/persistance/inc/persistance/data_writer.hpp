@@ -18,6 +18,7 @@ public:
     virtual ~Data_writer() = default;
 
     virtual bool create_tables() = 0;
+    virtual bool create_account(std::string account) = 0;
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -30,6 +31,7 @@ public:
     virtual ~Shared_data_writer() = default;
 
     virtual bool create_tables() = 0;
+    virtual bool create_account(std::string account) = 0;
 };
 }
 }

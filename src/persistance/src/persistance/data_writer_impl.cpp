@@ -19,11 +19,17 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	, m_command_factory{ std::move(command_factory) }
 {
 	m_create_tables_cmd = m_command_factory->create_command(Type::create_db_schema);
+	m_create_account_cmd = m_command_factory->create_command(Type::create_account);
 }
 
 bool Data_writer_impl::create_tables()
 {
 	return m_data_storage->execute_command(m_create_tables_cmd);
+}
+
+bool Data_writer_impl::create_account(std::string account)
+{
+	return m_data_storage->execute_command(m_create_account_cmd);
 }
 
 // --------------------------------------------------------------------------------------
@@ -37,6 +43,12 @@ bool Shared_data_writer_impl::create_tables()
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->create_tables();
+}
+
+bool Shared_data_writer_impl::create_account(std::string account)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->create_account(std::move(account));
 }
 
 }

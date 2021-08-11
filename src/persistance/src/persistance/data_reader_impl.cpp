@@ -2,6 +2,7 @@
 #include "persistance/command/types.hpp"
 #include "persistance/command/command_factory.hpp"
 #include "persistance/sqlite/command/command_impl.hpp"
+#include "persistance/sqlite/utils.hpp"
 #include <array>
 
 namespace nexuspool
@@ -56,11 +57,9 @@ Account_data Data_reader_impl::get_account(std::string account)
 	}
 	auto result = std::any_cast<Result_sqlite>(m_get_account_cmd->get_result());
 	auto result_row = result.m_rows.front();
-
-	//account_data.m_address = result_row.
+	account_data = convert_to_account_data(std::move(result_row));
 
 	return account_data;
-
 }
 
 

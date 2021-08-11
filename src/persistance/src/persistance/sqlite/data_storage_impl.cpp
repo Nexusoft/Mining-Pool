@@ -17,11 +17,34 @@ Data_storage_impl::Data_storage_impl(std::shared_ptr<spdlog::logger> logger, std
 bool Data_storage_impl::execute_command(std::any command)
 {
 	auto casted_command = std::any_cast<std::shared_ptr<command::Command>>(command);
-	Result_sqlite result;
-	auto return_value = exec_statement_with_result(std::any_cast<Command_type_sqlite>(casted_command->get_command()), result);
-	casted_command->set_result(std::move(result));
+
+	auto sqlite_command = std::any_cast<Command_type_sqlite>(casted_command->get_command());
+
+	bool return_value{ false };
+	if (sqlite_command.m_type == Command_type_sqlite::result)
+	{
+		Result_sqlite result;
+		return_value = exec_statement_with_result(sqlite_command, result);
+		casted_command->set_result(std::move(result));
+	}
+	else
+	{
+		return_value = exec_statement(sqlite_command);
+	}
+
 	casted_command->reset();	// resets sqlite prepared_stmt and clears the bindings
 	return return_value;
+}
+
+bool Data_storage_impl::exec_statement(Command_type_sqlite sql_command)
+{
+	auto ret = sqlite3_step(sql_command.m_statement);
+	if (ret != SQLITE_DONE)
+	{
+		m_logger->error("Sqlite step failure");
+		return false;
+	}
+	return true;
 }
 
 bool Data_storage_impl::exec_statement_with_result(Command_type_sqlite sql_command, Result_sqlite& result)
