@@ -157,7 +157,7 @@ void Command_get_account_impl::set_params(std::any params)
 Command_get_blocks_impl::Command_get_blocks_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT hash, height, type, reward, difficulty, orphan, block_found_time FROM block ORDER BY height LIMIT 100;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT hash, height, type, shares, difficulty, orphan, block_finder, round, block_found_time, mainnet_reward FROM block ORDER BY height LIMIT 100;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_blocks_impl::get_command() const
@@ -165,12 +165,13 @@ std::any Command_get_blocks_impl::get_command() const
 	Command_type_sqlite command{ m_stmt,
 		{{Column_sqlite::string}, 
 		{Column_sqlite::int32}, 
-		{Column_sqlite::string}, 
-		{Column_sqlite::string}, 
-		{Column_sqlite::int32}, 
-		{Column_sqlite::double_t}, 
 		{Column_sqlite::int32},
-		{Column_sqlite::string}} };
+		{Column_sqlite::double_t},
+		{Column_sqlite::double_t},
+		{Column_sqlite::int32},
+		{Column_sqlite::string}, 
+		{Column_sqlite::string},
+		{Column_sqlite::double_t}} };
 	return command;
 }
 

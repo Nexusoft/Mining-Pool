@@ -56,20 +56,20 @@ Method_result Method_latest_blocks::execute(Method_params const& params)
 {
     Method_result result;
     result.m_result = nlohmann::json::array();
-    for (auto i = 0U; i < 100; i++)
+    auto blocks = m_data_reader->get_latest_blocks();
+    for (auto& block : blocks)
     {
-        nlohmann::json block;
-        block["height"] = i + 10;
-        block["hash"] = "randomstring";
-        block["block_reward"] = 2.135;
-        block["time"] = "2021-07-16 10:12:33.239719";
-        block["network_diff"] = 1000.12;
-        block["payment_method"] = "test";
-        result.m_result.push_back(block);
+        nlohmann::json json_block;
+        json_block["height"] = block.m_height;
+        json_block["hash"] = block.m_hash;
+        json_block["block_reward"] = block.m_mainnet_reward;
+        json_block["time"] = block.m_block_found_time;
+        json_block["network_diff"] = block.m_difficulty;
+        json_block["payment_method"] = "test";
+        result.m_result.push_back(json_block);
     }
 
     return result;
-
 }
 
 Method_account::Method_account(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader)

@@ -21,9 +21,17 @@ struct Account_data
 
 struct Block_data
 {
-
+	std::string m_hash;
+	std::uint32_t m_height;
+	std::string m_type;
+	double m_shares;
+	double m_difficulty;
+	bool m_orphan;
+	std::string m_block_finder;
+	std::uint32_t m_round;
+	std::string m_block_found_time;
+	double m_mainnet_reward;
 };
-
 
 struct round_data
 {

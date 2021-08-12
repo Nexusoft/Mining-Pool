@@ -28,6 +28,12 @@ public:
         return m_data_reader->does_account_exists(std::move(account));
     }
 
+    std::vector<persistance::Block_data> get_latest_blocks()
+    {
+        std::scoped_lock lock(m_db_mutex);
+        return m_data_reader->get_latest_blocks();
+    }
+
 private:
 
     persistance::Data_reader::Uptr m_data_reader;

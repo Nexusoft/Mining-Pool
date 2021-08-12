@@ -19,11 +19,11 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	, m_data_storage{std::move(data_storage)}
 	, m_command_factory{std::move(command_factory)}
 {
-	m_create_tables_cmd = m_command_factory->create_command(Type::create_db_schema);
 	m_get_banned_ip_cmd = m_command_factory->create_command(Type::get_banned_api_ip);
 	m_get_banned_user_ip_cmd = m_command_factory->create_command(Type::get_banned_user_and_ip);
 	m_account_exists_cmd = m_command_factory->create_command(Type::account_exists);
 	m_get_account_cmd = m_command_factory->create_command(Type::get_account);
+	m_get_blocks_cmd = m_command_factory->create_command(Type::get_blocks);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -64,6 +64,23 @@ Account_data Data_reader_impl::get_account(std::string account)
 	account_data = convert_to_account_data(std::move(result_row));
 
 	return account_data;
+}
+
+std::vector<Block_data> Data_reader_impl::get_latest_blocks()
+{
+	std::vector<Block_data> blocks{};
+	if (!m_data_storage->execute_command(m_get_blocks_cmd))
+	{
+		return blocks;	// return empty result
+	}
+
+	auto result = std::any_cast<Result_sqlite>(m_get_account_cmd->get_result());
+	for (auto& row : result.m_rows)
+	{
+		blocks.push_back(convert_to_block_data(row));
+	}
+
+	return blocks;
 }
 
 

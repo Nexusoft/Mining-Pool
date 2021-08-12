@@ -4,6 +4,7 @@
 #include "persistance/types.hpp"
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace nexuspool
 {
@@ -22,6 +23,7 @@ public:
     virtual bool is_user_and_connection_banned(std::string user, std::string address) = 0;
     virtual bool does_account_exists(std::string account) = 0;
     virtual Account_data get_account(std::string account) = 0;
+    virtual std::vector<Block_data> get_latest_blocks() = 0;
 };
 }
 }
