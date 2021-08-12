@@ -30,6 +30,7 @@ public:
     bool does_account_exists(std::string account) override;
     Account_data get_account(std::string account) override;
     std::vector<Block_data> get_latest_blocks() override;
+    Round_data get_latest_round() override;
 
 private:
 
@@ -43,6 +44,7 @@ private:
     std::shared_ptr<Command> m_account_exists_cmd;
     std::shared_ptr<Command> m_get_account_cmd;
     std::shared_ptr<Command> m_get_blocks_cmd;
+    std::shared_ptr<Command> m_get_latest_round_cmd;
 
 
 };

@@ -19,6 +19,8 @@ struct Session_user
 	std::string m_nxs_address{ "" };
 	bool m_logged_in{ false };
 	bool m_new_account{ true };
+	std::uint32_t m_shares{ 0 };
+	double m_hashrate{ 0.0f };
 };
 
 using Session_key = uint256_t;

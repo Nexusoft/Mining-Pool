@@ -25,7 +25,8 @@ enum class Type : std::uint8_t
 	account_exists,
 	get_account,
 	get_blocks,
-	create_account
+	create_account,
+	get_latest_round
 
 };
 

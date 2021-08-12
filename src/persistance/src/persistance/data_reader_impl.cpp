@@ -24,6 +24,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_account_exists_cmd = m_command_factory->create_command(Type::account_exists);
 	m_get_account_cmd = m_command_factory->create_command(Type::get_account);
 	m_get_blocks_cmd = m_command_factory->create_command(Type::get_blocks);
+	m_get_latest_round_cmd = m_command_factory->create_command(Type::get_latest_round);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -77,11 +78,26 @@ std::vector<Block_data> Data_reader_impl::get_latest_blocks()
 	auto result = std::any_cast<Result_sqlite>(m_get_account_cmd->get_result());
 	for (auto& row : result.m_rows)
 	{
-		blocks.push_back(convert_to_block_data(row));
+		blocks.push_back(convert_to_block_data(std::move(row)));
 	}
 
 	return blocks;
 }
+
+Round_data Data_reader_impl::get_latest_round()
+{
+	Round_data round_data{};
+	if (!m_data_storage->execute_command(m_get_latest_round_cmd))
+	{
+		return round_data;	// return empty result
+	}
+	auto result = std::any_cast<Result_sqlite>(m_get_latest_round_cmd->get_result());
+	auto result_row = result.m_rows.front();
+	round_data = convert_to_round_data(std::move(result_row));
+
+	return round_data;
+}
+
 
 
 }

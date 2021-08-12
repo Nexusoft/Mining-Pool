@@ -33,30 +33,17 @@ struct Block_data
 	double m_mainnet_reward;
 };
 
-struct round_data
+struct Round_data
 {
-	explicit round_data(uint32_t round_to_set) : m_round{ round_to_set } {}
-	round_data()
-	{
-		//round = Core::nCurrentRound;
-		//nBlockNumber = Core::nBestHeight;
-		//hashBlock = Core::hashBlockSubmission.ToString();
-		//nRoundReward = Core::nRoundReward;
-		//nTotalShares = Core::TotalWeight();
-		//strBlockFinder = Core::LAST_ROUND_BLOCKFINDER;
-		//bOrphan = false;
-		//tBlockFoundTime = time(0);
-	}
-
-
-	uint32_t m_round;
-	uint32_t m_block_number;
-	std::string m_hash_block;
-	uint64_t m_round_reward;
-	uint64_t m_total_shares;
-	std::string m_block_finder;
-	bool m_orphan;
-	time_t m_block_found_time;
+	std::uint32_t m_round;
+	double m_total_shares;
+	double m_total_rewards;
+	std::uint32_t m_blocks;
+	std::uint32_t m_connection_count;
+	std::string m_start_date_time;
+	std::string m_end_date_time;
+	bool m_is_active;
+	bool m_is_paid;
 };
 
 struct connection_miner_data

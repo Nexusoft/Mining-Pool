@@ -91,6 +91,16 @@ public:
 	Type get_type() const override { return Type::get_blocks; }
 };
 
+class Command_get_latest_round_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_latest_round_impl(sqlite3* handle);
+
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_latest_round; }
+};
+
 // ------------------------------------------------------------------------------------
 // Write commands
 

@@ -176,6 +176,30 @@ std::any Command_get_blocks_impl::get_command() const
 }
 
 // -----------------------------------------------------------------------------------------------
+
+Command_get_latest_round_impl::Command_get_latest_round_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT id, round_number, total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid FROM round ORDER BY ID DESC LIMIT 1;", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_latest_round_impl::get_command() const
+{
+	Command_type_sqlite command{ m_stmt,
+		{{Column_sqlite::int64},
+		{Column_sqlite::int32},
+		{Column_sqlite::double_t},
+		{Column_sqlite::double_t},
+		{Column_sqlite::int32},
+		{Column_sqlite::int32},
+		{Column_sqlite::string},
+		{Column_sqlite::string},
+		{Column_sqlite::int32},
+		{Column_sqlite::int32}} };
+	return command;
+}
+
+// -----------------------------------------------------------------------------------------------
 // Write commands
 // -----------------------------------------------------------------------------------------------
 Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
