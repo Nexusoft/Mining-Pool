@@ -29,14 +29,18 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 bool Data_reader_impl::is_connection_banned(std::string address)
 {
 	m_get_banned_ip_cmd->set_params(std::move(address));
-	return m_data_storage->execute_command(m_get_banned_ip_cmd);
+	auto return_value = m_data_storage->execute_command(m_get_banned_ip_cmd);
+	auto result = std::any_cast<Result_sqlite>(m_get_banned_ip_cmd->get_result());
+	return return_value ? (result.m_rows.empty() ? false : true) : false;
 }
 
 bool Data_reader_impl::is_user_and_connection_banned(std::string user, std::string address)
 {
 	std::array<std::string, 2> params{ std::move(user), std::move(address) };
 	m_get_banned_user_ip_cmd->set_params(std::move(params));
-	return m_data_storage->execute_command(m_get_banned_user_ip_cmd);
+	auto return_value =  m_data_storage->execute_command(m_get_banned_user_ip_cmd);
+	auto result = std::any_cast<Result_sqlite>(m_get_banned_user_ip_cmd->get_result());
+	return return_value ? (result.m_rows.empty() ? false : true) : false;
 }
 
 bool Data_reader_impl::does_account_exists(std::string account)

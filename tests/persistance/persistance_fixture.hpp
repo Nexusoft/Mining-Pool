@@ -9,12 +9,14 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <thread>
+#include <fstream>
 #include <chrono>
 #include <stdlib.h>
 
 namespace
 {
 using namespace ::nexuspool;
+constexpr char db_filename[] = "test.sqlite3";
 
 class Persistance_fixture : public ::testing::Test
 {
@@ -29,14 +31,19 @@ public:
 
 protected:
 
+
 	std::shared_ptr<spdlog::logger> m_logger;
-	config::Persistance_config m_config{ config::Persistance_type::sqlite, "test.db"};
+	config::Persistance_config m_config{ config::Persistance_type::sqlite, db_filename };
 	persistance::Component::Uptr m_persistance_component;
 
-	void create_test_db()
+	void SetUp() override
 	{
-		system("create_test_sqlite.py");
-		system("create_test_data.py");
+		std::ifstream f(db_filename);
+		if (!f.good())
+		{
+			system("create_test_sqlite.py");
+			system("create_test_data.py");
+		}
 	}
 
 	void TearDown() override

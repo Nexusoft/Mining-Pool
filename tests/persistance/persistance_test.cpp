@@ -40,10 +40,16 @@ TEST_F(Persistance_fixture, command_factory_create_all_commands)
 }
 */
 
-TEST_F(Persistance_fixture, simple_data_reader)
+TEST_F(Persistance_fixture, command_is_user_and_connection_banned_not_found)
 {
-	create_test_db();
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->is_user_and_connection_banned("test", "test");
+	EXPECT_FALSE(result);
+}
 
-	data_reader->is_user_and_connection_banned("test", "test");
+TEST_F(Persistance_fixture, command_is_connection_banned_not_found)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->is_connection_banned("test");
+	EXPECT_FALSE(result);
 }
