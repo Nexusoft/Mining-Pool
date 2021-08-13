@@ -74,6 +74,15 @@ TEST_F(Persistance_fixture, command_account_exists)
 	}
 }
 
+TEST_F(Persistance_fixture, command_get_account)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	for (auto& valid_input : m_test_data.m_valid_account_names_input)
+	{
+		auto result = data_reader->get_account(valid_input);
+		EXPECT_EQ(result.m_address, valid_input);
+	}
+}
 
 /*
 TEST_F(Persistance_fixture, command_get_latest_blocks)

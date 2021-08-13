@@ -137,7 +137,6 @@ std::any Command_get_account_impl::get_command() const
 		{{Column_sqlite::string},
 		{Column_sqlite::string},
 		{Column_sqlite::string},
-		{Column_sqlite::string},
 		{Column_sqlite::int32},
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
