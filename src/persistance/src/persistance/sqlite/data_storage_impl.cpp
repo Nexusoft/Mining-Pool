@@ -57,7 +57,6 @@ bool Data_storage_impl::exec_statement_with_result(Command_type_sqlite sql_comma
 		Row_sqlite row;
 		for (auto& column : sql_command.m_row)
 		{
-			Column_sqlite column;
 			switch (column.m_type)
 			{
 			case Column_sqlite::string:

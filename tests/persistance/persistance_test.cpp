@@ -26,21 +26,7 @@ TEST_F(Persistance_fixture, create_shared_data_writer)
 	EXPECT_EQ(shared_data_writer_2.use_count(), 3);
 }
 
-/*
-TEST_F(Persistance_fixture, command_factory_create_all_commands)
-{
-	std::vector<command::Type> command_types_input = {Type::create_db_schema, Type::get_banned_api_ip, Type::get_banned_user_and_ip};
-	auto command_factory = m_persistance_component->get_command_factory();
-
-	for (auto& command_type : command_types_input)
-	{
-		auto command = command_factory->create_command(command_type);
-		EXPECT_EQ(command->get_type(), command_type);
-	}
-}
-*/
-
-TEST_F(Persistance_fixture, command_is_user_and_connection_banned_not_found)
+TEST_F(Persistance_fixture, command_is_user_and_connection_banned)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 	for (auto& invalid_input : m_test_data.m_invalid_input)
@@ -56,7 +42,7 @@ TEST_F(Persistance_fixture, command_is_user_and_connection_banned_not_found)
 	}
 }
 
-TEST_F(Persistance_fixture, command_is_connection_banned_not_found)
+TEST_F(Persistance_fixture, command_is_connection_banned)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 	for (auto& invalid_input : m_test_data.m_invalid_input)
@@ -72,6 +58,24 @@ TEST_F(Persistance_fixture, command_is_connection_banned_not_found)
 	}
 }
 
+TEST_F(Persistance_fixture, command_account_exists)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	for (auto& invalid_input : m_test_data.m_invalid_input)
+	{
+		auto result = data_reader->does_account_exists(invalid_input);
+		EXPECT_FALSE(result);
+	}
+
+	for (auto& valid_input : m_test_data.m_valid_account_names_input)
+	{
+		auto result = data_reader->does_account_exists(valid_input);
+		EXPECT_TRUE(result);
+	}
+}
+
+
+/*
 TEST_F(Persistance_fixture, command_get_latest_blocks)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
@@ -79,3 +83,4 @@ TEST_F(Persistance_fixture, command_get_latest_blocks)
 	EXPECT_FALSE(result.empty());
 
 }
+*/

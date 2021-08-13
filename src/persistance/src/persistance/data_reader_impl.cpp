@@ -48,9 +48,15 @@ bool Data_reader_impl::is_user_and_connection_banned(std::string user, std::stri
 bool Data_reader_impl::does_account_exists(std::string account)
 {
 	m_account_exists_cmd->set_params(std::move(account));
-	auto return_value = m_data_storage->execute_command(m_account_exists_cmd);
+	if (!m_data_storage->execute_command(m_account_exists_cmd))
+	{
+		return false;
+	}
+
 	auto result = std::any_cast<Result_sqlite>(m_account_exists_cmd->get_result());
-	return return_value ? (result.m_rows.empty() ? false : true) : false;
+	auto account_count = std::get<std::int32_t>(result.m_rows.front()[0].m_data);
+
+	return account_count ? true : false;
 }
 
 Account_data Data_reader_impl::get_account(std::string account)
