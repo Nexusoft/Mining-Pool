@@ -25,6 +25,7 @@ public:
     virtual Account_data get_account(std::string account) = 0;
     virtual std::vector<Block_data> get_latest_blocks() = 0;
     virtual Round_data get_latest_round() = 0;
+    virtual std::vector<Payment_data> get_payments(std::string account) = 0;
 };
 }
 }

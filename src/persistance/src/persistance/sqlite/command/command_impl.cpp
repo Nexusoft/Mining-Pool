@@ -200,6 +200,30 @@ std::any Command_get_latest_round_impl::get_command() const
 }
 
 // -----------------------------------------------------------------------------------------------
+
+Command_get_payments_impl::Command_get_payments_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT name, amount, payment_date_time FROM payment WHERE name = ':name';", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_payments_impl::get_command() const
+{
+	Command_type_sqlite command{ m_stmt,
+		{{Column_sqlite::string},
+		{Column_sqlite::double_t},
+		{Column_sqlite::string}} };
+	return command;
+}
+
+void Command_get_payments_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<std::string>(m_params);
+	bind_param(m_stmt, ":name", casted_params);
+}
+
+// -----------------------------------------------------------------------------------------------
 // Write commands
 // -----------------------------------------------------------------------------------------------
 Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)

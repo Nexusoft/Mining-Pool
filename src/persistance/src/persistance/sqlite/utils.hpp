@@ -11,6 +11,7 @@ namespace persistance {
 Account_data convert_to_account_data(Row_sqlite row);
 Block_data convert_to_block_data(Row_sqlite row);
 Round_data convert_to_round_data(Row_sqlite row);
+Payment_data convert_to_payment_data(Row_sqlite row);
 
 }
 }

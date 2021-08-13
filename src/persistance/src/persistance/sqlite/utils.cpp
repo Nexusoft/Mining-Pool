@@ -59,5 +59,18 @@ Round_data convert_to_round_data(Row_sqlite row)
 	return result;
 }
 
+Payment_data convert_to_payment_data(Row_sqlite row)
+{
+	assert(row.size() == 3U);
+	Payment_data result{};
+
+	result.m_account = std::get<std::string>(row[0].m_data);
+	result.m_amount = std::get<double>(row[1].m_data);
+	result.m_payment_date_time = std::get<std::string>(row[2].m_data);
+
+	return result;
+
+}
+
 }
 }

@@ -46,6 +46,13 @@ struct Round_data
 	bool m_is_paid;
 };
 
+struct Payment_data
+{
+	std::string m_account;
+	double m_amount;
+	std::string m_payment_date_time;
+};
+
 struct connection_miner_data
 {
 	connection_miner_data() : m_pps{ 0 }, m_wps{ 0 }, m_guid{ "" }
