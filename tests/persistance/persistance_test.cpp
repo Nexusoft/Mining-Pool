@@ -43,16 +43,33 @@ TEST_F(Persistance_fixture, command_factory_create_all_commands)
 TEST_F(Persistance_fixture, command_is_user_and_connection_banned_not_found)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
-	auto result = data_reader->is_user_and_connection_banned("test", "test");
-	EXPECT_FALSE(result);
+	for (auto& invalid_input : m_test_data.m_invalid_input)
+	{
+		auto result = data_reader->is_user_and_connection_banned(invalid_input, invalid_input);
+		EXPECT_FALSE(result);
+	}
+
+	for (auto& valid_input : m_test_data.m_banned_users_connections_input)
+	{
+		auto result = data_reader->is_user_and_connection_banned(valid_input.first, valid_input.second);
+		EXPECT_TRUE(result);
+	}
 }
 
 TEST_F(Persistance_fixture, command_is_connection_banned_not_found)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
-	auto result = data_reader->is_connection_banned("test");
-	EXPECT_FALSE(result);
+	for (auto& invalid_input : m_test_data.m_invalid_input)
+	{
+		auto result = data_reader->is_connection_banned(invalid_input);
+		EXPECT_FALSE(result);
+	}
 
+	for (auto& valid_input : m_test_data.m_banned_connections_api_input)
+	{
+		auto result = data_reader->is_connection_banned(valid_input);
+		EXPECT_TRUE(result);
+	}
 }
 
 TEST_F(Persistance_fixture, command_get_latest_blocks)

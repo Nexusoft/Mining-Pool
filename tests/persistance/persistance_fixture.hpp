@@ -1,6 +1,7 @@
 #ifndef TESTS_PERSISTANCE_FIXTURE_HPP
 #define TESTS_PERSISTANCE_FIXTURE_HPP
 
+#include "test_data.hpp"
 #include <gtest/gtest.h>
 #include <asio/io_context.hpp>
 #include <config/config.hpp>
@@ -16,7 +17,6 @@
 namespace
 {
 using namespace ::nexuspool;
-constexpr char db_filename[] = "test.sqlite3";
 
 class Persistance_fixture : public ::testing::Test
 {
@@ -31,14 +31,14 @@ public:
 
 protected:
 
-
+	Test_data m_test_data;
 	std::shared_ptr<spdlog::logger> m_logger;
-	config::Persistance_config m_config{ config::Persistance_type::sqlite, db_filename };
+	config::Persistance_config m_config{ config::Persistance_type::sqlite, m_test_data.m_db_filename };
 	persistance::Component::Uptr m_persistance_component;
 
 	void SetUp() override
 	{
-		std::ifstream f(db_filename);
+		std::ifstream f(m_test_data.m_db_filename);
 		if (!f.good())
 		{
 			system("create_test_sqlite.py");

@@ -64,7 +64,7 @@ Command_banned_user_and_ip_impl::Command_banned_user_and_ip_impl(sqlite3* handle
 	: Command_base_database_sqlite{ handle }
 {
 	sqlite3_prepare_v2(m_handle,
-		"SELECT * FROM banned_users_connections WHERE user = ':user' AND ip = ':ip';",
+		"SELECT user, ip FROM banned_users_connections WHERE user = :user AND ip = :ip;",
 		-1, &m_stmt, NULL);
 }
 
@@ -87,7 +87,7 @@ void Command_banned_user_and_ip_impl::set_params(std::any params)
 Command_banned_api_ip_impl::Command_banned_api_ip_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT * FROM banned_connections_api WHERE ip = ':ip';", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT ip FROM banned_connections_api WHERE ip = :ip;", -1, &m_stmt, NULL);
 }
 
 std::any Command_banned_api_ip_impl::get_command() const
@@ -108,7 +108,7 @@ void Command_banned_api_ip_impl::set_params(std::any params)
 Command_account_exists_impl::Command_account_exists_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT COUNT(name) FROM account WHERE name = ':name';", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT COUNT(name) FROM account WHERE name = :name;", -1, &m_stmt, NULL);
 }
 
 std::any Command_account_exists_impl::get_command() const
@@ -128,7 +128,7 @@ void Command_account_exists_impl::set_params(std::any params)
 Command_get_account_impl::Command_get_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT name, created_at, last_active, connection_count, shares, reward, hashrate FROM account WHERE name = ':name';", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT name, created_at, last_active, connection_count, shares, reward, hashrate FROM account WHERE name = :name;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_account_impl::get_command() const
@@ -204,7 +204,7 @@ std::any Command_get_latest_round_impl::get_command() const
 Command_get_payments_impl::Command_get_payments_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT name, amount, payment_date_time FROM payment WHERE name = ':name';", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT name, amount, payment_date_time FROM payment WHERE name = :name;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_payments_impl::get_command() const
