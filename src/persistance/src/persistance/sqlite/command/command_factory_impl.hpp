@@ -42,6 +42,9 @@ public:
             std::make_shared<Command_create_db_schema_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::create_account,
             std::make_shared<Command_create_account_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::add_payment,
+            std::make_shared<Command_add_payment_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        
     }
 
     ~Command_factory_impl()
@@ -86,6 +89,9 @@ private:
             break;
         case Type::create_account:
             result = std::any_cast<std::shared_ptr<Command_create_account_impl>>(m_commands[command_type]);
+            break;
+        case Type::add_payment:
+            result = std::any_cast<std::shared_ptr<Command_add_payment_impl>>(m_commands[command_type]);
             break;
         }
         

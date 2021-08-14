@@ -136,7 +136,22 @@ public:
 	void set_params(std::any params) override;
 };
 
+struct Command_add_payment_params
+{
+	std::string m_account;
+	double m_amount;
+};
 
+class Command_add_payment_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_add_payment_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::add_payment; }
+	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	void set_params(std::any params) override;
+};
 
 }
 }
