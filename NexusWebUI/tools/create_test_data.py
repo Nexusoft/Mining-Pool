@@ -40,6 +40,10 @@ def create_round_test_data(connection):
         total_reward = round(random.uniform(1, 10), 2)
         blocks = random.randint(1, 10)
         connection_count = random.randint(1, 100)
+        start_date_time = fake.past_datetime()
+        end_date_time = fake.past_datetime()
+        is_active = random.randint(0, 1)
+        is_paid = random.randint(0, 1)
 
         data_dict = {
             'round_number': x,
@@ -47,6 +51,10 @@ def create_round_test_data(connection):
             'total_reward': total_reward,
             'blocks': blocks,
             'connection_count': connection_count,
+            'start_date_time': start_date_time,
+            'end_date_time': end_date_time,
+            'is_active': is_active,
+            'is_paid': is_paid,
         }
 
         dataframe_round = dataframe_round.append(data_dict, ignore_index=True)
@@ -176,8 +184,8 @@ def create_account_test_data(connection):
 
     for x in range(accounts):
         name = names[x]
-        created_at = fake.date()
-        last_active = fake.date()
+        created_at = fake.past_datetime()
+        last_active = fake.past_datetime()
         connection_count = random.randint(1, 100)
         shares = round(random.uniform(1, 100), 2)
         reward = round(random.uniform(1, 10), 2)
@@ -208,12 +216,14 @@ def create_block_test_data(connection):
         'hash',
         'height',
         'type',
-        'reward',
+        'shares',
         'difficulty',
         'orphan',
         'block_finder',
         'round',
         'block_found_time',
+        'accepted_by_mainnet',
+        'mainnet_reward',
     ]
     )
 
@@ -227,23 +237,27 @@ def create_block_test_data(connection):
         hash = fake.md5(raw_output=False)
         height = random.randint(1, 100)
         type = 'Test'
-        reward = random.randint(1, 100)
+        shares = round(random.uniform(1, 10), 2)
         difficulty = round(random.uniform(1, 100), 2)
         orphan = random.randint(1, 100)
         block_finder = str(random.choice(account_list))
         round_value = random.choice(round_list)
         block_found_time = fake.past_datetime()
+        accepted_by_mainnet = random.randint(0, 1)
+        mainnet_reward = round(random.uniform(0, 1), 2)
 
         data_dict = {
             'hash': hash,
             'height': height,
             'type': type,
-            'reward': reward,
+            'shares': shares,
             'difficulty': difficulty,
             'orphan': orphan,
             'block_finder': block_finder,
             'round': round_value,
             'block_found_time': block_found_time,
+            'accepted_by_mainnet': accepted_by_mainnet,
+            'mainnet_reward': mainnet_reward,
         }
 
         dataframe_block = dataframe_block.append(data_dict, ignore_index=True)
@@ -308,13 +322,14 @@ def create_banned_users_connections_test_data(connection):
 con = None
 db_name = 'test.sqlite3'
 
+# Todo Create proper log
+
 if __name__ == '__main__':
     try:
         fake = Faker()
         db_con = connect_to_db(_file=db_name)
 
         clean_db(connection=db_con)
-
         create_round_test_data(connection=db_con)
         create_account_test_data(connection=db_con)
         create_block_test_data(connection=db_con)
