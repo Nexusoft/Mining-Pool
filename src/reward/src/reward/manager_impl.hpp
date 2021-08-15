@@ -22,6 +22,8 @@ public:
 
     Difficulty_result check_difficulty(const LLP::CBlock& block, uint32_t pool_nbits) const override;
 
+    void pay_all() const override;
+
 private:
 
 
