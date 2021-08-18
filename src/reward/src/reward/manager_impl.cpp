@@ -1,6 +1,6 @@
 #include "manager_impl.hpp"
 #include <spdlog/spdlog.h>
-#include <cpr/cpr.h>
+
 
 namespace nexuspool {
 namespace reward {

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <cstdint>
+#include <cpr/cpr.h>
 
 namespace nexuspool {
 namespace nexus_http_interface {

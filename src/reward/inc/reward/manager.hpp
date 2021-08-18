@@ -5,6 +5,7 @@
 #include <cstdint>
 #include "LLC/types/uint1024.h"
 #include "../src/LLP/block.hpp"
+#include <cpr/cpr.h>
 
 namespace nexuspool {
 namespace reward {
