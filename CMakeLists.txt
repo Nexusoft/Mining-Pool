@@ -35,12 +35,6 @@ if(WIN32)
     add_definitions(-D_WIN32_WINT=0x0601 -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-include(FetchContent)
-FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/whoshuu/cpr.git GIT_TAG c8d33915dbd88ad6c92b258869b03aba06587ff9) # the commit hash for 1.5.0
-FetchContent_MakeAvailable(cpr)
-include_directories(${cpr_SOURCE_DIR}/include)
-include_directories(${CURL_SOURCE_DIR}/include)
-
 # add submodules
 add_subdirectory(src/chrono)
 add_subdirectory(src/network)
@@ -71,4 +65,3 @@ target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 target_link_libraries(NexusPool chrono network config LLP TAO api persistance reward nexus_http_interface)
 
 target_link_libraries(NexusPool Threads::Threads)
-target_link_libraries(NexusPool cpr::cpr)

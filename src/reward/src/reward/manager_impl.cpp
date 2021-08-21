@@ -60,6 +60,7 @@ Difficulty_result Manager_impl::check_difficulty(const LLP::CBlock& block, uint3
 
 void Manager_impl::pay_all() const
 {
+	/*
 	//lock the database.
 	//Read from database to get sum of unpaid block rewards 
 	double total_block_rewards;
@@ -91,6 +92,8 @@ void Manager_impl::pay_all() const
 		//do we need to wait 10 minutes between transactions to avoid fees?
 		recipients_to_be_paid -= recipient_count_this_block;
 	}
+
+	*/
 
 
 }
