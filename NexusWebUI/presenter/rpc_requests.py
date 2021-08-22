@@ -1,17 +1,27 @@
 import json
+import logging
 import socket
 import requests
 import pybson
 import bson
 
+logger = logging.getLogger('NexusWebUI')
 
 def socket_connect(_ip, _port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((_ip, _port))
+
+    # Todo Log Message
+    print("Opened connection")
+    logger.info("Opened Connection to Backend")
+
     return s
 
 
 def socket_disconnect(_socket):
+    # Todo Log Message
+    print("Closed connection")
+
     _socket.close()
 
 

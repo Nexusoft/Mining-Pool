@@ -20,6 +20,7 @@ def create_db_and_connect(full_path):
 
 
 def create_table_structure(connection):
+    # Todo Remove after testing
 
     sql_round = f"""
     CREATE TABLE IF NOT EXISTS round ( 
@@ -82,6 +83,10 @@ def create_table_structure(connection):
     connection.execute(sql_banned_users_connections)
 
 
+def create_table_structure_from_schema(connection):
+    with open('dbschema_sqlite.sql') as fp:
+        connection.executescript(fp.read())
+
 ###################################
 con = None
 db_name = 'test.sqlite3'
@@ -95,7 +100,8 @@ if __name__ == '__main__':
         db_con = create_db_and_connect(os.path.join(script_dir, db_name))
         print("DB created")
 
-        create_table_structure(connection=db_con)
+        # create_table_structure(connection=db_con)
+        create_table_structure_from_schema(connection=db_con)
 
     except Exception as ex:
         print(ex)

@@ -1,4 +1,6 @@
 import json
+import logging
+
 import requests
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -8,6 +10,7 @@ from .forms import WalletSearchForm
 from .rpc_requests import get_latest_blocks, get_meta_info, socket_connect, socket_disconnect, get_account_header, \
     get_account_works, get_account_payouts
 
+logger = logging.getLogger('django')
 
 def block_overview_list(request):
     template_name = 'presenter/overview_list.html'
@@ -37,7 +40,7 @@ def block_overview_list(request):
                                                })
 
     except Exception as ex:
-        # Todo log Exception
+        logger.error(ex)
         messages.error(request, 'Could not establish connection to the Backend Server')
         return redirect('presenter:error')
 
@@ -53,7 +56,9 @@ def wallet_detail(request):
 
     if not form.is_valid():
         print(f"Form is invalid")
-        messages.error(request, "The Wallet ID you entered is unknown")
+        errors_json = json.loads(form.errors.as_json())
+        error_message = errors_json['__all__'][0]['message']
+        messages.error(request, error_message)
         return redirect('presenter:index')
 
     # Todo Get from .env
@@ -113,4 +118,8 @@ def wallet_detail(request):
                                            'table_account_works': table_account_works,
                                            'table_account_payouts': table_account_payouts
                                            })
+
+
+def block_detail(request, hash):
+    return redirect(f'https://explorer.nexus.io/search/{hash}')
 
