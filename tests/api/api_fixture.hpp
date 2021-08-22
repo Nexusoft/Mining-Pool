@@ -12,6 +12,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <thread>
 #include <chrono>
+#include <fstream>
 
 namespace 
 {
@@ -23,14 +24,20 @@ class Api_fixture : public ::testing::Test
 public:
 
 	Api_fixture()
-		: m_config{}
-		, m_io_context{ std::make_shared<::asio::io_context>() }
+		: m_io_context{ std::make_shared<::asio::io_context>() }
 		, m_network_component{ network::create_component(m_io_context) }
 		{
 			m_logger = spdlog::stdout_color_mt("logger");
 			m_logger->set_level(spdlog::level::debug);
 
-			m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
+			std::ifstream f(m_db_filename);
+			if (!f.good())
+			{
+				//system("create_test_sqlite.py");
+				system("create_test_data.py");
+			}
+
+			m_persistance_component = persistance::create_component(m_logger, m_config);
 
 			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
 				"127.0.0.1", 0, m_network_component->get_socket_factory());
@@ -40,8 +47,9 @@ protected:
 
 	enum io_state { init = 0, connected, disconnect, transmit, receive };
 
+	std::string m_db_filename{ "test.sqlite3" };
 	std::shared_ptr<spdlog::logger> m_logger;
-	config::Config m_config;
+	config::Persistance_config m_config{ config::Persistance_type::sqlite, m_db_filename };
 	std::shared_ptr<::asio::io_context> m_io_context;
 	std::unique_ptr<network::Component> m_network_component;
 	std::unique_ptr<persistance::Component> m_persistance_component;
