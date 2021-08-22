@@ -10,7 +10,6 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <thread>
-#include <fstream>
 #include <chrono>
 #include <stdlib.h>
 
@@ -35,16 +34,6 @@ protected:
 	std::shared_ptr<spdlog::logger> m_logger;
 	config::Persistance_config m_config{ config::Persistance_type::sqlite, m_test_data.m_db_filename };
 	persistance::Component::Uptr m_persistance_component;
-
-	void SetUp() override
-	{
-		std::ifstream f(m_test_data.m_db_filename);
-		if (!f.good())
-		{
-			system("create_test_sqlite.py");
-			system("create_test_data.py");
-		}
-	}
 
 	void TearDown() override
 	{

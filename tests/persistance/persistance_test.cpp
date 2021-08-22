@@ -84,7 +84,7 @@ TEST_F(Persistance_fixture, command_get_account)
 	}
 }
 
-/*
+
 TEST_F(Persistance_fixture, command_get_latest_blocks)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
@@ -92,4 +92,3 @@ TEST_F(Persistance_fixture, command_get_latest_blocks)
 	EXPECT_FALSE(result.empty());
 
 }
-*/

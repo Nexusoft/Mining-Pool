@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 #include <sqlite/sqlite3.h>
 
 
@@ -15,6 +16,13 @@ public:
 
 	Test_data()
 	{
+		std::ifstream f(m_db_filename);
+		if (!f.good())
+		{
+			system("create_test_sqlite.py");
+			system("create_test_data.py");
+		}
+
 		sqlite3_initialize();
 		sqlite3_open_v2(m_db_filename.c_str(), &m_handle, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
 		get_valid_account_names();

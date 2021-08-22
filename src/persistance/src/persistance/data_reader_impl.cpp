@@ -82,7 +82,7 @@ std::vector<Block_data> Data_reader_impl::get_latest_blocks()
 		return blocks;	// return empty result
 	}
 
-	auto result = std::any_cast<Result_sqlite>(m_get_account_cmd->get_result());
+	auto result = std::any_cast<Result_sqlite>(m_get_blocks_cmd->get_result());
 	for (auto& row : result.m_rows)
 	{
 		blocks.push_back(convert_to_block_data(std::move(row)));

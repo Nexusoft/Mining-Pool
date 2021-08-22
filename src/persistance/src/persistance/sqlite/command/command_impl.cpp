@@ -167,16 +167,16 @@ std::any Command_get_blocks_impl::get_command() const
 	Command_type_sqlite command{ m_stmt,
 		{{Column_sqlite::string}, 
 		{Column_sqlite::int32}, 
-		{Column_sqlite::int32},
+		{Column_sqlite::string},
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
 		{Column_sqlite::int32},
 		{Column_sqlite::string}, 
+		{Column_sqlite::int32},
 		{Column_sqlite::string},
 		{Column_sqlite::double_t}} };
 	return command;
 }
-
 // -----------------------------------------------------------------------------------------------
 
 Command_get_latest_round_impl::Command_get_latest_round_impl(sqlite3* handle)
