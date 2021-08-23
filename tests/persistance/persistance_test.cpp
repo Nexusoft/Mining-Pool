@@ -29,13 +29,13 @@ TEST_F(Persistance_fixture, create_shared_data_writer)
 TEST_F(Persistance_fixture, command_is_user_and_connection_banned)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
-	for (auto& invalid_input : m_test_data.m_invalid_input)
+	for (auto const& invalid_input : m_test_data.m_invalid_input)
 	{
 		auto result = data_reader->is_user_and_connection_banned(invalid_input, invalid_input);
 		EXPECT_FALSE(result);
 	}
 
-	for (auto& valid_input : m_test_data.m_banned_users_connections_input)
+	for (auto const& valid_input : m_test_data.m_banned_users_connections_input)
 	{
 		auto result = data_reader->is_user_and_connection_banned(valid_input.first, valid_input.second);
 		EXPECT_TRUE(result);
@@ -45,13 +45,13 @@ TEST_F(Persistance_fixture, command_is_user_and_connection_banned)
 TEST_F(Persistance_fixture, command_is_connection_banned)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
-	for (auto& invalid_input : m_test_data.m_invalid_input)
+	for (auto const& invalid_input : m_test_data.m_invalid_input)
 	{
 		auto result = data_reader->is_connection_banned(invalid_input);
 		EXPECT_FALSE(result);
 	}
 
-	for (auto& valid_input : m_test_data.m_banned_connections_api_input)
+	for (auto const& valid_input : m_test_data.m_banned_connections_api_input)
 	{
 		auto result = data_reader->is_connection_banned(valid_input);
 		EXPECT_TRUE(result);
@@ -61,13 +61,13 @@ TEST_F(Persistance_fixture, command_is_connection_banned)
 TEST_F(Persistance_fixture, command_account_exists)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
-	for (auto& invalid_input : m_test_data.m_invalid_input)
+	for (auto const& invalid_input : m_test_data.m_invalid_input)
 	{
 		auto result = data_reader->does_account_exists(invalid_input);
 		EXPECT_FALSE(result);
 	}
 
-	for (auto& valid_input : m_test_data.m_valid_account_names_input)
+	for (auto const& valid_input : m_test_data.m_valid_account_names_input)
 	{
 		auto result = data_reader->does_account_exists(valid_input);
 		EXPECT_TRUE(result);
@@ -77,7 +77,7 @@ TEST_F(Persistance_fixture, command_account_exists)
 TEST_F(Persistance_fixture, command_get_account)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
-	for (auto& valid_input : m_test_data.m_valid_account_names_input)
+	for (auto const& valid_input : m_test_data.m_valid_account_names_input)
 	{
 		auto result = data_reader->get_account(valid_input);
 		EXPECT_EQ(result.m_address, valid_input);
@@ -91,6 +91,31 @@ TEST_F(Persistance_fixture, command_get_latest_blocks)
 	EXPECT_FALSE(result.empty());
 
 }
+
+// Testdata currently missing
+/*
+TEST_F(Persistance_fixture, command_get_payments)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	for (auto const& invalid_input : m_test_data.m_invalid_input)
+	{
+		auto result = data_reader->get_payments(invalid_input);
+		EXPECT_TRUE(result.empty());
+	}
+
+	for (auto const& valid_input : m_test_data.m_valid_account_names_input)
+	{
+		auto result = data_reader->get_payments(valid_input);
+		EXPECT_FALSE(result.empty());
+
+		for (auto const& payment_result : result)
+		{
+			EXPECT_EQ(payment_result.m_account, valid_input);
+		}
+	}
+
+}
+*/
 
 // -----------------------------------------------------------------------------------------------
 // Write commands
