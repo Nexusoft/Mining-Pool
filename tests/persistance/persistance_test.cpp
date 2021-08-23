@@ -92,6 +92,14 @@ TEST_F(Persistance_fixture, command_get_latest_blocks)
 
 }
 
+TEST_F(Persistance_fixture, command_get_latest_round)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->get_latest_round();
+	EXPECT_TRUE(result.m_round);
+
+}
+
 // Testdata currently missing
 /*
 TEST_F(Persistance_fixture, command_get_payments)
