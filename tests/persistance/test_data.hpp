@@ -39,15 +39,12 @@ public:
 
 	void delete_from_account_table(std::string account)
 	{
-		sqlite3_stmt* stmt;
-		sqlite3_prepare_v2(m_handle, "DELETE FROM account WHERE name = :name", -1, &stmt, 0);
-		int index = sqlite3_bind_parameter_index(stmt, ":name");
-		if (index == 0)
-		{
-			return;
-		}
-		sqlite3_bind_text(stmt, index, account.c_str(), -1, SQLITE_TRANSIENT);
-		sqlite3_step(stmt);
+		delete_from_table("account", std::move(account));
+	}
+
+	void delete_from_payment_table(std::string account)
+	{
+		delete_from_table("payment", std::move(account));
 	}
 
 
@@ -58,6 +55,21 @@ public:
 	std::vector<std::pair<std::string, std::string>> m_banned_users_connections_input{};
 
 protected:
+
+	void delete_from_table(std::string table, std::string account)
+	{
+		std::string sql_stmt{ "DELETE FROM " };
+		sql_stmt += (table + " WHERE name = :name");
+		sqlite3_stmt* stmt;
+		sqlite3_prepare_v2(m_handle, sql_stmt.c_str(), -1, &stmt, 0);
+		int index = sqlite3_bind_parameter_index(stmt, ":name");
+		if (index == 0)
+		{
+			return;
+		}
+		sqlite3_bind_text(stmt, index, account.c_str(), -1, SQLITE_TRANSIENT);
+		sqlite3_step(stmt);
+	}
 
 	void get_valid_account_names()
 	{

@@ -84,6 +84,18 @@ TEST_F(Persistance_fixture, command_get_account)
 	}
 }
 
+TEST_F(Persistance_fixture, command_get_latest_blocks)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->get_latest_blocks();
+	EXPECT_FALSE(result.empty());
+
+}
+
+// -----------------------------------------------------------------------------------------------
+// Write commands
+// -----------------------------------------------------------------------------------------------
+
 TEST_F(Persistance_fixture, command_create_account)
 {
 	std::string account_name{ "testaccount" };
@@ -101,15 +113,25 @@ TEST_F(Persistance_fixture, command_create_account)
 
 	// cleanup db
 	m_test_data.delete_from_account_table(account_name);
-
 }
 
-
-
-TEST_F(Persistance_fixture, command_get_latest_blocks)
+TEST_F(Persistance_fixture, command_add_payment)
 {
-	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
-	auto result = data_reader->get_latest_blocks();
-	EXPECT_FALSE(result.empty());
+	std::string account_name{ "testaccount" };
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto result = data_writer->add_payment(account_name, 1000.0);
+	EXPECT_TRUE(result);
+
+	// add another payment for this account
+	result = data_writer->add_payment(account_name, 5000.0);
+	EXPECT_TRUE(result);
+
+	// cleanup db
+	m_test_data.delete_from_payment_table(account_name);
 
 }
+
+
+
+
+

@@ -287,10 +287,7 @@ Command_create_account_impl::Command_create_account_impl(sqlite3* handle)
 		(name, created_at, last_active, connection_count,shares, reward, hashrate) 
 		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, 0))"};
 
-	if (sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
-	{
-		std::cout << sqlite3_errmsg(m_handle) << std::endl;
-	}
+	sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL);
 }
 
 void Command_create_account_impl::set_params(std::any params)
@@ -306,7 +303,7 @@ Command_add_payment_impl::Command_add_payment_impl(sqlite3* handle)
 {
 	std::string add_payment{ R"(INSERT INTO payment 
 		(name, amount, payment_date_time) 
-		VALUES(:name, :amount, CURRENT_TIMESTAMP)" };
+		VALUES(:name, :amount, CURRENT_TIMESTAMP))" };
 
 	sqlite3_prepare_v2(m_handle, add_payment.c_str(), -1, &m_stmt, NULL);
 }
