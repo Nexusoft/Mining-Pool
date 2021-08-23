@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cstdio>
 #include <sqlite/sqlite3.h>
 
 
@@ -36,13 +37,27 @@ public:
 		sqlite3_shutdown();
 	}
 
+	void delete_from_account_table(std::string account)
+	{
+		sqlite3_stmt* stmt;
+		sqlite3_prepare_v2(m_handle, "DELETE FROM account WHERE name = :name", -1, &stmt, 0);
+		int index = sqlite3_bind_parameter_index(stmt, ":name");
+		if (index == 0)
+		{
+			return;
+		}
+		sqlite3_bind_text(stmt, index, account.c_str(), -1, SQLITE_TRANSIENT);
+		sqlite3_step(stmt);
+	}
+
+
 	std::string m_db_filename{ "test.sqlite3" };
 	std::vector<std::string> const m_invalid_input{ "", "asfagsgdsdfg", "123415234" };
 	std::vector<std::string> m_valid_account_names_input{};
 	std::vector<std::string> m_banned_connections_api_input{};
 	std::vector<std::pair<std::string, std::string>> m_banned_users_connections_input{};
 
-private:
+protected:
 
 	void get_valid_account_names()
 	{

@@ -285,9 +285,12 @@ Command_create_account_impl::Command_create_account_impl(sqlite3* handle)
 {
 	std::string create_account{R"(INSERT INTO account 
 		(name, created_at, last_active, connection_count,shares, reward, hashrate) 
-		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, 0)"};
+		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, 0))"};
 
-	sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL);
+	if (sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
+	{
+		std::cout << sqlite3_errmsg(m_handle) << std::endl;
+	}
 }
 
 void Command_create_account_impl::set_params(std::any params)

@@ -84,6 +84,27 @@ TEST_F(Persistance_fixture, command_get_account)
 	}
 }
 
+TEST_F(Persistance_fixture, command_create_account)
+{
+	std::string account_name{ "testaccount" };
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto result = data_writer->create_account(account_name);
+	EXPECT_TRUE(result);
+
+	// try to create the account a second time
+	result = data_writer->create_account(account_name);
+	EXPECT_FALSE(result);
+
+	// get the new account
+	auto account_result = m_persistance_component->get_data_reader_factory()->create_data_reader()->get_account(account_name);
+	EXPECT_EQ(account_result.m_address, account_name);
+
+	// cleanup db
+	m_test_data.delete_from_account_table(account_name);
+
+}
+
+
 
 TEST_F(Persistance_fixture, command_get_latest_blocks)
 {
