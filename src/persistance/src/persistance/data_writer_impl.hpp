@@ -29,6 +29,7 @@ public:
     bool create_tables() override;
     bool create_account(std::string account) override;
     bool add_payment(std::string account, double amount) override;
+    bool create_round(int round_number) override;
 
 private:
 
@@ -40,6 +41,7 @@ private:
     std::shared_ptr<Command> m_create_tables_cmd;
     std::shared_ptr<Command> m_create_account_cmd;
     std::shared_ptr<Command> m_add_payment_cmd;
+    std::shared_ptr<Command> m_create_round_cmd;    
  };
 
 class Shared_data_writer_impl : public Shared_data_writer
@@ -51,6 +53,7 @@ public:
     bool create_tables() override;
     bool create_account(std::string account) override;
     bool add_payment(std::string account, double amount) override;
+    bool create_round(int round_number) override;
 
 private:
 

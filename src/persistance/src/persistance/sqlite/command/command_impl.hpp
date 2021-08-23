@@ -153,6 +153,17 @@ public:
 	void set_params(std::any params) override;
 };
 
+class Command_create_round_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_create_round_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::create_round; }
+	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	void set_params(std::any params) override;
+};
+
 }
 }
 }

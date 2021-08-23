@@ -21,6 +21,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_create_tables_cmd = m_command_factory->create_command(Type::create_db_schema);
 	m_create_account_cmd = m_command_factory->create_command(Type::create_account);
 	m_add_payment_cmd = m_command_factory->create_command(Type::add_payment);
+	m_create_round_cmd = m_command_factory->create_command(Type::create_round);
 }
 
 bool Data_writer_impl::create_tables()
@@ -36,15 +37,21 @@ bool Data_writer_impl::create_account(std::string account)
 
 bool Data_writer_impl::add_payment(std::string account, double amount)
 {
-	m_add_payment_cmd->set_params(command::Command_add_payment_params{std::move(account), amount});
+	m_add_payment_cmd->set_params(command::Command_add_payment_params{ std::move(account), amount });
 	return m_data_storage->execute_command(m_add_payment_cmd);
+}
+
+bool Data_writer_impl::create_round(int round_number)
+{
+	m_create_round_cmd->set_params(round_number);
+	return m_data_storage->execute_command(m_create_round_cmd);
 }
 
 // --------------------------------------------------------------------------------------
 
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
-	: m_data_writer{std::move(data_writer)}
+	: m_data_writer{ std::move(data_writer) }
 {}
 
 bool Shared_data_writer_impl::create_tables()
@@ -63,6 +70,12 @@ bool Shared_data_writer_impl::add_payment(std::string account, double amount)
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->add_payment(std::move(account), amount);
+}
+
+bool Shared_data_writer_impl::create_round(int round_number)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->create_round(round_number);
 }
 
 }

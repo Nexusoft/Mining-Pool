@@ -20,6 +20,7 @@ public:
     virtual bool create_tables() = 0;
     virtual bool create_account(std::string account) = 0;
     virtual bool add_payment(std::string account, double amount) = 0;
+    virtual bool create_round(int round_number) = 0;
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -34,6 +35,7 @@ public:
     virtual bool create_tables() = 0;
     virtual bool create_account(std::string account) = 0;
     virtual bool add_payment(std::string account, double amount) = 0;
+    virtual bool create_round(int round_number) = 0;
 };
 }
 }

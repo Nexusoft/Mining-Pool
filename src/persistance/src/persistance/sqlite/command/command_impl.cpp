@@ -316,6 +316,24 @@ void Command_add_payment_impl::set_params(std::any params)
 	bind_param(m_stmt, ":amount", casted_params.m_amount);
 }
 
+// -----------------------------------------------------------------------------------------------
+Command_create_round_impl::Command_create_round_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string create_round{ R"(INSERT INTO round 
+		(round_number, total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid) 
+		VALUES(:round_number, 0, 0, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 0))" };
+
+	sqlite3_prepare_v2(m_handle, create_round.c_str(), -1, &m_stmt, NULL);
+}
+
+void Command_create_round_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<int>(m_params);
+	bind_param(m_stmt, ":round_number", casted_params);
+}
+
 }
 }
 }
