@@ -2,6 +2,7 @@
 #include "persistance/command/types.hpp"
 #include "persistance/command/command_factory.hpp"
 #include "persistance/sqlite/command/command_impl.hpp"
+#include "persistance/sqlite/utils.hpp"
 #include <array>
 
 namespace nexuspool
@@ -51,7 +52,12 @@ bool Data_writer_impl::create_round(int round_number)
 bool Data_writer_impl::update_account(Account_data data)
 {
 	m_update_account_cmd->set_params(command::Command_update_account_params{ 
-		std::move(data.m_last_active), data.m_connections, data.m_shares, data.m_balance, data.m_hashrate, std::move(data.m_address) });
+		get_datetime_string(std::chrono::system_clock::now()),	// take current time as last_active_time
+		data.m_connections, 
+		data.m_shares,
+		data.m_balance, 
+		data.m_hashrate, 
+		std::move(data.m_address) });
 	return m_data_storage->execute_command(m_update_account_cmd);
 }
 

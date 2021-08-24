@@ -163,7 +163,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 				Packet response;
 				if (result == Submit_block_result::accept)
 				{
-					self->create_new_account();
+					self->process_accepted();
 					response = response.get_packet(Packet::ACCEPT);
 					self->m_connection->transmit(response.get_bytes());
 				}
@@ -174,7 +174,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 				}
 				else
 				{
-					self->create_new_account();
+					self->process_accepted();
 					response = response.get_packet(Packet::BLOCK);
 					self->m_connection->transmit(response.get_bytes());
 				}
@@ -196,19 +196,28 @@ void Miner_connection::set_current_height(std::uint32_t height)
 	m_current_height = height;
 }
 
-void Miner_connection::create_new_account()
+void Miner_connection::process_accepted()
 {
 	auto session = m_session_registry.get_session(m_session_key);
-	auto user_data = session->get_user_data();
+	auto& user_data = session->get_user_data();
+
+	// create new account
 	if(user_data.m_new_account)
 	{
 		m_logger->info("Creating new account for miner {}", user_data.m_account.m_address);
 		if (!session->create_account())
 		{
 			m_logger->error("Failed creating new account for miner {}", user_data.m_account.m_address);
-			user_data.m_new_account = false;
 		}
+		user_data.m_new_account = false;
 	}
+
+	// add share
+	if (!session->add_share())
+	{
+		m_logger->error("Failed creating to update account for miner {}", user_data.m_account.m_address);
+	}
+
 	session->set_update_time(std::chrono::steady_clock::now());
 }
 

@@ -36,6 +36,7 @@ public:
 	Session_user& get_user_data() { return m_user_data;  }
 	std::chrono::steady_clock::time_point get_update_time() const { return m_update_time; }
 	void set_update_time(std::chrono::steady_clock::time_point update_time) { m_update_time = update_time; }
+	bool add_share();
 
 	bool create_account();
 

@@ -19,6 +19,12 @@ void Session::update_connection(std::shared_ptr<Miner_connection> miner_connecti
 	m_miner_connection = std::move(miner_connection);
 }
 
+bool Session::add_share()
+{
+	m_user_data.m_account.m_shares++;
+	return m_data_writer->update_account(m_user_data.m_account);
+}
+
 bool Session::create_account()
 {
 	assert(m_user_data.m_new_account);
