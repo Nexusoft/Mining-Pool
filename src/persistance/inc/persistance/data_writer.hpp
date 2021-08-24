@@ -1,6 +1,7 @@
 #ifndef NEXUSPOOL_PERSISTANCE_DATA_WRITER_HPP
 #define NEXUSPOOL_PERSISTANCE_DATA_WRITER_HPP
 
+#include <persistance/types.hpp>
 #include <memory>
 #include <string>
 
@@ -21,6 +22,7 @@ public:
     virtual bool create_account(std::string account) = 0;
     virtual bool add_payment(std::string account, double amount) = 0;
     virtual bool create_round(int round_number) = 0;
+    virtual bool update_account(Account_data data) = 0;    
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -36,6 +38,7 @@ public:
     virtual bool create_account(std::string account) = 0;
     virtual bool add_payment(std::string account, double amount) = 0;
     virtual bool create_round(int round_number) = 0;
+    virtual bool update_account(Account_data data) = 0;
 };
 }
 }

@@ -334,6 +334,29 @@ void Command_create_round_impl::set_params(std::any params)
 	bind_param(m_stmt, ":round_number", casted_params);
 }
 
+// -----------------------------------------------------------------------------------------------
+Command_update_account_impl::Command_update_account_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string update_account{ R"(UPDATE account SET 
+			last_active = :last_active, connection_count = :connection_count, shares = :shares, reward = :reward, hashrate = :hashrate
+			WHERE name = :name)" };
+
+	sqlite3_prepare_v2(m_handle, update_account.c_str(), -1, &m_stmt, NULL);
+}
+
+void Command_update_account_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_update_account_params>(m_params);
+	bind_param(m_stmt, ":last_active", casted_params.m_last_active);
+	bind_param(m_stmt, ":connection_count", casted_params.m_connection_count);
+	bind_param(m_stmt, ":shares", casted_params.m_shares);
+	bind_param(m_stmt, ":reward", casted_params.m_reward);
+	bind_param(m_stmt, ":hashrate", casted_params.m_hashrate);
+	bind_param(m_stmt, ":name", casted_params.m_name);
+}
+
 }
 }
 }

@@ -164,6 +164,27 @@ public:
 	void set_params(std::any params) override;
 };
 
+struct Command_update_account_params
+{
+	std::string m_last_active;
+	int m_connection_count;
+	double m_shares;
+	double m_reward;
+	double m_hashrate;
+	std::string m_name;
+};
+
+class Command_update_account_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_update_account_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::update_account; }
+	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	void set_params(std::any params) override;
+};
+
 }
 }
 }

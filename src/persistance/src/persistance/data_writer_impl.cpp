@@ -22,6 +22,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_create_account_cmd = m_command_factory->create_command(Type::create_account);
 	m_add_payment_cmd = m_command_factory->create_command(Type::add_payment);
 	m_create_round_cmd = m_command_factory->create_command(Type::create_round);
+	m_update_account_cmd = m_command_factory->create_command(Type::update_account);
 }
 
 bool Data_writer_impl::create_tables()
@@ -45,6 +46,13 @@ bool Data_writer_impl::create_round(int round_number)
 {
 	m_create_round_cmd->set_params(round_number);
 	return m_data_storage->execute_command(m_create_round_cmd);
+}
+
+bool Data_writer_impl::update_account(Account_data data)
+{
+	m_update_account_cmd->set_params(command::Command_update_account_params{ 
+		std::move(data.m_last_active), data.m_connections, data.m_shares, data.m_balance, data.m_hashrate, std::move(data.m_address) });
+	return m_data_storage->execute_command(m_update_account_cmd);
 }
 
 // --------------------------------------------------------------------------------------
@@ -76,6 +84,12 @@ bool Shared_data_writer_impl::create_round(int round_number)
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->create_round(round_number);
+}
+
+bool Shared_data_writer_impl::update_account(Account_data data)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->update_account(std::move(data));
 }
 
 }

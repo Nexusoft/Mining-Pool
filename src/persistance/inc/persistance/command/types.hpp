@@ -29,7 +29,8 @@ enum class Type : std::uint8_t
 	get_latest_round,
 	get_payments,
 	add_payment,
-	create_round
+	create_round,
+	update_account
 
 };
 
