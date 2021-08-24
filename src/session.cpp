@@ -22,9 +22,9 @@ void Session::update_connection(std::shared_ptr<Miner_connection> miner_connecti
 bool Session::create_account()
 {
 	assert(m_user_data.m_new_account);
-	assert(!m_user_data.m_nxs_address.empty());
+	assert(!m_user_data.m_account.m_address.empty());
 
-	return m_data_writer->create_account(m_user_data.m_nxs_address);
+	return m_data_writer->create_account(m_user_data.m_account.m_address);
 }
 
 // ------------------------------------------------------------------------------------------------------------
@@ -100,6 +100,19 @@ bool Session_registry::does_account_exists(std::string account)
 	std::scoped_lock lock(m_data_reader_mutex);
 
 	return m_data_reader->does_account_exists(std::move(account));
+}
+
+void Session_registry::login(Session_key key)
+{
+	auto session = get_session(key);
+	auto& user_data = session->get_user_data();
+	persistance::Account_data account_data{};
+	{	
+		std::scoped_lock lock(m_data_reader_mutex);
+		account_data = m_data_reader->get_account(user_data.m_account.m_address);
+	}
+
+	user_data.m_account = std::move(account_data);
 }
 
 }

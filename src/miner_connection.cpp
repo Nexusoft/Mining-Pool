@@ -80,11 +80,11 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 	else if (packet.m_header == Packet::LOGIN)
 	{
-		auto user_data = session->get_user_data();
+		auto& user_data = session->get_user_data();
 		// check if already logged in
 		if (user_data.m_logged_in)
 		{
-			m_logger->warn("Multiple login attempts of user {} with ip {} ", user_data.m_nxs_address, m_remote_address);
+			m_logger->warn("Multiple login attempts of user {} with ip {} ", user_data.m_account.m_address, m_remote_address);
 			// increase ddos score
 			return;
 		}
@@ -110,7 +110,11 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 
 		// check if user already exists in db
 		user_data.m_new_account = !m_session_registry.does_account_exists(nxs_address);
+		// login the user (fetch data from storage)
+		user_data.m_account.m_address = nxs_address;
+		m_session_registry.login(m_session_key);
 		user_data.m_logged_in = true;
+
 		response = response.get_packet(Packet::LOGIN_SUCCESS);
 		m_connection->transmit(response.get_bytes());
 	}
@@ -198,10 +202,10 @@ void Miner_connection::create_new_account()
 	auto user_data = session->get_user_data();
 	if(user_data.m_new_account)
 	{
-		m_logger->info("Creating new account for miner {}", user_data.m_nxs_address);
+		m_logger->info("Creating new account for miner {}", user_data.m_account.m_address);
 		if (!session->create_account())
 		{
-			m_logger->error("Failed creating new account for miner {}", user_data.m_nxs_address);
+			m_logger->error("Failed creating new account for miner {}", user_data.m_account.m_address);
 			user_data.m_new_account = false;
 		}
 	}

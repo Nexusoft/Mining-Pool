@@ -9,6 +9,7 @@
 #include "LLC/types/uint1024.h"
 #include "persistance/data_writer.hpp"
 #include "persistance/data_reader.hpp"
+#include "persistance/types.hpp"
 
 namespace nexuspool
 {
@@ -16,11 +17,9 @@ class Miner_connection;
 
 struct Session_user
 {
-	std::string m_nxs_address{ "" };
 	bool m_logged_in{ false };
 	bool m_new_account{ true };
-	std::uint32_t m_shares{ 0 };
-	double m_hashrate{ 0.0f };
+	persistance::Account_data m_account;
 };
 
 using Session_key = uint256_t;
@@ -68,6 +67,7 @@ public:
 	void update_height(std::uint32_t height);
 
 	bool does_account_exists(std::string account);
+	void login(Session_key key);	// fetch user data from storage for the specific session
 
 private:
 
