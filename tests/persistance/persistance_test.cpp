@@ -148,6 +148,40 @@ TEST_F(Persistance_fixture, command_create_account)
 	m_test_data.delete_from_account_table(account_name);
 }
 
+
+TEST_F(Persistance_fixture, command_update_account)
+{
+	std::string account_name{ "testaccount" };
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	// create a new testaccount
+	auto result_create_account = data_writer->create_account(account_name);
+	EXPECT_TRUE(result_create_account);
+
+	// Data to update
+	Account_data account_data;
+	account_data.m_balance = 100;
+	account_data.m_hashrate = 1000;
+	account_data.m_shares = 10000;
+	account_data.m_connections = 1;
+	account_data.m_address = account_name;
+
+	auto result_update_account = data_writer->update_account(account_data);
+	EXPECT_TRUE(result_update_account);
+
+	// get updated account to compare results
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result_account = data_reader->get_account(account_name);
+
+	EXPECT_EQ(result_account.m_balance, account_data.m_balance);
+	EXPECT_EQ(result_account.m_hashrate, account_data.m_hashrate);
+	EXPECT_EQ(result_account.m_shares, account_data.m_shares);
+	EXPECT_EQ(result_account.m_connections, account_data.m_connections);
+
+	// cleanup db
+	m_test_data.delete_from_account_table(account_name);
+
+}
+
 TEST_F(Persistance_fixture, command_add_payment)
 {
 	std::string account_name{ "testaccount" };
