@@ -47,6 +47,20 @@ public:
 		delete_from_table("payment", std::move(account));
 	}
 
+	void delete_from_round_table(int round_number)
+	{
+		std::string sql_stmt{ "DELETE FROM round WHERE round_number = :round_number" };
+		sqlite3_stmt* stmt;
+		sqlite3_prepare_v2(m_handle, sql_stmt.c_str(), -1, &stmt, 0);
+		int index = sqlite3_bind_parameter_index(stmt, ":round_number");
+		if (index == 0)
+		{
+			return;
+		}
+		sqlite3_bind_int(stmt, index, round_number);
+		sqlite3_step(stmt);
+	}
+
 
 	std::string m_db_filename{ "test.sqlite3" };
 	std::vector<std::string> const m_invalid_input{ "", "asfagsgdsdfg", "123415234" };
