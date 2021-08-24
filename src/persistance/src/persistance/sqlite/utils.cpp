@@ -2,6 +2,7 @@
 #include "persistance/sqlite/utils.hpp"
 #include <assert.h>
 #include <variant>
+#include <date.h>
 
 namespace nexuspool {
 namespace persistance {
@@ -71,6 +72,11 @@ Payment_data convert_to_payment_data(Row_sqlite row)
 
 	return result;
 
+}
+
+std::string get_datetime_string(std::chrono::system_clock::time_point t)
+{
+	return date::format("%F %T", t);	// %F = Equivalent to %Y-%m-%d  %T = Equivalent to %H:%M:%S
 }
 
 }
