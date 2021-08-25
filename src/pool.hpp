@@ -30,6 +30,8 @@ public:
 
 private:
 
+	void storage_config_check();
+
 	std::unique_ptr<network::Component> m_network_component;
 	std::unique_ptr<persistance::Component> m_persistance_component;
 	std::shared_ptr<network::Socket> m_listen_socket;

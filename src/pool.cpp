@@ -74,6 +74,8 @@ namespace nexuspool
 		// create tables at startup
 		m_persistance_component->get_data_writer_factory()->create_shared_data_writer()->create_tables();
 
+		storage_config_check();
+
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
 		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, 
@@ -92,5 +94,41 @@ namespace nexuspool
 		m_api_server->start();
 		m_pool_manager->start();
 		m_io_context->run();
+	}
+
+	void Pool::storage_config_check()
+	{
+		auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+		auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+
+		auto const config_data = data_reader->get_config();
+		std::string const mining_mode{ m_config.get_mining_mode() == config::Mining_mode::HASH ? "HASH" : "PRIME" };
+		if (config_data.m_version.empty())
+		{
+			// No config present
+			data_writer->create_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider);
+		}
+		else
+		{
+			if (mining_mode != config_data.m_mining_mode &&
+				m_config.get_pool_config().m_fee != config_data.m_fee &&
+				m_config.get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider)
+			{
+				// update config but only if there is no round active
+				auto const round_data = data_reader->get_latest_round();
+				if (round_data.m_is_active)
+				{
+					m_logger->warn("Pool config can't be changed now. Round {} is active until {}.", round_data.m_round, round_data.m_end_date_time);
+				}
+				else
+				{
+					data_writer->update_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider);
+				}
+			}
+
+			// TODO: check database version and update tables
+		}
+
+
 	}
 }
