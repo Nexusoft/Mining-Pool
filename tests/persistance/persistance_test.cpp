@@ -231,6 +231,18 @@ TEST_F(Persistance_fixture, commands_config)
 	EXPECT_EQ(result_get_config.m_fee, config_fee_input);
 	EXPECT_EQ(result_get_config.m_difficulty_divider, config_difficulty_divider_input);
 
+	// update config
+	config_mining_mode_input = "PRIME";
+	config_fee_input = 30;
+	config_difficulty_divider_input = 40;
+
+	result = data_writer->update_config(config_mining_mode_input, config_fee_input, config_difficulty_divider_input);
+	EXPECT_TRUE(result);
+
+	result_get_config = data_reader->get_config();
+	EXPECT_EQ(result_get_config.m_mining_mode, config_mining_mode_input);
+	EXPECT_EQ(result_get_config.m_fee, config_fee_input);
+	EXPECT_EQ(result_get_config.m_difficulty_divider, config_difficulty_divider_input);
 
 	// cleanup db
 	m_test_data.delete_from_config_table(1);

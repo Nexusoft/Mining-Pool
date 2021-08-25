@@ -401,7 +401,26 @@ Command_create_config_impl::Command_create_config_impl(sqlite3* handle)
 void Command_create_config_impl::set_params(std::any params)
 {
 	m_params = std::move(params);
-	auto casted_params = std::any_cast<Command_create_config_params>(m_params);
+	auto casted_params = std::any_cast<Command_config_params>(m_params);
+	bind_param(m_stmt, ":difficulty_divider", casted_params.m_difficulty_divider);
+	bind_param(m_stmt, ":fee", casted_params.m_fee);
+	bind_param(m_stmt, ":mining_mode", casted_params.m_mining_mode);
+}
+
+// -----------------------------------------------------------------------------------------------
+Command_update_config_impl::Command_update_config_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string create_config{ R"(UPDATE config SET 
+			difficulty_divider = :difficulty_divider, fee = :fee, mining_mode = :mining_mode)" };
+
+	sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL);
+}
+
+void Command_update_config_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_config_params>(m_params);
 	bind_param(m_stmt, ":difficulty_divider", casted_params.m_difficulty_divider);
 	bind_param(m_stmt, ":fee", casted_params.m_fee);
 	bind_param(m_stmt, ":mining_mode", casted_params.m_mining_mode);

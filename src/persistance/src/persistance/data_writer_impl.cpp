@@ -25,6 +25,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_create_round_cmd = m_command_factory->create_command(Type::create_round);
 	m_update_account_cmd = m_command_factory->create_command(Type::update_account);
 	m_create_config_cmd = m_command_factory->create_command(Type::create_config);
+	m_update_config_cmd = m_command_factory->create_command(Type::update_config);
 }
 
 bool Data_writer_impl::create_tables()
@@ -63,8 +64,14 @@ bool Data_writer_impl::update_account(Account_data data)
 
 bool Data_writer_impl::create_config(std::string mining_mode, int fee, int difficulty_divider)
 {
-	m_create_config_cmd->set_params(command::Command_create_config_params{fee, difficulty_divider, std::move(mining_mode)});
+	m_create_config_cmd->set_params(command::Command_config_params{fee, difficulty_divider, std::move(mining_mode)});
 	return m_data_storage->execute_command(m_create_config_cmd);
+}
+
+bool Data_writer_impl::update_config(std::string mining_mode, int fee, int difficulty_divider)
+{
+	m_update_config_cmd->set_params(command::Command_config_params{ fee, difficulty_divider, std::move(mining_mode) });
+	return m_data_storage->execute_command(m_update_config_cmd);
 }
 
 // --------------------------------------------------------------------------------------
@@ -108,6 +115,12 @@ bool Shared_data_writer_impl::create_config(std::string mining_mode, int fee, in
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->create_config(std::move(mining_mode), fee, difficulty_divider);
+}
+
+bool Shared_data_writer_impl::update_config(std::string mining_mode, int fee, int difficulty_divider)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->update_config(std::move(mining_mode), fee, difficulty_divider);
 }
 
 }
