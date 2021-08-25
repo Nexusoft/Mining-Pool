@@ -35,7 +35,7 @@ struct Block_data
 
 struct Round_data
 {
-	std::uint32_t m_round;
+	std::int64_t m_round;
 	double m_total_shares;
 	double m_total_rewards;
 	std::uint32_t m_blocks;

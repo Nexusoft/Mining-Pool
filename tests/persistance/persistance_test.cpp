@@ -200,13 +200,12 @@ TEST_F(Persistance_fixture, command_add_payment)
 
 TEST_F(Persistance_fixture, command_create_round)
 {
-	int round_number = 100;
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
-	auto result = data_writer->create_round(round_number);
+	auto result = data_writer->create_round();
 	EXPECT_TRUE(result);
 
 	// cleanup db
-	m_test_data.delete_from_round_table(round_number);
+//	m_test_data.delete_from_round_table(round_number);
 
 }
 

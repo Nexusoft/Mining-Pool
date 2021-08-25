@@ -29,7 +29,7 @@ public:
     bool create_tables() override;
     bool create_account(std::string account) override;
     bool add_payment(std::string account, double amount) override;
-    bool create_round(int round_number) override;
+    bool create_round() override;
     bool update_account(Account_data data) override;
 
 private:
@@ -55,7 +55,7 @@ public:
     bool create_tables() override;
     bool create_account(std::string account) override;
     bool add_payment(std::string account, double amount) override;
-    bool create_round(int round_number) override;
+    bool create_round() override;
     bool update_account(Account_data data) override;
 
 private:

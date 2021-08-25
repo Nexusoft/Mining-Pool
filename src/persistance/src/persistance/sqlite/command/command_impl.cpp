@@ -182,14 +182,13 @@ std::any Command_get_blocks_impl::get_command() const
 Command_get_latest_round_impl::Command_get_latest_round_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT id, round_number, total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid FROM round ORDER BY ID DESC LIMIT 1;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT round_number, total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid FROM round ORDER BY round_number DESC LIMIT 1;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_latest_round_impl::get_command() const
 {
 	Command_type_sqlite command{ m_stmt,
 		{{Column_sqlite::int64},
-		{Column_sqlite::int32},
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
 		{Column_sqlite::int32},
@@ -232,49 +231,70 @@ Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string create_tables{ R"(CREATE TABLE IF NOT EXISTS round (
-				  id INTEGER PRIMARY KEY AUTOINCREMENT,
-				  round_number INTEGER NOT NULL,
-				  total_shares REAL,
-				  total_reward REAL,
-				  blocks INTEGER,
-				  connection_count INTEGER
-				);
+		  round_number INTEGER PRIMARY KEY AUTOINCREMENT,
+		  total_shares REAL,
+		  total_reward REAL,
+		  blocks INTEGER,
+		  connection_count INTEGER,
+		  start_date_time TEXT NOT NULL,
+		  end_date_time TEXT NOT NULL,
+		  is_active INTEGER NOT NULL,
+		  is_paid INTEGER NOT NULL
+		);
 
-				CREATE TABLE IF NOT EXISTS block (
-				  id INTEGER PRIMARY KEY AUTOINCREMENT,
-				  hash TEXT NOT NULL,
-				  height INTEGER NOT NULL,
-				  type TEXT NOT NULL
-				  reward INTEGER NOT NULL,
-				  difficulty REAL NOT NULL,
-				  orphan INTEGER NOT NULL,
-				  block_finder TEXT NOT NULL,
-				  round INTEGER NOT NULL,
-				  block_found_time TEXT NOT NULL,
-				  FOREIGN KEY(round) REFERENCES round(id),
-				  FOREIGN KEY(block_finder) REFERENCES account(name)
-				);
+		CREATE TABLE IF NOT EXISTS block (
+		  id INTEGER PRIMARY KEY AUTOINCREMENT,
+		  hash TEXT NOT NULL,
+		  height INTEGER NOT NULL,
+		  type TEXT NOT NULL,
+		  shares REAL NOT NULL,
+		  difficulty REAL NOT NULL,
+		  orphan INTEGER NOT NULL,
+		  block_finder TEXT NOT NULL,
+		  round INTEGER NOT NULL,
+		  block_found_time TEXT NOT NULL,
+		  accepted_by_mainnet INTEGER NOT NULL,
+		  mainnet_reward REAL NOT NULL,
+		  FOREIGN KEY(round) REFERENCES round(round_number),
+		  FOREIGN KEY(block_finder) REFERENCES account(name)
+		);
 
-				CREATE TABLE IF NOT EXISTS account (
-				  name TEXT PRIMARY KEY,
-				  created_at TEXT NOT NULL,
-				  last_active TEXT,
-				  connection_count INTEGER,
-				  shares REAL,
-				  reward REAL,
-				  hashrate REAL
-				);
+		CREATE TABLE IF NOT EXISTS account (
+		  name TEXT PRIMARY KEY,
+		  created_at TEXT NOT NULL,
+		  last_active TEXT,
+		  connection_count INTEGER,
+		  shares REAL,
+		  reward REAL,
+		  hashrate REAL
+		);
 
-				CREATE TABLE IF NOT EXISTS banned_connections_api (
-				  id INTEGER PRIMARY KEY AUTOINCREMENT,
-				  ip TEXT NOT NULL
-				);
+		CREATE TABLE IF NOT EXISTS payment (
+		  id INTEGER PRIMARY KEY AUTOINCREMENT, 
+		  name TEXT NOT NULL,
+		  amount REAL NOT NULL,
+		  payment_date_time TEXT NOT NULL,
+		  FOREIGN KEY(name) REFERENCES account(name)
+		);
 
-				CREATE TABLE IF NOT EXISTS banned_users_connections (
-				  user TEXT,
-				  ip TEXT,
-				  PRIMARY KEY (user, ip)
-				);)"
+		CREATE TABLE IF NOT EXISTS banned_connections_api (
+		  id INTEGER PRIMARY KEY AUTOINCREMENT,
+		  ip TEXT NOT NULL
+		);
+
+		CREATE TABLE IF NOT EXISTS banned_users_connections (
+		  user TEXT,
+		  ip TEXT,
+		  PRIMARY KEY (user, ip)
+		);
+
+		CREATE TABLE IF NOT EXISTS config (
+		  id INTEGER PRIMARY KEY AUTOINCREMENT,
+		  version TEXT NOT NULL,
+		  difficulty_divider INTEGER NOT NULL,
+		  fee INTEGER NOT NULL,
+		  mining_mode TEXT NOT NULL
+		);)"
 	};
 
 	sqlite3_prepare_v2(m_handle, create_tables.c_str(), -1, &m_stmt, NULL);
@@ -321,17 +341,10 @@ Command_create_round_impl::Command_create_round_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string create_round{ R"(INSERT INTO round 
-		(round_number, total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid) 
-		VALUES(:round_number, 0, 0, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 0))" };
+		(total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid) 
+		VALUES(0, 0, 0, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 0))" };
 
 	sqlite3_prepare_v2(m_handle, create_round.c_str(), -1, &m_stmt, NULL);
-}
-
-void Command_create_round_impl::set_params(std::any params)
-{
-	m_params = std::move(params);
-	auto casted_params = std::any_cast<int>(m_params);
-	bind_param(m_stmt, ":round_number", casted_params);
 }
 
 // -----------------------------------------------------------------------------------------------
