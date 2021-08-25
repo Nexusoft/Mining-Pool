@@ -209,6 +209,17 @@ TEST_F(Persistance_fixture, command_create_round)
 
 }
 
+TEST_F(Persistance_fixture, command_create_config)
+{
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto result = data_writer->create_config("HASH", 3, 4);
+	EXPECT_TRUE(result);
+
+	// cleanup db
+	m_test_data.delete_from_config_table(1);
+
+}
+
 
 
 

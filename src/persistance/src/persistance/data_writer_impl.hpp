@@ -31,6 +31,7 @@ public:
     bool add_payment(std::string account, double amount) override;
     bool create_round() override;
     bool update_account(Account_data data) override;
+    bool create_config(std::string mining_mode, int fee, int difficulty_divider) override;
 
 private:
 
@@ -44,6 +45,7 @@ private:
     std::shared_ptr<Command> m_add_payment_cmd;
     std::shared_ptr<Command> m_create_round_cmd;    
     std::shared_ptr<Command> m_update_account_cmd;
+    std::shared_ptr<Command> m_create_config_cmd;
  };
 
 class Shared_data_writer_impl : public Shared_data_writer
@@ -57,6 +59,7 @@ public:
     bool add_payment(std::string account, double amount) override;
     bool create_round() override;
     bool update_account(Account_data data) override;
+    bool create_config(std::string mining_mode, int fee, int difficulty_divider) override;
 
 private:
 

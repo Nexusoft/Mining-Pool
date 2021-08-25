@@ -47,18 +47,14 @@ public:
 		delete_from_table("payment", std::move(account));
 	}
 
-	void delete_from_round_table(int round_number)
+	void delete_from_round_table(std::int64_t round_number)
 	{
-		std::string sql_stmt{ "DELETE FROM round WHERE round_number = :round_number" };
-		sqlite3_stmt* stmt;
-		sqlite3_prepare_v2(m_handle, sql_stmt.c_str(), -1, &stmt, 0);
-		int index = sqlite3_bind_parameter_index(stmt, ":round_number");
-		if (index == 0)
-		{
-			return;
-		}
-		sqlite3_bind_int(stmt, index, round_number);
-		sqlite3_step(stmt);
+		delete_from_table("round", "round_number", round_number);
+	}
+
+	void delete_from_config_table(std::int64_t id)
+	{
+		delete_from_table("config", "id", id);
 	}
 
 
@@ -82,6 +78,21 @@ protected:
 			return;
 		}
 		sqlite3_bind_text(stmt, index, account.c_str(), -1, SQLITE_TRANSIENT);
+		sqlite3_step(stmt);
+	}
+
+	void delete_from_table(std::string table, std::string id_name, std::int64_t id)
+	{
+		std::string sql_stmt{ "DELETE FROM " };
+		sql_stmt += (table + " WHERE " + id_name + " = :id");
+		sqlite3_stmt* stmt;
+		sqlite3_prepare_v2(m_handle, sql_stmt.c_str(), -1, &stmt, 0);
+		int index = sqlite3_bind_parameter_index(stmt, ":id");
+		if (index == 0)
+		{
+			return;
+		}
+		sqlite3_bind_int64(stmt, index, id);
 		sqlite3_step(stmt);
 	}
 

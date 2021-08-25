@@ -370,6 +370,26 @@ void Command_update_account_impl::set_params(std::any params)
 	bind_param(m_stmt, ":name", casted_params.m_name);
 }
 
+// -----------------------------------------------------------------------------------------------
+Command_create_config_impl::Command_create_config_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string create_config{ R"(INSERT INTO config 
+		(version, difficulty_divider, fee, mining_mode) 
+		VALUES('1.0', :difficulty_divider, :fee, :mining_mode))" };
+
+	sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL);
+}
+
+void Command_create_config_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_create_config_params>(m_params);
+	bind_param(m_stmt, ":difficulty_divider", casted_params.m_difficulty_divider);
+	bind_param(m_stmt, ":fee", casted_params.m_fee);
+	bind_param(m_stmt, ":mining_mode", casted_params.m_mining_mode);
+}
+
 }
 }
 }
