@@ -26,6 +26,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_blocks_cmd = m_command_factory->create_command(Type::get_blocks);
 	m_get_latest_round_cmd = m_command_factory->create_command(Type::get_latest_round);
 	m_get_payments_cmd = m_command_factory->create_command(Type::get_payments);
+	m_get_config_cmd = m_command_factory->create_command(Type::get_config);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -54,6 +55,11 @@ bool Data_reader_impl::does_account_exists(std::string account)
 	}
 
 	auto result = std::any_cast<Result_sqlite>(m_account_exists_cmd->get_result());
+	if (result.m_rows.empty())
+	{
+		return false;
+	}
+
 	auto account_count = std::get<std::int32_t>(result.m_rows.front()[0].m_data);
 
 	return account_count ? true : false;
@@ -68,6 +74,10 @@ Account_data Data_reader_impl::get_account(std::string account)
 		return account_data;	// return empty result
 	}
 	auto result = std::any_cast<Result_sqlite>(m_get_account_cmd->get_result());
+	if (result.m_rows.empty())
+	{
+		return account_data;	// return empty result
+	}
 	auto result_row = result.m_rows.front();
 	account_data = convert_to_account_data(std::move(result_row));
 
@@ -99,6 +109,10 @@ Round_data Data_reader_impl::get_latest_round()
 		return round_data;	// return empty result
 	}
 	auto result = std::any_cast<Result_sqlite>(m_get_latest_round_cmd->get_result());
+	if (result.m_rows.empty())
+	{
+		return round_data;	// return empty result
+	}
 	auto result_row = result.m_rows.front();
 	round_data = convert_to_round_data(std::move(result_row));
 
@@ -120,6 +134,25 @@ std::vector<Payment_data> Data_reader_impl::get_payments(std::string account)
 	}
 
 	return payments;
+}
+
+Config_data Data_reader_impl::get_config()
+{
+	Config_data config_data{};
+	if (!m_data_storage->execute_command(m_get_config_cmd))
+	{
+		return config_data;	// return empty result
+	}
+	auto result = std::any_cast<Result_sqlite>(m_get_config_cmd->get_result());
+	if (result.m_rows.empty())
+	{
+		return config_data;	// return empty result
+	}
+
+	auto result_row = result.m_rows.front();
+	config_data = convert_to_config_data(std::move(result_row));
+
+	return config_data;
 }
 
 

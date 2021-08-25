@@ -32,6 +32,7 @@ public:
     std::vector<Block_data> get_latest_blocks() override;
     Round_data get_latest_round() override;
     std::vector<Payment_data> get_payments(std::string account) override;
+    Config_data get_config() override;
 
 private:
 
@@ -47,6 +48,7 @@ private:
     std::shared_ptr<Command> m_get_blocks_cmd;
     std::shared_ptr<Command> m_get_latest_round_cmd;
     std::shared_ptr<Command> m_get_payments_cmd;
+    std::shared_ptr<Command> m_get_config_cmd;
 };
 
 }

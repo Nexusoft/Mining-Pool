@@ -112,6 +112,17 @@ public:
 	void set_params(std::any params) override;
 };
 
+class Command_get_config_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_config_impl(sqlite3* handle);
+
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_config; }
+	void set_params(std::any params) override { /* no params */ };
+};
+
 // ------------------------------------------------------------------------------------
 // Write commands
 

@@ -223,6 +223,23 @@ void Command_get_payments_impl::set_params(std::any params)
 	auto casted_params = std::any_cast<std::string>(m_params);
 	bind_param(m_stmt, ":name", casted_params);
 }
+// -----------------------------------------------------------------------------------------------
+
+Command_get_config_impl::Command_get_config_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT version, difficulty_divider, fee, mining_mode FROM config;", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_config_impl::get_command() const
+{
+	Command_type_sqlite command{ m_stmt,
+		{{Column_sqlite::string},
+		{Column_sqlite::int32},
+		{Column_sqlite::int32},
+		{Column_sqlite::string}} };
+	return command;
+}
 
 // -----------------------------------------------------------------------------------------------
 // Write commands

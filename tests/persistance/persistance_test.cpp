@@ -209,11 +209,28 @@ TEST_F(Persistance_fixture, command_create_round)
 
 }
 
-TEST_F(Persistance_fixture, command_create_config)
+TEST_F(Persistance_fixture, commands_config)
 {
+	std::string config_mining_mode_input{ "HASH" };
+	int config_fee_input = 3;
+	int config_difficulty_divider_input = 4;
+
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
-	auto result = data_writer->create_config("HASH", 3, 4);
+
+	// get config from empty table
+	auto result_get_config = data_reader->get_config();
+	EXPECT_TRUE(result_get_config.m_version.empty());
+
+	// insert a config
+	auto result = data_writer->create_config(config_mining_mode_input, config_fee_input, config_difficulty_divider_input);
 	EXPECT_TRUE(result);
+
+	result_get_config = data_reader->get_config();
+	EXPECT_EQ(result_get_config.m_mining_mode, config_mining_mode_input);
+	EXPECT_EQ(result_get_config.m_fee, config_fee_input);
+	EXPECT_EQ(result_get_config.m_difficulty_divider, config_difficulty_divider_input);
+
 
 	// cleanup db
 	m_test_data.delete_from_config_table(1);

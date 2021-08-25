@@ -53,6 +53,15 @@ struct Payment_data
 	std::string m_payment_date_time;
 };
 
+struct Config_data
+{
+	std::string m_version;
+	int m_fee;
+	int m_difficulty_divider;
+	std::string m_mining_mode;
+};
+
+
 struct connection_miner_data
 {
 	connection_miner_data() : m_pps{ 0 }, m_wps{ 0 }, m_guid{ "" }

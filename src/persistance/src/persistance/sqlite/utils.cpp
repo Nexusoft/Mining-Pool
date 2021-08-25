@@ -70,7 +70,19 @@ Payment_data convert_to_payment_data(Row_sqlite row)
 	result.m_payment_date_time = std::get<std::string>(row[2].m_data);
 
 	return result;
+}
 
+Config_data convert_to_config_data(Row_sqlite row)
+{
+	assert(row.size() == 4U);
+	Config_data result{};
+
+	result.m_version = std::get<std::string>(row[0].m_data);
+	result.m_fee = std::get<int>(row[1].m_data);
+	result.m_difficulty_divider = std::get<int>(row[2].m_data);
+	result.m_mining_mode = std::get<std::string>(row[3].m_data);
+
+	return result;
 }
 
 std::string get_datetime_string(std::chrono::system_clock::time_point t)
