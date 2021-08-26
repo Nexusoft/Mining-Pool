@@ -26,6 +26,7 @@ private:
 
 	bool exec_statement_with_result(Command_type_sqlite sql_command, Result_sqlite& result);
 	bool exec_statement(Command_type_sqlite sql_command);
+	bool exec_statements(Command_type_sqlite sql_command);
 
 	std::shared_ptr<spdlog::logger> m_logger;
 	std::string m_db_name;

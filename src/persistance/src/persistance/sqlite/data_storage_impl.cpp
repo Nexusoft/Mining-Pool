@@ -21,15 +21,26 @@ bool Data_storage_impl::execute_command(std::any command)
 	auto sqlite_command = std::any_cast<Command_type_sqlite>(casted_command->get_command());
 
 	bool return_value{ false };
-	if (sqlite_command.m_type == Command_type_sqlite::result)
+	switch (sqlite_command.m_type)
+	{
+	case Command_type_sqlite::Type::result:
 	{
 		Result_sqlite result;
 		return_value = exec_statement_with_result(sqlite_command, result);
 		casted_command->set_result(std::move(result));
+		break;
 	}
-	else
+	case Command_type_sqlite::Type::multiple_statements:
+	{
+		return_value = exec_statements(sqlite_command);
+		break;
+	}
+	case Command_type_sqlite::Type::no_result:
+	default:
 	{
 		return_value = exec_statement(sqlite_command);
+		break;
+	}
 	}
 
 	casted_command->reset();	// resets sqlite prepared_stmt and clears the bindings
@@ -38,7 +49,7 @@ bool Data_storage_impl::execute_command(std::any command)
 
 bool Data_storage_impl::exec_statement(Command_type_sqlite sql_command)
 {
-	auto ret = sqlite3_step(sql_command.m_statement);
+	auto ret = sqlite3_step(sql_command.m_statements.front());
 	if (ret != SQLITE_DONE)
 	{
 		m_logger->error("Sqlite step failure");
@@ -47,10 +58,25 @@ bool Data_storage_impl::exec_statement(Command_type_sqlite sql_command)
 	return true;
 }
 
+bool Data_storage_impl::exec_statements(Command_type_sqlite sql_command)
+{
+	for (auto& stmt : sql_command.m_statements)
+	{
+		auto ret = sqlite3_step(stmt);
+		if (ret != SQLITE_DONE)
+		{
+			m_logger->error("Sqlite step failure");
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool Data_storage_impl::exec_statement_with_result(Command_type_sqlite sql_command, Result_sqlite& result)
 {
 	int ret = 0;
-	while ((ret = sqlite3_step(sql_command.m_statement)) == SQLITE_ROW)
+	while ((ret = sqlite3_step(sql_command.m_statements.front())) == SQLITE_ROW)
 	{	
 		// process row here
 		auto column_index = 0U;
@@ -61,26 +87,26 @@ bool Data_storage_impl::exec_statement_with_result(Command_type_sqlite sql_comma
 			{
 			case Column_sqlite::string:
 			{
-				column.m_data = std::string(reinterpret_cast<const char*>(sqlite3_column_text(sql_command.m_statement, column_index)));
+				column.m_data = std::string(reinterpret_cast<const char*>(sqlite3_column_text(sql_command.m_statements.front(), column_index)));
 				column.m_type = Column_sqlite::string;
 				break;
 			}
 
 			case Column_sqlite::int32:
 			{
-				column.m_data = sqlite3_column_int(sql_command.m_statement, column_index);
+				column.m_data = sqlite3_column_int(sql_command.m_statements.front(), column_index);
 				column.m_type = Column_sqlite::int32;
 				break;
 			}
 			case Column_sqlite::int64:
 			{
-				column.m_data = sqlite3_column_int64(sql_command.m_statement, column_index);
+				column.m_data = sqlite3_column_int64(sql_command.m_statements.front(), column_index);
 				column.m_type = Column_sqlite::int64;
 				break;
 			}
 			case Column_sqlite::double_t:
 			{
-				column.m_data = sqlite3_column_double(sql_command.m_statement, column_index);
+				column.m_data = sqlite3_column_double(sql_command.m_statements.front(), column_index);
 				column.m_type = Column_sqlite::double_t;
 				break;
 			}

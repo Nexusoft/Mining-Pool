@@ -70,7 +70,7 @@ Command_banned_user_and_ip_impl::Command_banned_user_and_ip_impl(sqlite3* handle
 
 std::any Command_banned_user_and_ip_impl::get_command() const
 {
-	Command_type_sqlite command{ m_stmt, {{Column_sqlite::string}, {Column_sqlite::string }} };
+	Command_type_sqlite command{ {m_stmt}, {{Column_sqlite::string}, {Column_sqlite::string }} };
 	return command;
 }
 
@@ -92,7 +92,7 @@ Command_banned_api_ip_impl::Command_banned_api_ip_impl(sqlite3* handle)
 
 std::any Command_banned_api_ip_impl::get_command() const
 {
-	Command_type_sqlite command{ m_stmt, {{Column_sqlite::string}} };
+	Command_type_sqlite command{ {m_stmt}, {{Column_sqlite::string}} };
 	return command;
 }
 
@@ -113,7 +113,7 @@ Command_account_exists_impl::Command_account_exists_impl(sqlite3* handle)
 
 std::any Command_account_exists_impl::get_command() const
 {
-	Command_type_sqlite command{ m_stmt, {{Column_sqlite::int32}} };
+	Command_type_sqlite command{ {m_stmt}, {{Column_sqlite::int32}} };
 	return command;
 }
 
@@ -133,7 +133,7 @@ Command_get_account_impl::Command_get_account_impl(sqlite3* handle)
 
 std::any Command_get_account_impl::get_command() const
 {
-	Command_type_sqlite command{ m_stmt, 
+	Command_type_sqlite command{ {m_stmt},
 		{{Column_sqlite::string},
 		{Column_sqlite::string},
 		{Column_sqlite::string},
@@ -164,7 +164,7 @@ Command_get_blocks_impl::Command_get_blocks_impl(sqlite3* handle)
 
 std::any Command_get_blocks_impl::get_command() const
 {
-	Command_type_sqlite command{ m_stmt,
+	Command_type_sqlite command{ {m_stmt},
 		{{Column_sqlite::string}, 
 		{Column_sqlite::int32}, 
 		{Column_sqlite::string},
@@ -187,7 +187,7 @@ Command_get_latest_round_impl::Command_get_latest_round_impl(sqlite3* handle)
 
 std::any Command_get_latest_round_impl::get_command() const
 {
-	Command_type_sqlite command{ m_stmt,
+	Command_type_sqlite command{ {m_stmt},
 		{{Column_sqlite::int64},
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
@@ -210,7 +210,7 @@ Command_get_payments_impl::Command_get_payments_impl(sqlite3* handle)
 
 std::any Command_get_payments_impl::get_command() const
 {
-	Command_type_sqlite command{ m_stmt,
+	Command_type_sqlite command{ {m_stmt},
 		{{Column_sqlite::string},
 		{Column_sqlite::double_t},
 		{Column_sqlite::string}} };
@@ -233,7 +233,7 @@ Command_get_config_impl::Command_get_config_impl(sqlite3* handle)
 
 std::any Command_get_config_impl::get_command() const
 {
-	Command_type_sqlite command{ m_stmt,
+	Command_type_sqlite command{ {m_stmt},
 		{{Column_sqlite::string},
 		{Column_sqlite::int32},
 		{Column_sqlite::int32},
@@ -247,7 +247,8 @@ std::any Command_get_config_impl::get_command() const
 Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	std::string create_tables{ R"(CREATE TABLE IF NOT EXISTS round (
+	sqlite3_stmt* stmt;
+	sqlite3_prepare_v2(m_handle, R"(CREATE TABLE IF NOT EXISTS round (
 		  round_number INTEGER PRIMARY KEY AUTOINCREMENT,
 		  total_shares REAL,
 		  total_reward REAL,
@@ -257,9 +258,10 @@ Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
 		  end_date_time TEXT NOT NULL,
 		  is_active INTEGER NOT NULL,
 		  is_paid INTEGER NOT NULL
-		);
+		);)", -1, &stmt, NULL);
+	m_stmts.push_back(stmt);
 
-		CREATE TABLE IF NOT EXISTS block (
+	sqlite3_prepare_v2(m_handle, R"(CREATE TABLE IF NOT EXISTS block (
 		  id INTEGER PRIMARY KEY AUTOINCREMENT,
 		  hash TEXT NOT NULL,
 		  height INTEGER NOT NULL,
@@ -274,9 +276,10 @@ Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
 		  mainnet_reward REAL NOT NULL,
 		  FOREIGN KEY(round) REFERENCES round(round_number),
 		  FOREIGN KEY(block_finder) REFERENCES account(name)
-		);
+		);)", -1, &stmt, NULL);
+	m_stmts.push_back(stmt);
 
-		CREATE TABLE IF NOT EXISTS account (
+	sqlite3_prepare_v2(m_handle, R"(CREATE TABLE IF NOT EXISTS account (
 		  name TEXT PRIMARY KEY,
 		  created_at TEXT NOT NULL,
 		  last_active TEXT,
@@ -284,38 +287,62 @@ Command_create_db_schema_impl::Command_create_db_schema_impl(sqlite3* handle)
 		  shares REAL,
 		  reward REAL,
 		  hashrate REAL
-		);
+		);)", -1, &stmt, NULL);
+	m_stmts.push_back(stmt);
 
-		CREATE TABLE IF NOT EXISTS payment (
+	sqlite3_prepare_v2(m_handle, R"(CREATE TABLE IF NOT EXISTS payment (
 		  id INTEGER PRIMARY KEY AUTOINCREMENT, 
 		  name TEXT NOT NULL,
 		  amount REAL NOT NULL,
 		  payment_date_time TEXT NOT NULL,
 		  FOREIGN KEY(name) REFERENCES account(name)
-		);
+		);)", -1, &stmt, NULL);
+	m_stmts.push_back(stmt);
 
-		CREATE TABLE IF NOT EXISTS banned_connections_api (
+	sqlite3_prepare_v2(m_handle, R"(CREATE TABLE IF NOT EXISTS banned_connections_api (
 		  id INTEGER PRIMARY KEY AUTOINCREMENT,
 		  ip TEXT NOT NULL
-		);
+		);)", -1, &stmt, NULL);
+	m_stmts.push_back(stmt);
 
-		CREATE TABLE IF NOT EXISTS banned_users_connections (
+	sqlite3_prepare_v2(m_handle, R"(CREATE TABLE IF NOT EXISTS banned_users_connections (
 		  user TEXT,
 		  ip TEXT,
 		  PRIMARY KEY (user, ip)
-		);
+		);)", -1, &stmt, NULL);
+	m_stmts.push_back(stmt);
 
-		CREATE TABLE IF NOT EXISTS config (
+	sqlite3_prepare_v2(m_handle, R"(CREATE TABLE IF NOT EXISTS config (
 		  id INTEGER PRIMARY KEY AUTOINCREMENT,
 		  version TEXT NOT NULL,
 		  difficulty_divider INTEGER NOT NULL,
 		  fee INTEGER NOT NULL,
 		  mining_mode TEXT NOT NULL
-		);)"
-	};
-
-	sqlite3_prepare_v2(m_handle, create_tables.c_str(), -1, &m_stmt, NULL);
+		);)", -1, &stmt, NULL);
+	m_stmts.push_back(stmt);
 }
+
+Command_create_db_schema_impl::~Command_create_db_schema_impl()
+{
+	for (auto& stmt : m_stmts)
+	{
+		sqlite3_finalize(stmt);
+	}
+}
+
+std::any Command_create_db_schema_impl::get_command() const  
+{ 
+	return Command_type_sqlite{ m_stmts, {}, Command_type_sqlite::Type::multiple_statements }; 
+}
+
+void Command_create_db_schema_impl::reset()
+{
+	for (auto& stmt : m_stmts)
+	{
+		sqlite3_reset(stmt);
+	}
+}
+
 // -----------------------------------------------------------------------------------------------
 Command_create_account_impl::Command_create_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
@@ -395,7 +422,10 @@ Command_create_config_impl::Command_create_config_impl(sqlite3* handle)
 		(version, difficulty_divider, fee, mining_mode) 
 		VALUES('1.0', :difficulty_divider, :fee, :mining_mode))" };
 
-	sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL);
+	if (sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
+	{
+		std::cout << sqlite3_errmsg(m_handle) << std::endl;
+	}
 }
 
 void Command_create_config_impl::set_params(std::any params)

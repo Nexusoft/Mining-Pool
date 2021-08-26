@@ -21,7 +21,7 @@ public:
 	virtual ~Command_base_database_sqlite() { sqlite3_finalize(m_stmt); }
 	Command_base_database_sqlite(sqlite3* handle) : m_handle{ handle }, m_stmt{ nullptr } {}
 	Class get_class() const override { return Class::database_sqlite; }
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt }; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt} }; }
 	void reset() override;
 
 protected:
@@ -131,9 +131,15 @@ class Command_create_db_schema_impl : public Command_base_database_sqlite
 public:
 
 	explicit Command_create_db_schema_impl(sqlite3* handle);
+	~Command_create_db_schema_impl();
 
 	Type get_type() const override { return Type::create_db_schema; }
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	std::any get_command() const override;
+	void reset() override;
+
+protected:
+
+	std::vector<sqlite3_stmt*> m_stmts;
 };
 
 class Command_create_account_impl : public Command_base_database_sqlite
@@ -143,7 +149,7 @@ public:
 	explicit Command_create_account_impl(sqlite3* handle);
 
 	Type get_type() const override { return Type::create_account; }
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 	void set_params(std::any params) override;
 };
 
@@ -160,7 +166,7 @@ public:
 	explicit Command_add_payment_impl(sqlite3* handle);
 
 	Type get_type() const override { return Type::add_payment; }
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 	void set_params(std::any params) override;
 };
 
@@ -171,7 +177,7 @@ public:
 	explicit Command_create_round_impl(sqlite3* handle);
 
 	Type get_type() const override { return Type::create_round; }
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 };
 
 struct Command_update_account_params
@@ -191,7 +197,7 @@ public:
 	explicit Command_update_account_impl(sqlite3* handle);
 
 	Type get_type() const override { return Type::update_account; }
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 	void set_params(std::any params) override;
 };
 
@@ -209,7 +215,7 @@ public:
 	explicit Command_create_config_impl(sqlite3* handle);
 
 	Type get_type() const override { return Type::create_config; }
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 	void set_params(std::any params) override;
 };
 
@@ -220,7 +226,7 @@ public:
 	explicit Command_update_config_impl(sqlite3* handle);
 
 	Type get_type() const override { return Type::update_config; }
-	std::any get_command() const override { return Command_type_sqlite{ m_stmt, {}, Command_type_sqlite::no_result }; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 	void set_params(std::any params) override;
 };
 
