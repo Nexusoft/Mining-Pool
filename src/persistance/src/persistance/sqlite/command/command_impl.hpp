@@ -126,22 +126,6 @@ public:
 // ------------------------------------------------------------------------------------
 // Write commands
 
-class Command_create_db_schema_impl : public Command_base_database_sqlite
-{
-public:
-
-	explicit Command_create_db_schema_impl(sqlite3* handle);
-	~Command_create_db_schema_impl();
-
-	Type get_type() const override { return Type::create_db_schema; }
-	std::any get_command() const override;
-	void reset() override;
-
-protected:
-
-	std::vector<sqlite3_stmt*> m_stmts;
-};
-
 class Command_create_account_impl : public Command_base_database_sqlite
 {
 public:

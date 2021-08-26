@@ -71,8 +71,6 @@ namespace nexuspool
 
 		// data storage initialisation
 		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
-		// create tables at startup
-		m_persistance_component->get_data_writer_factory()->create_shared_data_writer()->create_tables();
 
 		storage_config_check();
 
@@ -125,10 +123,6 @@ namespace nexuspool
 					data_writer->update_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider);
 				}
 			}
-
-			// TODO: check database version and update tables
 		}
-
-
 	}
 }

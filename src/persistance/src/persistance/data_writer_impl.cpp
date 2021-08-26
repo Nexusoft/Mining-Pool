@@ -19,18 +19,12 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	, m_data_storage{ std::move(data_storage) }
 	, m_command_factory{ std::move(command_factory) }
 {
-	m_create_tables_cmd = m_command_factory->create_command(Type::create_db_schema);
 	m_create_account_cmd = m_command_factory->create_command(Type::create_account);
 	m_add_payment_cmd = m_command_factory->create_command(Type::add_payment);
 	m_create_round_cmd = m_command_factory->create_command(Type::create_round);
 	m_update_account_cmd = m_command_factory->create_command(Type::update_account);
 	m_create_config_cmd = m_command_factory->create_command(Type::create_config);
 	m_update_config_cmd = m_command_factory->create_command(Type::update_config);
-}
-
-bool Data_writer_impl::create_tables()
-{
-	return m_data_storage->execute_command(m_create_tables_cmd);
 }
 
 bool Data_writer_impl::create_account(std::string account)
@@ -80,12 +74,6 @@ bool Data_writer_impl::update_config(std::string mining_mode, int fee, int diffi
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
 	: m_data_writer{ std::move(data_writer) }
 {}
-
-bool Shared_data_writer_impl::create_tables()
-{
-	std::scoped_lock lock(m_writer_mutex);
-	return m_data_writer->create_tables();
-}
 
 bool Shared_data_writer_impl::create_account(std::string account)
 {

@@ -18,7 +18,6 @@ public:
 
     virtual ~Data_writer() = default;
 
-    virtual bool create_tables() = 0;
     virtual bool create_account(std::string account) = 0;
     virtual bool add_payment(std::string account, double amount) = 0;
     virtual bool create_round() = 0;
@@ -36,7 +35,6 @@ public:
 
     virtual ~Shared_data_writer() = default;
 
-    virtual bool create_tables() = 0;
     virtual bool create_account(std::string account) = 0;
     virtual bool add_payment(std::string account, double amount) = 0;
     virtual bool create_round() = 0;

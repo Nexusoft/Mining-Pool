@@ -40,8 +40,6 @@ public:
         m_commands.emplace(std::make_pair(Type::get_config,
             std::make_shared<Command_get_config_impl>(m_storage_manager->get_handle<sqlite3*>())));
         // Write commands
-        m_commands.emplace(std::make_pair(Type::create_db_schema,
-            std::make_shared<Command_create_db_schema_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::create_account,
             std::make_shared<Command_create_account_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::add_payment,
@@ -97,9 +95,6 @@ private:
             result = std::any_cast<std::shared_ptr<Command_get_config_impl>>(m_commands[command_type]);
             break;
             // Write commands
-        case Type::create_db_schema:
-            result = std::any_cast<std::shared_ptr<Command_create_db_schema_impl>>(m_commands[command_type]);
-            break;
         case Type::create_account:
             result = std::any_cast<std::shared_ptr<Command_create_account_impl>>(m_commands[command_type]);
             break;
