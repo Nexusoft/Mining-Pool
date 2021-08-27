@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.19)
+
+add_library(reward STATIC src/reward/manager_impl.cpp)
+                    
+target_include_directories(reward
+    PUBLIC 
+        $<INSTALL_INTERFACE:inc>    
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+    PRIVATE src
+)
+
+target_link_libraries(reward LLC)
