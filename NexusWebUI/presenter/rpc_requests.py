@@ -7,6 +7,7 @@ import bson
 
 logger = logging.getLogger('NexusWebUI')
 
+
 def socket_connect(_ip, _port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((_ip, _port))
@@ -91,7 +92,7 @@ def get_account_header(_socket, _account):
     return json_data
 
 
-def get_account_works(_socket):
+def get_account_works(_socket, _account):
     # Todo Documentation
     # Todo Error Handling
 
