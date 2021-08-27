@@ -4,20 +4,26 @@ CREATE TABLE IF NOT EXISTS round (
   total_shares REAL,
   total_reward REAL,
   blocks INTEGER,
-  connection_count INTEGER
+  connection_count INTEGER,
+  start_date_time TEXT NOT NULL,
+  end_date_time TEXT NOT NULL,
+  is_active INTEGER NOT NULL,
+  is_paid INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS block (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   hash TEXT NOT NULL,
   height INTEGER NOT NULL,
-  type TEXT NOT NULL
-  reward INTEGER NOT NULL,
+  type TEXT NOT NULL,
+  shares REAL NOT NULL,
   difficulty REAL NOT NULL,
   orphan INTEGER NOT NULL,
   block_finder TEXT NOT NULL,
   round INTEGER NOT NULL,
   block_found_time TEXT NOT NULL,
+  accepted_by_mainnet INTEGER NOT NULL,
+  mainnet_reward REAL NOT NULL,
   FOREIGN KEY(round) REFERENCES round(id),
   FOREIGN KEY(block_finder) REFERENCES account(name)
 );
@@ -30,6 +36,14 @@ CREATE TABLE IF NOT EXISTS account (
   shares REAL,
   reward REAL,
   hashrate REAL
+);
+
+CREATE TABLE IF NOT EXISTS payment (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, 
+  name TEXT NOT NULL,
+  amount REAL NOT NULL,
+  payment_date_time TEXT NOT NULL,
+  FOREIGN KEY(name) REFERENCES account(name)
 );
 
 CREATE TABLE IF NOT EXISTS banned_connections_api (

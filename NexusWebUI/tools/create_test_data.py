@@ -5,79 +5,7 @@ import pandas as pd
 from faker import Faker
 
 
-def connect_to_db(_file):
-    if not os.path.exists(_file):
-        raise AssertionError("DB File not found")
-
-    engine = sqlalchemy.create_engine(f'sqlite:///{_file}')
-    sqlalchemy_connection = engine.connect()
-    print("DB Connection established")
-
-    return sqlalchemy_connection
-
-
-def clean_db(connection):
-    tables = ['round', 'block', 'account', 'banned_connections_api', 'banned_users_connections']
-
-    for table in tables:
-        connection.execute(f'DELETE FROM {table}')
-
-
-def create_round_test_data(connection):
-    # Todo get Config
-    rounds = 10
-
-    # Create an Empty Dataframe to hold the Data
-    dataframe_round = pd.DataFrame(columns=['round_number',
-                                            'total_shares',
-                                            'total_reward',
-                                            'blocks',
-                                            'connection_count']
-                                   )
-
-    for x in range(rounds):
-        total_share = round(random.uniform(1, 10), 2)
-        total_reward = round(random.uniform(1, 10), 2)
-        blocks = random.randint(1, 10)
-        connection_count = random.randint(1, 100)
-        start_date_time = fake.past_datetime()
-        end_date_time = fake.past_datetime()
-        is_active = random.randint(0, 1)
-        is_paid = random.randint(0, 1)
-
-        data_dict = {
-            'round_number': x,
-            'total_shares': total_share,
-            'total_reward': total_reward,
-            'blocks': blocks,
-            'connection_count': connection_count,
-            'start_date_time': start_date_time,
-            'end_date_time': end_date_time,
-            'is_active': is_active,
-            'is_paid': is_paid,
-        }
-
-        dataframe_round = dataframe_round.append(data_dict, ignore_index=True)
-
-    dataframe_round.to_sql('round', con=connection, index=False, if_exists='append')
-    print("Inserted Test Data for 'Round'")
-
-
-def create_account_test_data(connection):
-    # Todo get Config
-    accounts = 100
-
-    # Create an Empty Dataframe to hold the Data
-    dataframe_account = pd.DataFrame(columns=[
-        'name',
-        'created_at',
-        'last_active',
-        'connection_count',
-        'shares',
-        'reward',
-        'hashrate'
-    ]
-    )
+def get_account_list():
 
     # This prevents getting the same name twice as a set is distinct
     names = ['8CKSnD9zR65fzBWHpmuBp5p78WBp9FA2YhfY2HsLFaF2VVyCQ6J',
@@ -182,6 +110,85 @@ def create_account_test_data(connection):
              '8BhpkJmja3r5ECrwZEWhu8FuazwT7XXvtkh8eGUtxo3uvrmaLyY',
              ]
 
+    return names
+
+
+def connect_to_db(_file):
+    if not os.path.exists(_file):
+        raise AssertionError("DB File not found")
+
+    engine = sqlalchemy.create_engine(f'sqlite:///{_file}')
+    sqlalchemy_connection = engine.connect()
+    print("DB Connection established")
+
+    return sqlalchemy_connection
+
+
+def clean_db(connection):
+    tables = ['round', 'block', 'account', 'banned_connections_api', 'banned_users_connections']
+
+    for table in tables:
+        connection.execute(f'DELETE FROM {table}')
+
+
+def create_round_test_data(connection):
+    # Todo get Config
+    rounds = 10
+
+    # Create an Empty Dataframe to hold the Data
+    dataframe_round = pd.DataFrame(columns=['round_number',
+                                            'total_shares',
+                                            'total_reward',
+                                            'blocks',
+                                            'connection_count']
+                                   )
+
+    for x in range(rounds):
+        total_share = round(random.uniform(1, 10), 2)
+        total_reward = round(random.uniform(1, 10), 2)
+        blocks = random.randint(1, 10)
+        connection_count = random.randint(1, 100)
+        start_date_time = fake.past_datetime()
+        end_date_time = fake.past_datetime()
+        is_active = random.randint(0, 1)
+        is_paid = random.randint(0, 1)
+
+        data_dict = {
+            'round_number': x,
+            'total_shares': total_share,
+            'total_reward': total_reward,
+            'blocks': blocks,
+            'connection_count': connection_count,
+            'start_date_time': start_date_time,
+            'end_date_time': end_date_time,
+            'is_active': is_active,
+            'is_paid': is_paid,
+        }
+
+        dataframe_round = dataframe_round.append(data_dict, ignore_index=True)
+
+    dataframe_round.to_sql('round', con=connection, index=False, if_exists='append')
+    print("Inserted Test Data for 'Round'")
+
+
+def create_account_test_data(connection):
+    # Todo get Config
+    accounts = 100
+
+    # Create an Empty Dataframe to hold the Data
+    dataframe_account = pd.DataFrame(columns=[
+        'name',
+        'created_at',
+        'last_active',
+        'connection_count',
+        'shares',
+        'reward',
+        'hashrate'
+    ]
+    )
+
+    names = get_account_list()
+
     for x in range(accounts):
         name = names[x]
         created_at = fake.past_datetime()
@@ -205,6 +212,36 @@ def create_account_test_data(connection):
 
     dataframe_account.to_sql('account', con=connection, index=False, if_exists='append')
     print("Inserted Test Data for 'Account'")
+
+
+def create_payment_test_data(connection):
+    accounts = 100
+
+    # Create an Empty Dataframe to hold the Data
+    dataframe_payment = pd.DataFrame(columns=[
+        'name',
+        'amount',
+        'payment_date_time',
+    ]
+    )
+
+    names = get_account_list()
+
+    for x in range(accounts):
+        name = names[x]
+        amount = round(random.uniform(1, 10), 2)
+        payment_date_time = fake.past_datetime()
+
+        data_dict = {
+            'name': name,
+            'amount': amount,
+            'payment_date_time': payment_date_time,
+        }
+
+        dataframe_payment = dataframe_payment.append(data_dict, ignore_index=True)
+
+    dataframe_payment.to_sql('payment', con=connection, index=False, if_exists='append')
+    print("Inserted Test Data for 'Payment'")
 
 
 def create_block_test_data(connection):
@@ -332,6 +369,7 @@ if __name__ == '__main__':
         clean_db(connection=db_con)
         create_round_test_data(connection=db_con)
         create_account_test_data(connection=db_con)
+        create_payment_test_data(connection=db_con)
         create_block_test_data(connection=db_con)
         create_banned_connections_api_test_data(connection=db_con)
         create_banned_users_connections_test_data(connection=db_con)

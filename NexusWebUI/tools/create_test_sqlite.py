@@ -84,8 +84,17 @@ def create_table_structure(connection):
 
 
 def create_table_structure_from_schema(connection):
-    with open('dbschema_sqlite.sql') as fp:
-        connection.executescript(fp.read())
+
+    schema_file_path = os.path.join('../..', 'dbschema_sqlite.sql')
+
+    print(f"Trying to open Schema File: {schema_file_path}")
+
+    try:
+        with open(schema_file_path) as fp:
+            connection.executescript(fp.read())
+    except Exception as ex:
+        print("Error when trying to read Schema File")
+        print(ex)
 
 ###################################
 con = None
@@ -102,6 +111,8 @@ if __name__ == '__main__':
 
         # create_table_structure(connection=db_con)
         create_table_structure_from_schema(connection=db_con)
+
+        print("Created the DB Structure successfully")
 
     except Exception as ex:
         print(ex)
