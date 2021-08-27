@@ -9,6 +9,7 @@
 #include "timer_manager.hpp"
 #include "block.hpp"
 #include "types.hpp"
+#include "config/types.hpp"
 
 #include <memory>
 #include <vector>
@@ -29,6 +30,7 @@ public:
 
     Wallet_connection(std::shared_ptr<asio::io_context> io_context,
         std::weak_ptr<Pool_manager> pool_manager,
+        config::Mining_mode mining_mode,
         config::Config& config,
         chrono::Timer_factory::Sptr timer_factory, 
         network::Socket::Sptr socket);
@@ -50,6 +52,7 @@ private:
     std::shared_ptr<::asio::io_context> m_io_context;
     std::weak_ptr<Pool_manager> m_pool_manager;
     config::Config& m_config;
+    config::Mining_mode m_mining_mode;
     network::Socket::Sptr m_socket;
     network::Connection::Sptr m_connection;
     std::shared_ptr<spdlog::logger> m_logger;

@@ -72,12 +72,13 @@ namespace nexuspool
 		// data storage initialisation
 		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
 
-		storage_config_check();
+		auto const config_data = storage_config_check();
 
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
 		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, 
 			m_config, 
+			config_data,
 			m_network_component->get_socket_factory(), 
 			m_persistance_component->get_data_writer_factory(),
 			m_persistance_component->get_data_reader_factory());
@@ -94,12 +95,13 @@ namespace nexuspool
 		m_io_context->run();
 	}
 
-	void Pool::storage_config_check()
+	persistance::Config_data Pool::storage_config_check()
 	{
+		persistance::Config_data config_data{};
 		auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
 		auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 
-		auto const config_data = data_reader->get_config();
+		config_data = data_reader->get_config();
 		std::string const mining_mode{ m_config.get_mining_mode() == config::Mining_mode::HASH ? "HASH" : "PRIME" };
 		if (config_data.m_version.empty())
 		{
@@ -124,5 +126,9 @@ namespace nexuspool
 				}
 			}
 		}
+
+		// Get the latest (maybe updated) config from storage
+		config_data = data_reader->get_config();
+		return config_data;
 	}
 }

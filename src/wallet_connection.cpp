@@ -10,12 +10,14 @@ namespace nexuspool
 {
 Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_context,
     std::weak_ptr<Pool_manager> pool_manager,
+    config::Mining_mode mining_mode,
     config::Config& config,
     chrono::Timer_factory::Sptr timer_factory, 
     network::Socket::Sptr socket)
     : m_io_context{ std::move(io_context) }
     , m_pool_manager{std::move(pool_manager)}
     , m_config{ config }
+    , m_mining_mode{mining_mode}
     , m_socket{ std::move(socket) }
     , m_logger{ spdlog::get("logger") }
     , m_timer_manager{ std::move(timer_factory) }
@@ -65,7 +67,7 @@ bool Wallet_connection::connect(network::Endpoint const& wallet_endpoint)
                     Packet packet;
                     packet.m_header = Packet::SET_CHANNEL;
                     packet.m_length = 4;
-                    packet.m_data = std::make_shared<network::Payload>(uint2bytes(self->m_config.get_mining_mode() == config::Mining_mode::PRIME ? 1U : 2U));
+                    packet.m_data = std::make_shared<network::Payload>(uint2bytes(self->m_mining_mode == config::Mining_mode::PRIME ? 1U : 2U));
                     self->m_connection->transmit(packet.get_bytes());
 
                     auto const get_height_interval = self->m_config.get_height_interval();

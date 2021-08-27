@@ -9,11 +9,13 @@ namespace nexuspool
 
 Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, 
 	config::Config& config,
+	persistance::Config_data storage_config_data,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
 	persistance::Data_reader_factory::Sptr data_reader_factory)
 	: m_io_context{std::move(io_context) }
 	, m_config{config}
+	, m_storage_config_data{std::move(storage_config_data)}
 	, m_timer_factory{std::make_shared<chrono::Timer_factory>(m_io_context)}
 	, m_socket_factory{std::move(socket_factory)}
 	, m_logger{ spdlog::get("logger") }
@@ -33,10 +35,11 @@ void Pool_manager::start()
 	network::Endpoint wallet_endpoint{ network::Transport_protocol::tcp, m_config.get_wallet_ip(), m_config.get_wallet_port() };
 	network::Endpoint local_endpoint{ network::Transport_protocol::tcp, m_config.get_local_ip(), m_config.get_local_port() };
 	auto local_socket = m_socket_factory->create_socket(local_endpoint);
+	config::Mining_mode mining_mode = m_storage_config_data.m_mining_mode == "HASH" ? config::Mining_mode::HASH : config::Mining_mode::PRIME;
 
 	auto self = shared_from_this();
 	// connect to wallet
-	m_wallet_connection = std::make_shared<Wallet_connection>(m_io_context, self, m_config, m_timer_factory, std::move(local_socket));
+	m_wallet_connection = std::make_shared<Wallet_connection>(m_io_context, self,mining_mode, m_config, m_timer_factory, std::move(local_socket));
 	if (!m_wallet_connection->connect(wallet_endpoint))
 	{
 		m_logger->critical("Couldn't connect to wallet using ip {} and port {}", m_config.get_wallet_ip(), m_config.get_wallet_port());
@@ -127,7 +130,7 @@ void Pool_manager::set_pool_nbits(std::uint32_t nbits)
 {
 	uint1024_t target, pool_target;
 	target.SetCompact(nbits);
-	pool_target = target >> m_config.get_pool_config().m_difficulty_divider;
+	pool_target = target >> m_storage_config_data.m_difficulty_divider;
 	m_pool_nBits = pool_target.GetCompact();
 }
 
