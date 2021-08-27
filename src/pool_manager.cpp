@@ -8,20 +8,21 @@ namespace nexuspool
 {
 
 Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, 
+	std::shared_ptr<spdlog::logger> logger,
 	config::Config& config,
 	persistance::Config_data storage_config_data,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
 	persistance::Data_reader_factory::Sptr data_reader_factory)
 	: m_io_context{std::move(io_context) }
+	, m_logger{ std::move(logger)}
 	, m_config{config}
 	, m_storage_config_data{std::move(storage_config_data)}
 	, m_timer_factory{std::make_shared<chrono::Timer_factory>(m_io_context)}
 	, m_socket_factory{std::move(socket_factory)}
-	, m_logger{ spdlog::get("logger") }
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
-	, m_reward_component{reward::create_component(m_data_writer_factory->create_shared_data_writer(), m_data_reader_factory->create_data_reader())}
+	, m_reward_component{reward::create_component(m_logger, m_data_writer_factory->create_shared_data_writer(), m_data_reader_factory->create_data_reader())}
 	, m_reward_manager{m_reward_component->create_reward_manager()}
 	, m_listen_socket{}
 	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config.get_session_expiry_time()}

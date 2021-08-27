@@ -30,6 +30,7 @@ class Pool_manager : public std::enable_shared_from_this<Pool_manager>
 public:
 
     Pool_manager(std::shared_ptr<asio::io_context> io_context, 
+        std::shared_ptr<spdlog::logger> logger,
         config::Config& config, 
         persistance::Config_data storage_config_data,
         network::Socket_factory::Sptr socket_factory,
@@ -56,11 +57,11 @@ private:
     chrono::Timer::Handler session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval);
 
     std::shared_ptr<::asio::io_context> m_io_context;
+    std::shared_ptr<spdlog::logger> m_logger;
     config::Config& m_config;
     persistance::Config_data m_storage_config_data;
     chrono::Timer_factory::Sptr m_timer_factory;
     network::Socket_factory::Sptr m_socket_factory;
-    std::shared_ptr<spdlog::logger> m_logger;
     persistance::Data_writer_factory::Sptr m_data_writer_factory;
     persistance::Data_reader_factory::Sptr m_data_reader_factory;
     reward::Component::Uptr m_reward_component;
