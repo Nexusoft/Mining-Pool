@@ -50,7 +50,9 @@ struct Payment_data
 {
 	std::string m_account;
 	double m_amount;
+	double m_shares;
 	std::string m_payment_date_time;
+	std::int64_t m_round;
 };
 
 struct Config_data

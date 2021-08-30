@@ -267,8 +267,8 @@ Command_add_payment_impl::Command_add_payment_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string add_payment{ R"(INSERT INTO payment 
-		(name, amount, payment_date_time) 
-		VALUES(:name, :amount, CURRENT_TIMESTAMP))" };
+		(name, amount, shares, payment_date_time, round) 
+		VALUES(:name, :amount, :shares, :datetime, :round))" };
 
 	sqlite3_prepare_v2(m_handle, add_payment.c_str(), -1, &m_stmt, NULL);
 }
@@ -279,6 +279,9 @@ void Command_add_payment_impl::set_params(std::any params)
 	auto casted_params = std::any_cast<Command_add_payment_params>(m_params);
 	bind_param(m_stmt, ":name", casted_params.m_account);
 	bind_param(m_stmt, ":amount", casted_params.m_amount);
+	bind_param(m_stmt, ":shares", casted_params.m_amount);
+	bind_param(m_stmt, ":datetime", casted_params.m_amount);
+	bind_param(m_stmt, ":round", casted_params.m_amount);
 }
 
 // -----------------------------------------------------------------------------------------------

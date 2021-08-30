@@ -33,9 +33,9 @@ bool Data_writer_impl::create_account(std::string account)
 	return m_data_storage->execute_command(m_create_account_cmd);
 }
 
-bool Data_writer_impl::add_payment(std::string account, double amount)
+bool Data_writer_impl::add_payment(Payment_data data)
 {
-	m_add_payment_cmd->set_params(command::Command_add_payment_params{ std::move(account), amount });
+	m_add_payment_cmd->set_params(command::Command_add_payment_params{ std::move(data.m_account), data.m_amount, data.m_shares, data.m_payment_date_time, data.m_round });
 	return m_data_storage->execute_command(m_add_payment_cmd);
 }
 
@@ -81,10 +81,10 @@ bool Shared_data_writer_impl::create_account(std::string account)
 	return m_data_writer->create_account(std::move(account));
 }
 
-bool Shared_data_writer_impl::add_payment(std::string account, double amount)
+bool Shared_data_writer_impl::add_payment(Payment_data data)
 {
 	std::scoped_lock lock(m_writer_mutex);
-	return m_data_writer->add_payment(std::move(account), amount);
+	return m_data_writer->add_payment(std::move(data));
 }
 
 bool Shared_data_writer_impl::create_round()

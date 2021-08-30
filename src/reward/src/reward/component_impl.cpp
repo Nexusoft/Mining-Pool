@@ -40,7 +40,7 @@ bool Component_impl::end_round(std::uint32_t round_number)
     }
 
     // end round now
-    round_data.m
+   // round_data.m
 
 
     return true;

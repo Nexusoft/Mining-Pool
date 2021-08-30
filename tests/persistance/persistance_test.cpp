@@ -184,17 +184,17 @@ TEST_F(Persistance_fixture, command_update_account)
 
 TEST_F(Persistance_fixture, command_add_payment)
 {
-	std::string account_name{ "testaccount" };
+	persistance::Payment_data const payment_input{ "testaccount", 1000.0, 200.0, "", 1 };
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
-	auto result = data_writer->add_payment(account_name, 1000.0);
+	auto result = data_writer->add_payment(payment_input);
 	EXPECT_TRUE(result);
 
 	// add another payment for this account
-	result = data_writer->add_payment(account_name, 5000.0);
+	result = data_writer->add_payment(payment_input);
 	EXPECT_TRUE(result);
 
 	// cleanup db
-	m_test_data.delete_from_payment_table(account_name);
+	m_test_data.delete_from_payment_table(payment_input.m_account);
 
 }
 

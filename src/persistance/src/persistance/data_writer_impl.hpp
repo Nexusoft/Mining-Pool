@@ -27,7 +27,7 @@ public:
         std::shared_ptr<persistance::command::Command_factory> command_factory);
 
     bool create_account(std::string account) override;
-    bool add_payment(std::string account, double amount) override;
+    bool add_payment(Payment_data data) override;
     bool create_round() override;
     bool update_account(Account_data data) override;
     bool create_config(std::string mining_mode, int fee, int difficulty_divider) override;
@@ -55,7 +55,7 @@ public:
     Shared_data_writer_impl(Data_writer::Uptr data_writer);
 
     bool create_account(std::string account) override;
-    bool add_payment(std::string account, double amount) override;
+    bool add_payment(Payment_data data) override;
     bool create_round() override;
     bool update_account(Account_data data) override;
     bool create_config(std::string mining_mode, int fee, int difficulty_divider) override;
