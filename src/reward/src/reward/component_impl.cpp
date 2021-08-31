@@ -34,7 +34,20 @@ bool Component_impl::end_round(std::uint32_t round_number)
         return false;
     }
 
-    // get all accounts which contribute to the current round
+    if (round_data.m_total_rewards > 0) // did the pool actually earned something this round?
+    {
+        // get all accounts which contribute to the current round
+        auto const active_accounts = m_data_reader->get_active_accounts_from_round();
+        for (auto& active_account : active_accounts)
+        {
+            // calculate reward for account
+            auto account_reward = round_data.m_total_rewards * (active_account.m_shares / round_data.m_total_shares);
+            // add account to payment table (without datetime -> not paid yet)
+            m_shared_data_writer->add_payment(persistance::Payment_data{ active_account.m_address, account_reward, active_account.m_shares, "", round_data.m_round });
+        }
+    }
+
+
 
     // end round now
    // round_data.m
