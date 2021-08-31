@@ -19,6 +19,12 @@ struct Account_data
 	double m_hashrate;
 };
 
+struct Account_data_for_payment
+{
+	std::string m_address;
+	double m_shares;
+};
+
 struct Block_data
 {
 	std::string m_hash;

@@ -242,6 +242,21 @@ std::any Command_get_config_impl::get_command() const
 }
 
 // -----------------------------------------------------------------------------------------------
+Command_get_active_accounts_from_round_impl::Command_get_active_accounts_from_round_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT name, shares FROM account WHERE shares > 0;", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_active_accounts_from_round_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt},
+		{{Column_sqlite::string},
+		{Column_sqlite::double_t}} };
+	return command;
+}
+
+// -----------------------------------------------------------------------------------------------
 // Write commands
 // -----------------------------------------------------------------------------------------------
 

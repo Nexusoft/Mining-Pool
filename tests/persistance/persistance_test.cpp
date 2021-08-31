@@ -100,6 +100,15 @@ TEST_F(Persistance_fixture, command_get_latest_round)
 
 }
 
+
+TEST_F(Persistance_fixture, command_get_active_accounts_from_round)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->get_active_accounts_from_round();
+	EXPECT_FALSE(result.empty());
+
+}
+
 // Testdata currently missing
 /*
 TEST_F(Persistance_fixture, command_get_payments)

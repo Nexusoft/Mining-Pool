@@ -23,6 +23,7 @@ enum class Type : std::uint8_t
 	get_banned_api_ip,
 	account_exists,
 	get_account,
+	get_active_accounts_from_round,
 	get_blocks,
 	create_account,
 	get_latest_round,

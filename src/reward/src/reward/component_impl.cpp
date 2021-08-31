@@ -34,10 +34,7 @@ bool Component_impl::end_round(std::uint32_t round_number)
         return false;
     }
 
-    if (!round_data.m_is_paid)
-    {
-        // payout round
-    }
+    // get all accounts which contribute to the current round
 
     // end round now
    // round_data.m
