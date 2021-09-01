@@ -140,7 +140,12 @@ def create_round_test_data(connection):
                                             'total_shares',
                                             'total_reward',
                                             'blocks',
-                                            'connection_count']
+                                            'connection_count',
+                                            'start_date_time',
+                                            'end_date_time',
+                                            'is_active',
+                                            'is_paid'
+                                            ]
                                    )
 
     for x in range(rounds):
@@ -182,7 +187,6 @@ def create_account_test_data(connection):
         'last_active',
         'connection_count',
         'shares',
-        'reward',
         'hashrate'
     ]
     )
@@ -195,7 +199,6 @@ def create_account_test_data(connection):
         last_active = fake.past_datetime()
         connection_count = random.randint(1, 100)
         shares = round(random.uniform(1, 100), 2)
-        reward = round(random.uniform(1, 10), 2)
         hashrate = round(random.uniform(1, 10), 2)
 
         data_dict = {
@@ -204,7 +207,6 @@ def create_account_test_data(connection):
             'last_active': last_active,
             'connection_count': connection_count,
             'shares': shares,
-            'reward': reward,
             'hashrate': hashrate,
         }
 
@@ -221,21 +223,30 @@ def create_payment_test_data(connection):
     dataframe_payment = pd.DataFrame(columns=[
         'name',
         'amount',
+        'shares',
         'payment_date_time',
+        'round',
     ]
     )
 
     names = get_account_list()
 
+    df_tmp = pd.read_sql(sql='SELECT round_number from round', con=connection)
+    round_list = list(df_tmp['round_number'])
+
     for x in range(accounts):
         name = names[x]
         amount = round(random.uniform(1, 10), 2)
+        shares = round(random.uniform(1, 100), 2)
         payment_date_time = fake.past_datetime()
+        round_value = random.choice(round_list)
 
         data_dict = {
             'name': name,
             'amount': amount,
+            'shares': shares,
             'payment_date_time': payment_date_time,
+            'round': round_value,
         }
 
         dataframe_payment = dataframe_payment.append(data_dict, ignore_index=True)
@@ -264,8 +275,8 @@ def create_block_test_data(connection):
     ]
     )
 
-    df_tmp = pd.read_sql(sql='SELECT id from round', con=connection)
-    round_list = list(df_tmp['id'])
+    df_tmp = pd.read_sql(sql='SELECT round_number from round', con=connection)
+    round_list = list(df_tmp['round_number'])
 
     df_tmp = pd.read_sql(sql='SELECT name from account', con=connection)
     account_list = list(df_tmp['name'])
