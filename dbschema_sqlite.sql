@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS round (
   blocks INTEGER,
   connection_count INTEGER,
   start_date_time TEXT NOT NULL,
-  end_date_time TEXT NOT NULL,
+  end_date_time TEXT,
   is_active INTEGER NOT NULL,
   is_paid INTEGER NOT NULL
 );
@@ -33,15 +33,17 @@ CREATE TABLE IF NOT EXISTS account (
   last_active TEXT,
   connection_count INTEGER,
   shares REAL,
-  reward REAL,
   hashrate REAL
 );
 
 CREATE TABLE IF NOT EXISTS payment (
   id INTEGER PRIMARY KEY AUTOINCREMENT, 
   name TEXT NOT NULL,
-  amount REAL NOT NULL,
-  payment_date_time TEXT NOT NULL,
+  amount REAL,
+  shares REAL,
+  payment_date_time TEXT,
+  round INTEGER NOT NULL,
+  FOREIGN KEY(round) REFERENCES round(round_number),
   FOREIGN KEY(name) REFERENCES account(name)
 );
 

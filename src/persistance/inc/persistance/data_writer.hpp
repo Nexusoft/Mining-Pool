@@ -19,7 +19,7 @@ public:
     virtual ~Data_writer() = default;
 
     virtual bool create_account(std::string account) = 0;
-    virtual bool add_payment(std::string account, double amount) = 0;
+    virtual bool add_payment(Payment_data data) = 0;
     virtual bool create_round() = 0;
     virtual bool update_account(Account_data data) = 0; 
     virtual bool create_config(std::string mining_mode, int fee, int difficulty_divider) = 0;
@@ -36,7 +36,7 @@ public:
     virtual ~Shared_data_writer() = default;
 
     virtual bool create_account(std::string account) = 0;
-    virtual bool add_payment(std::string account, double amount) = 0;
+    virtual bool add_payment(Payment_data data) = 0;
     virtual bool create_round() = 0;
     virtual bool update_account(Account_data data) = 0;
     virtual bool create_config(std::string mining_mode, int fee, int difficulty_divider) = 0;

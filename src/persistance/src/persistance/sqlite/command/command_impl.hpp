@@ -123,6 +123,17 @@ public:
 	void set_params(std::any params) override { /* no params */ };
 };
 
+class Command_get_active_accounts_from_round_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_active_accounts_from_round_impl(sqlite3* handle);
+
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_active_accounts_from_round; }
+	void set_params(std::any params) override { /* no params */ };
+};
+
 // ------------------------------------------------------------------------------------
 // Write commands
 
@@ -141,6 +152,9 @@ struct Command_add_payment_params
 {
 	std::string m_account;
 	double m_amount;
+	double m_shares;
+	std::string m_payment_datetime;
+	std::int64_t m_round;
 };
 
 class Command_add_payment_impl : public Command_base_database_sqlite
@@ -169,7 +183,6 @@ struct Command_update_account_params
 	std::string m_last_active;
 	int m_connection_count;
 	double m_shares;
-	double m_reward;
 	double m_hashrate;
 	std::string m_name;
 };

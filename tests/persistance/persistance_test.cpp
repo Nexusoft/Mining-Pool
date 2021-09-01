@@ -100,6 +100,15 @@ TEST_F(Persistance_fixture, command_get_latest_round)
 
 }
 
+
+TEST_F(Persistance_fixture, command_get_active_accounts_from_round)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->get_active_accounts_from_round();
+	EXPECT_FALSE(result.empty());
+
+}
+
 // Testdata currently missing
 /*
 TEST_F(Persistance_fixture, command_get_payments)
@@ -159,7 +168,6 @@ TEST_F(Persistance_fixture, command_update_account)
 
 	// Data to update
 	Account_data account_data;
-	account_data.m_balance = 100;
 	account_data.m_hashrate = 1000;
 	account_data.m_shares = 10000;
 	account_data.m_connections = 1;
@@ -172,7 +180,6 @@ TEST_F(Persistance_fixture, command_update_account)
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 	auto result_account = data_reader->get_account(account_name);
 
-	EXPECT_EQ(result_account.m_balance, account_data.m_balance);
 	EXPECT_EQ(result_account.m_hashrate, account_data.m_hashrate);
 	EXPECT_EQ(result_account.m_shares, account_data.m_shares);
 	EXPECT_EQ(result_account.m_connections, account_data.m_connections);
@@ -184,17 +191,17 @@ TEST_F(Persistance_fixture, command_update_account)
 
 TEST_F(Persistance_fixture, command_add_payment)
 {
-	std::string account_name{ "testaccount" };
+	persistance::Payment_data const payment_input{ "testaccount", 1000.0, 200.0, "", 1 };
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
-	auto result = data_writer->add_payment(account_name, 1000.0);
+	auto result = data_writer->add_payment(payment_input);
 	EXPECT_TRUE(result);
 
 	// add another payment for this account
-	result = data_writer->add_payment(account_name, 5000.0);
+	result = data_writer->add_payment(payment_input);
 	EXPECT_TRUE(result);
 
 	// cleanup db
-	m_test_data.delete_from_payment_table(account_name);
+	m_test_data.delete_from_payment_table(payment_input.m_account);
 
 }
 

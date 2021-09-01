@@ -15,8 +15,13 @@ struct Account_data
 	std::string m_created_at;
 	std::string m_last_active;
 	double m_shares;
-	double m_balance;
 	double m_hashrate;
+};
+
+struct Account_data_for_payment
+{
+	std::string m_address;
+	double m_shares;
 };
 
 struct Block_data
@@ -50,7 +55,9 @@ struct Payment_data
 {
 	std::string m_account;
 	double m_amount;
+	double m_shares;
 	std::string m_payment_date_time;
+	std::int64_t m_round;
 };
 
 struct Config_data

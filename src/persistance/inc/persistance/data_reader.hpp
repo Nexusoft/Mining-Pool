@@ -23,6 +23,7 @@ public:
     virtual bool is_user_and_connection_banned(std::string user, std::string address) = 0;
     virtual bool does_account_exists(std::string account) = 0;
     virtual Account_data get_account(std::string account) = 0;
+    virtual std::vector<Account_data_for_payment> get_active_accounts_from_round() = 0;
     virtual std::vector<Block_data> get_latest_blocks() = 0;
     virtual Round_data get_latest_round() = 0;
     virtual std::vector<Payment_data> get_payments(std::string account) = 0;
