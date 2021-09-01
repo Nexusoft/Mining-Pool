@@ -3,6 +3,7 @@
 #include "packet.hpp"
 #include "LLP/block.hpp"
 #include "TAO/Register/types/address.h"
+#include "types.hpp"
 
 namespace nexuspool
 {
@@ -79,11 +80,11 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 	else if (packet.m_header == Packet::LOGIN)
 	{
-		auto user_data = session.get_user_data();
+		auto& user_data = session->get_user_data();
 		// check if already logged in
 		if (user_data.m_logged_in)
 		{
-			m_logger->warn("Multiple login attempts of user {} with ip {} ", user_data.m_nxs_address, m_remote_address);
+			m_logger->warn("Multiple login attempts of user {} with ip {} ", user_data.m_account.m_address, m_remote_address);
 			// increase ddos score
 			return;
 		}
@@ -108,8 +109,12 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		// check if banned ip/user
 
 		// check if user already exists in db
-		// update db
+		user_data.m_new_account = !m_session_registry.does_account_exists(nxs_address);
+		// login the user (fetch data from storage)
+		user_data.m_account.m_address = nxs_address;
+		m_session_registry.login(m_session_key);
 		user_data.m_logged_in = true;
+
 		response = response.get_packet(Packet::LOGIN_SUCCESS);
 		m_connection->transmit(response.get_bytes());
 	}
@@ -127,11 +132,15 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		auto pool_manager_shared = m_pool_manager.lock();
 		if (pool_manager_shared)
 		{
-			pool_manager_shared->get_block([self = shared_from_this()](auto block)
+			std::uint32_t pool_nbits = pool_manager_shared->get_pool_nbits();
+			pool_manager_shared->get_block([self = shared_from_this(), pool_nbits](auto block)
 			{
+				//prepend pool nbits to the packet
+				auto pool_nbits_bytes = nexuspool::uint2bytes(pool_nbits);
 				Packet response;
 				response.m_header = Packet::BLOCK_DATA;
 				auto block_data = block.Serialize();
+				block_data.insert(block_data.begin(), pool_nbits_bytes.begin(), pool_nbits_bytes.end());
 				response.m_length = block_data.size();
 				response.m_data = std::make_shared<network::Payload>(block_data);
 
@@ -139,28 +148,33 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 			});
 		}
 	}
+	//miner has submitted a block to the pool
 	else if (packet.m_header == Packet::SUBMIT_BLOCK)
 	{
 		auto pool_manager_shared = m_pool_manager.lock();
 		if (pool_manager_shared)
 		{
-			std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };
+			
+			std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };			
 			std::uint64_t nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
-			pool_manager_shared->submit_block(block_data, nonce, [self = shared_from_this()](auto result)
+			auto block = LLP::deserialize_block(block_data);
+			pool_manager_shared->submit_block(std::move(block), nonce, [self = shared_from_this()](auto result)
 			{
 				Packet response;
-				if (result == Pool_manager::accept)
+				if (result == Submit_block_result::accept)
 				{
+					self->process_accepted();
 					response = response.get_packet(Packet::ACCEPT);
 					self->m_connection->transmit(response.get_bytes());
 				}
-				else if(result == Pool_manager::reject)
+				else if(result == Submit_block_result::reject)
 				{
 					response = response.get_packet(Packet::REJECT);
 					self->m_connection->transmit(response.get_bytes());
 				}
 				else
 				{
+					self->process_accepted();
 					response = response.get_packet(Packet::BLOCK);
 					self->m_connection->transmit(response.get_bytes());
 				}
@@ -174,12 +188,37 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 
 	// received a valid paket from miner -> update session
-	m_session_registry.update_session(m_session_key, session);
+	session->set_update_time(std::chrono::steady_clock::now());
 }
 
 void Miner_connection::set_current_height(std::uint32_t height)
 {
 	m_current_height = height;
+}
+
+void Miner_connection::process_accepted()
+{
+	auto session = m_session_registry.get_session(m_session_key);
+	auto& user_data = session->get_user_data();
+
+	// create new account
+	if(user_data.m_new_account)
+	{
+		m_logger->info("Creating new account for miner {}", user_data.m_account.m_address);
+		if (!session->create_account())
+		{
+			m_logger->error("Failed creating new account for miner {}", user_data.m_account.m_address);
+		}
+		user_data.m_new_account = false;
+	}
+
+	// add share
+	if (!session->add_share())
+	{
+		m_logger->error("Failed creating to update account for miner {}", user_data.m_account.m_address);
+	}
+
+	session->set_update_time(std::chrono::steady_clock::now());
 }
 
 }

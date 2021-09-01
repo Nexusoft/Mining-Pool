@@ -4,7 +4,7 @@
 #include "network/socket_factory.hpp"
 #include "network/types.hpp"
 #include "network/endpoint.hpp"
-#include "persistance/data_access.hpp"
+#include "persistance/data_reader.hpp"
 #include "api/parser.hpp"
 
 #include <memory>
@@ -17,14 +17,14 @@ namespace nexuspool
 namespace api
 {
     class Connection;
-    class Shared_data_access;
+    class Shared_data_reader;
 
 class Server 
 {
 public:
 
     Server(std::shared_ptr<spdlog::logger> logger,
-        persistance::Data_access::Uptr data_access,
+        persistance::Data_reader::Uptr data_reader,
         std::string local_ip, 
         std::uint16_t api_listen_port, 
         network::Socket_factory::Sptr socket_factory);
@@ -36,7 +36,7 @@ public:
 private:
 
     std::shared_ptr<spdlog::logger> m_logger;
-    std::shared_ptr<Shared_data_access> m_shared_data_access;
+    std::shared_ptr<Shared_data_reader> m_shared_data_reader;
     std::string m_local_ip;
     std::uint16_t m_api_listen_port;
     network::Endpoint m_local_endpoint;

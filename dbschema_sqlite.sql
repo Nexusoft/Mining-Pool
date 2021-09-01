@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS round (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  round_number INTEGER NOT NULL,
+  round_number INTEGER PRIMARY KEY AUTOINCREMENT,
   total_shares REAL,
   total_reward REAL,
   blocks INTEGER,
@@ -24,7 +23,7 @@ CREATE TABLE IF NOT EXISTS block (
   block_found_time TEXT NOT NULL,
   accepted_by_mainnet INTEGER NOT NULL,
   mainnet_reward REAL NOT NULL,
-  FOREIGN KEY(round) REFERENCES round(id),
+  FOREIGN KEY(round) REFERENCES round(round_number),
   FOREIGN KEY(block_finder) REFERENCES account(name)
 );
 
@@ -55,4 +54,12 @@ CREATE TABLE IF NOT EXISTS banned_users_connections (
   user TEXT,
   ip TEXT,
   PRIMARY KEY (user, ip)
+);
+
+CREATE TABLE IF NOT EXISTS config (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  version TEXT NOT NULL,
+  difficulty_divider INTEGER NOT NULL,
+  fee INTEGER NOT NULL,
+  mining_mode TEXT NOT NULL
 );

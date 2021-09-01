@@ -2,6 +2,7 @@
 #define NEXUSPOOL_POOL_HPP
 
 #include "config/config.hpp"
+#include "persistance/types.hpp"
 #include <spdlog/spdlog.h>
 #include <asio/signal_set.hpp>
 
@@ -29,6 +30,8 @@ public:
 	void run();
 
 private:
+
+	persistance::Config_data storage_config_check();
 
 	std::unique_ptr<network::Component> m_network_component;
 	std::unique_ptr<persistance::Component> m_persistance_component;

@@ -35,7 +35,6 @@ if(WIN32)
     add_definitions(-D_WIN32_WINT=0x0601 -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-
 # add submodules
 add_subdirectory(src/chrono)
 add_subdirectory(src/network)
@@ -46,6 +45,7 @@ add_subdirectory(src/LLC)
 add_subdirectory(src/TAO)
 add_subdirectory(src/persistance)
 add_subdirectory(src/reward)
+add_subdirectory(src/nexus_http_interface)
 
 if(WITH_TESTS)
     add_subdirectory(tests)
@@ -62,7 +62,6 @@ add_executable(NexusPool
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
-target_link_libraries(NexusPool chrono network config LLP TAO api persistance reward)
+target_link_libraries(NexusPool chrono network config LLP TAO api persistance reward nexus_http_interface)
 
 target_link_libraries(NexusPool Threads::Threads)
-

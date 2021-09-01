@@ -23,6 +23,7 @@ public:
 	virtual void set_result(std::any result) = 0;
 	virtual std::any get_result() const = 0;
 	virtual std::any get_command() const = 0;
+	virtual void reset() = 0;
 };
 
 class Command_base_database : public Command

@@ -2,20 +2,31 @@
 #include "wallet_connection.hpp"
 #include "miner_connection.hpp"
 #include "config/config.hpp"
+#include "reward/create_component.hpp"
 
 namespace nexuspool
 {
 
-Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, config::Config& config, network::Socket_factory::Sptr socket_factory)
+Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, 
+	std::shared_ptr<spdlog::logger> logger,
+	config::Config& config,
+	persistance::Config_data storage_config_data,
+	network::Socket_factory::Sptr socket_factory,
+	persistance::Data_writer_factory::Sptr data_writer_factory,
+	persistance::Data_reader_factory::Sptr data_reader_factory)
 	: m_io_context{std::move(io_context) }
+	, m_logger{ std::move(logger)}
 	, m_config{config}
+	, m_storage_config_data{std::move(storage_config_data)}
 	, m_timer_factory{std::make_shared<chrono::Timer_factory>(m_io_context)}
 	, m_socket_factory{std::move(socket_factory)}
-	, m_logger{ spdlog::get("logger") }
+	, m_data_writer_factory{std::move(data_writer_factory)}
+	, m_data_reader_factory{std::move(data_reader_factory)}
+	, m_reward_component{reward::create_component(m_logger, m_data_writer_factory->create_shared_data_writer(), m_data_reader_factory->create_data_reader())}
+	, m_reward_manager{m_reward_component->create_reward_manager()}
 	, m_listen_socket{}
-	, m_session_registry{m_config.get_session_expiry_time()}
+	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config.get_session_expiry_time()}
 	, m_current_height{0}
-	, m_get_block_pending{false}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 }
@@ -25,10 +36,11 @@ void Pool_manager::start()
 	network::Endpoint wallet_endpoint{ network::Transport_protocol::tcp, m_config.get_wallet_ip(), m_config.get_wallet_port() };
 	network::Endpoint local_endpoint{ network::Transport_protocol::tcp, m_config.get_local_ip(), m_config.get_local_port() };
 	auto local_socket = m_socket_factory->create_socket(local_endpoint);
+	config::Mining_mode mining_mode = m_storage_config_data.m_mining_mode == "HASH" ? config::Mining_mode::HASH : config::Mining_mode::PRIME;
 
 	auto self = shared_from_this();
 	// connect to wallet
-	m_wallet_connection = std::make_shared<Wallet_connection>(m_io_context, self, m_config, m_timer_factory, std::move(local_socket));
+	m_wallet_connection = std::make_shared<Wallet_connection>(m_io_context, self,mining_mode, m_config, m_timer_factory, std::move(local_socket));
 	if (!m_wallet_connection->connect(wallet_endpoint))
 	{
 		m_logger->critical("Couldn't connect to wallet using ip {} and port {}", m_config.get_wallet_ip(), m_config.get_wallet_port());
@@ -47,8 +59,8 @@ void Pool_manager::start()
 		auto miner_connection = std::make_shared<Miner_connection>(self->m_timer_factory, std::move(connection), self, session_key, self->m_session_registry);
 
 		auto session = self->m_session_registry.get_session(session_key);
-		session.update_connection(miner_connection);
-		self->m_session_registry.update_session(session_key, session);
+		session->update_connection(miner_connection);
+		session->set_update_time(std::chrono::steady_clock::now());
 
 		return miner_connection->connection_handler();
 	};
@@ -82,45 +94,45 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 	std::scoped_lock(m_block_mutex);
 	m_block = block;
 
-	// send the block to miner_connections if there are pending handlers
-	m_get_block_pending = false;
-	for (auto handler : m_pending_get_block_handlers)
-	{
-		m_io_context->post([handler = std::move(handler), self = shared_from_this()]() {
-			handler(self->m_block);
-		});
-	}
-	m_pending_get_block_handlers.clear();
 }
 
-void Pool_manager::get_block(Get_block_handler handler)
+void Pool_manager::get_block(Get_block_handler&& handler)
 {
-	std::scoped_lock(m_block_mutex);
-	if (m_block.nHeight == m_current_height)
-	{
-		handler(m_block);
-	}
-	else
-	{	// need a fresh block
-		if (m_get_block_pending)
-		{
-			// block request sent to wallet, waiting for new block
-			// store block request handler in pending list
-			m_pending_get_block_handlers.emplace_back(handler);
-		}
-		else
-		{
-			m_get_block_pending = true;
-			m_wallet_connection->get_block();
-
-		}
-	}
+	m_wallet_connection->get_block(std::move(handler));
 }
 
-void Pool_manager::submit_block(std::vector<std::uint8_t> const& block_data, std::uint64_t nonce, Submit_block_handler handler)
+void Pool_manager::submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler)
 {
-	// calc if reached difficulty threshold
-	// m_wallet_connection->submit_block(block_data, nonce, std::move(handler));
+	auto difficulty_result = m_reward_manager->check_difficulty(block, m_pool_nBits);
+	switch (difficulty_result)
+	{
+	case reward::Difficulty_result::accept:
+		// record share for this miner connection but don't submit block to wallet
+		handler(Submit_block_result::accept);
+		break;
+	case reward::Difficulty_result::block_found:
+		// submit the block to wallet
+		// m_wallet_connection->submit_block(block_data, nonce, std::move(handler));
+		break;
+	case reward::Difficulty_result::reject:
+		handler(Submit_block_result::reject);
+		break;
+	}	
+}
+
+std::uint32_t Pool_manager::get_pool_nbits()
+{
+	return m_pool_nBits;
+}
+
+//pool nbits determines the difficulty for the pool.  
+//For the hash channel, we set the difficulty to be a divided down version of the main net difficulty
+void Pool_manager::set_pool_nbits(std::uint32_t nbits)
+{
+	uint1024_t target, pool_target;
+	target.SetCompact(nbits);
+	pool_target = target >> m_storage_config_data.m_difficulty_divider;
+	m_pool_nBits = pool_target.GetCompact();
 }
 
 chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)

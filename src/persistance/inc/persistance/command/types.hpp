@@ -21,9 +21,18 @@ enum class Type : std::uint8_t
 {
 	get_banned_user_and_ip = 0,
 	get_banned_api_ip,
-	create_db_schema,
 	account_exists,
-	get_blocks
+	get_account,
+	get_blocks,
+	create_account,
+	get_latest_round,
+	get_payments,
+	add_payment,
+	create_round,
+	update_account,
+	create_config,
+	get_config,
+	update_config
 
 };
 

@@ -4,21 +4,25 @@
 #include "config/config.hpp"
 #include "config/types.hpp"
 #include "LLP/block.hpp"
+#include <algorithm>
 
 namespace nexuspool
 {
 Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_context,
     std::weak_ptr<Pool_manager> pool_manager,
+    config::Mining_mode mining_mode,
     config::Config& config,
     chrono::Timer_factory::Sptr timer_factory, 
     network::Socket::Sptr socket)
     : m_io_context{ std::move(io_context) }
     , m_pool_manager{std::move(pool_manager)}
     , m_config{ config }
+    , m_mining_mode{mining_mode}
     , m_socket{ std::move(socket) }
     , m_logger{ spdlog::get("logger") }
     , m_timer_manager{ std::move(timer_factory) }
     , m_current_height{0}
+    , m_get_block_pool_manager{false}
 {
 }
 
@@ -63,7 +67,7 @@ bool Wallet_connection::connect(network::Endpoint const& wallet_endpoint)
                     Packet packet;
                     packet.m_header = Packet::SET_CHANNEL;
                     packet.m_length = 4;
-                    packet.m_data = std::make_shared<network::Payload>(uint2bytes(self->m_config.get_mining_mode() == config::Mining_mode::PRIME ? 1U : 2U));
+                    packet.m_data = std::make_shared<network::Payload>(uint2bytes(self->m_mining_mode == config::Mining_mode::PRIME ? 1U : 2U));
                     self->m_connection->transmit(packet.get_bytes());
 
                     auto const get_height_interval = self->m_config.get_height_interval();
@@ -115,24 +119,42 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
             // update height at pool_manager
             pool_manager_shared->set_current_height(m_current_height);
 
-            // get new block from wallet
+            // get new block from wallet for pool_manager
             Packet packet_get_block;
             packet_get_block.m_header = Packet::GET_BLOCK;
             m_connection->transmit(packet_get_block.get_bytes());
+            m_get_block_pool_manager = true; 
+
+            // clear pending get_block handlers
+            std::scoped_lock lock(m_get_block_mutex);
+            std::queue<Get_block_handler> empty_queue;
+            std::swap(m_pending_get_block_handlers, empty_queue);
         }
     }
     // Block from wallet received
     else if (packet.m_header == Packet::BLOCK_DATA)
     {
-        auto block = deserialize_block(std::move(packet.m_data));
+        auto block = LLP::deserialize_block(std::move(*packet.m_data));
         if (block.nHeight == m_current_height)
         {
-            // transfer block to pool_manager
-            auto pool_manager_shared = m_pool_manager.lock();
-            if (!pool_manager_shared)
-                return;
+            if (m_get_block_pool_manager) // pool_manager get_block has priority
+            {
+                auto pool_manager_shared = m_pool_manager.lock();
+                if (!pool_manager_shared)
+                    return;
 
-            pool_manager_shared->set_block(block);
+                pool_manager_shared->set_pool_nbits(block.nBits);
+                pool_manager_shared->set_block(std::move(block));
+                m_get_block_pool_manager = false;
+            }
+            else
+            {
+                // get oldest pending_get_block handler from miner_connection and call it then pop()
+                std::scoped_lock lock(m_get_block_mutex);
+                auto handler = m_pending_get_block_handlers.front();
+                handler(block);
+                m_pending_get_block_handlers.pop();
+            }
         }
         else
         {
@@ -172,27 +194,15 @@ void Wallet_connection::submit_block(std::vector<std::uint8_t> const& block_data
     m_connection->transmit(packet.get_bytes());
 }
 
-void Wallet_connection::get_block()
+void Wallet_connection::get_block(Get_block_handler&& handler)
 {
     Packet packet_get_block;
     packet_get_block.m_header = Packet::GET_BLOCK;
     m_connection->transmit(packet_get_block.get_bytes());
-}
 
-LLP::CBlock Wallet_connection::deserialize_block(network::Shared_payload data)
-{
-    LLP::CBlock block;
-    block.nVersion = bytes2uint(std::vector<uint8_t>(data->begin(), data->begin() + 4));
-
-    block.hashPrevBlock.SetBytes(std::vector<uint8_t>(data->begin() + 4, data->begin() + 132));
-    block.hashMerkleRoot.SetBytes(std::vector<uint8_t>(data->begin() + 132, data->end() - 20));
-
-    block.nChannel = bytes2uint(std::vector<uint8_t>(data->end() - 20, data->end() - 16));
-    block.nHeight = bytes2uint(std::vector<uint8_t>(data->end() - 16, data->end() - 12));
-    block.nBits = bytes2uint(std::vector<uint8_t>(data->end() - 12, data->end() - 8));
-    block.nNonce = bytes2uint64(std::vector<uint8_t>(data->end() - 8, data->end()));
-
-    return block;
+    // store block request handler in pending list (handler comes from miner_connection)
+    std::scoped_lock lock(m_get_block_mutex);
+    m_pending_get_block_handlers.emplace(handler);
 }
 
 }

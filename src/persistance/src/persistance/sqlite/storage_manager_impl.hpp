@@ -15,7 +15,7 @@ class Storage_manager_sqlite : public Storage_manager
 {
 public:
 
-    Storage_manager_sqlite(std::shared_ptr<spdlog::logger> logger, std::string db_name);
+    Storage_manager_sqlite(std::shared_ptr<spdlog::logger> logger, std::string db_name, bool readonly = true);
 
     void start() override;
     void stop() override;
@@ -29,6 +29,7 @@ private:
 
     std::shared_ptr<spdlog::logger> m_logger;
     std::string m_db_name;
+    bool m_readonly;
     sqlite3* m_handle;
 
 };

@@ -8,60 +8,59 @@
 namespace nexuspool {
 namespace persistance {
 
-struct pool_data
+struct Account_data
 {
-public:
-	pool_data()
-	{
-		//nRound = Core::nCurrentRound;
-		//nBlockNumber = Core::nBestHeight;
-		//nRoundReward = Core::nRoundReward;
-		//nTotalShares = Core::TotalWeight();
-		//nConnectionCount = Core::nConnections;
-
-	}
-
-	uint32_t m_round;
-	uint32_t m_block_number;
-	uint64_t m_round_reward;
-	uint64_t m_total_shares;
-	uint32_t m_connection_count;
+	std::string m_address;
+	std::uint16_t m_connections;
+	std::string m_created_at;
+	std::string m_last_active;
+	double m_shares;
+	double m_balance;
+	double m_hashrate;
 };
 
-struct account_data
+struct Block_data
 {
-	std::string m_account_address;
-	int m_connections;
-	uint64_t m_shares;
-	uint64_t m_balance;
-	uint64_t m_pending_payout;
-};
-
-struct round_data
-{
-	explicit round_data(uint32_t round_to_set) : m_round{ round_to_set } {}
-	round_data()
-	{
-		//round = Core::nCurrentRound;
-		//nBlockNumber = Core::nBestHeight;
-		//hashBlock = Core::hashBlockSubmission.ToString();
-		//nRoundReward = Core::nRoundReward;
-		//nTotalShares = Core::TotalWeight();
-		//strBlockFinder = Core::LAST_ROUND_BLOCKFINDER;
-		//bOrphan = false;
-		//tBlockFoundTime = time(0);
-	}
-
-
-	uint32_t m_round;
-	uint32_t m_block_number;
-	std::string m_hash_block;
-	uint64_t m_round_reward;
-	uint64_t m_total_shares;
-	std::string m_block_finder;
+	std::string m_hash;
+	std::uint32_t m_height;
+	std::string m_type;
+	double m_shares;
+	double m_difficulty;
 	bool m_orphan;
-	time_t m_block_found_time;
+	std::string m_block_finder;
+	std::uint32_t m_round;
+	std::string m_block_found_time;
+	double m_mainnet_reward;
 };
+
+struct Round_data
+{
+	std::int64_t m_round;
+	double m_total_shares;
+	double m_total_rewards;
+	std::uint32_t m_blocks;
+	std::uint32_t m_connection_count;
+	std::string m_start_date_time;
+	std::string m_end_date_time;
+	bool m_is_active;
+	bool m_is_paid;
+};
+
+struct Payment_data
+{
+	std::string m_account;
+	double m_amount;
+	std::string m_payment_date_time;
+};
+
+struct Config_data
+{
+	std::string m_version;
+	int m_fee;
+	int m_difficulty_divider;
+	std::string m_mining_mode;
+};
+
 
 struct connection_miner_data
 {

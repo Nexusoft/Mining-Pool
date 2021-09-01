@@ -8,9 +8,14 @@
 #include "chrono/timer_factory.hpp"
 #include "timer_manager.hpp"
 #include "block.hpp"
+#include "types.hpp"
+#include "config/types.hpp"
 
 #include <memory>
 #include <vector>
+#include <queue>
+#include <mutex>
+#include <atomic>
 
 namespace asio { class io_context; }
 
@@ -25,6 +30,7 @@ public:
 
     Wallet_connection(std::shared_ptr<asio::io_context> io_context,
         std::weak_ptr<Pool_manager> pool_manager,
+        config::Mining_mode mining_mode,
         config::Config& config,
         chrono::Timer_factory::Sptr timer_factory, 
         network::Socket::Sptr socket);
@@ -35,25 +41,28 @@ public:
     void stop();
 
     void submit_block(std::vector<std::uint8_t> const& block_data, std::vector<std::uint8_t> const& nonce);
-    void get_block();
+    void get_block(Get_block_handler&& handler);
 
 private:
 
     void process_data(network::Shared_payload&& receive_buffer);
-
-    // Convert the Header of a Block into a Byte Stream for Reading and Writing Across Sockets
-    LLP::CBlock deserialize_block(network::Shared_payload data);
 
     void retry_connect(network::Endpoint const& wallet_endpoint);
 
     std::shared_ptr<::asio::io_context> m_io_context;
     std::weak_ptr<Pool_manager> m_pool_manager;
     config::Config& m_config;
+    config::Mining_mode m_mining_mode;
     network::Socket::Sptr m_socket;
     network::Connection::Sptr m_connection;
     std::shared_ptr<spdlog::logger> m_logger;
     Timer_manager m_timer_manager;
     std::uint32_t m_current_height;
+
+    // get_block variables
+    std::mutex m_get_block_mutex;
+    std::atomic<bool> m_get_block_pool_manager;
+    std::queue<Get_block_handler> m_pending_get_block_handlers;
 };
 }
 

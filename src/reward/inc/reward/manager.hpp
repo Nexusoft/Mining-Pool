@@ -4,6 +4,7 @@
 #include <memory>
 #include <cstdint>
 #include "LLC/types/uint1024.h"
+#include "block.hpp"
 
 namespace nexuspool {
 namespace reward {
@@ -25,7 +26,10 @@ public:
     // Clear the Shares for the current round.
     virtual void clear_shares() = 0;
 
-    virtual Difficulty_result check_difficulty(double difficulty, double target_difficulty) const = 0;
+    virtual Difficulty_result check_difficulty(const LLP::CBlock& block, uint32_t pool_nbits) const = 0;
+    //pay all miners with unpaid shares.
+    virtual void pay_all() const = 0;
+    
 
 
 };

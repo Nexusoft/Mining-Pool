@@ -1,0 +1,37 @@
+#ifndef NEXUSPOOL_REWARD_COMPONENT_IMPL_HPP
+#define NEXUSPOOL_REWARD_COMPONENT_IMPL_HPP
+
+#include "reward/component.hpp"
+#include "reward/manager_impl.hpp"
+#include "persistance/data_writer.hpp"
+#include "persistance/data_reader.hpp"
+#include <spdlog/spdlog.h>
+
+namespace nexuspool {
+namespace reward {
+
+class Component_impl : public Component
+{
+public:
+    Component_impl(std::shared_ptr<spdlog::logger> logger, persistance::Shared_data_writer::Sptr shared_data_writer, persistance::Data_reader::Uptr data_reader);
+
+    Manager::Uptr create_reward_manager() override
+    {
+        return std::make_unique<Manager_impl>();
+    }
+
+    void start_round() override;
+    bool end_round(std::uint32_t round_number) override;
+
+private:
+
+    std::shared_ptr<spdlog::logger> m_logger;
+    persistance::Shared_data_writer::Sptr m_shared_data_writer;
+    persistance::Data_reader::Uptr m_data_reader;
+
+};
+
+}
+}
+
+#endif
