@@ -50,7 +50,6 @@ bool Data_writer_impl::update_account(Account_data data)
 		get_datetime_string(std::chrono::system_clock::now()),	// take current time as last_active_time
 		data.m_connections, 
 		data.m_shares,
-		data.m_balance, 
 		data.m_hashrate, 
 		std::move(data.m_address) });
 	return m_data_storage->execute_command(m_update_account_cmd);

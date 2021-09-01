@@ -15,7 +15,6 @@ struct Account_data
 	std::string m_created_at;
 	std::string m_last_active;
 	double m_shares;
-	double m_balance;
 	double m_hashrate;
 };
 

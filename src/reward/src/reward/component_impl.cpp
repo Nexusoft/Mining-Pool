@@ -44,6 +44,8 @@ bool Component_impl::end_round(std::uint32_t round_number)
             auto account_reward = round_data.m_total_rewards * (active_account.m_shares / round_data.m_total_shares);
             // add account to payment table (without datetime -> not paid yet)
             m_shared_data_writer->add_payment(persistance::Payment_data{ active_account.m_address, account_reward, active_account.m_shares, "", round_data.m_round });
+
+            // update account -> reset shares
         }
     }
 

@@ -33,7 +33,6 @@ CREATE TABLE IF NOT EXISTS account (
   last_active TEXT,
   connection_count INTEGER,
   shares REAL,
-  reward REAL,
   hashrate REAL
 );
 

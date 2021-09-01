@@ -168,7 +168,6 @@ TEST_F(Persistance_fixture, command_update_account)
 
 	// Data to update
 	Account_data account_data;
-	account_data.m_balance = 100;
 	account_data.m_hashrate = 1000;
 	account_data.m_shares = 10000;
 	account_data.m_connections = 1;
@@ -181,7 +180,6 @@ TEST_F(Persistance_fixture, command_update_account)
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 	auto result_account = data_reader->get_account(account_name);
 
-	EXPECT_EQ(result_account.m_balance, account_data.m_balance);
 	EXPECT_EQ(result_account.m_hashrate, account_data.m_hashrate);
 	EXPECT_EQ(result_account.m_shares, account_data.m_shares);
 	EXPECT_EQ(result_account.m_connections, account_data.m_connections);
