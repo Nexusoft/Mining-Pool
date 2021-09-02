@@ -54,6 +54,8 @@ public:
             std::make_shared<Command_create_config_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::update_config,
             std::make_shared<Command_update_config_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::reset_shares_from_accounts,
+            std::make_shared<Command_reset_shares_from_accounts_impl>(m_storage_manager->get_handle<sqlite3*>())));
         
     }
 
@@ -117,6 +119,9 @@ private:
             break;           
         case Type::update_config:
             result = std::any_cast<std::shared_ptr<Command_update_config_impl>>(m_commands[command_type]);
+            break;
+        case Type::reset_shares_from_accounts:
+            result = std::any_cast<std::shared_ptr<Command_reset_shares_from_accounts_impl>>(m_commands[command_type]);
             break;
         }
         

@@ -373,6 +373,14 @@ void Command_update_config_impl::set_params(std::any params)
 	bind_param(m_stmt, ":fee", casted_params.m_fee);
 	bind_param(m_stmt, ":mining_mode", casted_params.m_mining_mode);
 }
+// -----------------------------------------------------------------------------------------------
+Command_reset_shares_from_accounts_impl::Command_reset_shares_from_accounts_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string reset_shares{ R"(UPDATE account SET shares = 0)" };
+
+	sqlite3_prepare_v2(m_handle, reset_shares.c_str(), -1, &m_stmt, NULL);
+}
 
 }
 }

@@ -25,6 +25,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_update_account_cmd = m_command_factory->create_command(Type::update_account);
 	m_create_config_cmd = m_command_factory->create_command(Type::create_config);
 	m_update_config_cmd = m_command_factory->create_command(Type::update_config);
+	m_reset_shares_from_accounts_cmd = m_command_factory->create_command(Type::reset_shares_from_accounts);
 }
 
 bool Data_writer_impl::create_account(std::string account)
@@ -67,8 +68,11 @@ bool Data_writer_impl::update_config(std::string mining_mode, int fee, int diffi
 	return m_data_storage->execute_command(m_update_config_cmd);
 }
 
+bool Data_writer_impl::reset_shares_from_accounts()
+{
+	return m_data_storage->execute_command(m_reset_shares_from_accounts_cmd);
+}
 // --------------------------------------------------------------------------------------
-
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
 	: m_data_writer{ std::move(data_writer) }
@@ -108,6 +112,12 @@ bool Shared_data_writer_impl::update_config(std::string mining_mode, int fee, in
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->update_config(std::move(mining_mode), fee, difficulty_divider);
+}
+
+bool Shared_data_writer_impl::reset_shares_from_accounts()
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->reset_shares_from_accounts();
 }
 
 }
