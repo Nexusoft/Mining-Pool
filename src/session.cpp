@@ -21,6 +21,7 @@ void Session::update_connection(std::shared_ptr<Miner_connection> miner_connecti
 
 bool Session::add_share()
 {
+	m_shares_in_session++;
 	m_user_data.m_account.m_shares++;
 	return m_data_writer->update_account(m_user_data.m_account);
 }
@@ -119,6 +120,7 @@ void Session_registry::login(Session_key key)
 	}
 
 	user_data.m_account = std::move(account_data);
+	user_data.m_login_time = std::chrono::steady_clock::now();
 }
 
 }

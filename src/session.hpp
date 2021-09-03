@@ -20,6 +20,7 @@ struct Session_user
 	bool m_logged_in{ false };
 	bool m_new_account{ true };
 	persistance::Account_data m_account;
+	std::chrono::steady_clock::time_point m_login_time;
 };
 
 using Session_key = uint256_t;
@@ -46,6 +47,7 @@ private:
 	Session_user m_user_data;
 	std::shared_ptr<Miner_connection> m_miner_connection;
 	std::chrono::steady_clock::time_point m_update_time;
+	std::uint32_t m_shares_in_session{ 0U };	// submitted shares since login
 };
 
 // Manages all sessions
