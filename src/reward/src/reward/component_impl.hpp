@@ -2,7 +2,6 @@
 #define NEXUSPOOL_REWARD_COMPONENT_IMPL_HPP
 
 #include "reward/component.hpp"
-#include "reward/manager_impl.hpp"
 #include "persistance/data_writer.hpp"
 #include "persistance/data_reader.hpp"
 #include <spdlog/spdlog.h>
@@ -15,13 +14,10 @@ class Component_impl : public Component
 public:
     Component_impl(std::shared_ptr<spdlog::logger> logger, persistance::Shared_data_writer::Sptr shared_data_writer, persistance::Data_reader::Uptr data_reader);
 
-    Manager::Uptr create_reward_manager() override
-    {
-        return std::make_unique<Manager_impl>();
-    }
-
     void start_round() override;
     bool end_round(std::uint32_t round_number) override;
+    Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const override;
+    void pay_all() const override;
 
 private:
 

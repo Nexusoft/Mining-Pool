@@ -1,11 +1,13 @@
 #ifndef NEXUSPOOL_REWARD_COMPONENT_HPP
 #define NEXUSPOOL_REWARD_COMPONENT_HPP
 
-#include "manager.hpp"
+#include "block.hpp"
 #include <memory>
 
 namespace nexuspool {
 namespace reward {
+
+enum class Difficulty_result : std::uint8_t { accept = 0, reject, block_found };
 
 class Component 
 {
@@ -14,13 +16,16 @@ public:
 
     virtual ~Component() = default;
 
-    virtual Manager::Uptr create_reward_manager() = 0;
-
     // Starts a new round
     virtual void start_round() = 0;
 
     // End round
     virtual bool end_round(std::uint32_t round_number) = 0;
+
+    virtual Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const = 0;
+    //pay all miners with unpaid shares.
+    virtual void pay_all() const = 0;
+
 
 };
 

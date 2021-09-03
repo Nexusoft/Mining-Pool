@@ -9,7 +9,6 @@
 #include "block.hpp"
 #include "types.hpp"
 #include "reward/component.hpp"
-#include "reward/manager.hpp"
 #include "persistance/data_writer_factory.hpp"
 #include "persistance/data_reader_factory.hpp"
 #include "persistance/types.hpp"
@@ -65,7 +64,6 @@ private:
     persistance::Data_writer_factory::Sptr m_data_writer_factory;
     persistance::Data_reader_factory::Sptr m_data_reader_factory;
     reward::Component::Uptr m_reward_component;
-    reward::Manager::Uptr m_reward_manager;
 
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
     network::Socket::Sptr m_listen_socket;

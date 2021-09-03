@@ -16,7 +16,6 @@ namespace
 {
 using namespace ::nexuspool;
 using ::nexuspool::reward::Component;
-using ::nexuspool::reward::Manager;
 
 class Reward_fixture : public ::testing::Test
 {
@@ -30,7 +29,6 @@ public:
 
 		m_component = reward::create_component(m_logger, m_persistance_component->get_data_writer_factory()->create_shared_data_writer(),
 			m_persistance_component->get_data_reader_factory()->create_data_reader());
-		m_reward_manager = m_component->create_reward_manager();
 	}
 
 protected:
@@ -38,7 +36,6 @@ protected:
 	config::Config m_config;
 	persistance::Component::Uptr m_persistance_component;
 	Component::Uptr m_component;
-	Manager::Uptr m_reward_manager;
 
 	LLP::CBlock create_test_block()
 	{

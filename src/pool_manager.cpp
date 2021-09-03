@@ -23,7 +23,6 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
 	, m_reward_component{reward::create_component(m_logger, m_data_writer_factory->create_shared_data_writer(), m_data_reader_factory->create_data_reader())}
-	, m_reward_manager{m_reward_component->create_reward_manager()}
 	, m_listen_socket{}
 	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config.get_session_expiry_time()}
 	, m_current_height{0}
@@ -103,7 +102,7 @@ void Pool_manager::get_block(Get_block_handler&& handler)
 
 void Pool_manager::submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler)
 {
-	auto difficulty_result = m_reward_manager->check_difficulty(block, m_pool_nBits);
+	auto difficulty_result = m_reward_component->check_difficulty(block, m_pool_nBits);
 	switch (difficulty_result)
 	{
 	case reward::Difficulty_result::accept:
