@@ -11,6 +11,7 @@ Session::Session(persistance::Shared_data_writer::Sptr data_writer)
 	, m_user_data{}
 	, m_miner_connection{}
 	, m_update_time{std::chrono::steady_clock::now()}
+	, m_hashrate_helper{config::Mining_mode::HASH}	// TODO get mining mode from config
 {
 }
 
@@ -19,11 +20,18 @@ void Session::update_connection(std::shared_ptr<Miner_connection> miner_connecti
 	m_miner_connection = std::move(miner_connection);
 }
 
-bool Session::add_share()
+bool Session::add_share(std::uint32_t pool_nbits)
 {
 	m_shares_in_session++;
 	m_user_data.m_account.m_shares++;
+	m_hashrate_helper.add_share(pool_nbits);
 	return m_data_writer->update_account(m_user_data.m_account);
+}
+
+double Session::get_hashrate() const
+{
+	// TODO update hashrate in db
+	return m_hashrate_helper.get_hashrate();
 }
 
 bool Session::create_account()

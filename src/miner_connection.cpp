@@ -158,6 +158,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 			std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };			
 			std::uint64_t nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
 			auto block = LLP::deserialize_block(block_data);
+			//update hashrate
 			pool_manager_shared->submit_block(std::move(block), nonce, [self = shared_from_this()](auto result)
 			{
 				Packet response;
@@ -213,9 +214,9 @@ void Miner_connection::process_accepted()
 	}
 
 	// add share
-	if (!session->add_share())
+	if (!session->add_share(0))
 	{
-		m_logger->error("Failed creating to update account for miner {}", user_data.m_account.m_address);
+		m_logger->error("Failed to update account for miner {}", user_data.m_account.m_address);
 	}
 
 	session->set_update_time(std::chrono::steady_clock::now());

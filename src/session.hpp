@@ -10,6 +10,7 @@
 #include "persistance/data_writer.hpp"
 #include "persistance/data_reader.hpp"
 #include "persistance/types.hpp"
+#include "utils.hpp"
 
 namespace nexuspool
 {
@@ -37,7 +38,8 @@ public:
 	Session_user& get_user_data() { return m_user_data;  }
 	std::chrono::steady_clock::time_point get_update_time() const { return m_update_time; }
 	void set_update_time(std::chrono::steady_clock::time_point update_time) { m_update_time = update_time; }
-	bool add_share();
+	bool add_share(std::uint32_t pool_nbits);
+	double get_hashrate() const;
 
 	bool create_account();
 
@@ -48,6 +50,7 @@ private:
 	std::shared_ptr<Miner_connection> m_miner_connection;
 	std::chrono::steady_clock::time_point m_update_time;
 	std::uint32_t m_shares_in_session{ 0U };	// submitted shares since login
+	Hashrate_helper m_hashrate_helper;
 };
 
 // Manages all sessions
