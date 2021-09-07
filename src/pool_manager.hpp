@@ -48,7 +48,7 @@ public:
     void get_block(Get_block_handler&& handler);
     void submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler);
 
-    std::uint32_t get_pool_nbits();
+    std::uint32_t get_pool_nbits() const;
     void set_pool_nbits(std::uint32_t nbits);
 
 private:

@@ -7,6 +7,7 @@
 #include <cmath>
 #include <optional>
 #include "config/types.hpp"
+#include "TAO/Ledger/difficulty.h"
 
 namespace nexuspool
 {
@@ -61,7 +62,7 @@ private:
 
 		if (m_mining_mode == config::Mining_mode::HASH)
 		{
-			m_hashrate = (pool_nbits * std::pow(2, 34)) / average_time.count();
+			m_hashrate = (TAO::Ledger::GetDifficulty(pool_nbits, 2) * std::pow(2, 34)) / average_time.count();
 		}
 	}
 

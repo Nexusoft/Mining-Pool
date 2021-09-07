@@ -119,7 +119,7 @@ void Pool_manager::submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit
 	}	
 }
 
-std::uint32_t Pool_manager::get_pool_nbits()
+std::uint32_t Pool_manager::get_pool_nbits() const
 {
 	return m_pool_nBits;
 }

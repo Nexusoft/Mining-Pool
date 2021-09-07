@@ -132,11 +132,11 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		auto pool_manager_shared = m_pool_manager.lock();
 		if (pool_manager_shared)
 		{
-			std::uint32_t pool_nbits = pool_manager_shared->get_pool_nbits();
-			pool_manager_shared->get_block([self = shared_from_this(), pool_nbits](auto block)
+			m_pool_nbits = pool_manager_shared->get_pool_nbits();
+			pool_manager_shared->get_block([self = shared_from_this()](auto block)
 			{
 				//prepend pool nbits to the packet
-				auto pool_nbits_bytes = nexuspool::uint2bytes(pool_nbits);
+				auto pool_nbits_bytes = nexuspool::uint2bytes(self->m_pool_nbits);
 				Packet response;
 				response.m_header = Packet::BLOCK_DATA;
 				auto block_data = block.Serialize();
@@ -214,7 +214,7 @@ void Miner_connection::process_accepted()
 	}
 
 	// add share
-	if (!session->add_share(0))
+	if (!session->add_share(m_pool_nbits))
 	{
 		m_logger->error("Failed to update account for miner {}", user_data.m_account.m_address);
 	}

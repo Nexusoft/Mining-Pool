@@ -46,6 +46,7 @@ private:
     bool m_connection_closed;	// indicator for server if the network connection has been closed
     Session_key m_session_key;
     Session_registry& m_session_registry;
+    std::uint32_t m_pool_nbits;
 };
 }
 
