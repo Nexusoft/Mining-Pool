@@ -9,12 +9,21 @@ Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, persistan
     , m_data_reader{ std::move(data_reader) }
 {}
 
-void Component_impl::start_round()
+bool Component_impl::start_round()
 {
+	m_logger->info("Starting new round");
     if (!m_shared_data_writer->create_round())
     {
         m_logger->error("Failed to create a new round!");
+		return false;
     }
+	return true;
+}
+
+bool Component_impl::is_round_active()
+{
+	auto const round_data = m_data_reader->get_latest_round();
+	return round_data.m_is_active;
 }
 
 bool Component_impl::end_round(std::uint32_t round_number)

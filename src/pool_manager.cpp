@@ -39,11 +39,21 @@ void Pool_manager::start()
 
 	auto self = shared_from_this();
 	// connect to wallet
-	m_wallet_connection = std::make_shared<Wallet_connection>(m_io_context, self,mining_mode, m_config, m_timer_factory, std::move(local_socket));
+	m_wallet_connection = std::make_shared<Wallet_connection>(m_io_context, self, mining_mode, m_config, m_timer_factory, std::move(local_socket));
 	if (!m_wallet_connection->connect(wallet_endpoint))
 	{
 		m_logger->critical("Couldn't connect to wallet using ip {} and port {}", m_config.get_wallet_ip(), m_config.get_wallet_port());
 		return;
+	}
+
+	// check if there is an active round -> if not start one
+	if (!m_reward_component->is_round_active())
+	{
+		if (!m_reward_component->start_round())
+		{
+			// error
+			return;
+		}
 	}
 
 	// listen

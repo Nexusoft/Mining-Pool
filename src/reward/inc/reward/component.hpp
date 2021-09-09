@@ -17,7 +17,9 @@ public:
     virtual ~Component() = default;
 
     // Starts a new round
-    virtual void start_round() = 0;
+    virtual bool start_round() = 0;
+
+    virtual bool is_round_active() = 0;
 
     // End round
     virtual bool end_round(std::uint32_t round_number) = 0;
