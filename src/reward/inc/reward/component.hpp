@@ -17,7 +17,7 @@ public:
     virtual ~Component() = default;
 
     // Starts a new round
-    virtual bool start_round() = 0;
+    virtual bool start_round(std::uint16_t round_duration_hours) = 0;
 
     virtual bool is_round_active() = 0;
 

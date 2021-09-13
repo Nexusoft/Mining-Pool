@@ -20,7 +20,7 @@ public:
 
     virtual bool create_account(std::string account) = 0;
     virtual bool add_payment(Payment_data data) = 0;
-    virtual bool create_round() = 0;
+    virtual bool create_round(std::string round_end_date_time) = 0;
     virtual bool update_account(Account_data data) = 0; 
     virtual bool create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) = 0;
     virtual bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) = 0;
@@ -38,7 +38,7 @@ public:
 
     virtual bool create_account(std::string account) = 0;
     virtual bool add_payment(Payment_data data) = 0;
-    virtual bool create_round() = 0;
+    virtual bool create_round(std::string round_end_date_time) = 0;
     virtual bool update_account(Account_data data) = 0;
     virtual bool create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) = 0;
     virtual bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) = 0;

@@ -41,8 +41,9 @@ bool Data_writer_impl::add_payment(Payment_data data)
 	return m_data_storage->execute_command(m_add_payment_cmd);
 }
 
-bool Data_writer_impl::create_round()
+bool Data_writer_impl::create_round(std::string round_end_date_time)
 {
+	m_create_round_cmd->set_params(std::move(round_end_date_time));
 	return m_data_storage->execute_command(m_create_round_cmd);
 }
 
@@ -91,10 +92,10 @@ bool Shared_data_writer_impl::add_payment(Payment_data data)
 	return m_data_writer->add_payment(std::move(data));
 }
 
-bool Shared_data_writer_impl::create_round()
+bool Shared_data_writer_impl::create_round(std::string round_end_date_time)
 {
 	std::scoped_lock lock(m_writer_mutex);
-	return m_data_writer->create_round();
+	return m_data_writer->create_round(std::move(round_end_date_time));
 }
 
 bool Shared_data_writer_impl::update_account(Account_data data)

@@ -49,7 +49,7 @@ void Pool_manager::start()
 	// check if there is an active round -> if not start one
 	if (!m_reward_component->is_round_active())
 	{
-		if (!m_reward_component->start_round())
+		if (!m_reward_component->start_round(m_storage_config_data.m_round_duration_hours))
 		{
 			// error
 			return;

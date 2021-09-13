@@ -1,4 +1,6 @@
 #include "component_impl.hpp"
+#include "common/utils.hpp"
+#include <chrono>
 
 namespace nexuspool {
 namespace reward {
@@ -9,10 +11,13 @@ Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, persistan
     , m_data_reader{ std::move(data_reader) }
 {}
 
-bool Component_impl::start_round()
+bool Component_impl::start_round(std::uint16_t round_duration_hours)
 {
 	m_logger->info("Starting new round");
-    if (!m_shared_data_writer->create_round())
+	// calc end_rount datetime
+	auto end_round_time = std::chrono::system_clock::now();
+	end_round_time += std::chrono::hours(round_duration_hours);
+    if (!m_shared_data_writer->create_round(common::get_datetime_string(end_round_time)))
     {
         m_logger->error("Failed to create a new round!");
 		return false;

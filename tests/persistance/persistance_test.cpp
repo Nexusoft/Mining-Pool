@@ -208,7 +208,7 @@ TEST_F(Persistance_fixture, command_add_payment)
 TEST_F(Persistance_fixture, command_create_round)
 {
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
-	auto result = data_writer->create_round();
+	auto result = data_writer->create_round("end_datetime");
 	EXPECT_TRUE(result);
 
 	// cleanup db

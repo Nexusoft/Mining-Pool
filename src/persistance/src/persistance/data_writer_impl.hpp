@@ -28,7 +28,7 @@ public:
 
     bool create_account(std::string account) override;
     bool add_payment(Payment_data data) override;
-    bool create_round() override;
+    bool create_round(std::string round_end_date_time) override;
     bool update_account(Account_data data) override;
     bool create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
     bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
@@ -58,7 +58,7 @@ public:
 
     bool create_account(std::string account) override;
     bool add_payment(Payment_data data) override;
-    bool create_round() override;
+    bool create_round(std::string round_end_date_time) override;
     bool update_account(Account_data data) override;
     bool create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
     bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
