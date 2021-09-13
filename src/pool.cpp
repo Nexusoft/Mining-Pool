@@ -3,6 +3,7 @@
 #include "network/component.hpp"
 #include "persistance/create_component.hpp"
 #include "config/validator.hpp"
+#include "common/types.hpp"
 #include "api/server.hpp"
 #include "pool_manager.hpp"
 
@@ -103,7 +104,7 @@ namespace nexuspool
 		auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 
 		config_data = data_reader->get_config();
-		std::string const mining_mode{ m_config.get_mining_mode() == config::Mining_mode::HASH ? "HASH" : "PRIME" };
+		std::string const mining_mode{ m_config.get_mining_mode() == common::Mining_mode::HASH ? "HASH" : "PRIME" };
 		if (config_data.m_version.empty())
 		{
 			// No config present

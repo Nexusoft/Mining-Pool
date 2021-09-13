@@ -16,8 +16,6 @@ Round_data convert_to_round_data(Row_sqlite row);
 Payment_data convert_to_payment_data(Row_sqlite row);
 Config_data convert_to_config_data(Row_sqlite row);
 
-std::string get_datetime_string(std::chrono::system_clock::time_point t);
-
 }
 }
 #endif

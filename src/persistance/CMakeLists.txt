@@ -16,4 +16,4 @@ target_include_directories(persistance
     PRIVATE src
 )
 
-target_link_libraries(persistance config sqlite3)
+target_link_libraries(persistance config common sqlite3)

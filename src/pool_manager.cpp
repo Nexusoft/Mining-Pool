@@ -35,7 +35,7 @@ void Pool_manager::start()
 	network::Endpoint wallet_endpoint{ network::Transport_protocol::tcp, m_config.get_wallet_ip(), m_config.get_wallet_port() };
 	network::Endpoint local_endpoint{ network::Transport_protocol::tcp, m_config.get_local_ip(), m_config.get_local_port() };
 	auto local_socket = m_socket_factory->create_socket(local_endpoint);
-	config::Mining_mode mining_mode = m_storage_config_data.m_mining_mode == "HASH" ? config::Mining_mode::HASH : config::Mining_mode::PRIME;
+	common::Mining_mode mining_mode = m_storage_config_data.m_mining_mode == "HASH" ? common::Mining_mode::HASH : common::Mining_mode::PRIME;
 
 	auto self = shared_from_this();
 	// connect to wallet

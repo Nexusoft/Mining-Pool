@@ -17,7 +17,7 @@ namespace config
 		, m_local_listen_port{ 0 }
 		, m_api_listen_port{0}
 		, m_local_ip{"127.0.0.1"}
-		, m_mining_mode{ Mining_mode::HASH}
+		, m_mining_mode{ common::Mining_mode::HASH}
 		, m_pool_config{}
 		, m_persistance_config{}
 		, m_logfile{""}		// no logfile usage, default
@@ -66,11 +66,11 @@ namespace config
 
 		if(mining_mode == "prime")
 		{
-			m_mining_mode = Mining_mode::PRIME;
+			m_mining_mode = common::Mining_mode::PRIME;
 		}
 		else
 		{
-			m_mining_mode = Mining_mode::HASH;
+			m_mining_mode = common::Mining_mode::HASH;
 		}
 
 		m_pool_config.m_address = j.at("pool")["address"];

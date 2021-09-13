@@ -37,6 +37,7 @@ endif()
 
 # add submodules
 add_subdirectory(src/chrono)
+add_subdirectory(src/common)
 add_subdirectory(src/network)
 add_subdirectory(src/config)
 add_subdirectory(src/api)
@@ -58,7 +59,7 @@ add_executable(NexusPool
                 src/timer_manager.cpp 
                 src/pool_manager.cpp
                 src/miner_connection.cpp
-                src/session.cpp)
+                src/session.cpp "src/common/inc/common/utils.hpp")
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 

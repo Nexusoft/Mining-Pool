@@ -3,6 +3,7 @@
 #include "persistance/command/command_factory.hpp"
 #include "persistance/sqlite/command/command_impl.hpp"
 #include "persistance/sqlite/utils.hpp"
+#include "common/utils.hpp"
 #include <array>
 
 namespace nexuspool
@@ -48,7 +49,7 @@ bool Data_writer_impl::create_round()
 bool Data_writer_impl::update_account(Account_data data)
 {
 	m_update_account_cmd->set_params(command::Command_update_account_params{ 
-		get_datetime_string(std::chrono::system_clock::now()),	// take current time as last_active_time
+		common::get_datetime_string(std::chrono::system_clock::now()),	// take current time as last_active_time
 		data.m_connections, 
 		data.m_shares,
 		data.m_hashrate, 

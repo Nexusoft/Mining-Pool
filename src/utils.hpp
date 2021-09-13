@@ -6,7 +6,7 @@
 #include <array>
 #include <cmath>
 #include <optional>
-#include "config/types.hpp"
+#include "common/types.hpp"
 #include "TAO/Ledger/difficulty.h"
 
 namespace nexuspool
@@ -14,7 +14,7 @@ namespace nexuspool
 class Hashrate_helper
 {
 public:
-	Hashrate_helper(config::Mining_mode mining_mode)
+	Hashrate_helper(common::Mining_mode mining_mode)
 		: m_mining_mode{ mining_mode }
 		, m_t1{ std::chrono::steady_clock::now() }
 		, m_t2{ std::chrono::steady_clock::now() }
@@ -60,13 +60,13 @@ private:
 		}
 		average_time = total_time / m_share_timepoints.size();
 
-		if (m_mining_mode == config::Mining_mode::HASH)
+		if (m_mining_mode == common::Mining_mode::HASH)
 		{
 			m_hashrate = (TAO::Ledger::GetDifficulty(pool_nbits, 2) * std::pow(2, 34)) / average_time.count();
 		}
 	}
 
-	config::Mining_mode m_mining_mode;
+	common::Mining_mode m_mining_mode;
 	std::chrono::steady_clock::time_point m_t1, m_t2;
 	std::array<std::chrono::milliseconds, 5U> m_share_timepoints;
 	std::size_t m_current_timepoint_index;

@@ -1,6 +1,7 @@
 #include "session.hpp"
 #include "miner_connection.hpp"
 #include "LLC/random.h"
+#include "common/types.hpp"
 #include <assert.h>
 
 namespace nexuspool
@@ -11,7 +12,7 @@ Session::Session(persistance::Shared_data_writer::Sptr data_writer)
 	, m_user_data{}
 	, m_miner_connection{}
 	, m_update_time{std::chrono::steady_clock::now()}
-	, m_hashrate_helper{config::Mining_mode::HASH}	// TODO get mining mode from config
+	, m_hashrate_helper{common::Mining_mode::HASH}	// TODO get mining mode from config
 {
 }
 
