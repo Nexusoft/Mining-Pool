@@ -33,6 +33,7 @@ public:
     bool create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
     bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
     bool reset_shares_from_accounts() override;
+    bool add_block(Block_data data) override;
 
 private:
 
@@ -48,6 +49,7 @@ private:
     std::shared_ptr<Command> m_create_config_cmd;
     std::shared_ptr<Command> m_update_config_cmd;
     std::shared_ptr<Command> m_reset_shares_from_accounts_cmd;
+    std::shared_ptr<Command> m_add_block_cmd;
  };
 
 class Shared_data_writer_impl : public Shared_data_writer
@@ -63,6 +65,7 @@ public:
     bool create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
     bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
     bool reset_shares_from_accounts() override;
+    bool add_block(Block_data data) override;
 
 private:
 

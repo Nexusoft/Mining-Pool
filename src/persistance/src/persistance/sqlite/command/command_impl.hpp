@@ -239,6 +239,29 @@ public:
 	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 };
 
+struct Command_add_block_params
+{
+	std::string m_hash;
+	int m_height;
+	std::string m_type;
+	double m_difficulty;
+	int m_orphan;
+	std::string m_block_finder;
+	std::int64_t m_round;
+	double m_mainnet_reward;
+};
+
+class Command_add_block_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_add_block_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::add_block; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
+	void set_params(std::any params) override;
+ };
+
 }
 }
 }

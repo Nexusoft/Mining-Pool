@@ -27,6 +27,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_create_config_cmd = m_command_factory->create_command(Type::create_config);
 	m_update_config_cmd = m_command_factory->create_command(Type::update_config);
 	m_reset_shares_from_accounts_cmd = m_command_factory->create_command(Type::reset_shares_from_accounts);
+	m_add_block_cmd = m_command_factory->create_command(Type::add_block);
 }
 
 bool Data_writer_impl::create_account(std::string account)
@@ -74,6 +75,21 @@ bool Data_writer_impl::reset_shares_from_accounts()
 {
 	return m_data_storage->execute_command(m_reset_shares_from_accounts_cmd);
 }
+
+bool Data_writer_impl::add_block(Block_data data)
+{
+	m_add_block_cmd->set_params(command::Command_add_block_params{
+	std::move(data.m_hash),
+	static_cast<int>(data.m_height),
+	std::move(data.m_type),
+	data.m_difficulty,
+	data.m_orphan,
+	std::move(data.m_block_finder),
+	data.m_round,
+	data.m_mainnet_reward});
+	return m_data_storage->execute_command(m_add_block_cmd);
+}
+
 // --------------------------------------------------------------------------------------
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
@@ -120,6 +136,12 @@ bool Shared_data_writer_impl::reset_shares_from_accounts()
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->reset_shares_from_accounts();
+}
+
+bool Shared_data_writer_impl::add_block(Block_data data)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->add_block(std::move(data));
 }
 
 }

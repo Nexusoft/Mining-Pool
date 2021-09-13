@@ -29,7 +29,6 @@ struct Block_data
 	std::string m_hash;
 	std::uint32_t m_height;
 	std::string m_type;
-	double m_shares;
 	double m_difficulty;
 	bool m_orphan;
 	std::string m_block_finder;
