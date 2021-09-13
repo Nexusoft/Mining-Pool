@@ -165,6 +165,7 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
     {
         m_logger->info("Block Accepted By Nexus Network.");
         //m_stats_collector->block_accepted();
+        // store block into DB
     }
     else if (packet.m_header == Packet::REJECT)
     {

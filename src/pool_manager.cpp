@@ -121,7 +121,8 @@ void Pool_manager::submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit
 		break;
 	case reward::Difficulty_result::block_found:
 		// submit the block to wallet
-		// m_wallet_connection->submit_block(block_data, nonce, std::move(handler));
+	//	m_wallet_connection->submit_block(block_data, nonce);
+		handler(Submit_block_result::block_found);	// miner will get his share even if the block would get rejected
 		break;
 	case reward::Difficulty_result::reject:
 		handler(Submit_block_result::reject);
