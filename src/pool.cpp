@@ -108,13 +108,14 @@ namespace nexuspool
 		if (config_data.m_version.empty())
 		{
 			// No config present
-			data_writer->create_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider);
+			data_writer->create_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider, m_config.get_pool_config().m_round_duration_hours);
 		}
 		else
 		{
 			if (mining_mode != config_data.m_mining_mode &&
 				m_config.get_pool_config().m_fee != config_data.m_fee &&
-				m_config.get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider)
+				m_config.get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider &&
+				m_config.get_pool_config().m_round_duration_hours != config_data.m_round_duration_hours)
 			{
 				// update config but only if there is no round active
 				auto const round_data = data_reader->get_latest_round();
@@ -124,7 +125,7 @@ namespace nexuspool
 				}
 				else
 				{
-					data_writer->update_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider);
+					data_writer->update_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider, m_config.get_pool_config().m_round_duration_hours);
 				}
 			}
 		}

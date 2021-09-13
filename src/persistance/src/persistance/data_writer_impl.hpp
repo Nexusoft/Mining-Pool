@@ -30,8 +30,8 @@ public:
     bool add_payment(Payment_data data) override;
     bool create_round() override;
     bool update_account(Account_data data) override;
-    bool create_config(std::string mining_mode, int fee, int difficulty_divider) override;
-    bool update_config(std::string mining_mode, int fee, int difficulty_divider) override;
+    bool create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
+    bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
     bool reset_shares_from_accounts() override;
 
 private:
@@ -60,8 +60,8 @@ public:
     bool add_payment(Payment_data data) override;
     bool create_round() override;
     bool update_account(Account_data data) override;
-    bool create_config(std::string mining_mode, int fee, int difficulty_divider) override;
-    bool update_config(std::string mining_mode, int fee, int difficulty_divider) override;
+    bool create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
+    bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) override;
     bool reset_shares_from_accounts() override;
 
 private:

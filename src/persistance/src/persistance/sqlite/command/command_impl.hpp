@@ -203,6 +203,7 @@ struct Command_config_params
 	int m_difficulty_divider;
 	int m_fee;
 	std::string m_mining_mode;
+	int m_round_duration_hours;
 };
 
 class Command_create_config_impl : public Command_base_database_sqlite

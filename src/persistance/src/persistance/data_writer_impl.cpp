@@ -57,15 +57,15 @@ bool Data_writer_impl::update_account(Account_data data)
 	return m_data_storage->execute_command(m_update_account_cmd);
 }
 
-bool Data_writer_impl::create_config(std::string mining_mode, int fee, int difficulty_divider)
+bool Data_writer_impl::create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours)
 {
-	m_create_config_cmd->set_params(command::Command_config_params{fee, difficulty_divider, std::move(mining_mode)});
+	m_create_config_cmd->set_params(command::Command_config_params{fee, difficulty_divider, std::move(mining_mode), round_duration_hours });
 	return m_data_storage->execute_command(m_create_config_cmd);
 }
 
-bool Data_writer_impl::update_config(std::string mining_mode, int fee, int difficulty_divider)
+bool Data_writer_impl::update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours)
 {
-	m_update_config_cmd->set_params(command::Command_config_params{ fee, difficulty_divider, std::move(mining_mode) });
+	m_update_config_cmd->set_params(command::Command_config_params{ fee, difficulty_divider, std::move(mining_mode), round_duration_hours });
 	return m_data_storage->execute_command(m_update_config_cmd);
 }
 
@@ -103,16 +103,16 @@ bool Shared_data_writer_impl::update_account(Account_data data)
 	return m_data_writer->update_account(std::move(data));
 }
 
-bool Shared_data_writer_impl::create_config(std::string mining_mode, int fee, int difficulty_divider)
+bool Shared_data_writer_impl::create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours)
 {
 	std::scoped_lock lock(m_writer_mutex);
-	return m_data_writer->create_config(std::move(mining_mode), fee, difficulty_divider);
+	return m_data_writer->create_config(std::move(mining_mode), fee, difficulty_divider, round_duration_hours);
 }
 
-bool Shared_data_writer_impl::update_config(std::string mining_mode, int fee, int difficulty_divider)
+bool Shared_data_writer_impl::update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours)
 {
 	std::scoped_lock lock(m_writer_mutex);
-	return m_data_writer->update_config(std::move(mining_mode), fee, difficulty_divider);
+	return m_data_writer->update_config(std::move(mining_mode), fee, difficulty_divider, round_duration_hours);
 }
 
 bool Shared_data_writer_impl::reset_shares_from_accounts()

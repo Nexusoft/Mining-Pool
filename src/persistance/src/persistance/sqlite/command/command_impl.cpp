@@ -337,8 +337,8 @@ Command_create_config_impl::Command_create_config_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string create_config{ R"(INSERT INTO config 
-		(version, difficulty_divider, fee, mining_mode) 
-		VALUES('1.0', :difficulty_divider, :fee, :mining_mode))" };
+		(version, difficulty_divider, fee, mining_mode, round_duration_hours) 
+		VALUES('1.0', :difficulty_divider, :fee, :mining_mode, :round_duration_hours))" };
 
 	if (sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
 	{
@@ -353,6 +353,7 @@ void Command_create_config_impl::set_params(std::any params)
 	bind_param(m_stmt, ":difficulty_divider", casted_params.m_difficulty_divider);
 	bind_param(m_stmt, ":fee", casted_params.m_fee);
 	bind_param(m_stmt, ":mining_mode", casted_params.m_mining_mode);
+	bind_param(m_stmt, ":round_duration_hours", casted_params.m_round_duration_hours);
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -360,7 +361,7 @@ Command_update_config_impl::Command_update_config_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string create_config{ R"(UPDATE config SET 
-			difficulty_divider = :difficulty_divider, fee = :fee, mining_mode = :mining_mode)" };
+			difficulty_divider = :difficulty_divider, fee = :fee, mining_mode = :mining_mode, round_duration_hours = :round_duration_hours)" };
 
 	sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL);
 }
@@ -372,6 +373,7 @@ void Command_update_config_impl::set_params(std::any params)
 	bind_param(m_stmt, ":difficulty_divider", casted_params.m_difficulty_divider);
 	bind_param(m_stmt, ":fee", casted_params.m_fee);
 	bind_param(m_stmt, ":mining_mode", casted_params.m_mining_mode);
+	bind_param(m_stmt, ":round_duration_hours", casted_params.m_round_duration_hours);
 }
 // -----------------------------------------------------------------------------------------------
 Command_reset_shares_from_accounts_impl::Command_reset_shares_from_accounts_impl(sqlite3* handle)

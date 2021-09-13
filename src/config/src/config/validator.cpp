@@ -102,7 +102,18 @@ bool Validator::check(std::string const& config_file)
             {
                 m_mandatory_fields.push_back(Validator_error{ "pool/difficulty_divider", "Not a number" });
             }
-        }        
+        }       
+        if (j.count("pool")["round_duration_hours"] == 0)
+        {
+            m_mandatory_fields.push_back(Validator_error{ "pool/round_duration_hours", "" });
+        }
+        else
+        {
+            if (!j.at("pool")["round_duration_hours"].is_number())
+            {
+                m_mandatory_fields.push_back(Validator_error{ "pool/round_duration_hours", "Not a number" });
+            }
+        }
 
         // persistance config
         if (j.count("persistance")["type"] == 0)

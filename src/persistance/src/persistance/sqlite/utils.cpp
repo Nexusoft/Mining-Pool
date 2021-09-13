@@ -73,20 +73,16 @@ Payment_data convert_to_payment_data(Row_sqlite row)
 
 Config_data convert_to_config_data(Row_sqlite row)
 {
-	assert(row.size() == 4U);
+	assert(row.size() == 5U);
 	Config_data result{};
 
 	result.m_version = std::get<std::string>(row[0].m_data);
 	result.m_fee = std::get<int>(row[1].m_data);
 	result.m_difficulty_divider = std::get<int>(row[2].m_data);
 	result.m_mining_mode = std::get<std::string>(row[3].m_data);
+	result.m_round_duration_hours = std::get<int>(row[4].m_data);
 
 	return result;
-}
-
-std::string get_datetime_string(std::chrono::system_clock::time_point t)
-{
-	return date::format("%F %T", t);	// %F = Equivalent to %Y-%m-%d  %T = Equivalent to %H:%M:%S
 }
 
 }

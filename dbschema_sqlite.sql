@@ -63,5 +63,6 @@ CREATE TABLE IF NOT EXISTS config (
   version TEXT NOT NULL,
   difficulty_divider INTEGER NOT NULL,
   fee INTEGER NOT NULL,
-  mining_mode TEXT NOT NULL
+  mining_mode TEXT NOT NULL,
+  round_duration_hours INTEGER NOT NULL
 );

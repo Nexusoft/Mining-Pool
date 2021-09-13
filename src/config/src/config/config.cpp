@@ -77,6 +77,7 @@ namespace config
 		m_pool_config.m_fee = j.at("pool")["fee"];
 		m_pool_config.m_min_share = j.at("pool")["min_share"];
 		m_pool_config.m_difficulty_divider = j.at("pool")["difficulty_divider"];
+		m_pool_config.m_round_duration_hours = j.at("pool")["round_duration_hours"];
 
 		auto persistance_type = j.at("persistance")["type"];
 		m_persistance_config.m_file = j.at("persistance")["file"];
