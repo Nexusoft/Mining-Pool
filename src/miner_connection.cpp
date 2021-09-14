@@ -135,11 +135,14 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 			m_pool_nbits = pool_manager_shared->get_pool_nbits();
 			pool_manager_shared->get_block([self = shared_from_this()](auto block)
 			{
+				auto session = self->m_session_registry.get_session(self->m_session_key);
+				session->set_block(block);
+
 				//prepend pool nbits to the packet
 				auto pool_nbits_bytes = nexuspool::uint2bytes(self->m_pool_nbits);
 				Packet response;
 				response.m_header = Packet::BLOCK_DATA;
-				auto block_data = block.Serialize();
+				auto block_data = block.serialize();
 				block_data.insert(block_data.begin(), pool_nbits_bytes.begin(), pool_nbits_bytes.end());
 				response.m_length = block_data.size();
 				response.m_data = std::make_shared<network::Payload>(block_data);
@@ -151,15 +154,28 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 	//miner has submitted a block to the pool
 	else if (packet.m_header == Packet::SUBMIT_BLOCK)
 	{
+		if (packet.m_length != 72)
+		{
+			m_logger->error("Invalid paket length for submit_block received! Received {} bytes", packet.m_length);
+			return; // exit early
+		}
 		auto pool_manager_shared = m_pool_manager.lock();
 		if (pool_manager_shared)
 		{
 			
 			std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };			
 			std::uint64_t nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
-			auto block = LLP::deserialize_block(block_data);
+			auto block = session->get_block();
+			if (!block)
+			{
+				m_logger->error("Miner has no block in current session set.");
+				return; // exit early
+			}
+
+			//TODO compare block merkle_root with received merkle_root (block_data)
+
 			//update hashrate
-			pool_manager_shared->submit_block(std::move(block), nonce, [self = shared_from_this()](auto result)
+			pool_manager_shared->submit_block(std::move(block), block_data, nonce, [self = shared_from_this()](auto result)
 			{
 				Packet response;
 				if (result == Submit_block_result::accept)

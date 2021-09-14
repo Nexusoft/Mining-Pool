@@ -13,6 +13,7 @@ Session::Session(persistance::Shared_data_writer::Sptr data_writer)
 	, m_miner_connection{}
 	, m_update_time{std::chrono::steady_clock::now()}
 	, m_hashrate_helper{common::Mining_mode::HASH}	// TODO get mining mode from config
+	, m_block{}
 {
 }
 

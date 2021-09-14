@@ -46,7 +46,7 @@ public:
     // Methods towards miner_connection
 
     void get_block(Get_block_handler&& handler);
-    void submit_block(LLP::CBlock&& block, std::uint64_t nonce, Submit_block_handler handler);
+    void submit_block(std::unique_ptr<LLP::CBlock> block, std::vector<std::uint8_t> const& block_merkle_root, std::uint64_t nonce, Submit_block_handler handler);
 
     std::uint32_t get_pool_nbits() const;
     void set_pool_nbits(std::uint32_t nbits);

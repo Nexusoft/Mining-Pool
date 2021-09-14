@@ -11,6 +11,7 @@
 #include "persistance/data_reader.hpp"
 #include "persistance/types.hpp"
 #include "utils.hpp"
+#include "block.hpp"
 
 namespace nexuspool
 {
@@ -40,6 +41,8 @@ public:
 	void set_update_time(std::chrono::steady_clock::time_point update_time) { m_update_time = update_time; }
 	bool add_share(std::uint32_t pool_nbits);
 	double get_hashrate() const;
+	void set_block(LLP::CBlock const& block) { m_block = std::make_unique<LLP::CBlock>(block); }
+	std::unique_ptr<LLP::CBlock> get_block() { return std::move(m_block); }
 
 	bool create_account();
 
@@ -51,6 +54,7 @@ private:
 	std::chrono::steady_clock::time_point m_update_time;
 	std::uint32_t m_shares_in_session{ 0U };	// submitted shares since login
 	Hashrate_helper m_hashrate_helper;
+	std::unique_ptr<LLP::CBlock> m_block;
 };
 
 // Manages all sessions
