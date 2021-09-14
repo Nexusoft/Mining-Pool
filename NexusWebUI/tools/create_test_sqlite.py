@@ -20,10 +20,16 @@ def create_db_and_connect(full_path):
 
 
 def create_table_structure_from_schema(connection):
+    schema_file_path = None
+    # Todo move to config
+    schema_file_name = 'dbschema_sqlite.sql'
 
-    schema_file_path = os.path.join('../..', 'dbschema_sqlite.sql')
-
-    print(f"Trying to open Schema File: {schema_file_path}")
+    if os.path.isfile(schema_file_name):
+        print(f"Trying to open Schema File: {schema_file_path}")
+        schema_file_path = schema_file_name
+    else:
+        print(f"Trying to open Schema File: {schema_file_path}")
+        schema_file_path = os.path.join('../..', schema_file_name)
 
     try:
         with open(schema_file_path) as fp:
