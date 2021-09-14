@@ -25,11 +25,11 @@ def create_table_structure_from_schema(connection):
     schema_file_name = 'dbschema_sqlite.sql'
 
     if os.path.isfile(schema_file_name):
-        print(f"Trying to open Schema File: {schema_file_path}")
         schema_file_path = schema_file_name
+        print(f"Trying to open Schema File in local Dir: {schema_file_path}")
     else:
-        print(f"Trying to open Schema File: {schema_file_path}")
         schema_file_path = os.path.join('../..', schema_file_name)
+        print(f"Trying to open Schema File: {schema_file_path}")
 
     try:
         with open(schema_file_path) as fp:
