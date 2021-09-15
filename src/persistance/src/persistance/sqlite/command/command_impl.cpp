@@ -256,6 +256,34 @@ std::any Command_get_active_accounts_from_round_impl::get_command() const
 }
 
 // -----------------------------------------------------------------------------------------------
+Command_get_blocks_from_round_impl::Command_get_blocks_from_round_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT hash, height, type, difficulty, orphan, block_finder, round, block_found_time, mainnet_reward FROM block WHERE round = :round;", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_blocks_from_round_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt},
+		{{Column_sqlite::string},
+		{Column_sqlite::int32},
+		{Column_sqlite::string},
+		{Column_sqlite::double_t},
+		{Column_sqlite::int32},
+		{Column_sqlite::string},
+		{Column_sqlite::int32},
+		{Column_sqlite::string},
+		{Column_sqlite::double_t}} };
+	return command;
+}
+
+void Command_get_blocks_from_round_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<std::int64_t>(m_params);
+	bind_param(m_stmt, ":round", casted_params);
+}
+// -----------------------------------------------------------------------------------------------
 // Write commands
 // -----------------------------------------------------------------------------------------------
 

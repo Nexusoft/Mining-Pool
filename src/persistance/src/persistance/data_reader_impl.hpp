@@ -34,6 +34,7 @@ public:
     std::vector<Payment_data> get_payments(std::string account) override;
     Config_data get_config() override;
     std::vector<Account_data_for_payment> get_active_accounts_from_round() override;
+    std::vector<Block_data> get_blocks_from_round(std::uint32_t round) override;
 
 private:
 
@@ -51,6 +52,7 @@ private:
     std::shared_ptr<Command> m_get_payments_cmd;
     std::shared_ptr<Command> m_get_config_cmd;
     std::shared_ptr<Command> m_get_active_accounts_from_round_cmd;
+    std::shared_ptr<Command> m_get_blocks_from_round_cmd;
 };
 
 }

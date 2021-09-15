@@ -28,6 +28,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_payments_cmd = m_command_factory->create_command(Type::get_payments);
 	m_get_config_cmd = m_command_factory->create_command(Type::get_config);
 	m_get_active_accounts_from_round_cmd = m_command_factory->create_command(Type::get_active_accounts_from_round);
+	m_get_blocks_from_round_cmd = m_command_factory->create_command(Type::get_blocks_from_round);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -170,6 +171,24 @@ std::vector<Account_data_for_payment> Data_reader_impl::get_active_accounts_from
 	}
 
 	return accounts_data;
+}
+
+std::vector<Block_data> Data_reader_impl::get_blocks_from_round(std::uint32_t round)
+{
+	std::vector<Block_data> blocks{};
+	m_get_blocks_from_round_cmd->set_params(round);
+	if (!m_data_storage->execute_command(m_get_blocks_from_round_cmd))
+	{
+		return blocks;	// return empty result
+	}
+
+	auto result = std::any_cast<Result_sqlite>(m_get_blocks_from_round_cmd->get_result());
+	for (auto& row : result.m_rows)
+	{
+		blocks.push_back(convert_to_block_data(std::move(row)));
+	}
+
+	return blocks;
 }
 
 
