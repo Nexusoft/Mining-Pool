@@ -28,6 +28,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_update_config_cmd = m_command_factory->create_command(Type::update_config);
 	m_reset_shares_from_accounts_cmd = m_command_factory->create_command(Type::reset_shares_from_accounts);
 	m_add_block_cmd = m_command_factory->create_command(Type::add_block);
+	m_update_block_rewards_cmd = m_command_factory->create_command(Type::update_block_rewards);
 }
 
 bool Data_writer_impl::create_account(std::string account)
@@ -90,6 +91,15 @@ bool Data_writer_impl::add_block(Block_data data)
 	return m_data_storage->execute_command(m_add_block_cmd);
 }
 
+bool Data_writer_impl::update_block_rewards(std::string hash, bool orphan, double reward)
+{
+	m_update_block_rewards_cmd->set_params(command::Command_update_block_reward_params{
+	orphan,
+	reward,
+	std::move(hash)});
+	return m_data_storage->execute_command(m_update_block_rewards_cmd);
+}
+
 // --------------------------------------------------------------------------------------
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
@@ -142,6 +152,12 @@ bool Shared_data_writer_impl::add_block(Block_data data)
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->add_block(std::move(data));
+}
+
+bool Shared_data_writer_impl::update_block_rewards(std::string hash, bool orphan, double reward)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->update_block_rewards(std::move(hash), orphan, reward);
 }
 
 }

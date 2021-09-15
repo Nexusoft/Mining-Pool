@@ -35,7 +35,8 @@ enum class Type : std::uint8_t
 	get_config,
 	update_config,
 	reset_shares_from_accounts,
-	add_block
+	add_block,
+	update_block_rewards
 
 };
 

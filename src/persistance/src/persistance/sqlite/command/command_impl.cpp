@@ -417,7 +417,27 @@ void Command_add_block_impl::set_params(std::any params)
 	bind_param(m_stmt, ":round", casted_params.m_round);
 	bind_param(m_stmt, ":mainnet_reward", casted_params.m_mainnet_reward);
 }
+// -----------------------------------------------------------------------------------------------
+Command_update_block_rewards_impl::Command_update_block_rewards_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string update_block_rewards{ R"(UPDATE block SET 
+			orphan = :orphan, mainnet_reward = :mainnet_reward WHERE hash = :hash)" };
 
+	if (sqlite3_prepare_v2(m_handle, update_block_rewards.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
+	{
+		std::cout << sqlite3_errmsg(m_handle) << std::endl;
+	}
+}
+
+void Command_update_block_rewards_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_update_block_reward_params>(m_params);
+	bind_param(m_stmt, ":orphan", casted_params.m_orphan);
+	bind_param(m_stmt, ":mainnet_reward", casted_params.m_mainnet_reward);
+	bind_param(m_stmt, ":hash", casted_params.m_hash);
+}
 }
 }
 }

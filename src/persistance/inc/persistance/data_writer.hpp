@@ -26,6 +26,7 @@ public:
     virtual bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) = 0;
     virtual bool reset_shares_from_accounts() = 0;
     virtual bool add_block(Block_data data) = 0;
+    virtual bool update_block_rewards(std::string hash, bool orphan, double reward) = 0;
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -45,6 +46,7 @@ public:
     virtual bool update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours) = 0;
     virtual bool reset_shares_from_accounts() = 0;
     virtual bool add_block(Block_data data) = 0;
+    virtual bool update_block_rewards(std::string hash, bool orphan, double reward) = 0;
 };
 }
 }
