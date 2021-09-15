@@ -8,6 +8,7 @@ namespace nexuspool {
 namespace common {
 
 std::string get_datetime_string(std::chrono::system_clock::time_point t);
+std::string get_datetime_string(std::uint32_t t);
 
 std::chrono::system_clock::time_point get_timepoint_from_string(std::string const& date, std::string const& format);
 
