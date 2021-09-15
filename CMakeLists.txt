@@ -35,6 +35,8 @@ if(WIN32)
     add_definitions(-D_WIN32_WINT=0x0601 -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
+add_subdirectory(oatpp-1.2.5)
+
 # add submodules
 add_subdirectory(src/chrono)
 add_subdirectory(src/common)
@@ -59,7 +61,7 @@ add_executable(NexusPool
                 src/timer_manager.cpp 
                 src/pool_manager.cpp
                 src/miner_connection.cpp
-                src/session.cpp "src/common/inc/common/utils.hpp")
+                src/session.cpp)
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 

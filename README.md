@@ -5,7 +5,7 @@ Pool for Nexus Hash and Prime channel
 
 ## Wallet Setup
 
-Ensure you are on latest wallet daemon release 5.0.x or greater. Ensure wallet has been unlocked for mining.
+Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet has been unlocked for mining.
 
 ```
     -llpallowip=<ip-port>   ex: -llpallowip=192.168.0.1:9325 
@@ -21,7 +21,7 @@ Ensure you are on latest wallet daemon release 5.0.x or greater. Ensure wallet h
 ```
     <pool_config_file> Default=pool.conf
     -c --check          run config file check before miner startup
-    -v --version        Show NexusMiner version
+    -v --version        Show NexusPool version
 ```
 
   ./NexusPool ../../myownpool.conf -c

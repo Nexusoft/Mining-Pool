@@ -8,9 +8,6 @@ TEST(Nexus_http_interface, initialisation)
 {
 	auto nexus_http_interface_component = nexus_http_interface::create_component();
 	EXPECT_TRUE(nexus_http_interface_component);
-
-	auto nexus_http_interface_manager = nexus_http_interface_component->create_nexus_http_interface_manager();
-	EXPECT_TRUE(nexus_http_interface_manager);
 }
 
 TEST_F(Nexus_http_interface_fixture, connection_test)
