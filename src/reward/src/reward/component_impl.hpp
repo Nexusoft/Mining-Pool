@@ -16,6 +16,7 @@ public:
 
     bool start_round(std::uint16_t round_duration_hours) override;
     bool is_round_active() override;
+    std::uint32_t get_current_round() const;
     bool end_round(std::uint32_t round_number) override;
     Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const override;
     void pay_all() const override;
@@ -25,6 +26,7 @@ private:
     std::shared_ptr<spdlog::logger> m_logger;
     persistance::Shared_data_writer::Sptr m_shared_data_writer;
     persistance::Data_reader::Uptr m_data_reader;
+    std::uint32_t m_current_round;
 
 };
 

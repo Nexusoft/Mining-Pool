@@ -9,6 +9,7 @@ Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, persistan
     : m_logger{std::move(logger)}
     , m_shared_data_writer{ std::move(shared_data_writer) }
     , m_data_reader{ std::move(data_reader) }
+	, m_current_round{0}
 {}
 
 bool Component_impl::start_round(std::uint16_t round_duration_hours)
@@ -22,13 +23,26 @@ bool Component_impl::start_round(std::uint16_t round_duration_hours)
         m_logger->error("Failed to create a new round!");
 		return false;
     }
+	auto const round_data = m_data_reader->get_latest_round();
+	m_current_round = round_data.m_round;
+
 	return true;
 }
 
 bool Component_impl::is_round_active()
 {
 	auto const round_data = m_data_reader->get_latest_round();
-	return round_data.m_is_active;
+	if (round_data.m_is_active)
+	{
+		m_current_round = round_data.m_round;
+		return true;
+	}
+	return false;
+}
+
+std::uint32_t Component_impl::get_current_round() const
+{
+	return m_current_round;
 }
 
 bool Component_impl::end_round(std::uint32_t round_number)
@@ -61,6 +75,7 @@ bool Component_impl::end_round(std::uint32_t round_number)
 
     // reset shares of all accounts (round end)
     m_shared_data_writer->reset_shares_from_accounts();
+	m_current_round = 0;
 
 
 

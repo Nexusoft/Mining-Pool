@@ -20,6 +20,7 @@ public:
     virtual bool start_round(std::uint16_t round_duration_hours) = 0;
 
     virtual bool is_round_active() = 0;
+    virtual std::uint32_t get_current_round() const = 0;
 
     // End round
     virtual bool end_round(std::uint32_t round_number) = 0;

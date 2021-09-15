@@ -42,14 +42,12 @@ public:
     // Methods towards wallet_connection
     void set_current_height(std::uint32_t height);
     void set_block(LLP::CBlock const& block);
+    void add_block_to_storage(LLP::CBlock const& block);
 
     // Methods towards miner_connection
-
     void get_block(Get_block_handler&& handler);
     void submit_block(std::unique_ptr<LLP::CBlock> block, std::vector<std::uint8_t> const& block_merkle_root, std::uint64_t nonce, Submit_block_handler handler);
-
     std::uint32_t get_pool_nbits() const;
-    void set_pool_nbits(std::uint32_t nbits);
 
 private:
 

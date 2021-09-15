@@ -3,6 +3,7 @@
 #include "miner_connection.hpp"
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
+#include "TAO/Ledger/difficulty.h"
 
 namespace nexuspool
 {
@@ -103,6 +104,27 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 	std::scoped_lock(m_block_mutex);
 	m_block = block;
 
+//pool nbits determines the difficulty for the pool.  
+//For the hash channel, we set the difficulty to be a divided down version of the main net difficulty
+	uint1024_t target, pool_target;
+	target.SetCompact(m_block.nBits);
+	pool_target = target >> m_storage_config_data.m_difficulty_divider;
+	m_pool_nBits = pool_target.GetCompact();
+
+}
+
+void Pool_manager::add_block_to_storage(LLP::CBlock const& block)
+{
+	auto data_writer = m_data_writer_factory->create_shared_data_writer();
+	persistance::Block_data block_data;
+	block_data.m_hash = block.GetHash().ToString();
+	block_data.m_height = block.nHeight;
+	block_data.m_type = block.nChannel == 1 ? "prime" : "hash";
+	block_data.m_orphan = 0;
+	//block_data.m_mainnet_reward = block.
+	block_data.m_difficulty = TAO::Ledger::GetDifficulty(block.nBits, block.nChannel);
+	block_data.m_round = m_reward_component->get_current_round();
+	data_writer->add_block(std::move(block_data));
 }
 
 void Pool_manager::get_block(Get_block_handler&& handler)
@@ -132,17 +154,8 @@ void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, std::vector<
 
 std::uint32_t Pool_manager::get_pool_nbits() const
 {
+	std::scoped_lock(m_block_mutex);
 	return m_pool_nBits;
-}
-
-//pool nbits determines the difficulty for the pool.  
-//For the hash channel, we set the difficulty to be a divided down version of the main net difficulty
-void Pool_manager::set_pool_nbits(std::uint32_t nbits)
-{
-	uint1024_t target, pool_target;
-	target.SetCompact(nbits);
-	pool_target = target >> m_storage_config_data.m_difficulty_divider;
-	m_pool_nBits = pool_target.GetCompact();
 }
 
 chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
