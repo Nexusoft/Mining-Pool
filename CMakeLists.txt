@@ -65,6 +65,6 @@ add_executable(NexusPool
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
-target_link_libraries(NexusPool chrono network config LLP TAO api persistance reward nexus_http_interface)
+target_link_libraries(NexusPool chrono network config LLP TAO api persistance reward)
 
 target_link_libraries(NexusPool Threads::Threads)

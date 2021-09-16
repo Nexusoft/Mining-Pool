@@ -121,7 +121,6 @@ void Pool_manager::add_block_to_storage(LLP::CBlock const& block)
 	block_data.m_height = block.nHeight;
 	block_data.m_type = block.nChannel == 1 ? "prime" : "hash";
 	block_data.m_orphan = 0;
-	//block_data.m_mainnet_reward = block.
 	block_data.m_difficulty = TAO::Ledger::GetDifficulty(block.nBits, block.nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));

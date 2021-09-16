@@ -14,7 +14,7 @@ class Component_impl : public Component
 public:
     Component_impl(std::shared_ptr<spdlog::logger> logger, std::string wallet_ip);
 
-    bool get_block(std::string hash) override;
+    bool get_block_reward_data(std::string hash, common::Block_reward_data& reward_data) override;
 
 private:
 

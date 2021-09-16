@@ -3,6 +3,7 @@
 #include "oatpp/web/client/HttpRequestExecutor.hpp"
 #include "oatpp/network/tcp/client/ConnectionProvider.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include <json/json.hpp>
 
 namespace nexuspool {
 namespace nexus_http_interface {
@@ -23,9 +24,9 @@ Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, std::stri
 	m_client = Api_client::createShared(requestExecutor, objectMapper);
 }
 
-bool Component_impl::get_block(std::string hash)
+bool Component_impl::get_block_reward_data(std::string hash, common::Block_reward_data& reward_data)
 {
-	std::string parameter{ "?hash=" };
+	std::string parameter{ "?verbose=summary&hash=" };
 	parameter += hash;
 	auto response = m_client->get_block(parameter.c_str());
 	auto const status_code = response->getStatusCode();
@@ -34,8 +35,14 @@ bool Component_impl::get_block(std::string hash)
 		return false;
 	}
 
-	auto data = response->readBodyToString();
-	m_logger->info("[get_block] data={}", data->c_str());
+	auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str() );
+
+	// TODO: error handling
+
+	reward_data.m_reward = data_json["result"]["mint"];
+	reward_data.m_timestamp = data_json["result"]["time"];
+	reward_data.m_tx_confirmations = data_json["result"]["tx"][0]["confirmations"];
+	reward_data.m_tx_type = data_json["result"]["tx"][0]["contracts"][0]["OP"];
 }
 
 }

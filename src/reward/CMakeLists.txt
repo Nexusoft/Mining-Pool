@@ -11,4 +11,4 @@ target_include_directories(reward
     PRIVATE src
 )
 
-target_link_libraries(reward LLC LLP persistance)
+target_link_libraries(reward LLC LLP persistance nexus_http_interface)
