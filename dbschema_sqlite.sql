@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS account (
   last_active TEXT,
   connection_count INTEGER,
   shares REAL,
+  shares_last_round REAL,
   hashrate REAL
 );
 

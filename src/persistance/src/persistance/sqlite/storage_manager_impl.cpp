@@ -49,7 +49,6 @@ void Storage_manager_sqlite::start()
 		  block_finder TEXT NOT NULL,
 		  round INTEGER NOT NULL,
 		  block_found_time TEXT NOT NULL,
-		  accepted_by_mainnet INTEGER NOT NULL,
 		  mainnet_reward REAL NOT NULL,
 		  FOREIGN KEY(round) REFERENCES round(round_number),
 		  FOREIGN KEY(block_finder) REFERENCES account(name)
@@ -61,6 +60,7 @@ void Storage_manager_sqlite::start()
 		  last_active TEXT,
 		  connection_count INTEGER,
 		  shares REAL,
+		  shares_last_round REAL,
 		  hashrate REAL
 		);)", NULL, NULL, NULL);
 
@@ -88,7 +88,8 @@ void Storage_manager_sqlite::start()
 		  version TEXT NOT NULL,
 		  difficulty_divider INTEGER NOT NULL,
 		  fee INTEGER NOT NULL,
-		  mining_mode TEXT NOT NULL
+		  mining_mode TEXT NOT NULL,
+		  round_duration_hours INTEGER NOT NULL
 		);)", NULL, NULL, NULL);
 }
 
