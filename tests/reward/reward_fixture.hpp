@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include "block.hpp"
 #include <persistance/create_component.hpp>
+#include <nexus_http_interface/create_component.hpp>
 #include <reward/create_component.hpp>
 #include <config/config.hpp>
 #include <spdlog/spdlog.h>
@@ -27,7 +28,9 @@ public:
 		m_logger->set_level(spdlog::level::debug);
 		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
 
-		m_component = reward::create_component(m_logger, m_persistance_component->get_data_writer_factory()->create_shared_data_writer(),
+		m_component = reward::create_component(m_logger, 
+			nexus_http_interface::create_component(m_logger, m_config.get_wallet_ip()), 
+			m_persistance_component->get_data_writer_factory()->create_shared_data_writer(),
 			m_persistance_component->get_data_reader_factory()->create_data_reader());
 	}
 

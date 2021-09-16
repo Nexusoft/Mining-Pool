@@ -3,6 +3,7 @@
 #include "miner_connection.hpp"
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
+#include "nexus_http_interface/create_component.hpp"
 #include "TAO/Ledger/difficulty.h"
 
 namespace nexuspool
@@ -23,7 +24,8 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
-	, m_reward_component{reward::create_component(m_logger, m_data_writer_factory->create_shared_data_writer(), m_data_reader_factory->create_data_reader())}
+	, m_reward_component{reward::create_component(m_logger, 
+		nexus_http_interface::create_component(m_logger, m_config.get_wallet_ip()), m_data_writer_factory->create_shared_data_writer(), m_data_reader_factory->create_data_reader())}
 	, m_listen_socket{}
 	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config.get_session_expiry_time()}
 	, m_current_height{0}
@@ -115,15 +117,18 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 
 void Pool_manager::add_block_to_storage(LLP::CBlock const& block)
 {
+	auto const block_hash = block.GetHash().ToString();
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
 	persistance::Block_data block_data;
-	block_data.m_hash = block.GetHash().ToString();
+	block_data.m_hash = block_hash;
 	block_data.m_height = block.nHeight;
 	block_data.m_type = block.nChannel == 1 ? "prime" : "hash";
 	block_data.m_orphan = 0;
 	block_data.m_difficulty = TAO::Ledger::GetDifficulty(block.nBits, block.nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
+
+	m_reward_component->add_block(block_hash);
 }
 
 void Pool_manager::get_block(Get_block_handler&& handler)

@@ -5,11 +5,17 @@
 namespace nexuspool {
 namespace reward {
 
-Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, persistance::Shared_data_writer::Sptr shared_data_writer, persistance::Data_reader::Uptr data_reader)
+Component_impl::Component_impl(
+	std::shared_ptr<spdlog::logger> logger, 
+	nexus_http_interface::Component::Uptr http_interface,
+	persistance::Shared_data_writer::Sptr shared_data_writer, 
+	persistance::Data_reader::Uptr data_reader)
     : m_logger{std::move(logger)}
+	, m_http_interface{std::move(http_interface)}
     , m_shared_data_writer{ std::move(shared_data_writer) }
     , m_data_reader{ std::move(data_reader) }
 	, m_current_round{0}
+	, m_possible_found_blocks{}
 {}
 
 bool Component_impl::start_round(std::uint16_t round_duration_hours)
@@ -146,6 +152,11 @@ void Component_impl::pay_all() const
 	*/
 
 
+}
+
+void Component_impl::add_block(std::string hash)
+{
+	m_possible_found_blocks.push_back(std::move(hash));
 }
 
 }

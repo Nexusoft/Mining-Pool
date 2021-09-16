@@ -6,7 +6,7 @@ using namespace ::nexuspool;
 
 TEST(Reward, initialisation)
 {
-	auto reward_component = reward::create_component(nullptr, nullptr, nullptr);
+	auto reward_component = reward::create_component(nullptr, nullptr, nullptr, nullptr);
 	EXPECT_TRUE(reward_component);
 }
 
