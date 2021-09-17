@@ -5,6 +5,7 @@
 #include "nexus_http_interface/component.hpp"
 #include "persistance/data_writer.hpp"
 #include "persistance/data_reader.hpp"
+#include "reward/payout_manager.hpp"
 #include <spdlog/spdlog.h>
 #include <vector>
 
@@ -25,7 +26,7 @@ public:
     std::uint32_t get_current_round() const;
     bool end_round(std::uint32_t round_number) override;
     Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const override;
-    void pay_all() const override;
+    void pay_all() override;
     void add_block(std::string hash) override;
 
 private:
@@ -36,6 +37,7 @@ private:
     persistance::Data_reader::Uptr m_data_reader;
     std::uint32_t m_current_round;
     std::vector<std::string> m_possible_found_blocks;
+    Payout_manager m_payout_manager;
 
 };
 

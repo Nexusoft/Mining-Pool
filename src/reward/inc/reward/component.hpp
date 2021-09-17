@@ -29,7 +29,7 @@ public:
 
     virtual Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const = 0;
     //pay all miners with unpaid shares.
-    virtual void pay_all() const = 0;
+    virtual void pay_all() = 0;
 
     // adds the block hash to a list of possible accepted blocks by mainnet (possible because they still can be orphaned)
     virtual void add_block(std::string hash) = 0;

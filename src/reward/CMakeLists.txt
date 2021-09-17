@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.19)
 
 add_library(reward STATIC 
                           src/reward/create_component.cpp 
-                          src/reward/component_impl.cpp)
+                          src/reward/component_impl.cpp 
+                          src/reward/payout_manager.cpp)
                     
 target_include_directories(reward
     PUBLIC 
