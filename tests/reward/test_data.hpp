@@ -1,0 +1,98 @@
+#ifndef TESTS_REWARD_TEST_DATA_HPP
+#define TESTS_REWARD_TEST_DATA_HPP
+
+#include <string>
+#include <vector>
+#include <cstdio>
+#include <gtest/gtest.h>
+#include "block.hpp"
+#include "persistance/component_mock.hpp"
+#include "persistance/data_reader_factory_mock.hpp"
+#include "persistance/data_writer_factory_mock.hpp"
+#include "persistance/data_reader_mock.hpp"
+#include "persistance/data_writer_mock.hpp"
+
+namespace
+{
+	using namespace ::nexuspool;
+	using namespace ::testing;
+
+class Test_data
+{
+public:
+
+	Test_data()
+	{
+		m_persistance_component_mock = std::make_unique<persistance::Component_mock>();
+		m_data_reader_factory_mock = std::make_shared<persistance::Data_reader_factory_mock>();
+		m_data_writer_factory_mock = std::make_shared<persistance::Data_writer_factory_mock>();
+		m_data_reader_mock = std::make_unique<persistance::Data_reader_mock>();
+		m_shared_data_writer_mock = std::make_shared<persistance::Shared_data_writer_mock>();
+	}
+
+	~Test_data()
+	{
+
+	}
+
+	LLP::CBlock create_test_block()
+	{
+		LLP::CBlock test_block;
+
+		// use a sample Nexus block as a test vector
+		std::uint32_t nHeight = 2023276;
+		std::uint32_t nVersion = 4;
+		std::uint32_t nChannel = 2;
+		std::uint32_t nBits = 0x7b032ed8;
+		std::uint64_t nNonce = 21155560019;
+		std::string merkleStr = "31f5a458fc4207cd30fd1c4f43c26a3140193ed088f75004aa5b07beebf6be905fd49a412294c73850b422437c414429a6160df514b8ec919ea8a2346d3a3025";
+		std::string hashPrevBlockStr = "00000902546301d2a29b00cad593cf05c798469b0e3f39fe623e6762111d6f9eed3a6a18e0e5453e81da8d0db5e89808e68e96c8df13005b714b1e63d7fa44a5025d1370f6f255af2d5121c4f65624489f1b401f651b5bd505002d3a5efc098aa6fa762d270433a51697d7d8d3252d56bbbfbe62f487f258c757690d31e493a7";
+		std::string expectedHashResultStr = "00000000000072d507b3b1cf8829e6e8201cd5288494b53b379e9f33fcaeeec82d1415330bbb4746354db60b3dbb86ed5008d27877ada92194e5d54d3bfb247ede1b0305db3f208e7e4a51a237dcb0ccc342d345ad7221f0bbe30561e517d0adb2190870bd24ab6b17e9dd895383f183eab21d5d045e438ad9c3d004983eed6b";
+		std::uint64_t expectedHashUpper64Bits = 0x72d5;
+
+		test_block.nHeight = nHeight;
+		test_block.nVersion = nVersion;
+		test_block.nChannel = nChannel;
+		test_block.nBits = nBits;
+		test_block.nNonce = nNonce;
+		test_block.hashMerkleRoot.SetHex(merkleStr);
+		test_block.hashPrevBlock.SetHex(hashPrevBlockStr);
+
+		return test_block;
+	}
+
+	std::unique_ptr<persistance::Component_mock> create_persistance_component()
+	{
+		ON_CALL(*m_persistance_component_mock, get_data_writer_factory()).WillByDefault(Return(m_data_writer_factory_mock));
+		ON_CALL(*m_persistance_component_mock, get_data_reader_factory()).WillByDefault(Return(m_data_reader_factory_mock));
+
+		ON_CALL(*m_data_writer_factory_mock, create_shared_data_writer_impl()).WillByDefault(Return(m_shared_data_writer_mock));
+		EXPECT_CALL(*m_data_reader_factory_mock, create_data_reader_impl()).WillOnce(Return(ByMove(std::make_unique<persistance::Data_reader_mock>())));
+
+		return std::move(m_persistance_component_mock);
+	}
+
+
+	std::shared_ptr<persistance::Data_reader_factory_mock> m_data_reader_factory_mock;
+	std::shared_ptr<persistance::Data_writer_factory_mock> m_data_writer_factory_mock;
+	std::unique_ptr<persistance::Data_reader_mock> m_data_reader_mock;
+	std::shared_ptr<persistance::Shared_data_writer_mock> m_shared_data_writer_mock;
+
+	std::uint32_t m_test_current_round{ 3 };
+	persistance::Round_data m_test_round_data{ m_test_current_round, 20, 5, 2, 0, "", "", true, false };
+	std::vector<persistance::Block_data> m_test_blocks_from_round{
+		{ "testblockhash1", 50001, "hash", 351.64, false, "", m_test_current_round, "", 2.546},
+		{ "testblockhash2", 50002, "hash", 352.64, false, "", m_test_current_round, "", 2.546},
+		{ "testblockhash3", 50003, "prime", 8.64, false, "", m_test_current_round, "", 2.546},
+	};
+
+protected:
+
+	std::unique_ptr<persistance::Component_mock> m_persistance_component_mock;
+
+
+
+};
+
+}
+#endif

@@ -13,6 +13,7 @@ namespace persistance {
 
 class Data_writer_factory_mock : public Data_writer_factory
 {
+public:
     MOCK_METHOD(Shared_data_writer_mock::Sptr, create_shared_data_writer_impl, (), (override));
 };
 

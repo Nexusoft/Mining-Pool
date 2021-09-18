@@ -1,18 +1,23 @@
 #include <gtest/gtest.h>
 #include "reward_fixture.hpp"
 
-
 using namespace ::nexuspool;
 
-TEST(Reward, initialisation)
+TEST_F(Reward_fixture, create_component_with_active_round)
 {
-	auto reward_component = reward::create_component(nullptr, nullptr, nullptr, nullptr);
-	EXPECT_TRUE(reward_component);
+	EXPECT_CALL(*m_test_data.m_data_reader_mock, get_latest_round).WillOnce(Return(m_test_data.m_test_round_data));
+	EXPECT_CALL(*m_test_data.m_data_reader_mock, get_blocks_from_round(m_test_data.m_test_current_round)).WillOnce(Return(m_test_data.m_test_blocks_from_round));
+
+
+	m_component = reward::create_component(m_logger, std::make_unique<nexus_http_interface::Component_mock>(),
+		m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
+		m_persistance_component_mock->get_data_reader_factory()->create_data_reader());
+
 }
 
-TEST_F(Reward_fixture, difficulty_test)
+TEST_F(Reward_fixture_created_component, difficulty_test)
 {
-	LLP::CBlock test_block = create_test_block();
+	LLP::CBlock test_block = m_test_data.create_test_block();
 	std::string test_block_hash = test_block.GetHash().ToString();
 
 	std::uint32_t test_nbits = test_block.nBits;
@@ -33,5 +38,4 @@ TEST_F(Reward_fixture, difficulty_test)
 	std::uint32_t test_nbits_harder = test_difficulty_threshold.GetCompact();
 
 	result = m_component->check_difficulty(test_block, test_nbits_harder);
-
 }
