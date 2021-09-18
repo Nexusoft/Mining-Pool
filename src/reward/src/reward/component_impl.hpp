@@ -26,7 +26,7 @@ public:
     std::uint32_t get_current_round() const;
     bool end_round(std::uint32_t round_number) override;
     Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const override;
-    void pay_all() override;
+    bool pay_all() override;
     void add_block(std::string hash) override;
 
 private:

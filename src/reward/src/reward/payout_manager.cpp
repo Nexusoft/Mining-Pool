@@ -30,7 +30,17 @@ void Payout_manager::calculate_reward_of_blocks(std::vector<std::string>& blocks
 			continue;
 		}
 
+		bool is_orphan = true;
+		if (reward_data.m_tx_type == "COINBASE" && reward_data.m_tx_confirmations > 3)	// 3 confirmations enough?
+		{
+			is_orphan = false;
+		}
+
 		// update block in db
+		if (!m_shared_data_writer.update_block_rewards(block, is_orphan, reward_data.m_reward))
+		{
+			m_logger->error("Couldn't update block in storage for hash {}", block);
+		}
 	}
 
 	// clear given block vector because all data have been processed.
