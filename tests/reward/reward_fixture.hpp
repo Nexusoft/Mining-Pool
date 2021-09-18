@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include "block.hpp"
-#include <persistance/create_component.hpp>
+#include "persistance/component_mock.hpp"
 #include "nexus_http_interface/component_mock.hpp"
 #include <reward/create_component.hpp>
 #include <config/config.hpp>
@@ -11,6 +11,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <cstdint>
 #include <string>
+#include <memory>
 
 
 namespace
@@ -26,17 +27,16 @@ public:
 	{
 		m_logger = spdlog::stdout_color_mt("logger");
 		m_logger->set_level(spdlog::level::debug);
-		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
 
 		m_component = reward::create_component(m_logger, std::make_unique<nexus_http_interface::Component_mock>(), 
-			m_persistance_component->get_data_writer_factory()->create_shared_data_writer(),
-			m_persistance_component->get_data_reader_factory()->create_data_reader());
+			m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
+			m_persistance_component_mock->get_data_reader_factory()->create_data_reader());
 	}
 
 protected:
 	std::shared_ptr<spdlog::logger> m_logger;
 	config::Config m_config;
-	persistance::Component::Uptr m_persistance_component;
+	std::unique_ptr<persistance::Component_mock> m_persistance_component_mock;
 	Component::Uptr m_component;
 
 	LLP::CBlock create_test_block()
