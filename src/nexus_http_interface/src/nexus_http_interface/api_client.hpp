@@ -13,6 +13,9 @@ class Api_client : public oatpp::web::client::ApiClient
 {
 API_CLIENT_INIT(Api_client)
 API_CALL("GET", "ledger/get/block{parameter}", get_block, PATH(String, parameter))
+API_CALL("GET", "finance/debit/account{parameter}", payout, PATH(String, parameter))
+
+
 
 };
 #include OATPP_CODEGEN_END(ApiClient)

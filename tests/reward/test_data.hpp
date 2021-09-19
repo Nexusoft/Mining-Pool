@@ -23,11 +23,12 @@ public:
 
 	Test_data()
 	{
-		m_persistance_component_mock = std::make_unique<persistance::Component_mock>();
-		m_data_reader_factory_mock = std::make_shared<persistance::Data_reader_factory_mock>();
-		m_data_writer_factory_mock = std::make_shared<persistance::Data_writer_factory_mock>();
-		m_data_reader_mock = std::make_unique<persistance::Data_reader_mock>();
-		m_shared_data_writer_mock = std::make_shared<persistance::Shared_data_writer_mock>();
+		m_persistance_component_mock = std::make_unique<NiceMock<persistance::Component_mock>>();
+		m_data_reader_factory_mock = std::make_shared<NiceMock<persistance::Data_reader_factory_mock>>();
+		m_data_writer_factory_mock = std::make_shared<NiceMock<persistance::Data_writer_factory_mock>>();
+		m_data_reader_mock = std::make_unique<NiceMock<persistance::Data_reader_mock>>();
+		m_shared_data_writer_mock = std::make_shared<NiceMock<persistance::Shared_data_writer_mock>>();
+		m_data_reader_mock_raw = m_data_reader_mock.get();
 	}
 
 	~Test_data()
@@ -67,7 +68,7 @@ public:
 		ON_CALL(*m_persistance_component_mock, get_data_reader_factory()).WillByDefault(Return(m_data_reader_factory_mock));
 
 		ON_CALL(*m_data_writer_factory_mock, create_shared_data_writer_impl()).WillByDefault(Return(m_shared_data_writer_mock));
-		EXPECT_CALL(*m_data_reader_factory_mock, create_data_reader_impl()).WillOnce(Return(ByMove(std::make_unique<persistance::Data_reader_mock>())));
+		ON_CALL(*m_data_reader_factory_mock, create_data_reader_impl()).WillByDefault(Return(ByMove(std::move(m_data_reader_mock))));
 
 		return std::move(m_persistance_component_mock);
 	}
@@ -76,6 +77,7 @@ public:
 	std::shared_ptr<persistance::Data_reader_factory_mock> m_data_reader_factory_mock;
 	std::shared_ptr<persistance::Data_writer_factory_mock> m_data_writer_factory_mock;
 	std::unique_ptr<persistance::Data_reader_mock> m_data_reader_mock;
+	persistance::Data_reader_mock* m_data_reader_mock_raw{ nullptr };
 	std::shared_ptr<persistance::Shared_data_writer_mock> m_shared_data_writer_mock;
 
 	std::uint32_t m_test_current_round{ 3 };

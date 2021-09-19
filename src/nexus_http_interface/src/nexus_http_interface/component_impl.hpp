@@ -15,6 +15,7 @@ public:
     Component_impl(std::shared_ptr<spdlog::logger> logger, std::string wallet_ip);
 
     bool get_block_reward_data(std::string hash, common::Block_reward_data& reward_data) override;
+    bool payout(Payout_recipients const& recipients) override;
 
 private:
 

@@ -11,6 +11,7 @@ class Component_mock : public Component
 {
 public:
     MOCK_METHOD(bool, get_block_reward_data, (std::string hash, common::Block_reward_data& reward_data), (override));
+    MOCK_METHOD(bool, payout, (Payout_recipients const& recipients), (override));
 
 };
 

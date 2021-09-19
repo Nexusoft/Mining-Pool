@@ -45,5 +45,45 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 	reward_data.m_tx_type = data_json["result"]["tx"][0]["contracts"][0]["OP"];
 }
 
+bool Component_impl::payout(Payout_recipients const& recipients)
+{
+	/*
+	"pin": "1234",
+		"name" : "default"
+		"recipients" :
+		[
+	{
+		"name_to": "bob:savings",
+			"amount" : 5,
+			"reference" : 1234
+	},
+		{
+			"address_to": "8CHjS5Qe7Mghgrqb6NeEaVxjexbdp9p2QVdRTt8W4rzbWhu3fL8",
+			"amount" : 5,
+			"reference" : 5678
+		},
+		{
+			"address_to": "4kYv4Xft6wufMVi191nQDNprgkK6kzy6gqWRpmfMxyx9KMfEV1u",
+			"amount" : 5
+		}
+		]
+		*/
+
+	std::string parameter{ "?verbose=summary&hash=" };
+	auto response = m_client->payout(parameter.c_str());
+	auto const status_code = response->getStatusCode();
+	if (status_code != 200)
+	{
+		return false;
+	}
+
+	auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
+	std::string const tx_id = data_json["result"]["txid"];
+
+	m_logger->info("Successfully paid all miners. Tx_id: {}", tx_id);
+
+	return true;
+}
+
 }
 }

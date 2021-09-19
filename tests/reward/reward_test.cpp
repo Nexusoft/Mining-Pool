@@ -5,8 +5,8 @@ using namespace ::nexuspool;
 
 TEST_F(Reward_fixture, create_component_with_active_round)
 {
-	EXPECT_CALL(*m_test_data.m_data_reader_mock, get_latest_round).WillOnce(Return(m_test_data.m_test_round_data));
-	EXPECT_CALL(*m_test_data.m_data_reader_mock, get_blocks_from_round(m_test_data.m_test_current_round)).WillOnce(Return(m_test_data.m_test_blocks_from_round));
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_latest_round).WillOnce(Return(m_test_data.m_test_round_data));
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_blocks_from_round(m_test_data.m_test_current_round)).WillOnce(Return(m_test_data.m_test_blocks_from_round));
 
 
 	m_component = reward::create_component(m_logger, std::make_unique<nexus_http_interface::Component_mock>(),
