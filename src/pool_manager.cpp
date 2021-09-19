@@ -127,8 +127,6 @@ void Pool_manager::add_block_to_storage(LLP::CBlock const& block)
 	block_data.m_difficulty = TAO::Ledger::GetDifficulty(block.nBits, block.nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
-
-	m_reward_component->add_block(block_hash);
 }
 
 void Pool_manager::get_block(Get_block_handler&& handler)

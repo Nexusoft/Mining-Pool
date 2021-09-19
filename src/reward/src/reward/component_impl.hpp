@@ -27,7 +27,6 @@ public:
     bool end_round(std::uint32_t round_number) override;
     Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const override;
     bool pay_all() override;
-    void add_block(std::string hash) override;
 
 private:
 
@@ -36,7 +35,6 @@ private:
     persistance::Shared_data_writer::Sptr m_shared_data_writer;
     persistance::Data_reader::Uptr m_data_reader;
     std::uint32_t m_current_round;
-    std::vector<std::string> m_possible_found_blocks;
     Payout_manager m_payout_manager;
 
 };

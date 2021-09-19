@@ -15,25 +15,11 @@ Component_impl::Component_impl(
     , m_shared_data_writer{ std::move(shared_data_writer) }
     , m_data_reader{ std::move(data_reader) }
 	, m_current_round{0}
-	, m_possible_found_blocks{}
 	, m_payout_manager{ m_logger, *http_interface, *shared_data_writer, *data_reader }
 {
 	if (is_round_active())
 	{
-		m_logger->info("Loading blocks from current round {}", m_current_round);
-		auto const blocks = m_data_reader->get_blocks_from_round(m_current_round);
-		for (auto& block : blocks)
-		{
-			// all blocks which already have a reward for this round are filtered out
-			if (block.m_mainnet_reward > 0)
-			{
-				continue;
-			}
-
-			m_possible_found_blocks.push_back(block.m_hash);
-		}
-
-		m_payout_manager.calculate_reward_of_blocks(m_possible_found_blocks);
+		m_payout_manager.calculate_reward_of_blocks(m_current_round);
 	}
 }
 
@@ -148,14 +134,9 @@ bool Component_impl::pay_all()
 		return false;	// round is still active
 	}
 
-	m_payout_manager.calculate_reward_of_blocks(m_possible_found_blocks);
+	m_payout_manager.calculate_reward_of_blocks(m_current_round);
 	m_payout_manager.payout(m_current_round);
 	return true;
-}
-
-void Component_impl::add_block(std::string hash)
-{
-	m_possible_found_blocks.push_back(std::move(hash));
 }
 
 }

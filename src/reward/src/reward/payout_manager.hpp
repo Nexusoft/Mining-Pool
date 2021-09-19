@@ -19,7 +19,7 @@ public:
         persistance::Shared_data_writer& shared_data_writer,
         persistance::Data_reader& data_reader);
 
-    void calculate_reward_of_blocks(std::vector<std::string>& blocks);
+    void calculate_reward_of_blocks(std::uint32_t round);
     void payout(std::uint32_t current_round);
 
 private:

@@ -31,9 +31,6 @@ public:
     //pay all miners with unpaid shares.
     virtual bool pay_all() = 0;
 
-    // adds the block hash to a list of possible accepted blocks by mainnet (possible because they still can be orphaned)
-    virtual void add_block(std::string hash) = 0;
-
 
 };
 
