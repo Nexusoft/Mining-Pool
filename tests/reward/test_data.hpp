@@ -14,8 +14,18 @@
 
 namespace
 {
-	using namespace ::nexuspool;
-	using namespace ::testing;
+using namespace ::nexuspool;
+using namespace ::testing;
+
+std::uint32_t test_current_round{ 3 };
+persistance::Round_data test_round_data{ test_current_round, 20, 5, 2, 0, "2021-09-19 10:20:04", "2021-09-20 10:20:04", true, false };
+std::vector<persistance::Block_data> test_blocks_from_round{
+	{ "testblockhash1", 50001, "hash", 351.64, false, "", test_current_round, "2021-09-19 13:36:14", 2.546},
+	{ "testblockhash2", 50002, "hash", 352.64, false, "", test_current_round, "2021-09-19 18:50:45", 2.546},
+	{ "testblockhash3", 50003, "prime", 8.64, false, "", test_current_round, "2021-09-19 19:00:59", 2.546},
+};
+
+persistance::Round_data test_round_not_active_not_paid_data{ test_current_round, 20, 5, 2, 0, "", "", false, false };
 
 class Test_data
 {
@@ -79,14 +89,6 @@ public:
 	std::unique_ptr<persistance::Data_reader_mock> m_data_reader_mock;
 	persistance::Data_reader_mock* m_data_reader_mock_raw{ nullptr };
 	std::shared_ptr<persistance::Shared_data_writer_mock> m_shared_data_writer_mock;
-
-	std::uint32_t m_test_current_round{ 3 };
-	persistance::Round_data m_test_round_data{ m_test_current_round, 20, 5, 2, 0, "", "", true, false };
-	std::vector<persistance::Block_data> m_test_blocks_from_round{
-		{ "testblockhash1", 50001, "hash", 351.64, false, "", m_test_current_round, "", 2.546},
-		{ "testblockhash2", 50002, "hash", 352.64, false, "", m_test_current_round, "", 2.546},
-		{ "testblockhash3", 50003, "prime", 8.64, false, "", m_test_current_round, "", 2.546},
-	};
 
 protected:
 
