@@ -15,7 +15,7 @@ Component_impl::Component_impl(
     , m_shared_data_writer{ std::move(shared_data_writer) }
     , m_data_reader{ std::move(data_reader) }
 	, m_current_round{0}
-	, m_payout_manager{ m_logger, *http_interface, *shared_data_writer, *data_reader }
+	, m_payout_manager{ m_logger, *m_http_interface, *m_shared_data_writer, *m_data_reader }
 {
 	if (is_round_active())
 	{
