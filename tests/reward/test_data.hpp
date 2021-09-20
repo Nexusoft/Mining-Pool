@@ -11,21 +11,31 @@
 #include "persistance/data_writer_factory_mock.hpp"
 #include "persistance/data_reader_mock.hpp"
 #include "persistance/data_writer_mock.hpp"
+#include "nexus_http_interface/component_mock.hpp"
 
 namespace
 {
 using namespace ::nexuspool;
 using namespace ::testing;
 
-std::uint32_t test_current_round{ 3 };
-persistance::Round_data test_round_data{ test_current_round, 20, 5, 2, 0, "2021-09-19 10:20:04", "2021-09-20 10:20:04", true, false };
-std::vector<persistance::Block_data> test_blocks_from_round{
+std::uint32_t const test_current_round{ 3 };
+std::uint32_t const test_unpaid_round{ 4 };
+persistance::Round_data const test_round_data{ test_current_round, 20, 5, 2, 0, "2021-09-19 10:20:04", "2021-09-20 10:20:04", true, false };
+std::vector<persistance::Block_data> const test_blocks_from_round{
 	{ "testblockhash1", 50001, "hash", 351.64, false, "", test_current_round, "2021-09-19 13:36:14", 2.546},
 	{ "testblockhash2", 50002, "hash", 352.64, false, "", test_current_round, "2021-09-19 18:50:45", 2.546},
 	{ "testblockhash3", 50003, "prime", 8.64, false, "", test_current_round, "2021-09-19 19:00:59", 2.546},
 };
 
-persistance::Round_data test_round_not_active_not_paid_data{ test_current_round, 20, 5, 2, 0, "", "", false, false };
+persistance::Round_data const test_round_not_active_not_paid_data{ test_unpaid_round, 200, 50, 5, 0, "2021-09-19 10:20:04", "2021-09-20 10:20:04", false, false };
+persistance::Round_data const test_round_not_active_paid_data{ test_current_round, 20, 5, 2, 0, "2021-09-20 12:00:44", "2021-09-21 12:00:44", false, true };
+std::vector<persistance::Block_data> const test_blocks_from_unpaid_round{
+	{ "testblockhash1", 60001, "hash", 351.64, false, "", test_unpaid_round, "2021-09-19 13:36:14", 0},
+	{ "testblockhash2", 60002, "hash", 352.64, false, "", test_unpaid_round, "2021-09-19 18:50:45", 0},
+	{ "testblockhash3", 60003, "hash", 372.64, false, "", test_unpaid_round, "2021-09-19 19:00:59", 0},
+	{ "testblockhash4", 60004, "hash", 382.64, false, "", test_unpaid_round, "2021-09-19 19:00:59", 0},
+	{ "testblockhash5", 60005, "hash", 399.64, false, "", test_unpaid_round, "2021-09-19 19:00:59", 0},
+};
 
 class Test_data
 {
@@ -39,6 +49,9 @@ public:
 		m_data_reader_mock = std::make_unique<NiceMock<persistance::Data_reader_mock>>();
 		m_shared_data_writer_mock = std::make_shared<NiceMock<persistance::Shared_data_writer_mock>>();
 		m_data_reader_mock_raw = m_data_reader_mock.get();
+
+		m_http_interface_mock = std::make_unique<nexus_http_interface::Component_mock>();
+		m_http_interface_mock_raw = m_http_interface_mock.get();
 	}
 
 	~Test_data()
@@ -89,10 +102,13 @@ public:
 	std::unique_ptr<persistance::Data_reader_mock> m_data_reader_mock;
 	persistance::Data_reader_mock* m_data_reader_mock_raw{ nullptr };
 	std::shared_ptr<persistance::Shared_data_writer_mock> m_shared_data_writer_mock;
+	std::unique_ptr<nexus_http_interface::Component_mock> m_http_interface_mock;
+	nexus_http_interface::Component_mock* m_http_interface_mock_raw{ nullptr };
 
 protected:
 
 	std::unique_ptr<persistance::Component_mock> m_persistance_component_mock;
+
 
 
 

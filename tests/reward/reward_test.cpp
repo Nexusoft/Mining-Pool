@@ -63,3 +63,45 @@ TEST_F(Reward_fixture, create_component_with_active_round)
 		m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
 		m_persistance_component_mock->get_data_reader_factory()->create_data_reader());
 }
+
+TEST_F(Reward_fixture_created_component, pay_all_with_unknown_round_test)
+{
+	auto const unknown_round = 100U;
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(unknown_round)).WillOnce(Return(persistance::Round_data{}));
+
+	auto result = m_component->pay_all(unknown_round);
+	EXPECT_FALSE(result);
+}
+
+TEST_F(Reward_fixture_created_component, pay_all_with_active_round_test)
+{
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(test_round_data.m_round)).WillOnce(Return(test_round_data));
+
+	auto result = m_component->pay_all(test_round_data.m_round);
+	EXPECT_FALSE(result);
+}
+
+TEST_F(Reward_fixture_created_component, pay_all_with_already_paid_round_test)
+{
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(test_round_not_active_paid_data.m_round)).WillOnce(Return(test_round_not_active_paid_data));
+
+	auto result = m_component->pay_all(test_round_not_active_paid_data.m_round);
+	EXPECT_FALSE(result);
+}
+
+TEST_F(Reward_fixture_created_component, pay_all_calculate_rewards_tests)
+{
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(test_round_not_active_not_paid_data.m_round)).WillOnce(Return(test_round_not_active_not_paid_data));
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_blocks_from_round(test_unpaid_round)).WillOnce(Return(test_blocks_from_unpaid_round));
+
+	for(auto& block : test_blocks_from_unpaid_round)
+	{
+		common::Block_reward_data reward_data{};
+		EXPECT_CALL(*m_test_data.m_http_interface_mock_raw, get_block_reward_data(block.m_hash, _)).WillRepeatedly(Return(true));
+		EXPECT_CALL(*m_test_data.m_shared_data_writer_mock, update_block_rewards(block.m_hash, _, _)).WillOnce(Return(true));
+	}
+
+	auto result = m_component->pay_all(test_round_not_active_not_paid_data.m_round);
+	EXPECT_TRUE(result);
+}
+

@@ -21,7 +21,7 @@ Payout_manager::Payout_manager(
 void Payout_manager::calculate_reward_of_blocks(std::uint32_t round)
 {
 	auto blocks_update_count = 0U;
-	m_logger->info("Loading blocks from current round {}", round);
+	m_logger->info("Loading blocks from round {}", round);
 	auto const blocks = m_data_reader.get_blocks_from_round(round);
 
 	for (auto& block : blocks)

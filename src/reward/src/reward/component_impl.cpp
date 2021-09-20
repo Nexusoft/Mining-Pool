@@ -119,11 +119,16 @@ Difficulty_result Component_impl::check_difficulty(const LLP::CBlock& block, uin
 
 }
 
-bool Component_impl::pay_all()
+bool Component_impl::pay_all(std::uint32_t round)
 {
 	// check if round is ended and not paid and if pay_all is called after round_end_tme + grace period
 	// to give last blocks a little time for possible mainnet confirmations
-	auto const round_data = m_data_reader->get_latest_round();
+	auto const round_data = m_data_reader->get_round(round);
+	if (round_data.is_empty())
+	{
+		return false;
+	}
+
 	if (round_data.m_is_paid)
 	{
 		return false;	// already paid
@@ -134,8 +139,8 @@ bool Component_impl::pay_all()
 		return false;	// round is still active
 	}
 
-	m_payout_manager.calculate_reward_of_blocks(m_current_round);
-	m_payout_manager.payout(m_current_round);
+	m_payout_manager.calculate_reward_of_blocks(round);
+	m_payout_manager.payout(round);
 	return true;
 }
 

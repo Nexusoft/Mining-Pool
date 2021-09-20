@@ -23,6 +23,7 @@ public:
     MOCK_METHOD(std::vector<Account_data_for_payment>, get_active_accounts_from_round, (), (override));
     MOCK_METHOD(std::vector<Block_data>, get_latest_blocks, (), (override));
     MOCK_METHOD(Round_data, get_latest_round, (), (override));
+    MOCK_METHOD(Round_data, get_round, (std::uint32_t round), (override));
     MOCK_METHOD(std::vector<Payment_data>, get_payments, (std::string account), (override));
     MOCK_METHOD(Config_data, get_config, (), (override));
     MOCK_METHOD(std::vector<Block_data>, get_blocks_from_round, (std::uint32_t round), (override));

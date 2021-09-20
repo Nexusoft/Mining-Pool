@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 #include "test_data.hpp"
-#include "nexus_http_interface/component_mock.hpp"
 #include "reward/create_component.hpp"
 #include <config/config.hpp>
 #include <spdlog/spdlog.h>
@@ -52,7 +51,7 @@ public:
 
 	Reward_fixture_created_component()
 	{
-		m_component = reward::create_component(m_logger, std::make_unique<nexus_http_interface::Component_mock>(),
+		m_component = reward::create_component(m_logger, std::move(m_test_data.m_http_interface_mock),
 			m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
 			m_persistance_component_mock->get_data_reader_factory()->create_data_reader());
 	}
