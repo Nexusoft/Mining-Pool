@@ -26,6 +26,7 @@ public:
     virtual std::vector<Account_data_for_payment> get_active_accounts_from_round() = 0;
     virtual std::vector<Block_data> get_latest_blocks() = 0;
     virtual Round_data get_latest_round() = 0;
+    virtual Round_data get_round(std::uint32_t round) = 0;
     virtual std::vector<Payment_data> get_payments(std::string account) = 0;
     virtual Config_data get_config() = 0;
     virtual std::vector<Block_data> get_blocks_from_round(std::uint32_t round) = 0;

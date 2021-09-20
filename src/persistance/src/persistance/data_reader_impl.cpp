@@ -25,6 +25,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_account_cmd = m_command_factory->create_command(Type::get_account);
 	m_get_blocks_cmd = m_command_factory->create_command(Type::get_blocks);
 	m_get_latest_round_cmd = m_command_factory->create_command(Type::get_latest_round);
+	m_get_round_cmd = m_command_factory->create_command(Type::get_round);
 	m_get_payments_cmd = m_command_factory->create_command(Type::get_payments);
 	m_get_config_cmd = m_command_factory->create_command(Type::get_config);
 	m_get_active_accounts_from_round_cmd = m_command_factory->create_command(Type::get_active_accounts_from_round);
@@ -111,6 +112,25 @@ Round_data Data_reader_impl::get_latest_round()
 		return round_data;	// return empty result
 	}
 	auto result = std::any_cast<Result_sqlite>(m_get_latest_round_cmd->get_result());
+	if (result.m_rows.empty())
+	{
+		return round_data;	// return empty result
+	}
+	auto result_row = result.m_rows.front();
+	round_data = convert_to_round_data(std::move(result_row));
+
+	return round_data;
+}
+
+Round_data Data_reader_impl::get_round(std::uint32_t round)
+{
+	Round_data round_data{};
+	m_get_round_cmd->set_params(round);
+	if (!m_data_storage->execute_command(m_get_round_cmd))
+	{
+		return round_data;	// return empty result
+	}
+	auto result = std::any_cast<Result_sqlite>(m_get_round_cmd->get_result());
 	if (result.m_rows.empty())
 	{
 		return round_data;	// return empty result

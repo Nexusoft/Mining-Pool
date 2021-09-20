@@ -35,6 +35,8 @@ public:
             std::make_shared<Command_get_blocks_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::get_latest_round,
             std::make_shared<Command_get_latest_round_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::get_round,
+            std::make_shared<Command_get_round_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::get_payments,
             std::make_shared<Command_get_payments_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::get_config,
@@ -97,6 +99,9 @@ private:
             break;
         case Type::get_latest_round:
             result = std::any_cast<std::shared_ptr<Command_get_latest_round_impl>>(m_commands[command_type]);
+            break;
+        case Type::get_round:
+            result = std::any_cast<std::shared_ptr<Command_get_round_impl>>(m_commands[command_type]);
             break;
         case Type::get_payments:
             result = std::any_cast<std::shared_ptr<Command_get_payments_impl>>(m_commands[command_type]);

@@ -201,6 +201,36 @@ std::any Command_get_latest_round_impl::get_command() const
 
 // -----------------------------------------------------------------------------------------------
 
+Command_get_round_impl::Command_get_round_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT round_number, total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid FROM round WHERE round_number = :round_number;", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_round_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt},
+		{{Column_sqlite::int64},
+		{Column_sqlite::double_t},
+		{Column_sqlite::double_t},
+		{Column_sqlite::int32},
+		{Column_sqlite::int32},
+		{Column_sqlite::string},
+		{Column_sqlite::string},
+		{Column_sqlite::int32},
+		{Column_sqlite::int32}} };
+	return command;
+}
+
+void Command_get_round_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<std::int64_t>(m_params);
+	bind_param(m_stmt, ":round_number", casted_params);
+}
+
+// -----------------------------------------------------------------------------------------------
+
 Command_get_payments_impl::Command_get_payments_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {

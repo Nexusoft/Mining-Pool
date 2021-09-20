@@ -27,6 +27,7 @@ enum class Type : std::uint8_t
 	get_blocks,
 	create_account,
 	get_latest_round,
+	get_round,
 	get_payments,
 	add_payment,
 	create_round,
