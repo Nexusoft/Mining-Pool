@@ -27,6 +27,7 @@ public:
     virtual bool reset_shares_from_accounts() = 0;
     virtual bool add_block(Block_data data) = 0;
     virtual bool update_block_rewards(std::string hash, bool orphan, double reward) = 0;
+    virtual bool update_round(Round_data round) = 0;
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -47,6 +48,7 @@ public:
     virtual bool reset_shares_from_accounts() = 0;
     virtual bool add_block(Block_data data) = 0;
     virtual bool update_block_rewards(std::string hash, bool orphan, double reward) = 0;
+    virtual bool update_round(Round_data round) = 0;
 };
 }
 }

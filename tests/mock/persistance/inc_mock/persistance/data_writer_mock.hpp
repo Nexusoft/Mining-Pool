@@ -25,6 +25,7 @@ public:
     MOCK_METHOD(bool, reset_shares_from_accounts, (), (override));
     MOCK_METHOD(bool, add_block, (Block_data data), (override));
     MOCK_METHOD(bool, update_block_rewards, (std::string hash, bool orphan, double reward), (override));
+    MOCK_METHOD(bool, update_round, (Round_data round), (override));
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -41,6 +42,7 @@ public:
     MOCK_METHOD(bool, reset_shares_from_accounts, (), (override));
     MOCK_METHOD(bool, add_block, (Block_data data), (override));
     MOCK_METHOD(bool, update_block_rewards, (std::string hash, bool orphan, double reward), (override));
+    MOCK_METHOD(bool, update_round, (Round_data round), (override));
 };
 
 }

@@ -496,6 +496,38 @@ void Command_update_block_rewards_impl::set_params(std::any params)
 	bind_param(m_stmt, ":mainnet_reward", casted_params.m_mainnet_reward);
 	bind_param(m_stmt, ":hash", casted_params.m_hash);
 }
+// -----------------------------------------------------------------------------------------------
+Command_update_round_impl::Command_update_round_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string update_round{ R"(UPDATE round SET 
+			total_shares = :total_shares, 
+			total_reward = :total_reward, 
+			blocks = :blocks, 
+			connection_count = :connection_count,  
+			is_active = :is_active, 
+			is_paid = :is_paid 
+			WHERE round_number = :round_number)" };
+
+	if (sqlite3_prepare_v2(m_handle, update_round.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
+	{
+		std::cout << sqlite3_errmsg(m_handle) << std::endl;
+	}
+}
+
+void Command_update_round_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_update_round_params>(m_params);
+	bind_param(m_stmt, ":total_shares", casted_params.m_total_shares);
+	bind_param(m_stmt, ":total_reward", casted_params.m_total_reward);
+	bind_param(m_stmt, ":blocks", casted_params.m_blocks);
+	bind_param(m_stmt, ":connection_count", casted_params.m_connection_count);
+	bind_param(m_stmt, ":is_active", casted_params.m_is_active);
+	bind_param(m_stmt, ":is_paid", casted_params.m_is_paid);
+	bind_param(m_stmt, ":round_number", casted_params.m_round_number);
+}
+
 }
 }
 }

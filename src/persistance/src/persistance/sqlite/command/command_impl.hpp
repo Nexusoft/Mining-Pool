@@ -302,6 +302,28 @@ public:
 	void set_params(std::any params) override;
 };
 
+struct Command_update_round_params
+{
+	std::int64_t m_round_number;
+	double m_total_shares;
+	double m_total_reward;
+	int m_blocks;
+	int m_connection_count;
+	int m_is_active;
+	int m_is_paid;
+};
+
+class Command_update_round_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_update_round_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::update_round; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
+	void set_params(std::any params) override;
+};
+
 }
 }
 }

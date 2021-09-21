@@ -29,6 +29,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_reset_shares_from_accounts_cmd = m_command_factory->create_command(Type::reset_shares_from_accounts);
 	m_add_block_cmd = m_command_factory->create_command(Type::add_block);
 	m_update_block_rewards_cmd = m_command_factory->create_command(Type::update_block_rewards);
+	m_update_round_cmd = m_command_factory->create_command(Type::update_round);
 }
 
 bool Data_writer_impl::create_account(std::string account)
@@ -100,6 +101,19 @@ bool Data_writer_impl::update_block_rewards(std::string hash, bool orphan, doubl
 	return m_data_storage->execute_command(m_update_block_rewards_cmd);
 }
 
+bool Data_writer_impl::update_round(Round_data round)
+{
+	m_update_block_rewards_cmd->set_params(command::Command_update_round_params{
+	round.m_round,
+	round.m_total_shares,
+	round.m_total_rewards,
+	static_cast<int>(round.m_blocks),
+	static_cast<int>(round.m_connection_count),
+	round.m_is_active,
+	round.m_is_paid});
+	return m_data_storage->execute_command(m_update_round_cmd);
+}
+
 // --------------------------------------------------------------------------------------
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
@@ -158,6 +172,12 @@ bool Shared_data_writer_impl::update_block_rewards(std::string hash, bool orphan
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->update_block_rewards(std::move(hash), orphan, reward);
+}
+
+bool Shared_data_writer_impl::update_round(Round_data round)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->update_round(std::move(round));
 }
 
 }
