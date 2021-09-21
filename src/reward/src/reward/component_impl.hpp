@@ -8,6 +8,7 @@
 #include "reward/payout_manager.hpp"
 #include <spdlog/spdlog.h>
 #include <vector>
+#include <string>
 
 namespace nexuspool {
 namespace reward {
@@ -19,7 +20,9 @@ public:
         std::shared_ptr<spdlog::logger> logger, 
         nexus_http_interface::Component::Uptr http_interface,
         persistance::Shared_data_writer::Sptr shared_data_writer, 
-        persistance::Data_reader::Uptr data_reader);
+        persistance::Data_reader::Uptr data_reader,
+        std::string account_from,
+        std::string pin);
 
     bool start_round(std::uint16_t round_duration_hours) override;
     bool is_round_active() override;
@@ -36,6 +39,8 @@ private:
     persistance::Data_reader::Uptr m_data_reader;
     std::uint32_t m_current_round;
     Payout_manager m_payout_manager;
+    std::string m_account_from;
+    std::string m_pin;
 
 };
 

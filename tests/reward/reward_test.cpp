@@ -61,7 +61,8 @@ TEST_F(Reward_fixture, create_component_with_active_round)
 
 	m_component = reward::create_component(m_logger, std::make_unique<nexus_http_interface::Component_mock>(),
 		m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
-		m_persistance_component_mock->get_data_reader_factory()->create_data_reader());
+		m_persistance_component_mock->get_data_reader_factory()->create_data_reader(),
+		"defauöt", "1234");
 }
 
 TEST_F(Reward_fixture_created_component, pay_all_with_unknown_round_test)

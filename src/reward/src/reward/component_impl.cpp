@@ -9,13 +9,17 @@ Component_impl::Component_impl(
 	std::shared_ptr<spdlog::logger> logger, 
 	nexus_http_interface::Component::Uptr http_interface,
 	persistance::Shared_data_writer::Sptr shared_data_writer, 
-	persistance::Data_reader::Uptr data_reader)
+	persistance::Data_reader::Uptr data_reader,
+	std::string account_from,
+	std::string pin)
     : m_logger{std::move(logger)}
 	, m_http_interface{std::move(http_interface)}
     , m_shared_data_writer{ std::move(shared_data_writer) }
     , m_data_reader{ std::move(data_reader) }
 	, m_current_round{0}
 	, m_payout_manager{ m_logger, *m_http_interface, *m_shared_data_writer, *m_data_reader }
+	, m_account_from{std::move(account_from)}
+	, m_pin{std::move(pin)}
 {
 	if (is_round_active())
 	{

@@ -53,7 +53,8 @@ public:
 	{
 		m_component = reward::create_component(m_logger, std::move(m_test_data.m_http_interface_mock),
 			m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
-			m_persistance_component_mock->get_data_reader_factory()->create_data_reader());
+			m_persistance_component_mock->get_data_reader_factory()->create_data_reader(),
+			"default", "1234");
 	}
 
 protected:

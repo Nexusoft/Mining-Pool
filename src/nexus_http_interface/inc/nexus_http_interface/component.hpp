@@ -29,7 +29,7 @@ public:
     virtual bool get_block_reward_data(std::string hash, common::Block_reward_data& reward_data) = 0;
 
     // Payout all miners that are given to this method
-    virtual bool payout(Payout_recipients const& recipients) = 0;
+    virtual bool payout(std::string account_from, std::string pin, Payout_recipients const& recipients) = 0;
 
 };
 

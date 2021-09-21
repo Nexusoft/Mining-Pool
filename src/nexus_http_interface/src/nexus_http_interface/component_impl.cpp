@@ -45,7 +45,7 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 	reward_data.m_tx_type = data_json["result"]["tx"][0]["contracts"][0]["OP"];
 }
 
-bool Component_impl::payout(Payout_recipients const& recipients)
+bool Component_impl::payout(std::string account_from, std::string pin, Payout_recipients const& recipients)
 {
 	/*
 	"pin": "1234",
