@@ -15,8 +15,6 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     -apiauth=0              API calls to the wallet need no authorization (will be changed in future releases)
 ```
 
-
-
 ## COMMAND LINE OPTION ARGUMENTS
 
 ```
@@ -26,6 +24,36 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
 ```
 
   ./NexusPool ../../myownpool.conf -c
+
+  ## Pool.conf
+
+  Some important config options in pool.conf
+
+  ```
+    "wallet_ip"             // the ip the NXS wallet listens to
+    "wallet_port"           // port of the NXS wallet
+    "local_ip"              // the ip of the POOL. 
+    "local_port" :          // port of the POOL for connecting to NXS wallet. (0 for ephemeral port)
+    "local_listen_port" : 0, // port of the POOL for listening to incoming miner connections. Potential miners will use local_ip:local_listen_port to connect to the POOL.
+    "api_listen_port" : 0,   // port of the POOL for listening to incoming API calls (from the web frontend for example).
+    "mining_mode" : "HASH",  // mining mode the POOL is started with. Options are 'HASH' or 'PRIME'. Changes to this config option will only take effect after round end.
+    "connection_retry_interval" // retry time in seconds trying to connect to NXS wallet if a connection attempt failed.
+    "get_height_interval"       // time in seconds polling for current BLOCK height of NXS wallet.
+    "session_expiry_time"       // time in seconds after which a miner session expires.
+
+    "persistance"       // Option group regarding used storage for the POOL
+        "type"          // which storage type the POOL uses. Currently only 'sqlite' is supported.
+        "file"          // filename of the storage.
+
+    "pool"              // Option group regarding POOL mining.
+        "address"               // NXS address for the POOL mined blocks.
+        "account"               // NXS account name used for transfer NXS rewards to the miners.
+        "pin"                   // PIN for the used NXS account to transfer NXS rewards to the miners.
+        "fee"                   // POOL fee in %
+        "difficulty_divider"        // reduced the NXS mainnet difficulty for miners.
+        "round_duration_hours"      // time in hours for the duration of a mining round. Payouts to miners can only happen when a round is finished. Config changes to POOL difficulty, fee, mining mode can only happen after round end.
+```
+
 
 ## BUILDING
 
