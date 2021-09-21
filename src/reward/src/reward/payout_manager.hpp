@@ -6,6 +6,7 @@
 #include "persistance/data_reader.hpp"
 #include <spdlog/spdlog.h>
 #include <vector>
+#include <string>
 
 namespace nexuspool {
 namespace reward {
@@ -19,8 +20,8 @@ public:
         persistance::Shared_data_writer& shared_data_writer,
         persistance::Data_reader& data_reader);
 
-    void calculate_reward_of_blocks(std::uint32_t round);
-    void payout(std::uint32_t current_round);
+    double calculate_reward_of_blocks(std::uint32_t round);
+    bool payout(std::string const& account_from, std::string const& pin, std::uint32_t current_round);
 
 private:
 

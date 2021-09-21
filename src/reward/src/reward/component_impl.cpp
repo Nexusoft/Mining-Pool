@@ -62,7 +62,7 @@ std::uint32_t Component_impl::get_current_round() const
 
 bool Component_impl::end_round(std::uint32_t round_number)
 {
-    auto const round_data = m_data_reader->get_latest_round();
+    auto round_data = m_data_reader->get_latest_round();
     if (round_data.m_round != round_number)
     {
         m_logger->error("Failed to end round {}. Latest round is {}", round_number, round_data.m_round);
@@ -74,6 +74,9 @@ bool Component_impl::end_round(std::uint32_t round_number)
         m_logger->error("Failed to end round {}. Round is already ended.", round_number);
         return false;
     }
+
+	round_data.m_total_rewards += m_payout_manager.calculate_reward_of_blocks(round_number);
+	// update total_rewards of round in storage
 
     if (round_data.m_total_rewards > 0) // did the pool actually earned something this round?
     {
@@ -127,7 +130,7 @@ bool Component_impl::pay_all(std::uint32_t round)
 {
 	// check if round is ended and not paid and if pay_all is called after round_end_tme + grace period
 	// to give last blocks a little time for possible mainnet confirmations
-	auto const round_data = m_data_reader->get_round(round);
+	auto round_data = m_data_reader->get_round(round);
 	if (round_data.is_empty())
 	{
 		return false;
@@ -143,8 +146,7 @@ bool Component_impl::pay_all(std::uint32_t round)
 		return false;	// round is still active
 	}
 
-	m_payout_manager.calculate_reward_of_blocks(round);
-	m_payout_manager.payout(round);
+	m_payout_manager.payout(m_account_from, m_pin, round);
 	return true;
 }
 
