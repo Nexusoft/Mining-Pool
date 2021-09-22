@@ -10,7 +10,8 @@ Component::Uptr create_component(
     persistance::Shared_data_writer::Sptr shared_data_writer, 
     persistance::Data_reader::Uptr data_reader,
     std::string account_from,
-    std::string pin)
+    std::string pin,
+    std::uint16_t pool_fee)
 {
     return std::make_unique<Component_impl>(
         std::move(logger), 
@@ -18,7 +19,8 @@ Component::Uptr create_component(
         std::move(shared_data_writer), 
         std::move(data_reader),
         std::move(account_from),
-        std::move(pin));
+        std::move(pin),
+        pool_fee);
 }
 
 }

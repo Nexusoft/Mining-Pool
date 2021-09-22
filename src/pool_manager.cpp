@@ -29,7 +29,8 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_data_reader_factory->create_data_reader(),
 		m_config.get_pool_config().m_account,
-		m_config.get_pool_config().m_pin)}
+		m_config.get_pool_config().m_pin,
+		m_config.get_pool_config().m_fee)}
 	, m_listen_socket{}
 	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config.get_session_expiry_time()}
 	, m_current_height{0}

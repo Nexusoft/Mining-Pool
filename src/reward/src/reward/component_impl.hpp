@@ -22,7 +22,8 @@ public:
         persistance::Shared_data_writer::Sptr shared_data_writer, 
         persistance::Data_reader::Uptr data_reader,
         std::string account_from,
-        std::string pin);
+        std::string pin,
+        std::uint16_t pool_fee);
 
     bool start_round(std::uint16_t round_duration_hours) override;
     bool is_round_active() override;
@@ -41,6 +42,7 @@ private:
     Payout_manager m_payout_manager;
     std::string m_account_from;
     std::string m_pin;
+    std::uint16_t m_pool_fee;
 
 };
 

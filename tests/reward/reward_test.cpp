@@ -62,7 +62,7 @@ TEST_F(Reward_fixture, create_component_with_active_round)
 	m_component = reward::create_component(m_logger, std::make_unique<nexus_http_interface::Component_mock>(),
 		m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
 		m_persistance_component_mock->get_data_reader_factory()->create_data_reader(),
-		"defauöt", "1234");
+		"defauöt", "1234", 1);
 }
 
 TEST_F(Reward_fixture_created_component, pay_all_with_unknown_round_test)
@@ -92,7 +92,7 @@ TEST_F(Reward_fixture_created_component, pay_all_with_already_paid_round_test)
 
 TEST_F(Reward_fixture_created_component, pay_all_calculate_rewards_tests)
 {
-	/*
+	
 	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(test_round_not_active_not_paid_data.m_round)).WillOnce(Return(test_round_not_active_not_paid_data));
 	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_blocks_from_round(test_unpaid_round)).WillOnce(Return(test_blocks_from_unpaid_round));
 
@@ -105,6 +105,41 @@ TEST_F(Reward_fixture_created_component, pay_all_calculate_rewards_tests)
 
 	auto result = m_component->pay_all(test_round_not_active_not_paid_data.m_round);
 	EXPECT_TRUE(result);
-	*/
+	
+}
+
+TEST_F(Reward_fixture_created_component, end_round_with_unknown_round_number_test)
+{
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_latest_round).WillOnce(Return(test_round_data));
+
+	auto result = m_component->end_round(100);
+	EXPECT_FALSE(result);
+}
+
+TEST_F(Reward_fixture_created_component, end_round_with_not_active_round_test)
+{
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_latest_round).WillOnce(Return(test_round_not_active_paid_data));
+
+	auto result = m_component->end_round(test_round_not_active_paid_data.m_round);
+	EXPECT_FALSE(result);
+}
+
+TEST_F(Reward_fixture_created_component, end_round_test)
+{
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_latest_round).WillOnce(Return(test_round_data));
+	calculate_rewards_expectations(test_round_data, test_current_round, test_blocks_from_round);
+	double total_shares_input = 0;
+	for (auto& active_account : test_active_accounts_from_round)
+	{
+		EXPECT_CALL(*m_test_data.m_shared_data_writer_mock, add_payment(_)).WillRepeatedly(Return(true));
+		total_shares_input += active_account.m_shares;
+	}
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_total_shares_from_accounts).WillOnce(Return(total_shares_input));
+	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_active_accounts_from_round).WillOnce(Return(test_active_accounts_from_round));
+	EXPECT_CALL(*m_test_data.m_shared_data_writer_mock, reset_shares_from_accounts).WillOnce(Return(true));
+	EXPECT_CALL(*m_test_data.m_shared_data_writer_mock, update_round(_)).WillOnce(Return(true));
+
+	auto result = m_component->end_round(test_round_data.m_round);
+	EXPECT_TRUE(result);
 }
 

@@ -11,7 +11,8 @@ Component_impl::Component_impl(
 	persistance::Shared_data_writer::Sptr shared_data_writer, 
 	persistance::Data_reader::Uptr data_reader,
 	std::string account_from,
-	std::string pin)
+	std::string pin,
+	std::uint16_t pool_fee)
     : m_logger{std::move(logger)}
 	, m_http_interface{std::move(http_interface)}
     , m_shared_data_writer{ std::move(shared_data_writer) }
@@ -20,6 +21,7 @@ Component_impl::Component_impl(
 	, m_payout_manager{ m_logger, *m_http_interface, *m_shared_data_writer, *m_data_reader }
 	, m_account_from{std::move(account_from)}
 	, m_pin{std::move(pin)}
+	, m_pool_fee{pool_fee}
 {
 	if (is_round_active())
 	{
@@ -76,16 +78,16 @@ bool Component_impl::end_round(std::uint32_t round_number)
     }
 
 	round_data.m_total_rewards += m_payout_manager.calculate_reward_of_blocks(round_number);
-	// update total_rewards of round in storage
+	round_data.m_total_shares = m_data_reader->get_total_shares_from_accounts();
 
-    if (round_data.m_total_rewards > 0) // did the pool actually earned something this round?
+    if (round_data.m_total_rewards > 0 && round_data.m_total_shares > 0) // did the pool actually earned something this round?
     {
         // get all accounts which contribute to the current round
         auto const active_accounts = m_data_reader->get_active_accounts_from_round();
         for (auto& active_account : active_accounts)
         {
-            // calculate reward for account
-            auto account_reward = round_data.m_total_rewards * (active_account.m_shares / round_data.m_total_shares);
+            // calculate reward for account. First reduce the total_rewards with pool_fee % 
+            auto account_reward = (round_data.m_total_rewards * ( 1.0 - static_cast<double>(m_pool_fee / 100))) * (active_account.m_shares / round_data.m_total_shares);
             // add account to payment table (without datetime -> not paid yet)
             m_shared_data_writer->add_payment(persistance::Payment_data{ active_account.m_address, account_reward, active_account.m_shares, "", round_data.m_round });
         }
@@ -95,11 +97,9 @@ bool Component_impl::end_round(std::uint32_t round_number)
     m_shared_data_writer->reset_shares_from_accounts();
 	m_current_round = 0;
 
-
-
     // end round now
-   // round_data.m
-
+	round_data.m_is_active = false;
+	m_shared_data_writer->update_round(round_data);
 
     return true;
 }

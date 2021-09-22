@@ -31,6 +31,7 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round)
 		// all blocks which already have a reward for this round are filtered out
 		if (block.m_mainnet_reward > 0)
 		{
+			total_rewards += block.m_mainnet_reward;
 			continue;
 		}
 
