@@ -5,7 +5,7 @@ using namespace ::nexuspool;
 
 TEST_F(Reward_fixture_created_component, difficulty_test)
 {
-	LLP::CBlock test_block = m_test_data.create_test_block();
+	LLP::CBlock test_block = m_test_data.create_hash_channel_test_block();
 	std::string test_block_hash = test_block.GetHash().ToString();
 
 	std::uint32_t test_nbits = test_block.nBits;
@@ -26,6 +26,23 @@ TEST_F(Reward_fixture_created_component, difficulty_test)
 	std::uint32_t test_nbits_harder = test_difficulty_threshold.GetCompact();
 
 	result = m_component->check_difficulty(test_block, test_nbits_harder);
+}
+
+TEST_F(Reward_fixture_created_component, prime_difficulty_test)
+{
+	LLP::CBlock test_block = m_test_data.create_prime_channel_test_block();
+	std::uint32_t test_nbits = test_block.nBits;
+
+	auto result = m_component->check_difficulty(test_block, test_nbits);
+	EXPECT_EQ(result, nexuspool::reward::Difficulty_result::block_found);
+
+	//change the test block a bit so it will be rejected by the pool
+	test_block.nNonce+=100;
+	result = m_component->check_difficulty(test_block, test_nbits);
+	EXPECT_EQ(result, nexuspool::reward::Difficulty_result::reject);
+
+	//todo: find example of a block that would be accpepted by the pool but not mainnet
+
 }
 
 TEST_F(Reward_fixture_created_component, is_round_active_test)

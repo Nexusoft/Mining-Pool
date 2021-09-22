@@ -68,7 +68,7 @@ public:
 
 	}
 
-	LLP::CBlock create_test_block()
+	LLP::CBlock create_hash_channel_test_block()
 	{
 		LLP::CBlock test_block;
 
@@ -82,6 +82,33 @@ public:
 		std::string hashPrevBlockStr = "00000902546301d2a29b00cad593cf05c798469b0e3f39fe623e6762111d6f9eed3a6a18e0e5453e81da8d0db5e89808e68e96c8df13005b714b1e63d7fa44a5025d1370f6f255af2d5121c4f65624489f1b401f651b5bd505002d3a5efc098aa6fa762d270433a51697d7d8d3252d56bbbfbe62f487f258c757690d31e493a7";
 		std::string expectedHashResultStr = "00000000000072d507b3b1cf8829e6e8201cd5288494b53b379e9f33fcaeeec82d1415330bbb4746354db60b3dbb86ed5008d27877ada92194e5d54d3bfb247ede1b0305db3f208e7e4a51a237dcb0ccc342d345ad7221f0bbe30561e517d0adb2190870bd24ab6b17e9dd895383f183eab21d5d045e438ad9c3d004983eed6b";
 		std::uint64_t expectedHashUpper64Bits = 0x72d5;
+
+		test_block.nHeight = nHeight;
+		test_block.nVersion = nVersion;
+		test_block.nChannel = nChannel;
+		test_block.nBits = nBits;
+		test_block.nNonce = nNonce;
+		test_block.hashMerkleRoot.SetHex(merkleStr);
+		test_block.hashPrevBlock.SetHex(hashPrevBlockStr);
+
+		return test_block;
+	}
+
+	LLP::CBlock create_prime_channel_test_block()
+	{	
+		LLP::CBlock test_block;
+
+		// use a sample Nexus block as a test vector
+		std::uint32_t nHeight = 2023281;
+		std::uint32_t nVersion = 4;
+		std::uint32_t nChannel = 1;
+		std::uint32_t nBits = 0x04edbf41;
+		std::uint64_t nNonce = 4855405147206064663;
+		std::string merkleStr = "753608706d2e1a660e8bb781cfafb1bd10b183a9cfb614b6999687d029caeb5dd5553f58c9d9dfc45fd6254ebb5bd6479ce9fde428177a04096ea67120478003";
+		std::string hashPrevBlockStr = "00000000000143e9a77aa469d90d2da3a2cae76de6f978af11cf4094571cf1c7c2410759ca0f7d373d74703b0e822c18413bc0e7d506b83afdcce40b685c3da306646eea9785c034fe53efb66761c249801d456340027320813afa7ba6dbe4f9cd711aa18ec2cc1c514598fca2ccad9630c0e7c19901da41d0cbfcf5c53665a2";
+		std::string expectedHashResultStr = "000008b60c656453f28d18ed2fd27745e9468b1cd4269366b81755b1266e872bdf5623ec40aa40d491319f511cb9cc6a9884177a5f7228c3ff0c29a24d9f4e8b6dc48d4765107f8f5cd32494096823a8f53f5d1ef6b17e4b9c2e9aed620bf8415dabd93ff613730fac3677198545ea99c6bfc780fd15c8e21b98af0db461bf8a";
+		std::uint64_t expectedHashUpper64Bits = 0x000008b60c656453;
+		double expected_difficulty = 8.2689857;
 
 		test_block.nHeight = nHeight;
 		test_block.nVersion = nVersion;

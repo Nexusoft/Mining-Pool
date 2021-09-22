@@ -1,5 +1,7 @@
 #include "component_impl.hpp"
 #include "common/utils.hpp"
+#include "../TAO/inc/TAO/Ledger/prime.h"
+#include "../TAO/inc/TAO/Ledger/difficulty.h"
 #include <chrono>
 
 namespace nexuspool {
@@ -107,18 +109,46 @@ bool Component_impl::end_round(std::uint32_t round_number)
 Difficulty_result Component_impl::check_difficulty(const LLP::CBlock& block, uint32_t pool_nbits) const
 {
 	Difficulty_result result = Difficulty_result::reject;
-	uint1024_t mainnet_difficulty_target;
-	mainnet_difficulty_target.SetCompact(block.nBits);
-	uint1024_t block_hash = block.GetHash();
-	uint1024_t pool_difficulty_target;
-	pool_difficulty_target.SetCompact(pool_nbits);
-	if (block_hash < mainnet_difficulty_target)
+	
+	
+	//hash channel
+	if (block.nChannel == 2)
 	{
-		result = Difficulty_result::block_found;
+		uint1024_t block_hash = block.GetHash();
+		uint1024_t mainnet_difficulty_target;
+		mainnet_difficulty_target.SetCompact(block.nBits);
+		uint1024_t pool_difficulty_target;
+		pool_difficulty_target.SetCompact(pool_nbits);
+		if (block_hash < mainnet_difficulty_target)
+		{
+			result = Difficulty_result::block_found;
+		}
+		else if (block_hash < pool_difficulty_target)
+		{
+			result = Difficulty_result::accept;
+		}
 	}
-	else if (block_hash < pool_difficulty_target)
+	//prime channel
+	else if (block.nChannel == 1)
 	{
-		result = Difficulty_result::accept;
+		uint1024_t block_prime = block.GetPrime();
+		std::vector<uint8_t> offsets;
+		double actual_prime_difficulty = TAO::Ledger::GetPrimeDifficulty(block_prime, offsets);
+		double mainnet_difficulty_target = TAO::Ledger::GetDifficulty(block.nBits, block.nChannel);
+		double pool_difficulty_target = TAO::Ledger::GetDifficulty(pool_nbits, block.nChannel);
+		if (actual_prime_difficulty >= mainnet_difficulty_target)
+		{
+			result = Difficulty_result::block_found;
+		}
+		else if (actual_prime_difficulty >= pool_difficulty_target)
+		{
+			result = Difficulty_result::accept;
+		}
+
+	}
+	else
+	{
+		result = Difficulty_result::reject;
 	}
 
 
