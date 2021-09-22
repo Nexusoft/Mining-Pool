@@ -36,6 +36,7 @@ public:
     Config_data get_config() override;
     std::vector<Account_data_for_payment> get_active_accounts_from_round() override;
     std::vector<Block_data> get_blocks_from_round(std::uint32_t round) override;
+    double get_total_shares_from_accounts() override;
 
 private:
 
@@ -55,6 +56,7 @@ private:
     std::shared_ptr<Command> m_get_config_cmd;
     std::shared_ptr<Command> m_get_active_accounts_from_round_cmd;
     std::shared_ptr<Command> m_get_blocks_from_round_cmd;
+    std::shared_ptr<Command> m_get_total_shares_from_accounts_cmd;
 };
 
 }

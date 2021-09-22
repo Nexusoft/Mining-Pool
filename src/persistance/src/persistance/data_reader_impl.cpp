@@ -30,6 +30,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_config_cmd = m_command_factory->create_command(Type::get_config);
 	m_get_active_accounts_from_round_cmd = m_command_factory->create_command(Type::get_active_accounts_from_round);
 	m_get_blocks_from_round_cmd = m_command_factory->create_command(Type::get_blocks_from_round);
+	m_get_total_shares_from_accounts_cmd = m_command_factory->create_command(Type::get_total_shares_from_accounts);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -209,6 +210,22 @@ std::vector<Block_data> Data_reader_impl::get_blocks_from_round(std::uint32_t ro
 	}
 
 	return blocks;
+}
+
+double Data_reader_impl::get_total_shares_from_accounts()
+{
+	if (!m_data_storage->execute_command(m_get_total_shares_from_accounts_cmd))
+	{
+		return 0;
+	}
+
+	auto result = std::any_cast<Result_sqlite>(m_get_total_shares_from_accounts_cmd->get_result());
+	if (result.m_rows.empty())
+	{
+		return 0;
+	}
+
+	return std::get<std::double_t>(result.m_rows.front()[0].m_data);
 }
 
 

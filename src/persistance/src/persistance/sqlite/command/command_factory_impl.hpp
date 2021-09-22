@@ -45,6 +45,9 @@ public:
             std::make_shared<Command_get_active_accounts_from_round_impl>(m_storage_manager->get_handle<sqlite3*>())));     
         m_commands.emplace(std::make_pair(Type::get_blocks_from_round,
             std::make_shared<Command_get_blocks_from_round_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::get_total_shares_from_accounts,
+            std::make_shared<Command_get_total_shares_from_accounts_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        
         // Write commands
         m_commands.emplace(std::make_pair(Type::create_account,
             std::make_shared<Command_create_account_impl>(m_storage_manager->get_handle<sqlite3*>())));
@@ -116,6 +119,9 @@ private:
             break;
         case Type::get_blocks_from_round:
             result = std::any_cast<std::shared_ptr<Command_get_blocks_from_round_impl>>(m_commands[command_type]);
+            break;
+        case Type::get_total_shares_from_accounts:
+            result = std::any_cast<std::shared_ptr<Command_get_total_shares_from_accounts_impl>>(m_commands[command_type]);
             break;
             // Write commands
         case Type::create_account:

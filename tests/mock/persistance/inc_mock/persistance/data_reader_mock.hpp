@@ -27,6 +27,8 @@ public:
     MOCK_METHOD(std::vector<Payment_data>, get_payments, (std::string account), (override));
     MOCK_METHOD(Config_data, get_config, (), (override));
     MOCK_METHOD(std::vector<Block_data>, get_blocks_from_round, (std::uint32_t round), (override));
+    MOCK_METHOD(double, get_total_shares_from_accounts, (), (override));
+    
 };
 
 }

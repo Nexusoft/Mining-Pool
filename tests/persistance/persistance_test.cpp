@@ -84,6 +84,13 @@ TEST_F(Persistance_fixture, command_get_account)
 	}
 }
 
+TEST_F(Persistance_fixture, command_get_total_shares_from_accounts)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->get_total_shares_from_accounts();
+	EXPECT_DOUBLE_EQ(result, !(0.0));
+}
+
 TEST_F(Persistance_fixture, command_get_latest_blocks)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();

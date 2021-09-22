@@ -131,7 +131,6 @@ public:
 
 	std::any get_command() const override;
 	Type get_type() const override { return Type::get_config; }
-	void set_params(std::any params) override { /* no params */ };
 };
 
 class Command_get_active_accounts_from_round_impl : public Command_base_database_sqlite
@@ -142,7 +141,6 @@ public:
 
 	std::any get_command() const override;
 	Type get_type() const override { return Type::get_active_accounts_from_round; }
-	void set_params(std::any params) override { /* no params */ };
 };
 
 class Command_get_blocks_from_round_impl : public Command_base_database_sqlite
@@ -154,6 +152,16 @@ public:
 	std::any get_command() const override;
 	Type get_type() const override { return Type::get_blocks_from_round; }
 	void set_params(std::any params) override;
+};
+
+class Command_get_total_shares_from_accounts_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_total_shares_from_accounts_impl(sqlite3* handle);
+
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_total_shares_from_accounts; }
 };
 
 // ------------------------------------------------------------------------------------

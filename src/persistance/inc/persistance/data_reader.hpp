@@ -30,6 +30,7 @@ public:
     virtual std::vector<Payment_data> get_payments(std::string account) = 0;
     virtual Config_data get_config() = 0;
     virtual std::vector<Block_data> get_blocks_from_round(std::uint32_t round) = 0;
+    virtual double get_total_shares_from_accounts() = 0;
 };
 }
 }

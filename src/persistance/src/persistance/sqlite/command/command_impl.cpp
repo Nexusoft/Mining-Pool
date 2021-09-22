@@ -313,6 +313,21 @@ void Command_get_blocks_from_round_impl::set_params(std::any params)
 	auto casted_params = std::any_cast<std::int64_t>(m_params);
 	bind_param(m_stmt, ":round", casted_params);
 }
+
+// -----------------------------------------------------------------------------------------------
+Command_get_total_shares_from_accounts_impl::Command_get_total_shares_from_accounts_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT SUM(shares) FROM account", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_total_shares_from_accounts_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt},
+		{{Column_sqlite::double_t}} };
+	return command;
+}
+
 // -----------------------------------------------------------------------------------------------
 // Write commands
 // -----------------------------------------------------------------------------------------------

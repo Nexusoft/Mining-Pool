@@ -39,7 +39,8 @@ enum class Type : std::uint8_t
 	add_block,
 	update_block_rewards,
 	get_blocks_from_round,
-	update_round
+	update_round,
+	get_total_shares_from_accounts
 };
 
 
