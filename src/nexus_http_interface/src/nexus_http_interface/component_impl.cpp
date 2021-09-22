@@ -47,6 +47,20 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 
 bool Component_impl::payout(std::string account_from, std::string pin, Payout_recipients const& recipients)
 {
+	nlohmann::json body;
+	body["pin"] = pin;
+	body["name"] = account_from;
+	body["recipients"] = nlohmann::json::array();
+	for (auto& recipient : recipients)
+	{
+		nlohmann::json json_recipient;
+		json_recipient["address_to"] = recipient.m_address;
+		json_recipient["amount"] = recipient.m_reward;
+
+		body["recipients"].push_back(json_recipient);
+	}
+
+	m_logger->info("{}", body.dump());
 	/*
 	"pin": "1234",
 		"name" : "default"
@@ -69,8 +83,10 @@ bool Component_impl::payout(std::string account_from, std::string pin, Payout_re
 		]
 		*/
 
-	std::string parameter{ "?verbose=summary&hash=" };
-	auto response = m_client->payout(parameter.c_str());
+	//std::string parameter{ "?pin=" };
+	//parameter += pin;
+	//parameter += "&"
+	auto response = m_client->payout(body.dump().c_str());
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
