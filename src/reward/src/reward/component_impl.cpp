@@ -110,7 +110,6 @@ Difficulty_result Component_impl::check_difficulty(const LLP::CBlock& block, uin
 {
 	Difficulty_result result = Difficulty_result::reject;
 	
-	
 	//hash channel
 	if (block.nChannel == 2)
 	{
@@ -174,6 +173,16 @@ bool Component_impl::pay_all(std::uint32_t round)
 	if (round_data.m_is_active)
 	{
 		return false;	// round is still active
+	}
+
+	auto time_now = std::chrono::system_clock::now();
+	auto round_end_time = common::get_timepoint_from_string(round_data.m_end_date_time, "%Y-%m-%d %H:%M:%S");
+	round_end_time += std::chrono::minutes(15);		// 15 minutes grace period
+
+	if (time_now < round_end_time)
+	{
+		m_logger->error("Payout error. Payout for round {} will be possible after {}", round, common::get_datetime_string(round_end_time));
+		return false;
 	}
 
 	m_payout_manager.payout(m_account_from, m_pin, round);

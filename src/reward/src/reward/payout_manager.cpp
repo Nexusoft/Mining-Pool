@@ -74,12 +74,21 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round)
 bool Payout_manager::payout(std::string const& account_from, std::string const& pin, std::uint32_t current_round)
 {
 	nexus_http_interface::Payout_recipients payout_recipients{};
-	auto const accounts = m_data_reader.get_active_accounts_from_round();
+	auto const payments = m_data_reader.get_not_paid_data_from_round(current_round);
+	if (payments.empty())
+	{
+		return false;
+	}
+
+	for (auto& payment : payments)
+	{
+		payout_recipients.push_back(nexus_http_interface::Payout_recipient_data{ payment.m_account, payment.m_amount});
+	}
 
 	auto result = m_http_interface.payout(account_from, pin, payout_recipients);
 	if (!result)
 	{
-		m_logger->error("Couldn't pay miners. {} accounts from round {} not paid!", accounts.size(), current_round);
+		m_logger->error("Couldn't pay miners. {} accounts from round {} not paid!", payments.size(), current_round);
 		return false;
 	}
 	return true;
