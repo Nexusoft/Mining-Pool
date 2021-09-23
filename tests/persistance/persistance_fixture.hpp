@@ -4,9 +4,8 @@
 #include "test_data.hpp"
 #include <gtest/gtest.h>
 #include <asio/io_context.hpp>
-#include <config/config.hpp>
-#include <persistance/create_component.hpp>
-
+#include "config/types.hpp"
+#include "persistance/create_component.hpp"
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <thread>
