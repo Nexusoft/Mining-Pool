@@ -1,7 +1,7 @@
 #include "component_impl.hpp"
 #include "common/utils.hpp"
-#include "../TAO/inc/TAO/Ledger/prime.h"
-#include "../TAO/inc/TAO/Ledger/difficulty.h"
+#include "TAO/Ledger/prime.h"
+#include "TAO/Ledger/difficulty.h"
 #include <chrono>
 
 namespace nexuspool {

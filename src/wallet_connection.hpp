@@ -4,7 +4,6 @@
 #include "network/connection.hpp"
 #include "network/socket.hpp"
 #include "network/types.hpp"
-#include <spdlog/spdlog.h>
 #include "chrono/timer_factory.hpp"
 #include "timer_manager.hpp"
 #include "block.hpp"
@@ -18,10 +17,10 @@
 #include <atomic>
 
 namespace asio { class io_context; }
+namespace spdlog { class logger; }
 
 namespace nexuspool
 {
-namespace config { class Config; }
 class Pool_manager;
 
 class Wallet_connection : public std::enable_shared_from_this<Wallet_connection>
@@ -29,9 +28,11 @@ class Wallet_connection : public std::enable_shared_from_this<Wallet_connection>
 public:
 
     Wallet_connection(std::shared_ptr<asio::io_context> io_context,
+        std::shared_ptr<spdlog::logger> logger,
         std::weak_ptr<Pool_manager> pool_manager,
         common::Mining_mode mining_mode,
-        config::Config& config,
+        std::uint16_t connection_retry_interval,
+        std::uint16_t get_height_interval,
         chrono::Timer_factory::Sptr timer_factory, 
         network::Socket::Sptr socket);
 
@@ -50,12 +51,13 @@ private:
     void retry_connect(network::Endpoint const& wallet_endpoint);
 
     std::shared_ptr<::asio::io_context> m_io_context;
+    std::shared_ptr<spdlog::logger> m_logger;
     std::weak_ptr<Pool_manager> m_pool_manager;
-    config::Config& m_config;
     common::Mining_mode m_mining_mode;
+    std::uint16_t const m_connection_retry_interval;
+    std::uint16_t const m_get_height_interval;
     network::Socket::Sptr m_socket;
     network::Connection::Sptr m_connection;
-    std::shared_ptr<spdlog::logger> m_logger;
     Timer_manager m_timer_manager;
     std::uint32_t m_current_height;
 

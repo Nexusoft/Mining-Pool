@@ -2,7 +2,6 @@
 #define NEXUSPOOL_MINER_CONNECTION_HPP
 
 #include "network/connection.hpp"
-#include <spdlog/spdlog.h>
 #include "chrono/timer_factory.hpp"
 #include "timer_manager.hpp"
 #include "session.hpp"
@@ -10,6 +9,8 @@
 #include <memory>
 #include <string>
 #include <atomic>
+
+namespace spdlog { class logger; }
 
 namespace nexuspool
 {
@@ -19,7 +20,8 @@ class Miner_connection : public std::enable_shared_from_this<Miner_connection>
 {
 public:
 
-    Miner_connection(chrono::Timer_factory::Sptr timer_factory, 
+    Miner_connection(std::shared_ptr<spdlog::logger> logger,
+        chrono::Timer_factory::Sptr timer_factory, 
         network::Connection::Sptr&& connection, 
         std::weak_ptr<Pool_manager> pool_manager,
         Session_key session_key,
@@ -37,9 +39,9 @@ private:
     // checks if a new account should be created, add share for session
     void process_accepted();
 
+    std::shared_ptr<spdlog::logger> m_logger;
     network::Connection::Sptr m_connection;
     std::weak_ptr<Pool_manager> m_pool_manager;
-    std::shared_ptr<spdlog::logger> m_logger;
     Timer_manager m_timer_manager;
     std::atomic<std::uint32_t> m_current_height;
     std::string m_remote_address;

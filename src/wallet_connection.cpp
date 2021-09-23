@@ -1,25 +1,27 @@
 #include "wallet_connection.hpp"
 #include "pool_manager.hpp"
 #include "packet.hpp"
-#include "config/config.hpp"
-#include "config/types.hpp"
 #include "LLP/block.hpp"
+#include <spdlog/spdlog.h>
 #include <algorithm>
 
 namespace nexuspool
 {
 Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_context,
+    std::shared_ptr<spdlog::logger> logger,
     std::weak_ptr<Pool_manager> pool_manager,
     common::Mining_mode mining_mode,
-    config::Config& config,
+    std::uint16_t connection_retry_interval, 
+    std::uint16_t get_height_interval,
     chrono::Timer_factory::Sptr timer_factory, 
     network::Socket::Sptr socket)
     : m_io_context{ std::move(io_context) }
+    , m_logger{std::move(logger)}
     , m_pool_manager{std::move(pool_manager)}
-    , m_config{ config }
     , m_mining_mode{mining_mode}
+    , m_connection_retry_interval{ connection_retry_interval }
+    , m_get_height_interval{ get_height_interval }
     , m_socket{ std::move(socket) }
-    , m_logger{ spdlog::get("logger") }
     , m_timer_manager{ std::move(timer_factory) }
     , m_current_height{0}
     , m_get_block_pool_manager{false}
@@ -39,9 +41,8 @@ void Wallet_connection::retry_connect(network::Endpoint const& wallet_endpoint)
     m_connection = nullptr;		// close connection (socket etc)
 
     // retry connect
-    auto const connection_retry_interval = m_config.get_connection_retry_interval();
-    m_logger->info("Connection retry {} seconds", connection_retry_interval);
-    m_timer_manager.start_connection_retry_timer(connection_retry_interval, shared_from_this(), wallet_endpoint);
+    m_logger->info("Connection retry {} seconds", m_connection_retry_interval);
+    m_timer_manager.start_connection_retry_timer(m_connection_retry_interval, shared_from_this(), wallet_endpoint);
 }
 
 bool Wallet_connection::connect(network::Endpoint const& wallet_endpoint)
@@ -70,8 +71,7 @@ bool Wallet_connection::connect(network::Endpoint const& wallet_endpoint)
                     packet.m_data = std::make_shared<network::Payload>(uint2bytes(self->m_mining_mode == common::Mining_mode::PRIME ? 1U : 2U));
                     self->m_connection->transmit(packet.get_bytes());
 
-                    auto const get_height_interval = self->m_config.get_height_interval();
-                    self->m_timer_manager.start_get_height_timer(get_height_interval, self->m_connection);             
+                    self->m_timer_manager.start_get_height_timer(self->m_get_height_interval, self->m_connection);
                 }
                 else
                 {	// data received

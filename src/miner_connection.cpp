@@ -4,17 +4,19 @@
 #include "LLP/block.hpp"
 #include "TAO/Register/types/address.h"
 #include "types.hpp"
+#include <spdlog/spdlog.h>
 
 namespace nexuspool
 {
-Miner_connection::Miner_connection(chrono::Timer_factory::Sptr timer_factory, 
+Miner_connection::Miner_connection(std::shared_ptr<spdlog::logger> logger,
+	chrono::Timer_factory::Sptr timer_factory, 
 	network::Connection::Sptr&& connection, 
 	std::weak_ptr<Pool_manager> pool_manager,
 	Session_key session_key,
 	Session_registry& session_registry)
-    : m_connection{ std::move(connection) }
+    : m_logger{ std::move(logger) }
+	, m_connection{ std::move(connection) }
 	, m_pool_manager{std::move(pool_manager)}
-    , m_logger{ spdlog::get("logger") }
     , m_timer_manager{ std::move(timer_factory) }
     , m_current_height{ 0 }
 	, m_remote_address{""}

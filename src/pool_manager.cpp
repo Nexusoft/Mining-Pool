@@ -47,7 +47,15 @@ void Pool_manager::start()
 
 	auto self = shared_from_this();
 	// connect to wallet
-	m_wallet_connection = std::make_shared<Wallet_connection>(m_io_context, self, mining_mode, m_config, m_timer_factory, std::move(local_socket));
+	m_wallet_connection = std::make_shared<Wallet_connection>(
+		m_io_context, 
+		m_logger, 
+		self, 
+		mining_mode, 
+		m_config.get_connection_retry_interval(), 
+		m_config.get_height_interval(), 
+		m_timer_factory, 
+		std::move(local_socket));
 	if (!m_wallet_connection->connect(wallet_endpoint))
 	{
 		m_logger->critical("Couldn't connect to wallet using ip {} and port {}", m_config.get_wallet_ip(), m_config.get_wallet_port());
@@ -73,7 +81,7 @@ void Pool_manager::start()
 	auto socket_handler = [self](network::Connection::Sptr&& connection)
 	{
 		auto const session_key = self->m_session_registry.create_session();
-		auto miner_connection = std::make_shared<Miner_connection>(self->m_timer_factory, std::move(connection), self, session_key, self->m_session_registry);
+		auto miner_connection = std::make_shared<Miner_connection>(self->m_logger, self->m_timer_factory, std::move(connection), self, session_key, self->m_session_registry);
 
 		auto session = self->m_session_registry.get_session(session_key);
 		session->update_connection(miner_connection);
