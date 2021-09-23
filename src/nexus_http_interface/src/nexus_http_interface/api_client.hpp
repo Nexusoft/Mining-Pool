@@ -10,8 +10,8 @@ namespace nexuspool {
 namespace nexus_http_interface {
 
 #include OATPP_CODEGEN_BEGIN(DTO)
-class Payout_recipient_dto : public oatpp::DTO {
-
+class Payout_recipient_dto : public oatpp::DTO 
+{
 	DTO_INIT(Payout_recipient_dto, DTO)
 
 	DTO_FIELD(String, address_to);
@@ -28,7 +28,6 @@ public:
 
 class Payout_dto : public oatpp::DTO 
 {
-
 	DTO_INIT(Payout_dto, DTO)
 
 	DTO_FIELD(String, pin);
@@ -44,9 +43,6 @@ class Api_client : public oatpp::web::client::ApiClient
 API_CLIENT_INIT(Api_client)
 API_CALL("GET", "ledger/get/block{parameter}", get_block, PATH(String, parameter))
 API_CALL("POST", "finance/debit/account", payout, BODY_DTO(Object<Payout_dto>, body))
-
-
-
 };
 #include OATPP_CODEGEN_END(ApiClient)
 

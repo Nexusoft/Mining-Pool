@@ -31,6 +31,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_active_accounts_from_round_cmd = m_command_factory->create_command(Type::get_active_accounts_from_round);
 	m_get_blocks_from_round_cmd = m_command_factory->create_command(Type::get_blocks_from_round);
 	m_get_total_shares_from_accounts_cmd = m_command_factory->create_command(Type::get_total_shares_from_accounts);
+	m_get_not_paid_data_from_round_cmd = m_command_factory->create_command(Type::get_not_paid_data_from_round);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -226,6 +227,24 @@ double Data_reader_impl::get_total_shares_from_accounts()
 	}
 
 	return std::get<std::double_t>(result.m_rows.front()[0].m_data);
+}
+
+std::vector<Payment_data> Data_reader_impl::get_not_paid_data_from_round(std::uint32_t round)
+{
+	std::vector<Payment_data> payments{};
+	m_get_not_paid_data_from_round_cmd->set_params(round);
+	if (!m_data_storage->execute_command(m_get_not_paid_data_from_round_cmd))
+	{
+		return payments;	// return empty result
+	}
+
+	auto result = std::any_cast<Result_sqlite>(m_get_not_paid_data_from_round_cmd->get_result());
+	for (auto& row : result.m_rows)
+	{
+		payments.push_back(convert_to_reduced_payment_data(std::move(row)));
+	}
+
+	return payments;
 }
 
 

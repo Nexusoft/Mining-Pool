@@ -76,8 +76,6 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 	nexus_http_interface::Payout_recipients payout_recipients{};
 	auto const accounts = m_data_reader.get_active_accounts_from_round();
 
-	// update total_shares of round
-
 	auto result = m_http_interface.payout(account_from, pin, payout_recipients);
 	if (!result)
 	{
