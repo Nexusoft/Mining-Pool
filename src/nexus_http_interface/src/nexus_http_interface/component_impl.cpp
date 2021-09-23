@@ -32,6 +32,7 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
+		m_logger->error("API error. Code: {} Message: {}", status_code, response->readBodyToString()->c_str());
 		return false;
 	}
 
@@ -49,49 +50,19 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 
 bool Component_impl::payout(std::string account_from, std::string pin, Payout_recipients const& recipients)
 {
-	nlohmann::json body;
-	body["pin"] = pin;
-	body["name"] = account_from;
-	body["recipients"] = nlohmann::json::array();
+	auto dto = Payout_dto::createShared();
+	dto->pin = oatpp::String(pin.c_str());
+	dto->name = oatpp::String(account_from.c_str());
 	for (auto& recipient : recipients)
 	{
-		nlohmann::json json_recipient;
-		json_recipient["address_to"] = recipient.m_address;
-		json_recipient["amount"] = recipient.m_reward;
-
-		body["recipients"].push_back(json_recipient);
+		dto->recipients->push_back(Payout_recipient_dto::createShared(recipient.m_address.c_str(), recipient.m_reward));
 	}
 
-	m_logger->info("{}", body.dump());
-	/*
-	"pin": "1234",
-		"name" : "default"
-		"recipients" :
-		[
-	{
-		"name_to": "bob:savings",
-			"amount" : 5,
-			"reference" : 1234
-	},
-		{
-			"address_to": "8CHjS5Qe7Mghgrqb6NeEaVxjexbdp9p2QVdRTt8W4rzbWhu3fL8",
-			"amount" : 5,
-			"reference" : 5678
-		},
-		{
-			"address_to": "4kYv4Xft6wufMVi191nQDNprgkK6kzy6gqWRpmfMxyx9KMfEV1u",
-			"amount" : 5
-		}
-		]
-		*/
-
-	//std::string parameter{ "?pin=" };
-	//parameter += pin;
-	//parameter += "&"
-	auto response = m_client->payout(body.dump().c_str());
+	auto response = m_client->payout(dto);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
+		m_logger->error("API error. Code: {} Message: {}", status_code, response->readBodyToString()->c_str());
 		return false;
 	}
 
