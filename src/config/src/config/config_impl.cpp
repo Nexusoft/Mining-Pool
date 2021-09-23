@@ -1,5 +1,5 @@
 
-#include "config/config.hpp"
+#include "config/config_impl.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -10,7 +10,7 @@ namespace nexuspool
 {
 namespace config
 {
-	Config::Config()
+	Config_impl::Config_impl()
 		: m_wallet_ip{ "127.0.0.1" }
 		, m_wallet_port{9325}
 		, m_local_port{ 0 }
@@ -28,7 +28,7 @@ namespace config
 	{
 	}
 
-	bool Config::read_config(std::string const& pool_config_file)
+	bool Config_impl::read_config(std::string const& pool_config_file)
 	{
 		std::cout << "Reading config file " << pool_config_file << std::endl;
 
@@ -122,7 +122,7 @@ namespace config
 		return true;
 	}
 
-	bool Config::read_stats_printer_config(nlohmann::json& j)
+	bool Config_impl::read_stats_printer_config(nlohmann::json& j)
 	{
 		for (auto& stats_printers_json : j["stats_printers"])
 		{

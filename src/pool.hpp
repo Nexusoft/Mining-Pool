@@ -40,7 +40,7 @@ private:
 	std::shared_ptr<spdlog::logger> m_logger;
 	std::shared_ptr<Pool_manager> m_pool_manager;
 
-	config::Config m_config;
+	std::shared_ptr<config::Config> m_config;
 	std::unique_ptr<api::Server> m_api_server;
 
 	std::shared_ptr<::asio::signal_set> m_signals;

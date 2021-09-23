@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include "test_data.hpp"
 #include "reward/create_component.hpp"
-#include <config/config.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <cstdint>
@@ -34,8 +33,6 @@ protected:
 	Test_data m_test_data;
 	std::unique_ptr<persistance::Component_mock> m_persistance_component_mock;
 	std::shared_ptr<spdlog::logger> m_logger;
-	config::Config m_config;
-
 	Component::Uptr m_component;
 
 	void TearDown() override

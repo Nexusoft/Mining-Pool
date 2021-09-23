@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 #include <nexus_http_interface/create_component.hpp>
-#include <config/config.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <cstdint>
@@ -29,7 +28,6 @@ public:
 
 protected:
 	std::shared_ptr<spdlog::logger> m_logger;
-	config::Config m_config;
 	Component::Uptr m_component;
 
 	void TearDown() override

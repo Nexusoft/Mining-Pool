@@ -20,6 +20,7 @@ namespace nexuspool
 		: m_io_context{ std::make_shared<::asio::io_context>() }
 		, m_signals{ std::make_shared<::asio::signal_set>(*m_io_context) }
 	{
+		m_config = config::create_config();
 		m_logger = spdlog::stdout_color_mt("logger");
 		m_logger->set_level(spdlog::level::debug);
 		m_logger->set_pattern("[%D %H:%M:%S.%e][%^%l%$] %v");
@@ -65,13 +66,13 @@ namespace nexuspool
 
 	bool Pool::init(std::string const& pool_config_file)
 	{
-		if (!m_config.read_config(pool_config_file))
+		if (!m_config->read_config(pool_config_file))
 		{
 			return false;
 		}
 
 		// data storage initialisation
-		m_persistance_component = persistance::create_component(m_logger, m_config.get_persistance_config());
+		m_persistance_component = persistance::create_component(m_logger, m_config->get_persistance_config());
 
 		auto const config_data = storage_config_check();
 
@@ -85,7 +86,7 @@ namespace nexuspool
 			m_persistance_component->get_data_writer_factory(),
 			m_persistance_component->get_data_reader_factory());
 		m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
-			m_config.get_local_ip(), m_config.get_api_listen_port(), m_network_component->get_socket_factory());
+			m_config->get_local_ip(), m_config->get_api_listen_port(), m_network_component->get_socket_factory());
 
 		return true;
 	}
@@ -104,18 +105,18 @@ namespace nexuspool
 		auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 
 		config_data = data_reader->get_config();
-		std::string const mining_mode{ m_config.get_mining_mode() == common::Mining_mode::HASH ? "HASH" : "PRIME" };
+		std::string const mining_mode{ m_config->get_mining_mode() == common::Mining_mode::HASH ? "HASH" : "PRIME" };
 		if (config_data.m_version.empty())
 		{
 			// No config present
-			data_writer->create_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider, m_config.get_pool_config().m_round_duration_hours);
+			data_writer->create_config(mining_mode, m_config->get_pool_config().m_fee, m_config->get_pool_config().m_difficulty_divider, m_config->get_pool_config().m_round_duration_hours);
 		}
 		else
 		{
 			if (mining_mode != config_data.m_mining_mode &&
-				m_config.get_pool_config().m_fee != config_data.m_fee &&
-				m_config.get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider &&
-				m_config.get_pool_config().m_round_duration_hours != config_data.m_round_duration_hours)
+				m_config->get_pool_config().m_fee != config_data.m_fee &&
+				m_config->get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider &&
+				m_config->get_pool_config().m_round_duration_hours != config_data.m_round_duration_hours)
 			{
 				// update config but only if there is no round active
 				auto const round_data = data_reader->get_latest_round();
@@ -125,7 +126,7 @@ namespace nexuspool
 				}
 				else
 				{
-					data_writer->update_config(mining_mode, m_config.get_pool_config().m_fee, m_config.get_pool_config().m_difficulty_divider, m_config.get_pool_config().m_round_duration_hours);
+					data_writer->update_config(mining_mode, m_config->get_pool_config().m_fee, m_config->get_pool_config().m_difficulty_divider, m_config->get_pool_config().m_round_duration_hours);
 				}
 			}
 		}

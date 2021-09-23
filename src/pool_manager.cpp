@@ -11,28 +11,28 @@ namespace nexuspool
 
 Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, 
 	std::shared_ptr<spdlog::logger> logger,
-	config::Config& config,
+	config::Config::Sptr config,
 	persistance::Config_data storage_config_data,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
 	persistance::Data_reader_factory::Sptr data_reader_factory)
 	: m_io_context{std::move(io_context) }
 	, m_logger{ std::move(logger)}
-	, m_config{config}
+	, m_config{std::move(config)}
 	, m_storage_config_data{std::move(storage_config_data)}
 	, m_timer_factory{std::make_shared<chrono::Timer_factory>(m_io_context)}
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
 	, m_reward_component{reward::create_component(m_logger, 
-		nexus_http_interface::create_component(m_logger, m_config.get_wallet_ip()), 
+		nexus_http_interface::create_component(m_logger, m_config->get_wallet_ip()), 
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_data_reader_factory->create_data_reader(),
-		m_config.get_pool_config().m_account,
-		m_config.get_pool_config().m_pin,
-		m_config.get_pool_config().m_fee)}
+		m_config->get_pool_config().m_account,
+		m_config->get_pool_config().m_pin,
+		m_config->get_pool_config().m_fee)}
 	, m_listen_socket{}
-	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config.get_session_expiry_time()}
+	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config->get_session_expiry_time()}
 	, m_current_height{0}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
@@ -40,8 +40,8 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 
 void Pool_manager::start()
 {
-	network::Endpoint wallet_endpoint{ network::Transport_protocol::tcp, m_config.get_wallet_ip(), m_config.get_wallet_port() };
-	network::Endpoint local_endpoint{ network::Transport_protocol::tcp, m_config.get_local_ip(), m_config.get_local_port() };
+	network::Endpoint wallet_endpoint{ network::Transport_protocol::tcp, m_config->get_wallet_ip(), m_config->get_wallet_port() };
+	network::Endpoint local_endpoint{ network::Transport_protocol::tcp, m_config->get_local_ip(), m_config->get_local_port() };
 	auto local_socket = m_socket_factory->create_socket(local_endpoint);
 	common::Mining_mode mining_mode = m_storage_config_data.m_mining_mode == "HASH" ? common::Mining_mode::HASH : common::Mining_mode::PRIME;
 
@@ -52,13 +52,13 @@ void Pool_manager::start()
 		m_logger, 
 		self, 
 		mining_mode, 
-		m_config.get_connection_retry_interval(), 
-		m_config.get_height_interval(), 
+		m_config->get_connection_retry_interval(), 
+		m_config->get_height_interval(), 
 		m_timer_factory, 
 		std::move(local_socket));
 	if (!m_wallet_connection->connect(wallet_endpoint))
 	{
-		m_logger->critical("Couldn't connect to wallet using ip {} and port {}", m_config.get_wallet_ip(), m_config.get_wallet_port());
+		m_logger->critical("Couldn't connect to wallet using ip {} and port {}", m_config->get_wallet_ip(), m_config->get_wallet_port());
 		return;
 	}
 
@@ -73,7 +73,7 @@ void Pool_manager::start()
 	}
 
 	// listen
-	network::Endpoint local_listen_endpoint{ network::Transport_protocol::tcp, m_config.get_local_ip(), m_config.get_local_listen_port() };
+	network::Endpoint local_listen_endpoint{ network::Transport_protocol::tcp, m_config->get_local_ip(), m_config->get_local_listen_port() };
 	m_listen_socket = m_socket_factory->create_socket(local_listen_endpoint);
 
 	
@@ -92,8 +92,8 @@ void Pool_manager::start()
 
 	m_listen_socket->listen(socket_handler);
 
-	m_session_registry_maintenance->start(chrono::Seconds(m_config.get_session_expiry_time()), 
-		session_registry_maintenance_handler(m_config.get_session_expiry_time()));
+	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
+		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 	
 }
 
