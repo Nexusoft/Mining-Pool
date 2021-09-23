@@ -60,7 +60,6 @@ void Storage_manager_sqlite::start()
 		  last_active TEXT,
 		  connection_count INTEGER,
 		  shares REAL,
-		  shares_last_round REAL,
 		  hashrate REAL
 		);)", NULL, NULL, NULL);
 

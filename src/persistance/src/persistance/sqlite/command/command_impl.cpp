@@ -336,7 +336,7 @@ Command_create_account_impl::Command_create_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string create_account{R"(INSERT INTO account 
-		(name, created_at, last_active, connection_count, shares, shares_last_round, hashrate) 
+		(name, created_at, last_active, connection_count, shares, hashrate) 
 		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, 0))"};
 
 	sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL);
@@ -394,7 +394,7 @@ Command_update_account_impl::Command_update_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string update_account{ R"(UPDATE account SET 
-			last_active = :last_active, connection_count = :connection_count, shares = :shares, shares_last_round = :shares, hashrate = :hashrate
+			last_active = :last_active, connection_count = :connection_count, shares = :shares, hashrate = :hashrate
 			WHERE name = :name)" };
 
 	sqlite3_prepare_v2(m_handle, update_account.c_str(), -1, &m_stmt, NULL);
