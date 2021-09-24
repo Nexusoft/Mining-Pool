@@ -8,13 +8,13 @@ namespace common {
 
 std::string get_datetime_string(std::chrono::system_clock::time_point t)
 {
-    return date::format("%Y-%m-%d %H:%M:%S", t);
+    return date::format(datetime_format, t);
 }
 
 std::string get_datetime_string(std::uint32_t t)
 {
     date::sys_seconds tp{ std::chrono::seconds{t} };
-    return date::format("%Y-%m-%d %H:%M:%S", tp);
+    return date::format(datetime_format, tp);
 }
 
 std::chrono::system_clock::time_point get_timepoint_from_string(std::string const& date, std::string const& format)

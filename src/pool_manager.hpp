@@ -52,6 +52,8 @@ public:
 private:
 
     chrono::Timer::Handler session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval);
+    chrono::Timer::Handler end_round_handler();
+    void end_round();
 
     std::shared_ptr<::asio::io_context> m_io_context;
     std::shared_ptr<spdlog::logger> m_logger;
@@ -68,6 +70,7 @@ private:
 
     Session_registry m_session_registry;    // holds all sessions -> each session contains a miner_connection
     chrono::Timer::Uptr m_session_registry_maintenance;
+    chrono::Timer::Uptr m_end_round_timer;
 
     // connection variables
     std::atomic<std::uint32_t> m_current_height;

@@ -4,6 +4,7 @@
 #include "block.hpp"
 #include <string>
 #include <memory>
+#include <chrono>
 
 namespace nexuspool {
 namespace reward {
@@ -23,6 +24,7 @@ public:
     // Check if the current round is active or not
     virtual bool is_round_active() = 0;
     virtual std::uint32_t get_current_round() const = 0;
+    virtual void get_start_end_round_times(std::chrono::system_clock::time_point& start_time, std::chrono::system_clock::time_point& end_time) = 0;
 
     // End round
     virtual bool end_round(std::uint32_t round_number) = 0;

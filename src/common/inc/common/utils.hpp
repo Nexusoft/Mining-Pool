@@ -7,6 +7,8 @@
 namespace nexuspool {
 namespace common {
 
+constexpr const char* datetime_format = { "%Y-%m-%d %H:%M:%S" };
+
 std::string get_datetime_string(std::chrono::system_clock::time_point t);
 std::string get_datetime_string(std::uint32_t t);
 

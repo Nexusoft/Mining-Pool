@@ -3,6 +3,7 @@
 #include "TAO/Ledger/prime.h"
 #include "TAO/Ledger/difficulty.h"
 #include <chrono>
+#include <cassert>
 
 namespace nexuspool {
 namespace reward {
@@ -62,6 +63,16 @@ bool Component_impl::is_round_active()
 std::uint32_t Component_impl::get_current_round() const
 {
 	return m_current_round;
+}
+
+void Component_impl::get_start_end_round_times(std::chrono::system_clock::time_point& start_time, std::chrono::system_clock::time_point& end_time)
+{
+	auto const round_data = m_data_reader->get_latest_round();
+	assert(round_data.is_empty());
+
+	start_time = common::get_timepoint_from_string(round_data.m_start_date_time, common::datetime_format);
+	end_time = common::get_timepoint_from_string(round_data.m_end_date_time, common::datetime_format);
+
 }
 
 bool Component_impl::end_round(std::uint32_t round_number)
@@ -174,7 +185,11 @@ bool Component_impl::pay_all(std::uint32_t round)
 		return false;	// round is still active
 	}
 
-	m_payout_manager.payout(m_account_from, m_pin, round);
+	if (m_payout_manager.payout(m_account_from, m_pin, round))
+	{
+		round_data.m_is_paid = true;
+		m_shared_data_writer->update_round(round_data);
+	}
 	return true;
 }
 

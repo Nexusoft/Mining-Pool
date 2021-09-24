@@ -83,6 +83,8 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 
 	if (payments.size() > 99) // 99 recipients are allowed in a single transaction
 	{
+		// TODO payout all other miners also!
+
 		std::vector<persistance::Payment_data> payments_reduced(std::make_move_iterator(payments.begin()), std::make_move_iterator(payments.begin() + 98));
 		payments.erase(payments.begin(), payments.begin() + 98);
 		for (auto& payment : payments_reduced)

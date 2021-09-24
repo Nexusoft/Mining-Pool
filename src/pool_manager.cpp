@@ -36,6 +36,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	, m_current_height{0}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
+	m_end_round_timer = m_timer_factory->create_timer();
 }
 
 void Pool_manager::start()
@@ -72,6 +73,20 @@ void Pool_manager::start()
 		}
 	}
 
+	// calculate round duration and start timer for end_round
+	std::chrono::system_clock::time_point round_start_time, round_end_time;
+	m_reward_component->get_start_end_round_times(round_start_time, round_end_time);
+	auto time_now = std::chrono::system_clock::now();
+	if (time_now > round_end_time)
+	{
+		end_round();
+	}
+	else
+	{
+		// start timer for end_round
+		m_end_round_timer->start(chrono::Seconds(std::chrono::duration_cast<std::chrono::seconds>(round_end_time - time_now).count()), end_round_handler());
+	}
+
 	// listen
 	network::Endpoint local_listen_endpoint{ network::Transport_protocol::tcp, m_config->get_local_ip(), m_config->get_local_listen_port() };
 	m_listen_socket = m_socket_factory->create_socket(local_listen_endpoint);
@@ -100,6 +115,7 @@ void Pool_manager::start()
 void Pool_manager::stop()
 {
 	m_session_registry_maintenance->cancel();
+	m_end_round_timer->cancel();
 	m_session_registry.stop();	// clear sessions and deletes miner_connection objects
 	m_listen_socket->stop_listen();
 }
@@ -190,5 +206,35 @@ chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::u
 	};
 
 }
+
+chrono::Timer::Handler Pool_manager::end_round_handler()
+{
+	return[this](bool canceled)
+	{
+		if (canceled)	// don't do anything if the timer has been canceled
+		{
+			return;
+		}
+
+		end_round();
+		// start next round
+		if (!m_reward_component->start_round(m_storage_config_data.m_round_duration_hours))
+		{
+			// error
+			return;
+		}
+	};
+}
+
+void Pool_manager::end_round()
+{
+	auto const current_round = m_reward_component->get_current_round();
+	m_reward_component->end_round(current_round);
+	m_reward_component->pay_all(current_round);
+}
+
+
+
+
 
 }
