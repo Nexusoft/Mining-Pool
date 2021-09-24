@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "reward_fixture.hpp"
+#include "common/utils.hpp"
 
 using namespace ::nexuspool;
 
@@ -69,6 +70,17 @@ TEST_F(Reward_fixture_created_component, start_round_test)
 	auto result = m_component->start_round(24);
 	EXPECT_TRUE(result);
 	EXPECT_EQ(m_component->get_current_round(), test_round_data.m_round);
+}
+
+TEST_F(Reward_fixture_created_component, get_start_end_round_times_test)
+{
+	ON_CALL(*m_test_data.m_data_reader_mock_raw, get_latest_round).WillByDefault(Return(test_round_data));
+
+	std::chrono::system_clock::time_point round_start_time, round_end_time;
+	m_component->get_start_end_round_times(round_start_time, round_end_time);
+
+	EXPECT_EQ(common::get_datetime_string(round_start_time), test_round_data.m_start_date_time);
+	EXPECT_EQ(common::get_datetime_string(round_end_time), test_round_data.m_end_date_time);
 }
 
 TEST_F(Reward_fixture, create_component_with_active_round)

@@ -68,7 +68,7 @@ std::uint32_t Component_impl::get_current_round() const
 void Component_impl::get_start_end_round_times(std::chrono::system_clock::time_point& start_time, std::chrono::system_clock::time_point& end_time)
 {
 	auto const round_data = m_data_reader->get_latest_round();
-	assert(round_data.is_empty());
+	assert(!round_data.is_empty());
 
 	start_time = common::get_timepoint_from_string(round_data.m_start_date_time, common::datetime_format);
 	end_time = common::get_timepoint_from_string(round_data.m_end_date_time, common::datetime_format);
