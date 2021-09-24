@@ -41,7 +41,8 @@ enum class Type : std::uint8_t
 	get_blocks_from_round,
 	update_round,
 	get_total_shares_from_accounts,
-	get_not_paid_data_from_round
+	get_not_paid_data_from_round,
+	account_paid
 };
 
 

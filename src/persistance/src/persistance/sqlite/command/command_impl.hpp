@@ -344,6 +344,23 @@ public:
 	void set_params(std::any params) override;
 };
 
+struct Command_account_paid_params
+{
+	std::int64_t m_round_number;
+	std::string m_account;
+};
+
+class Command_account_paid_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_account_paid_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::account_paid; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
+	void set_params(std::any params) override;
+};
+
 }
 }
 }

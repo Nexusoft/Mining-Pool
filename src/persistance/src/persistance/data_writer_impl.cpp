@@ -30,6 +30,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_add_block_cmd = m_command_factory->create_command(Type::add_block);
 	m_update_block_rewards_cmd = m_command_factory->create_command(Type::update_block_rewards);
 	m_update_round_cmd = m_command_factory->create_command(Type::update_round);
+	m_account_paid_cmd = m_command_factory->create_command(Type::account_paid);
 }
 
 bool Data_writer_impl::create_account(std::string account)
@@ -114,6 +115,12 @@ bool Data_writer_impl::update_round(Round_data round)
 	return m_data_storage->execute_command(m_update_round_cmd);
 }
 
+bool Data_writer_impl::account_paid(std::uint32_t round_number, std::string account)
+{
+	m_account_paid_cmd->set_params(command::Command_account_paid_params{round_number, std::move(account) });
+	return m_data_storage->execute_command(m_account_paid_cmd);
+}
+
 // --------------------------------------------------------------------------------------
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
@@ -178,6 +185,12 @@ bool Shared_data_writer_impl::update_round(Round_data round)
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->update_round(std::move(round));
+}
+
+bool Shared_data_writer_impl::account_paid(std::uint32_t round_number, std::string account)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->account_paid(round_number, std::move(account));
 }
 
 }

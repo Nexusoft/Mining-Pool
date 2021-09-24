@@ -565,6 +565,28 @@ void Command_update_round_impl::set_params(std::any params)
 	bind_param(m_stmt, ":is_paid", casted_params.m_is_paid);
 	bind_param(m_stmt, ":round_number", casted_params.m_round_number);
 }
+// -----------------------------------------------------------------------------------------------
+Command_account_paid_impl::Command_account_paid_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string account_paid{ R"(UPDATE payment SET 
+			payment_date_time = CURRENT_TIMESTAMP
+			WHERE round_number = :round_number
+				AND name = :name)" };
+
+	if (sqlite3_prepare_v2(m_handle, account_paid.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
+	{
+		std::cout << sqlite3_errmsg(m_handle) << std::endl;
+	}
+}
+
+void Command_account_paid_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_account_paid_params>(m_params);
+	bind_param(m_stmt, ":round_number", casted_params.m_round_number);
+	bind_param(m_stmt, ":name", casted_params.m_account);
+}
 
 }
 }
