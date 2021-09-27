@@ -264,13 +264,11 @@ def create_block_test_data(connection):
         'hash',
         'height',
         'type',
-        'shares',
         'difficulty',
         'orphan',
         'block_finder',
         'round',
         'block_found_time',
-        'accepted_by_mainnet',
         'mainnet_reward',
     ]
     )
@@ -285,26 +283,22 @@ def create_block_test_data(connection):
         hash = fake.md5(raw_output=False)
         height = random.randint(1, 100)
         type = 'Test'
-        shares = round(random.uniform(1, 10), 2)
         difficulty = round(random.uniform(1, 100), 2)
         orphan = random.randint(1, 100)
         block_finder = str(random.choice(account_list))
         round_value = random.choice(round_list)
         block_found_time = fake.past_datetime()
-        accepted_by_mainnet = random.randint(0, 1)
         mainnet_reward = round(random.uniform(0, 1), 2)
 
         data_dict = {
             'hash': hash,
             'height': height,
             'type': type,
-            'shares': shares,
             'difficulty': difficulty,
             'orphan': orphan,
             'block_finder': block_finder,
             'round': round_value,
             'block_found_time': block_found_time,
-            'accepted_by_mainnet': accepted_by_mainnet,
             'mainnet_reward': mainnet_reward,
         }
 
