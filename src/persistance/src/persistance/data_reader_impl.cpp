@@ -127,7 +127,7 @@ Round_data Data_reader_impl::get_latest_round()
 Round_data Data_reader_impl::get_round(std::uint32_t round)
 {
 	Round_data round_data{};
-	m_get_round_cmd->set_params(round);
+	m_get_round_cmd->set_params(static_cast<std::int64_t>(round));
 	if (!m_data_storage->execute_command(m_get_round_cmd))
 	{
 		return round_data;	// return empty result

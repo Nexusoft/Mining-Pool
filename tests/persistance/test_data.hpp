@@ -29,6 +29,7 @@ public:
 		get_valid_account_names();
 		get_banned_connections_api();
 		get_banned_users_connections();
+		get_round_numbers();
 	}
 
 	~Test_data()
@@ -47,8 +48,9 @@ public:
 		delete_from_table("payment", std::move(account));
 	}
 
-	void delete_from_round_table(std::int64_t round_number)
+	void delete_latest_round()
 	{
+		auto round_number = get_latest_round_number();
 		delete_from_table("round", "round_number", round_number);
 	}
 
@@ -57,12 +59,12 @@ public:
 		delete_from_table("config", "id", id);
 	}
 
-
 	std::string m_db_filename{ "test.sqlite3" };
 	std::vector<std::string> const m_invalid_input{ "", "asfagsgdsdfg", "123415234" };
 	std::vector<std::string> m_valid_account_names_input{};
 	std::vector<std::string> m_banned_connections_api_input{};
 	std::vector<std::pair<std::string, std::string>> m_banned_users_connections_input{};
+	std::vector<std::int64_t> m_valid_round_numbers_input{};
 
 protected:
 
@@ -105,7 +107,6 @@ protected:
 		{
 			m_valid_account_names_input.push_back(std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0))));
 		}
-
 	}
 
 	void get_banned_connections_api()
@@ -133,11 +134,29 @@ protected:
 		}
 	}
 
-	
+	std::int64_t get_latest_round_number()
+	{
+		sqlite3_stmt* stmt;
+		sqlite3_prepare_v2(m_handle, "SELECT round_number FROM round ORDER BY round_number DESC LIMIT 1;", -1, &stmt, 0);
+		int ret;
+		while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
+		{
+			 return sqlite3_column_int64(stmt, 0);
+		}
+	}
+
+	void get_round_numbers()
+	{
+		sqlite3_stmt* stmt;
+		sqlite3_prepare_v2(m_handle, "SELECT round_number FROM round;", -1, &stmt, 0);
+		int ret;
+		while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
+		{
+			m_valid_round_numbers_input.push_back(sqlite3_column_int64(stmt, 0));
+		}
+	}	
 
 	sqlite3* m_handle;
-
-
 };
 
 }

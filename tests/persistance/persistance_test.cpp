@@ -7,6 +7,18 @@
 using namespace persistance;
 using ::nexuspool::persistance::command::Type;
 
+
+/*
+get_active_accounts_from_round,
+reset_shares_from_accounts,
+add_block,
+update_block_rewards,
+get_blocks_from_round,
+update_round,
+get_not_paid_data_from_round,
+account_paid
+*/
+
 TEST_F(Persistance_fixture, create_shared_data_writer)
 {
 	auto data_writer_factory = m_persistance_component->get_data_writer_factory();
@@ -96,9 +108,18 @@ TEST_F(Persistance_fixture, command_get_latest_round)
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 	auto result = data_reader->get_latest_round();
 	EXPECT_TRUE(result.m_round);
-
 }
 
+TEST_F(Persistance_fixture, command_get_round)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	for (auto const& valid_input : m_test_data.m_valid_round_numbers_input)
+	{
+		auto result = data_reader->get_round(valid_input);
+		EXPECT_TRUE(!result.is_empty());
+		EXPECT_EQ(result.m_round, valid_input);
+	}
+}
 
 TEST_F(Persistance_fixture, command_get_active_accounts_from_round)
 {
@@ -108,8 +129,6 @@ TEST_F(Persistance_fixture, command_get_active_accounts_from_round)
 
 }
 
-// Testdata currently missing
-/*
 TEST_F(Persistance_fixture, command_get_payments)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
@@ -131,7 +150,7 @@ TEST_F(Persistance_fixture, command_get_payments)
 	}
 
 }
-*/
+
 
 // -----------------------------------------------------------------------------------------------
 // Write commands
@@ -211,7 +230,7 @@ TEST_F(Persistance_fixture, command_create_round)
 	EXPECT_TRUE(result);
 
 	// cleanup db
-//	m_test_data.delete_from_round_table(round_number);
+	m_test_data.delete_latest_round();
 
 }
 

@@ -159,7 +159,6 @@ def create_round_test_data(connection):
         is_paid = random.randint(0, 1)
 
         data_dict = {
-            'round_number': x,
             'total_shares': total_share,
             'total_reward': total_reward,
             'blocks': blocks,
