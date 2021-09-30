@@ -198,7 +198,7 @@ std::vector<Account_data_for_payment> Data_reader_impl::get_active_accounts_from
 std::vector<Block_data> Data_reader_impl::get_blocks_from_round(std::uint32_t round)
 {
 	std::vector<Block_data> blocks{};
-	m_get_blocks_from_round_cmd->set_params(round);
+	m_get_blocks_from_round_cmd->set_params(static_cast<std::int64_t>(round));
 	if (!m_data_storage->execute_command(m_get_blocks_from_round_cmd))
 	{
 		return blocks;	// return empty result
@@ -232,7 +232,7 @@ double Data_reader_impl::get_total_shares_from_accounts()
 std::vector<Payment_data> Data_reader_impl::get_not_paid_data_from_round(std::uint32_t round)
 {
 	std::vector<Payment_data> payments{};
-	m_get_not_paid_data_from_round_cmd->set_params(round);
+	m_get_not_paid_data_from_round_cmd->set_params(static_cast<std::int64_t>(round));
 	if (!m_data_storage->execute_command(m_get_not_paid_data_from_round_cmd))
 	{
 		return payments;	// return empty result

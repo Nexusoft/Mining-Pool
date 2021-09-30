@@ -11,8 +11,6 @@ using ::nexuspool::persistance::command::Type;
 /*
 get_active_accounts_from_round,
 reset_shares_from_accounts,
-update_block_rewards,
-get_blocks_from_round,
 update_round,
 get_not_paid_data_from_round,
 account_paid
@@ -147,9 +145,19 @@ TEST_F(Persistance_fixture, command_get_payments)
 			EXPECT_EQ(payment_result.m_account, valid_input);
 		}
 	}
-
 }
 
+TEST_F(Persistance_fixture, command_get_blocks_from_round)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->get_blocks_from_round(m_test_data.m_valid_round_numbers_input.front());
+	EXPECT_FALSE(result.empty());
+
+	for (auto i = 0U; i < result.size(); i++)
+	{
+		EXPECT_EQ(result[i].m_hash, m_test_data.m_valid_blocks_in_round_input[i]);
+	}
+}
 
 // -----------------------------------------------------------------------------------------------
 // Write commands
@@ -286,6 +294,23 @@ TEST_F(Persistance_fixture, command_add_block)
 	// cleanup db
 	m_test_data.delete_from_block_table(block_hash_input);
 }
+
+TEST_F(Persistance_fixture, command_update_block_rewards)
+{
+	std::string const block_hash_input{ "testblockhash" };
+	persistance::Block_data const block_input{ block_hash_input, 5983133, "HASH", 7896, false, "blockfinder", 5, "current_datetime", 2.54 };
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto result = data_writer->add_block(block_input);
+	EXPECT_TRUE(result);
+
+	result = data_writer->update_block_rewards(block_hash_input, true, 5.0);
+	EXPECT_TRUE(result);
+
+	// cleanup db
+	m_test_data.delete_from_block_table(block_hash_input);
+}
+
+
 
 
 

@@ -30,6 +30,7 @@ public:
 		get_banned_connections_api();
 		get_banned_users_connections();
 		get_round_numbers();
+		get_valid_blocks_in_round();
 	}
 
 	~Test_data()
@@ -71,6 +72,7 @@ public:
 	std::vector<std::string> m_banned_connections_api_input{};
 	std::vector<std::pair<std::string, std::string>> m_banned_users_connections_input{};
 	std::vector<std::int64_t> m_valid_round_numbers_input{};
+	std::vector<std::string> m_valid_blocks_in_round_input{};
 
 protected:
 
@@ -113,6 +115,23 @@ protected:
 		while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
 		{
 			m_valid_account_names_input.push_back(std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0))));
+		}
+	}
+
+	void get_valid_blocks_in_round()
+	{
+		sqlite3_stmt* stmt;
+		sqlite3_prepare_v2(m_handle, "SELECT hash FROM block WHERE round = :round;", -1, &stmt, 0);
+		int index = sqlite3_bind_parameter_index(stmt, ":round");
+		if (index == 0)
+		{
+			return;
+		}
+		sqlite3_bind_int64(stmt, index, m_valid_round_numbers_input.front());
+		int ret;
+		while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
+		{
+			m_valid_blocks_in_round_input.push_back(std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0))));
 		}
 	}
 
