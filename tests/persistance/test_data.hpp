@@ -40,23 +40,29 @@ public:
 
 	void delete_from_account_table(std::string account)
 	{
-		delete_from_table("account", std::move(account));
+		delete_from_table("account", "name", std::move(account));
 	}
 
 	void delete_from_payment_table(std::string account)
 	{
-		delete_from_table("payment", std::move(account));
+		delete_from_table("payment", "name", std::move(account));
+	}
+
+	void delete_from_block_table(std::string blockhash)
+	{
+		delete_from_table("block", "hash", std::move(blockhash));
 	}
 
 	void delete_latest_round()
 	{
-		auto round_number = get_latest_round_number();
+		auto round_number = get_latest_record_id_from_table("round", "round_number");
 		delete_from_table("round", "round_number", round_number);
 	}
 
-	void delete_from_config_table(std::int64_t id)
+	void delete_from_config_table()
 	{
-		delete_from_table("config", "id", id);
+		auto config_id = get_latest_record_id_from_table("config", "id");
+		delete_from_table("config", "id", config_id);
 	}
 
 	std::string m_db_filename{ "test.sqlite3" };
@@ -68,18 +74,19 @@ public:
 
 protected:
 
-	void delete_from_table(std::string table, std::string account)
+	void delete_from_table(std::string table, std::string column_name, std::string column_value)
 	{
+		std::string column_bind_param_name = ":" + column_name;
 		std::string sql_stmt{ "DELETE FROM " };
-		sql_stmt += (table + " WHERE name = :name");
+		sql_stmt += (table + " WHERE " + column_name + " = " + column_bind_param_name);
 		sqlite3_stmt* stmt;
 		sqlite3_prepare_v2(m_handle, sql_stmt.c_str(), -1, &stmt, 0);
-		int index = sqlite3_bind_parameter_index(stmt, ":name");
+		int index = sqlite3_bind_parameter_index(stmt, column_bind_param_name.c_str());
 		if (index == 0)
 		{
 			return;
 		}
-		sqlite3_bind_text(stmt, index, account.c_str(), -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(stmt, index, column_value.c_str(), -1, SQLITE_TRANSIENT);
 		sqlite3_step(stmt);
 	}
 
@@ -134,15 +141,19 @@ protected:
 		}
 	}
 
-	std::int64_t get_latest_round_number()
+	std::int64_t get_latest_record_id_from_table(std::string table, std::string column)
 	{
+		std::string sql_stmt{ "SELECT " };
+		sql_stmt += (column + " FROM " + table + " ORDER BY " + column + " DESC LIMIT 1;");
 		sqlite3_stmt* stmt;
-		sqlite3_prepare_v2(m_handle, "SELECT round_number FROM round ORDER BY round_number DESC LIMIT 1;", -1, &stmt, 0);
+		sqlite3_prepare_v2(m_handle, sql_stmt.c_str(), -1, &stmt, 0);
 		int ret;
 		while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
 		{
-			 return sqlite3_column_int64(stmt, 0);
+			return sqlite3_column_int64(stmt, 0);
 		}
+
+		return 0;
 	}
 
 	void get_round_numbers()

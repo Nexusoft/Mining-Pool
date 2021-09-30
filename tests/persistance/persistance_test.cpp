@@ -11,7 +11,6 @@ using ::nexuspool::persistance::command::Type;
 /*
 get_active_accounts_from_round,
 reset_shares_from_accounts,
-add_block,
 update_block_rewards,
 get_blocks_from_round,
 update_round,
@@ -220,7 +219,6 @@ TEST_F(Persistance_fixture, command_add_payment)
 
 	// cleanup db
 	m_test_data.delete_from_payment_table(payment_input.m_account);
-
 }
 
 TEST_F(Persistance_fixture, command_create_round)
@@ -274,9 +272,21 @@ TEST_F(Persistance_fixture, commands_config)
 	EXPECT_EQ(result_get_config.m_round_duration_hours, config_round_duration_hours_input);
 
 	// cleanup db
-	m_test_data.delete_from_config_table(1);
-
+	m_test_data.delete_from_config_table();
 }
+
+TEST_F(Persistance_fixture, command_add_block)
+{
+	std::string const block_hash_input{ "testblockhash" };
+	persistance::Block_data const block_input{ block_hash_input, 5983133, "HASH", 7896, false, "blockfinder", 5, "current_datetime", 2.54};
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto result = data_writer->add_block(block_input);
+	EXPECT_TRUE(result);
+
+	// cleanup db
+	m_test_data.delete_from_block_table(block_hash_input);
+}
+
 
 
 
