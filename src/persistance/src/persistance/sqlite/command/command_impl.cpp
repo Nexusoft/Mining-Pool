@@ -128,7 +128,7 @@ void Command_account_exists_impl::set_params(std::any params)
 Command_get_account_impl::Command_get_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT name, created_at, last_active, connection_count, shares, reward, hashrate FROM account WHERE name = :name;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT name, created_at, last_active, connection_count, shares, hashrate FROM account WHERE name = :name;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_account_impl::get_command() const
@@ -138,7 +138,6 @@ std::any Command_get_account_impl::get_command() const
 		{Column_sqlite::string},
 		{Column_sqlite::string},
 		{Column_sqlite::int32},
-		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t}} };
 	return command;
@@ -258,7 +257,7 @@ void Command_get_payments_impl::set_params(std::any params)
 Command_get_config_impl::Command_get_config_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT version, difficulty_divider, fee, mining_mode FROM config;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT version, difficulty_divider, fee, mining_mode, round_duration_hours FROM config;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_config_impl::get_command() const
@@ -267,7 +266,8 @@ std::any Command_get_config_impl::get_command() const
 		{{Column_sqlite::string},
 		{Column_sqlite::int32},
 		{Column_sqlite::int32},
-		{Column_sqlite::string}} };
+		{Column_sqlite::string},
+		{Column_sqlite::int32}} };
 	return command;
 }
 
@@ -360,9 +360,12 @@ Command_create_account_impl::Command_create_account_impl(sqlite3* handle)
 {
 	std::string create_account{R"(INSERT INTO account 
 		(name, created_at, last_active, connection_count, shares, hashrate) 
-		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, 0))"};
+		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0))"};
 
-	sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL);
+	if (sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
+	{
+		std::cout << sqlite3_errmsg(m_handle) << std::endl;
+	}
 }
 
 void Command_create_account_impl::set_params(std::any params)
@@ -494,10 +497,7 @@ Command_add_block_impl::Command_add_block_impl(sqlite3* handle)
 		(hash, height, type, difficulty, orphan, block_finder, round, block_found_time, mainnet_reward) 
 		VALUES(:hash, :height, :type, :difficulty, :orphan, :block_finder, :round, CURRENT_TIMESTAMP, :mainnet_reward))" };
 
-	if (sqlite3_prepare_v2(m_handle, add_block.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
-	{
-		std::cout << sqlite3_errmsg(m_handle) << std::endl;
-	}
+	sqlite3_prepare_v2(m_handle, add_block.c_str(), -1, &m_stmt, NULL);
 }
 
 void Command_add_block_impl::set_params(std::any params)
@@ -520,10 +520,7 @@ Command_update_block_rewards_impl::Command_update_block_rewards_impl(sqlite3* ha
 	std::string update_block_rewards{ R"(UPDATE block SET 
 			orphan = :orphan, mainnet_reward = :mainnet_reward WHERE hash = :hash)" };
 
-	if (sqlite3_prepare_v2(m_handle, update_block_rewards.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
-	{
-		std::cout << sqlite3_errmsg(m_handle) << std::endl;
-	}
+	sqlite3_prepare_v2(m_handle, update_block_rewards.c_str(), -1, &m_stmt, NULL);
 }
 
 void Command_update_block_rewards_impl::set_params(std::any params)
@@ -547,10 +544,7 @@ Command_update_round_impl::Command_update_round_impl(sqlite3* handle)
 			is_paid = :is_paid 
 			WHERE round_number = :round_number)" };
 
-	if (sqlite3_prepare_v2(m_handle, update_round.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
-	{
-		std::cout << sqlite3_errmsg(m_handle) << std::endl;
-	}
+	sqlite3_prepare_v2(m_handle, update_round.c_str(), -1, &m_stmt, NULL);
 }
 
 void Command_update_round_impl::set_params(std::any params)
@@ -571,20 +565,17 @@ Command_account_paid_impl::Command_account_paid_impl(sqlite3* handle)
 {
 	std::string account_paid{ R"(UPDATE payment SET 
 			payment_date_time = CURRENT_TIMESTAMP
-			WHERE round_number = :round_number
+			WHERE round = :round
 				AND name = :name)" };
 
-	if (sqlite3_prepare_v2(m_handle, account_paid.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
-	{
-		std::cout << sqlite3_errmsg(m_handle) << std::endl;
-	}
+	sqlite3_prepare_v2(m_handle, account_paid.c_str(), -1, &m_stmt, NULL);
 }
 
 void Command_account_paid_impl::set_params(std::any params)
 {
 	m_params = std::move(params);
 	auto casted_params = std::any_cast<Command_account_paid_params>(m_params);
-	bind_param(m_stmt, ":round_number", casted_params.m_round_number);
+	bind_param(m_stmt, ":round", casted_params.m_round_number);
 	bind_param(m_stmt, ":name", casted_params.m_account);
 }
 

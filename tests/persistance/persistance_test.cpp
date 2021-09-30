@@ -7,14 +7,6 @@
 using namespace persistance;
 using ::nexuspool::persistance::command::Type;
 
-TEST(Persistance, initialisation)
-{
-	auto logger = spdlog::stdout_color_mt("test_logger");
-	config::Persistance_config config{};
-	auto component = persistance::create_component(logger, config);
-	EXPECT_TRUE(component);
-}
-
 TEST_F(Persistance_fixture, create_shared_data_writer)
 {
 	auto data_writer_factory = m_persistance_component->get_data_writer_factory();
@@ -88,7 +80,7 @@ TEST_F(Persistance_fixture, command_get_total_shares_from_accounts)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
 	auto result = data_reader->get_total_shares_from_accounts();
-	EXPECT_DOUBLE_EQ(result, !(0.0));
+	EXPECT_GE(result, 0);
 }
 
 TEST_F(Persistance_fixture, command_get_latest_blocks)
