@@ -135,12 +135,29 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 	std::scoped_lock(m_block_mutex);
 	m_block = block;
 
-//pool nbits determines the difficulty for the pool.  
-//For the hash channel, we set the difficulty to be a divided down version of the main net difficulty
-	uint1024_t target, pool_target;
-	target.SetCompact(m_block.nBits);
-	pool_target = target >> m_storage_config_data.m_difficulty_divider;
-	m_pool_nBits = pool_target.GetCompact();
+	//pool nbits determines the difficulty for the pool.  
+	//For the hash channel, we set the difficulty to be a divided down version of the main net difficulty.
+	if (block.nChannel == 2) //hash channel
+	{
+		uint1024_t target, pool_target;
+		target.SetCompact(m_block.nBits);
+		if (m_storage_config_data.m_difficulty_divider >= 0)
+			pool_target = target << m_storage_config_data.m_difficulty_divider;
+		else
+			pool_target = target;
+		m_pool_nBits = pool_target.GetCompact();
+	}
+	else if (block.nChannel == 1) //prime channel
+	{
+		double difficulty = get_difficulty(m_block.nBits, block.nChannel);
+		difficulty -= m_storage_config_data.m_difficulty_divider;
+		difficulty = std::max(2.0, difficulty);
+		m_pool_nBits = static_cast<uint32_t>(difficulty * 10000000.0);
+	}
+	else
+	{
+		m_pool_nBits = block.nBits;
+	}
 
 }
 
