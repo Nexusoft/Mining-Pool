@@ -1,30 +1,21 @@
-#ifndef NEXUSPOOL_CHRONO_TIMER_HPP
-#define NEXUSPOOL_CHRONO_TIMER_HPP
+#ifndef NEXUSPOOL_CHRONO_TIMER_IMPL_HPP
+#define NEXUSPOOL_CHRONO_TIMER_IMPL_HPP
 
+#include "chrono/timer.hpp"
 #include "asio/basic_waitable_timer.hpp"
-#include "asio/io_context.hpp"
-
+#include "asio/io_service.hpp"
 #include <functional>
 #include <memory>
-
 
 namespace nexuspool {
 namespace chrono {
 
-	using Milliseconds = std::chrono::milliseconds;
-	using Seconds = std::chrono::seconds;
-
-class Timer 
+class Timer_impl : public Timer
 {
 public:
 
-	using Uptr = std::unique_ptr <Timer>;
-
-	// Called when the asynchronous timer expires. Canceled = true (timer has been canceled), false (timer has expired normally)
-	using Handler = std::function<void(bool canceled)>;
-
     // According to asio documentation -> if a running timer gets deleted, asio implicitly calls cancel() on that timer
-    explicit Timer(std::shared_ptr<asio::io_context> io_context)
+    explicit Timer_impl(std::shared_ptr<asio::io_context> io_context)
         : m_io_context{std::move(io_context)}, m_timer{*m_io_context }
     {
     }

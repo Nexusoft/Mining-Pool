@@ -3,6 +3,7 @@
 #include "miner_connection.hpp"
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
+#include "chrono/create_component.hpp"
 #include "nexus_http_interface/create_component.hpp"
 #include "TAO/Ledger/difficulty.h"
 
@@ -13,6 +14,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	std::shared_ptr<spdlog::logger> logger,
 	config::Config::Sptr config,
 	persistance::Config_data storage_config_data,
+	chrono::Timer_factory::Sptr timer_factory,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
 	persistance::Data_reader_factory::Sptr data_reader_factory)
@@ -20,7 +22,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	, m_logger{ std::move(logger)}
 	, m_config{std::move(config)}
 	, m_storage_config_data{std::move(storage_config_data)}
-	, m_timer_factory{std::make_shared<chrono::Timer_factory>(m_io_context)}
+	, m_timer_factory{ std::move(timer_factory) }
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}

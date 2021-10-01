@@ -3,6 +3,7 @@
 
 #include "config/config.hpp"
 #include "persistance/types.hpp"
+#include "chrono/component.hpp"
 #include <spdlog/spdlog.h>
 #include <asio/signal_set.hpp>
 
@@ -35,6 +36,7 @@ private:
 
 	std::unique_ptr<network::Component> m_network_component;
 	std::unique_ptr<persistance::Component> m_persistance_component;
+	chrono::Component::Uptr m_timer_component;
 	std::shared_ptr<network::Socket> m_listen_socket;
 	std::shared_ptr<::asio::io_context> m_io_context;
 	std::shared_ptr<spdlog::logger> m_logger;

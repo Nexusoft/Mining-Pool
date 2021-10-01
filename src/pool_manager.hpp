@@ -32,6 +32,7 @@ public:
         std::shared_ptr<spdlog::logger> logger,
         config::Config::Sptr config, 
         persistance::Config_data storage_config_data,
+        chrono::Timer_factory::Sptr timer_factory,
         network::Socket_factory::Sptr socket_factory,
         persistance::Data_writer_factory::Sptr data_writer_factory,
         persistance::Data_reader_factory::Sptr data_reader_factory);

@@ -1,6 +1,7 @@
 #include "pool.hpp"
 #include "network/create_component.hpp"
 #include "network/component.hpp"
+#include "chrono/create_component.hpp"
 #include "persistance/create_component.hpp"
 #include "config/validator.hpp"
 #include "common/types.hpp"
@@ -71,6 +72,8 @@ namespace nexuspool
 			return false;
 		}
 
+		m_timer_component = chrono::create_component(m_io_context);
+
 		// data storage initialisation
 		m_persistance_component = persistance::create_component(m_logger, m_config->get_persistance_config());
 
@@ -82,6 +85,7 @@ namespace nexuspool
 			m_logger,
 			m_config, 
 			config_data,
+			m_timer_component->get_timer_factory(),
 			m_network_component->get_socket_factory(), 
 			m_persistance_component->get_data_writer_factory(),
 			m_persistance_component->get_data_reader_factory());
