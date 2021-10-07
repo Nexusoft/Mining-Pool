@@ -39,87 +39,99 @@ namespace config
 			return false;
 		}
 
-		json j = json::parse(config_file);
-		j.at("wallet_ip").get_to(m_wallet_ip);
-		j.at("wallet_port").get_to(m_wallet_port);
-		if (j.count("local_ip") != 0)
+		try
 		{
-			j.at("local_ip").get_to(m_local_ip);
-		}
-		if (j.count("local_port") != 0)
-		{
-			j.at("local_port").get_to(m_local_port);
-		}
-		if (j.count("local_listen_port") != 0)
-		{
-			j.at("local_listen_port").get_to(m_local_listen_port);
-		}
-		if (j.count("api_listen_port") != 0)
-		{
-			j.at("api_listen_port").get_to(m_api_listen_port);
-		}
-		
-		std::string mining_mode = j["mining_mode"];
-		std::for_each(mining_mode.begin(), mining_mode.end(), [](char & c) {
-        	c = ::tolower(c);
-    	});
+			json j = json::parse(config_file);
+			j.at("wallet_ip").get_to(m_wallet_ip);
+			j.at("wallet_port").get_to(m_wallet_port);
+			if (j.count("local_ip") != 0)
+			{
+				j.at("local_ip").get_to(m_local_ip);
+			}
+			if (j.count("local_port") != 0)
+			{
+				j.at("local_port").get_to(m_local_port);
+			}
+			if (j.count("local_listen_port") != 0)
+			{
+				j.at("local_listen_port").get_to(m_local_listen_port);
+			}
+			if (j.count("api_listen_port") != 0)
+			{
+				j.at("api_listen_port").get_to(m_api_listen_port);
+			}
 
-		if(mining_mode == "prime")
-		{
-			m_mining_mode = common::Mining_mode::PRIME;
-		}
-		else
-		{
-			m_mining_mode = common::Mining_mode::HASH;
-		}
+			std::string mining_mode = j["mining_mode"];
+			std::for_each(mining_mode.begin(), mining_mode.end(), [](char& c) 
+			{
+				c = ::tolower(c);
+			});
 
-		m_pool_config.m_address = j.at("pool")["address"];
-		m_pool_config.m_account = j.at("pool")["account"];
-		m_pool_config.m_pin = j.at("pool")["pin"];
-		m_pool_config.m_fee = j.at("pool")["fee"];
-		m_pool_config.m_min_share = j.at("pool")["min_share"];
-		m_pool_config.m_difficulty_divider = j.at("pool")["difficulty_divider"];
-		m_pool_config.m_round_duration_hours = j.at("pool")["round_duration_hours"];
+			if (mining_mode == "prime")
+			{
+				m_mining_mode = common::Mining_mode::PRIME;
+			}
+			else
+			{
+				m_mining_mode = common::Mining_mode::HASH;
+			}
 
-		auto persistance_type = j.at("persistance")["type"];
-		m_persistance_config.m_file = j.at("persistance")["file"];
+			m_pool_config.m_address = j.at("pool")["address"];
+			m_pool_config.m_account = j.at("pool")["account"];
+			m_pool_config.m_pin = j.at("pool")["pin"];
+			m_pool_config.m_fee = j.at("pool")["fee"];
+			m_pool_config.m_min_share = j.at("pool")["min_share"];
+			m_pool_config.m_difficulty_divider = j.at("pool")["difficulty_divider"];
+			m_pool_config.m_round_duration_hours = j.at("pool")["round_duration_hours"];
 
-		if (persistance_type == "database")
-		{
-			m_persistance_config.m_type = Persistance_type::database;
+			auto persistance_type = j.at("persistance")["type"];
+			m_persistance_config.m_file = j.at("persistance")["file"];
+
+			if (persistance_type == "database")
+			{
+				m_persistance_config.m_type = Persistance_type::database;
+			}
+			else
+			{
+				m_persistance_config.m_type = Persistance_type::sqlite;
+			}
+
+			// read stats printer config
+			if (!read_stats_printer_config(j))
+			{
+				return false;
+			}
+
+			// advanced configs
+			if (j.count("connection_retry_interval") != 0)
+			{
+				j.at("connection_retry_interval").get_to(m_connection_retry_interval);
+			}
+			if (j.count("print_statistics_interval") != 0)
+			{
+				j.at("print_statistics_interval").get_to(m_print_statistics_interval);
+			}
+			if (j.count("get_height_interval") != 0)
+			{
+				j.at("get_height_interval").get_to(m_get_height_interval);
+			}
+			if (j.count("session_expiry_time") != 0)
+			{
+				j.at("session_expiry_time").get_to(m_session_expiry_time);
+			}
+
+			if (j.count("logfile") != 0)
+			{
+				j.at("logfile").get_to(m_logfile);
+			}
+
+			return true;
 		}
-		else
+		catch (std::exception& e)
 		{
-			m_persistance_config.m_type = Persistance_type::sqlite;
-		}
-
-		// read stats printer config
-		if(!read_stats_printer_config(j))
-		{
+			std::cerr << "Failed to parse config file. Exception: " << e.what() << std::endl;
 			return false;
 		}
-
-		// advanced configs
-		if (j.count("connection_retry_interval") != 0)
-		{
-			j.at("connection_retry_interval").get_to(m_connection_retry_interval);
-		}
-		if (j.count("print_statistics_interval") != 0)
-		{
-			j.at("print_statistics_interval").get_to(m_print_statistics_interval);
-		}
-		if (j.count("get_height_interval") != 0)
-		{
-			j.at("get_height_interval").get_to(m_get_height_interval);
-		}
-		if (j.count("session_expiry_time") != 0)
-		{
-			j.at("session_expiry_time").get_to(m_session_expiry_time);
-		}
-
-		j.at("logfile").get_to(m_logfile);
-		// TODO Need to add exception handling here and set return value appropriately
-		return true;
 	}
 
 	bool Config_impl::read_stats_printer_config(nlohmann::json& j)
