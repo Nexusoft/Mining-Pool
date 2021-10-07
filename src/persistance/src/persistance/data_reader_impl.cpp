@@ -241,7 +241,7 @@ std::vector<Payment_data> Data_reader_impl::get_not_paid_data_from_round(std::ui
 	auto result = std::any_cast<Result_sqlite>(m_get_not_paid_data_from_round_cmd->get_result());
 	for (auto& row : result.m_rows)
 	{
-		payments.push_back(convert_to_reduced_payment_data(std::move(row)));
+		payments.push_back(convert_to_payment_data(std::move(row)));
 	}
 
 	return payments;

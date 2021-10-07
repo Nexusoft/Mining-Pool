@@ -13,7 +13,6 @@ get_active_accounts_from_round,
 reset_shares_from_accounts,
 update_round,
 get_not_paid_data_from_round,
-account_paid
 */
 
 TEST_F(Persistance_fixture, create_shared_data_writer)
@@ -326,10 +325,26 @@ TEST_F(Persistance_fixture, command_account_paid)
 	result = data_writer->add_payment(payment_input);
 	EXPECT_TRUE(result);
 
+	auto result_not_paid_payments = data_reader->get_not_paid_data_from_round(round_number_input);
+	EXPECT_FALSE(result_not_paid_payments.empty());
+	for (auto& result_payment : result_not_paid_payments)
+	{
+		EXPECT_EQ(result_payment.m_account, account_input);
+		EXPECT_EQ(result_payment.m_amount, payment_input.m_amount);
+		EXPECT_EQ(result_payment.m_round, payment_input.m_round);
+		EXPECT_EQ(result_payment.m_shares, payment_input.m_shares);
+		EXPECT_TRUE(result_payment.m_payment_date_time.empty());		// datetime empty = not paid yet
+	}
+
 	// pay account
 	result = data_writer->account_paid(round_number_input, account_input);
 	EXPECT_TRUE(result);
 
+	// now this command doesn't deliver any results
+	result_not_paid_payments = data_reader->get_not_paid_data_from_round(round_number_input);
+	EXPECT_TRUE(result_not_paid_payments.empty());
+
+	// get the payments data through other command (for frontent api)
 	auto const result_payments = data_reader->get_payments(account_input);
 	for (auto& result_payment : result_payments)
 	{
