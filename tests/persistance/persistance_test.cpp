@@ -310,6 +310,40 @@ TEST_F(Persistance_fixture, command_update_block_rewards)
 	m_test_data.delete_from_block_table(block_hash_input);
 }
 
+TEST_F(Persistance_fixture, command_account_paid)
+{
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+
+	// add a new payment record which is not paid yet (no datetime set)
+	std::int64_t const round_number_input{ 500 };
+	std::string const account_input{ "testaccount" };
+	persistance::Payment_data const payment_input{ account_input, 1000.0, 200.0, "", round_number_input };
+	auto result = data_writer->add_payment(payment_input);
+	EXPECT_TRUE(result);
+
+	// add another payment for this account
+	result = data_writer->add_payment(payment_input);
+	EXPECT_TRUE(result);
+
+	// pay account
+	result = data_writer->account_paid(round_number_input, account_input);
+	EXPECT_TRUE(result);
+
+	auto const result_payments = data_reader->get_payments(account_input);
+	for (auto& result_payment : result_payments)
+	{
+		EXPECT_EQ(result_payment.m_account, account_input);
+		EXPECT_EQ(result_payment.m_amount, payment_input.m_amount);
+		EXPECT_EQ(result_payment.m_round, payment_input.m_round);
+		EXPECT_EQ(result_payment.m_shares, payment_input.m_shares);
+		EXPECT_FALSE(result_payment.m_payment_date_time.empty());
+	}
+
+	// cleanup db
+	m_test_data.delete_from_payment_table(payment_input.m_account);
+}
+
 
 
 
