@@ -233,7 +233,7 @@ void Command_get_round_impl::set_params(std::any params)
 Command_get_payments_impl::Command_get_payments_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT name, amount, shares, payment_date_time FROM payment WHERE name = :name;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT name, amount, shares, payment_date_time, round FROM payment WHERE name = :name;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_payments_impl::get_command() const
@@ -242,7 +242,8 @@ std::any Command_get_payments_impl::get_command() const
 		{{Column_sqlite::string},
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
-		{Column_sqlite::string}} };
+		{Column_sqlite::string},
+		{Column_sqlite::int64}} };
 	return command;
 }
 
