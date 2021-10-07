@@ -392,9 +392,9 @@ void Command_add_payment_impl::set_params(std::any params)
 	auto casted_params = std::any_cast<Command_add_payment_params>(m_params);
 	bind_param(m_stmt, ":name", casted_params.m_account);
 	bind_param(m_stmt, ":amount", casted_params.m_amount);
-	bind_param(m_stmt, ":shares", casted_params.m_amount);
-	bind_param(m_stmt, ":datetime", casted_params.m_amount);
-	bind_param(m_stmt, ":round", casted_params.m_amount);
+	bind_param(m_stmt, ":shares", casted_params.m_shares);
+	bind_param(m_stmt, ":datetime", casted_params.m_payment_datetime);
+	bind_param(m_stmt, ":round", casted_params.m_round);
 }
 
 // -----------------------------------------------------------------------------------------------
