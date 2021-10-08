@@ -122,12 +122,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 	}
 	else if (packet.m_header == Packet::GET_HEIGHT)
 	{
-		Packet response;
-		response.m_header = Packet::BLOCK_HEIGHT;
-		response.m_data = std::make_shared<std::vector<uint8_t>>(uint2bytes(m_current_height));
-		response.m_length = packet.m_data->size();
-
-		m_connection->transmit(response.get_bytes());
+		send_height();
 	}
 	else if (packet.m_header == Packet::GET_BLOCK)
 	{
@@ -213,6 +208,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 void Miner_connection::set_current_height(std::uint32_t height)
 {
 	m_current_height = height;
+	send_height();
 }
 
 void Miner_connection::process_accepted()
@@ -238,6 +234,16 @@ void Miner_connection::process_accepted()
 	}
 
 	session->set_update_time(std::chrono::steady_clock::now());
+}
+
+void Miner_connection::send_height()
+{
+	Packet response;
+	response.m_header = Packet::BLOCK_HEIGHT;
+	response.m_data = std::make_shared<std::vector<uint8_t>>(uint2bytes(m_current_height));
+	response.m_length = response.m_data->size();
+
+	m_connection->transmit(response.get_bytes());
 }
 
 }

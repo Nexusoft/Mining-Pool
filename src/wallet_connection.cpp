@@ -107,14 +107,15 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
     }
     else if (packet.m_header == Packet::BLOCK_HEIGHT)
     {
+        auto pool_manager_shared = m_pool_manager.lock();
+        if (!pool_manager_shared)
+            return;
+
         auto const height = bytes2uint(*packet.m_data);
         if (height > m_current_height)
         {
             m_current_height = height;
-            m_logger->info("Nexus Network: New Block");
-            auto pool_manager_shared = m_pool_manager.lock();
-            if (!pool_manager_shared)
-                return;
+            m_logger->info("Nexus Network: New Block with height {}", m_current_height);
 
             // update height at pool_manager
             pool_manager_shared->set_current_height(m_current_height);
@@ -129,6 +130,11 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
             std::scoped_lock lock(m_get_block_mutex);
             std::queue<Get_block_handler> empty_queue;
             std::swap(m_pending_get_block_handlers, empty_queue);
+        }
+        else
+        {
+            // send the height message to all miners
+            pool_manager_shared->set_current_height(m_current_height);
         }
     }
     // Block from wallet received

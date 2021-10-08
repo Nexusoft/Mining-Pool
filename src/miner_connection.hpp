@@ -39,6 +39,8 @@ private:
     // checks if a new account should be created, add share for session
     void process_accepted();
 
+    void send_height();
+
     std::shared_ptr<spdlog::logger> m_logger;
     network::Connection::Sptr m_connection;
     std::weak_ptr<Pool_manager> m_pool_manager;

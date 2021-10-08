@@ -127,9 +127,10 @@ void Pool_manager::set_current_height(std::uint32_t height)
 	if (height > m_current_height)
 	{
 		m_current_height = height;
-		// give the miners the new height
-		m_session_registry.update_height(m_current_height);
 	}
+
+	// give the miners the height
+	m_session_registry.update_height(m_current_height);
 }
 
 void Pool_manager::set_block(LLP::CBlock const& block)
