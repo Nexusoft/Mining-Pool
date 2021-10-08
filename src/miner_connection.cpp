@@ -238,6 +238,11 @@ void Miner_connection::process_accepted()
 
 void Miner_connection::send_height()
 {
+	if (!m_connection)
+	{
+		return;
+	}
+
 	Packet response;
 	response.m_header = Packet::BLOCK_HEIGHT;
 	response.m_data = std::make_shared<std::vector<uint8_t>>(uint2bytes(m_current_height));
