@@ -91,6 +91,12 @@ bool Wallet_connection::connect(network::Endpoint const& wallet_endpoint)
 
 void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
 {
+    // if we don't have a connection to the wallet we cant do anything useful.
+    if (!m_connection)
+    {
+        return;
+    }
+
     Packet packet{ std::move(receive_buffer) };
     if (!packet.is_valid())
     {
@@ -202,6 +208,11 @@ void Wallet_connection::submit_block(std::vector<std::uint8_t> const& block_data
 
 void Wallet_connection::get_block(Get_block_handler&& handler)
 {
+    if (!m_connection)
+    {
+        return;
+    }
+
     Packet packet_get_block;
     packet_get_block.m_header = Packet::GET_BLOCK;
     m_connection->transmit(packet_get_block.get_bytes());
