@@ -183,7 +183,7 @@ void Pool_manager::get_block(Get_block_handler&& handler)
 	m_wallet_connection->get_block(std::move(handler));
 }
 
-void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, std::vector<std::uint8_t> const& block_merkle_root, std::uint64_t nonce, Submit_block_handler handler)
+void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, std::uint64_t nonce, Submit_block_handler handler)
 {
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
 	switch (difficulty_result)

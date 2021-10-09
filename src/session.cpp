@@ -24,7 +24,6 @@ void Session::update_connection(std::shared_ptr<Miner_connection> miner_connecti
 
 bool Session::add_share(std::uint32_t pool_nbits)
 {
-	m_shares_in_session++;
 	m_user_data.m_account.m_shares++;
 	m_hashrate_helper.add_share(pool_nbits);
 	return m_data_writer->update_account(m_user_data.m_account);
@@ -42,6 +41,15 @@ bool Session::create_account()
 	assert(!m_user_data.m_account.m_address.empty());
 
 	return m_data_writer->create_account(m_user_data.m_account.m_address);
+}
+
+std::unique_ptr<LLP::CBlock> Session::get_block() 
+{ 
+	if (m_block)
+	{
+		return std::move(m_block);
+	}
+	return nullptr;
 }
 
 // ------------------------------------------------------------------------------------------------------------

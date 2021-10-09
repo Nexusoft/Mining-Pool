@@ -42,7 +42,7 @@ public:
 	bool add_share(std::uint32_t pool_nbits);
 	double get_hashrate() const;
 	void set_block(LLP::CBlock const& block) { m_block = std::make_unique<LLP::CBlock>(block); }
-	std::unique_ptr<LLP::CBlock> get_block() { return std::move(m_block); }
+	std::unique_ptr<LLP::CBlock> get_block();
 
 	bool create_account();
 
@@ -52,7 +52,6 @@ private:
 	Session_user m_user_data;
 	std::shared_ptr<Miner_connection> m_miner_connection;
 	std::chrono::steady_clock::time_point m_update_time;
-	std::uint32_t m_shares_in_session{ 0U };	// submitted shares since login
 	Hashrate_helper m_hashrate_helper;
 	std::unique_ptr<LLP::CBlock> m_block;
 };
