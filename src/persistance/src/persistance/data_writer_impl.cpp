@@ -104,14 +104,14 @@ bool Data_writer_impl::update_block_rewards(std::string hash, bool orphan, doubl
 
 bool Data_writer_impl::update_round(Round_data round)
 {
-	m_update_block_rewards_cmd->set_params(command::Command_update_round_params{
-	round.m_round,
-	round.m_total_shares,
-	round.m_total_rewards,
-	static_cast<int>(round.m_blocks),
-	static_cast<int>(round.m_connection_count),
-	round.m_is_active,
-	round.m_is_paid});
+	m_update_round_cmd->set_params(command::Command_update_round_params{
+		round.m_round,
+		round.m_total_shares,
+		round.m_total_rewards,
+		static_cast<int>(round.m_blocks),
+		static_cast<int>(round.m_connection_count),
+		round.m_is_active,
+		round.m_is_paid});
 	return m_data_storage->execute_command(m_update_round_cmd);
 }
 
