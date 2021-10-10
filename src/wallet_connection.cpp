@@ -177,6 +177,20 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
         m_logger->info("Block Accepted By Nexus Network.");
         //m_stats_collector->block_accepted();
         // store block into DB
+
+        // the oldest handler is the first one who submitted the block
+        std::scoped_lock lock(m_submit_block_mutex);
+        auto handler = m_pending_submit_block_handlers.front();
+        handler(Submit_block_result::block_found);
+        m_pending_submit_block_handlers.pop();
+
+        // if there are other pending handlers in the list -> those get the "share" result
+        while (!m_pending_submit_block_handlers.empty())
+        {
+            auto handler = m_pending_submit_block_handlers.front();
+            handler(Submit_block_result::accept);
+            m_pending_submit_block_handlers.pop();
+        }
     }
     else if (packet.m_header == Packet::REJECT)
     {
@@ -192,18 +206,20 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 }
 
-void Wallet_connection::submit_block(std::vector<std::uint8_t> const& block_data, std::vector<std::uint8_t> const& nonce)
+void Wallet_connection::submit_block(network::Shared_payload&& block_data, Submit_block_handler&& handler)
 {
     m_logger->info("Submitting Block...");
 
     Packet packet;
     packet.m_header = Packet::SUBMIT_BLOCK;
-
-    packet.m_data = std::make_shared<std::vector<std::uint8_t>>(block_data);
-    packet.m_data->insert(packet.m_data->end(), nonce.begin(), nonce.end());
+    packet.m_data = std::move(block_data);
     packet.m_length = 72;
 
     m_connection->transmit(packet.get_bytes());
+
+    // store block request handler in pending list (handler comes from miner_connection)
+    std::scoped_lock lock(m_submit_block_mutex);
+    m_pending_submit_block_handlers.emplace(handler);
 }
 
 void Wallet_connection::get_block(Get_block_handler&& handler)

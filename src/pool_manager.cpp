@@ -189,14 +189,20 @@ void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, Submit_block
 	switch (difficulty_result)
 	{
 	case reward::Difficulty_result::accept:
+	{
 		// record share for this miner connection but don't submit block to wallet
 		handler(Submit_block_result::accept);
 		break;
+	}
 	case reward::Difficulty_result::block_found:
+	{
 		// submit the block to wallet
-		m_wallet_connection->submit_block(block->hashMerkleRoot.GetBytes(), nexuspool::uint2bytes64(block->nNonce));
-		handler(Submit_block_result::block_found);	// miner will get his share even if the block would get rejected
+		auto nonce = nexuspool::uint2bytes64(block->nNonce);
+		auto block_data = std::make_shared<std::vector<std::uint8_t>>(block->hashMerkleRoot.GetBytes());
+		block_data->insert(block_data->end(), nonce.begin(), nonce.end());
+		m_wallet_connection->submit_block(std::move(block_data), std::move(handler));
 		break;
+	}
 	case reward::Difficulty_result::reject:
 		handler(Submit_block_result::reject);
 		break;
