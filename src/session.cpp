@@ -137,7 +137,12 @@ void Session_registry::login(Session_key key)
 		account_data = m_data_reader->get_account(user_data.m_account.m_address);
 	}
 
-	user_data.m_account = std::move(account_data);
+	if (!account_data.is_empty())
+	{
+		// only move account_data from storage if the account has been found
+		user_data.m_account = std::move(account_data);
+	}
+
 	user_data.m_login_time = std::chrono::steady_clock::now();
 }
 
