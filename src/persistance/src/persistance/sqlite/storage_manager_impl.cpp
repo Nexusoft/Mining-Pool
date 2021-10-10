@@ -66,8 +66,11 @@ void Storage_manager_sqlite::start()
 	sqlite3_exec(m_handle, R"(CREATE TABLE IF NOT EXISTS payment (
 		  id INTEGER PRIMARY KEY AUTOINCREMENT, 
 		  name TEXT NOT NULL,
-		  amount REAL NOT NULL,
-		  payment_date_time TEXT NOT NULL,
+		  amount REAL,
+		  shares REAL,
+		  payment_date_time TEXT,
+		  round INTEGER NOT NULL,
+		  FOREIGN KEY(round) REFERENCES round(round_number),
 		  FOREIGN KEY(name) REFERENCES account(name)
 		);)", NULL, NULL, NULL);
 
