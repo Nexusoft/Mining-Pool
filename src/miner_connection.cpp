@@ -169,10 +169,11 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 				return; // exit early
 			}
 
+			block->nNonce = nonce;	// update nonce
 			//TODO compare block merkle_root with received merkle_root (block_data)
 
 			//update hashrate
-			pool_manager_shared->submit_block(std::move(block), nonce, [self = shared_from_this()](auto result)
+			pool_manager_shared->submit_block(std::move(block), [self = shared_from_this()](auto result)
 			{
 				Packet response;
 				if (result == Submit_block_result::accept)
