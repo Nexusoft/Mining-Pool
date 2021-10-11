@@ -165,7 +165,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 			auto block = session->get_block();
 			if (!block)
 			{
-				m_logger->error("Miner has no block in current session set.");
+				m_logger->debug("Miner has no block in current session set.");
 				return; // exit early
 			}
 

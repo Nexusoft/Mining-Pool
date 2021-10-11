@@ -183,22 +183,21 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
         auto handler = m_pending_submit_block_handlers.front();
         handler(Submit_block_result::block_found);
         m_pending_submit_block_handlers.pop();
-
-        // if there are other pending handlers in the list -> those get the "share" result
-        while (!m_pending_submit_block_handlers.empty())
-        {
-            auto handler = m_pending_submit_block_handlers.front();
-            handler(Submit_block_result::accept);
-            m_pending_submit_block_handlers.pop();
-        }
     }
     else if (packet.m_header == Packet::REJECT)
     {
         m_logger->warn("Block Rejected by Nexus Network.");
+
+
         Packet packet_get_block;
         packet_get_block.m_header = Packet::GET_BLOCK;
         m_connection->transmit(packet_get_block.get_bytes());
         //  m_stats_collector->block_rejected();
+
+        std::scoped_lock lock(m_submit_block_mutex);
+        auto handler = m_pending_submit_block_handlers.front();
+        handler(Submit_block_result::reject);
+        m_pending_submit_block_handlers.pop();
     }
     else
     {
