@@ -43,7 +43,7 @@ public:
     // Methods towards wallet_connection
     void set_current_height(std::uint32_t height);
     void set_block(LLP::CBlock const& block);
-    void add_block_to_storage(LLP::CBlock const& block);
+    void add_block_to_storage(std::uint32_t block_map_id);
 
     // Methods towards miner_connection
     void get_block(Get_block_handler&& handler);
@@ -78,6 +78,10 @@ private:
     std::mutex m_block_mutex;
     LLP::CBlock m_block;
     std::uint32_t m_pool_nBits;
+
+    // variables for block to storage
+    std::atomic<std::uint32_t> m_block_map_id;
+    std::map<std::uint32_t, std::shared_ptr<LLP::CBlock>> m_block_map;
 };
 }
 

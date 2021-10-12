@@ -36,6 +36,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	, m_listen_socket{}
 	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config->get_session_expiry_time()}
 	, m_current_height{0}
+	, m_block_map_id{0}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
@@ -127,6 +128,9 @@ void Pool_manager::set_current_height(std::uint32_t height)
 	if (height > m_current_height)
 	{
 		m_current_height = height;
+		// new block -> clear pending blocks from previous height
+		m_block_map.clear();
+		m_block_map_id = 0;
 	}
 
 	m_logger->trace("Setting height for miners");
@@ -165,16 +169,17 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 
 }
 
-void Pool_manager::add_block_to_storage(LLP::CBlock const& block)
+void Pool_manager::add_block_to_storage(std::uint32_t block_map_id)
 {
-	auto const block_hash = block.GetHash().ToString();
+	auto block = m_block_map[block_map_id];
+	auto const block_hash = block->GetHash().ToString();
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
 	persistance::Block_data block_data;
 	block_data.m_hash = block_hash;
-	block_data.m_height = block.nHeight;
-	block_data.m_type = block.nChannel == 1 ? "prime" : "hash";
+	block_data.m_height = block->nHeight;
+	block_data.m_type = block->nChannel == 1 ? "prime" : "hash";
 	block_data.m_orphan = 0;
-	block_data.m_difficulty = TAO::Ledger::GetDifficulty(block.nBits, block.nChannel);
+	block_data.m_difficulty = TAO::Ledger::GetDifficulty(block->nBits, block->nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
 }
@@ -201,7 +206,9 @@ void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, Submit_block
 		auto nonce = nexuspool::uint2bytes64(block->nNonce);
 		auto block_data = std::make_shared<std::vector<std::uint8_t>>(block->hashMerkleRoot.GetBytes());
 		block_data->insert(block_data->end(), nonce.begin(), nonce.end());
-		m_wallet_connection->submit_block(std::move(block_data), std::move(handler));
+		m_block_map.emplace(std::make_pair(m_block_map_id.load(), std::make_shared<LLP::CBlock>(*block)));
+		m_wallet_connection->submit_block(std::move(block_data), m_block_map_id, std::move(handler));
+		m_block_map_id++;
 		break;
 	}
 	case reward::Difficulty_result::reject:

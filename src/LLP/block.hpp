@@ -20,13 +20,13 @@ public:
 	using Sptr = std::shared_ptr<CBlock>;
 
 	/** Begin of Header.   BEGIN(nVersion) **/
-	unsigned int  nVersion{ 0 };
+	std::uint32_t  nVersion{ 0 };
 	uint1024_t hashPrevBlock{ 0 };
 	uint512_t hashMerkleRoot{ 0 };
-	unsigned int  nChannel{ 0 };
-	unsigned int   nHeight{ 0 };
-	unsigned int     nBits{ 0 };
-	uint64_t         nNonce{ 0 };
+	std::uint32_t nChannel{ 0 };
+	std::uint32_t nHeight{ 0 };
+	std::uint32_t nBits{ 0 };
+	std::uint64_t nNonce{ 0 };
 	/** End of Header.     END(nNonce).
 		All the components to build an SK1024 Block Hash. **/
 

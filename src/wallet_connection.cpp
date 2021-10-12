@@ -160,9 +160,12 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
             {
                 // get oldest pending_get_block handler from miner_connection and call it then pop()
                 std::scoped_lock lock(m_get_block_mutex);
-                auto handler = m_pending_get_block_handlers.front();
-                handler(block);
-                m_pending_get_block_handlers.pop();
+                if (!m_pending_get_block_handlers.empty())
+                {
+                    auto handler = m_pending_get_block_handlers.front();
+                    handler(block);
+                    m_pending_get_block_handlers.pop();
+                }
             }
         }
         else
@@ -175,11 +178,15 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
         m_logger->info("Block Accepted By Nexus Network.");
         //m_stats_collector->block_accepted();
         // store block into DB
+        auto pool_manager_shared = m_pool_manager.lock();
+        if (!pool_manager_shared)
+            return;
 
         // the oldest handler is the first one who submitted the block
         std::scoped_lock lock(m_submit_block_mutex);
         auto handler = m_pending_submit_block_handlers.front();
-        handler(Submit_block_result::block_found);
+        pool_manager_shared->add_block_to_storage(handler.first);
+        handler.second(Submit_block_result::block_found);
         m_pending_submit_block_handlers.pop();
     }
     else if (packet.m_header == Packet::REJECT)
@@ -194,7 +201,7 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
 
         std::scoped_lock lock(m_submit_block_mutex);
         auto handler = m_pending_submit_block_handlers.front();
-        handler(Submit_block_result::reject);
+        handler.second(Submit_block_result::reject);
         m_pending_submit_block_handlers.pop();
     }
     else
@@ -203,7 +210,7 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 }
 
-void Wallet_connection::submit_block(network::Shared_payload&& block_data, Submit_block_handler&& handler)
+void Wallet_connection::submit_block(network::Shared_payload&& block_data, std::uint32_t block_map_id, Submit_block_handler&& handler)
 {
     m_logger->info("Submitting Block...");
 
@@ -216,7 +223,7 @@ void Wallet_connection::submit_block(network::Shared_payload&& block_data, Submi
 
     // store block request handler in pending list (handler comes from miner_connection)
     std::scoped_lock lock(m_submit_block_mutex);
-    m_pending_submit_block_handlers.emplace(handler);
+    m_pending_submit_block_handlers.emplace(std::make_pair(block_map_id, handler));
 }
 
 void Wallet_connection::get_block(Get_block_handler&& handler)

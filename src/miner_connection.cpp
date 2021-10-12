@@ -64,6 +64,12 @@ network::Connection::Handler Miner_connection::connection_handler()
 
 void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 {
+	// if we don't have a connection to the wallet we cant do anything useful.
+	if (!m_connection)
+	{
+		return;
+	}
+
     Packet packet{ std::move(receive_buffer) };
     if (!packet.is_valid())
     {

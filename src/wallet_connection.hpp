@@ -41,7 +41,7 @@ public:
     // Close connection
     void stop();
 
-    void submit_block(network::Shared_payload&& block_data, Submit_block_handler&& handler);
+    void submit_block(network::Shared_payload&& block_data, std::uint32_t block_map_id, Submit_block_handler&& handler);
     void get_block(Get_block_handler&& handler);
 
 private:
@@ -68,7 +68,7 @@ private:
 
     // submit_block variables
     std::mutex m_submit_block_mutex;
-    std::queue<Submit_block_handler> m_pending_submit_block_handlers;
+    std::queue<std::pair<std::uint32_t, Submit_block_handler>> m_pending_submit_block_handlers;
 };
 }
 
