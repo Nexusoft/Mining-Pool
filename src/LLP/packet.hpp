@@ -63,6 +63,7 @@ namespace nexuspool
 		// creates a packet from received buffer
 		explicit Packet(network::Shared_payload buffer)
 		{
+			m_is_valid = true;
 			if(buffer->empty())
 			{
 				m_header = 255;
@@ -72,7 +73,11 @@ namespace nexuspool
 				m_header = (*buffer)[0];
 			}
 			m_length = 0;
-			if (buffer->size() > 1)
+			if (buffer->size() > 1 && buffer->size() < 4)
+			{
+				m_is_valid = false;
+			}
+			else if (buffer->size() > 4)
 			{
 				m_length = ((*buffer)[1] << 24) + ((*buffer)[2] << 16) + ((*buffer)[3] << 8) + ((*buffer)[4]);
 				m_data = std::make_shared<std::vector<uint8_t>>(buffer->begin() + 5, buffer->end());
@@ -86,9 +91,15 @@ namespace nexuspool
         uint8_t			m_header;
         uint32_t		m_length;
         network::Shared_payload m_data;
+		bool m_is_valid;
 
 		inline bool is_valid() const
 		{
+			if (!m_is_valid)
+			{
+				return false;
+			}
+
 			// m_header == 0 because of LOGIN message
 			return ((m_header == 0 && m_length == 0) ||(m_header < 128 && m_length > 0) || (m_header >= 128 && m_header < 255 && m_length == 0));
 		}

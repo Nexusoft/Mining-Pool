@@ -107,9 +107,7 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
 
     if (packet.m_header == Packet::PING)
     {
-        Packet response;
-        response = response.get_packet(Packet::PING);
-        m_connection->transmit(response.get_bytes());
+        m_logger->trace("Ping received");
     }
     else if (packet.m_header == Packet::BLOCK_HEIGHT)
     {
