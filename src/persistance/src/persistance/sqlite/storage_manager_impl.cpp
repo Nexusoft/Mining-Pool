@@ -43,7 +43,6 @@ void Storage_manager_sqlite::start()
 		  hash TEXT NOT NULL,
 		  height INTEGER NOT NULL,
 		  type TEXT NOT NULL,
-		  shares REAL NOT NULL,
 		  difficulty REAL NOT NULL,
 		  orphan INTEGER NOT NULL,
 		  block_finder TEXT NOT NULL,
