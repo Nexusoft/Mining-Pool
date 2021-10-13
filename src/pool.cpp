@@ -80,7 +80,8 @@ namespace nexuspool
 
 			m_logger = std::make_shared<spdlog::logger>(spdlog::logger("logger", { console_sink, file_sink }));
 			m_logger->set_pattern("[%D %H:%M:%S.%e][%^%l%$] %v");
-
+			spdlog::set_default_logger(m_logger);
+			spdlog::flush_on(spdlog::level::info);
 		}
 		m_logger->set_level(static_cast<spdlog::level::level_enum>(m_config->get_log_level()));
 
