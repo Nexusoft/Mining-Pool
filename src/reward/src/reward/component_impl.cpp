@@ -26,10 +26,6 @@ Component_impl::Component_impl(
 	, m_pin{std::move(pin)}
 	, m_pool_fee{pool_fee}
 {
-	if (is_round_active())
-	{
-		m_payout_manager.calculate_reward_of_blocks(m_current_round);
-	}
 }
 
 bool Component_impl::start_round(std::uint16_t round_duration_hours)

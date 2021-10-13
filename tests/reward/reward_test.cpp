@@ -83,17 +83,6 @@ TEST_F(Reward_fixture_created_component, get_start_end_round_times_test)
 	EXPECT_EQ(common::get_datetime_string(round_end_time), test_round_data.m_end_date_time);
 }
 
-TEST_F(Reward_fixture, create_component_with_active_round)
-{
-	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_latest_round).WillOnce(Return(test_round_data));
-	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_blocks_from_round(test_current_round)).WillOnce(Return(test_blocks_from_round));
-
-	m_component = reward::create_component(m_logger, std::make_unique<nexus_http_interface::Component_mock>(),
-		m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
-		m_persistance_component_mock->get_data_reader_factory()->create_data_reader(),
-		"defauöt", "1234", 1);
-}
-
 TEST_F(Reward_fixture_created_component, pay_all_with_unknown_round_test)
 {
 	auto const unknown_round = 100U;
