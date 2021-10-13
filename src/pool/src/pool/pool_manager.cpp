@@ -1,4 +1,5 @@
 #include "pool/pool_manager.hpp"
+#include "pool/session_impl.hpp"
 #include "pool/wallet_connection.hpp"
 #include "pool/miner_connection.hpp"
 #include "config/config.hpp"
@@ -34,7 +35,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 		m_config->get_pool_config().m_pin,
 		m_config->get_pool_config().m_fee)}
 	, m_listen_socket{}
-	, m_session_registry{ m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config->get_session_expiry_time()}
+	, m_session_registry{std::make_shared<Session_registry_impl>(m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config->get_session_expiry_time())}
 	, m_current_height{0}
 	, m_block_map_id{0}
 {
@@ -98,10 +99,10 @@ void Pool_manager::start()
 	// on listen/accept, save created connection to pool_conenctions and call the connection_handler of created pool connection object
 	auto socket_handler = [self](network::Connection::Sptr&& connection)
 	{
-		auto const session_key = self->m_session_registry.create_session();
+		auto const session_key = self->m_session_registry->create_session();
 		auto miner_connection = std::make_shared<Miner_connection>(self->m_logger, self->m_timer_factory, std::move(connection), self, session_key, self->m_session_registry);
 
-		auto session = self->m_session_registry.get_session(session_key);
+		auto session = self->m_session_registry->get_session(session_key);
 		session->update_connection(miner_connection);
 		session->set_update_time(std::chrono::steady_clock::now());
 
@@ -119,7 +120,7 @@ void Pool_manager::stop()
 {
 	m_session_registry_maintenance->cancel();
 	m_end_round_timer->cancel();
-	m_session_registry.stop();	// clear sessions and deletes miner_connection objects
+	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_listen_socket->stop_listen();
 }
 
@@ -135,7 +136,7 @@ void Pool_manager::set_current_height(std::uint32_t height)
 
 	m_logger->trace("Setting height for miners");
 	// give the miners the height
-	m_session_registry.update_height(m_current_height);
+	m_session_registry->update_height(m_current_height);
 }
 
 void Pool_manager::set_block(LLP::CBlock const& block)
@@ -232,7 +233,7 @@ chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::u
 			return;
 		}
 
-		m_session_registry.clear_unused_sessions();
+		m_session_registry->clear_unused_sessions();
 
 		// restart timer
 		m_session_registry_maintenance->start(chrono::Seconds(session_registry_maintenance_interval),

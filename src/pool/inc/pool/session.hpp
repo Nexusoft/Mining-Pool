@@ -1,16 +1,11 @@
 #ifndef NEXUSPOOL_SESSION_HPP
 #define NEXUSPOOL_SESSION_HPP
 
-#include <map>
 #include <memory>
 #include <string>
-#include <mutex>
 #include <chrono>
 #include "LLC/types/uint1024.h"
-#include "persistance/data_writer.hpp"
-#include "persistance/data_reader.hpp"
 #include "persistance/types.hpp"
-#include "pool/utils.hpp"
 #include "block.hpp"
 
 namespace nexuspool
@@ -32,61 +27,41 @@ class Session
 {
 public:
 
-	Session(persistance::Shared_data_writer::Sptr data_writer);
+	virtual ~Session() = default;
 
-	void update_connection(std::shared_ptr<Miner_connection> miner_connection);
-	std::weak_ptr<Miner_connection> get_connection() { return m_miner_connection; }
-	Session_user& get_user_data() { return m_user_data;  }
-	std::chrono::steady_clock::time_point get_update_time() const { return m_update_time; }
-	void set_update_time(std::chrono::steady_clock::time_point update_time) { m_update_time = update_time; }
-	bool add_share(std::uint32_t pool_nbits);
-	double get_hashrate() const;
-	void set_block(LLP::CBlock const& block) { m_block = std::make_unique<LLP::CBlock>(block); }
-	std::unique_ptr<LLP::CBlock> get_block();
+	virtual void update_connection(std::shared_ptr<Miner_connection> miner_connection) = 0;
+	virtual std::weak_ptr<Miner_connection> get_connection() = 0;
+	virtual Session_user& get_user_data() = 0;
+	virtual std::chrono::steady_clock::time_point get_update_time() const = 0;
+	virtual void set_update_time(std::chrono::steady_clock::time_point update_time) = 0;
+	virtual bool add_share(std::uint32_t pool_nbits) = 0;
+	virtual double get_hashrate() const = 0;
+	virtual void set_block(LLP::CBlock const& block) = 0;
+	virtual std::unique_ptr<LLP::CBlock> get_block() = 0;
 
-	bool create_account();
-
-private:
-
-	persistance::Shared_data_writer::Sptr m_data_writer;
-	Session_user m_user_data;
-	std::shared_ptr<Miner_connection> m_miner_connection;
-	std::chrono::steady_clock::time_point m_update_time;
-	Hashrate_helper m_hashrate_helper;
-	std::unique_ptr<LLP::CBlock> m_block;
+	virtual bool create_account() = 0;
 };
 
 // Manages all sessions
 class Session_registry
 {
 public:
+	using Sptr = std::shared_ptr<Session_registry>;
 
-	explicit Session_registry(persistance::Data_reader::Uptr data_reader, 
-		persistance::Shared_data_writer::Sptr data_writer,
-		std::uint32_t session_expiry_time);
+	virtual ~Session_registry() = default;
 
-	void stop();
+	virtual void stop() = 0;
 
 	// Managment methods
-	Session_key create_session();
-	std::shared_ptr<Session> get_session(Session_key key);
-	void clear_unused_sessions();
+	virtual Session_key create_session() = 0;
+	virtual std::shared_ptr<Session> get_session(Session_key key) = 0;
+	virtual void clear_unused_sessions() = 0;
 
 	// update height on active sessions
-	void update_height(std::uint32_t height);
+	virtual void update_height(std::uint32_t height) = 0;
 
-	bool does_account_exists(std::string account);
-	void login(Session_key key);	// fetch user data from storage for the specific session
-
-private:
-
-	persistance::Data_reader::Uptr m_data_reader;			// hold ownership over data_reader/writer
-	persistance::Shared_data_writer::Sptr m_data_writer;
-	std::mutex m_sessions_mutex;
-	std::mutex m_data_reader_mutex;
-	std::map<Session_key, std::shared_ptr<Session>> m_sessions;
-	std::uint32_t m_session_expiry_time;
-
+	virtual bool does_account_exists(std::string account) = 0;
+	virtual void login(Session_key key) = 0;	// fetch user data from storage for the specific session
 };
 
 }

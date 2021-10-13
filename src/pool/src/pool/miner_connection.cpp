@@ -13,7 +13,7 @@ Miner_connection::Miner_connection(std::shared_ptr<spdlog::logger> logger,
 	network::Connection::Sptr&& connection, 
 	std::weak_ptr<Pool_manager> pool_manager,
 	Session_key session_key,
-	Session_registry& session_registry)
+	Session_registry::Sptr session_registry)
     : m_logger{ std::move(logger) }
 	, m_connection{ std::move(connection) }
 	, m_pool_manager{std::move(pool_manager)}
@@ -22,7 +22,7 @@ Miner_connection::Miner_connection(std::shared_ptr<spdlog::logger> logger,
 	, m_remote_address{""}
 	, m_connection_closed{true}
 	, m_session_key{session_key}
-	, m_session_registry{session_registry}
+	, m_session_registry{std::move(session_registry)}
 {
 }
 
@@ -78,7 +78,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
         return;
     }
 
-	auto session = m_session_registry.get_session(m_session_key);
+	auto session = m_session_registry->get_session(m_session_key);
 
     if (packet.m_header == Packet::PING)
     {
@@ -117,10 +117,10 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 		// check if banned ip/user
 
 		// check if user already exists in db
-		user_data.m_new_account = !m_session_registry.does_account_exists(nxs_address);
+		user_data.m_new_account = !m_session_registry->does_account_exists(nxs_address);
 		// login the user (fetch data from storage)
 		user_data.m_account.m_address = nxs_address;
-		m_session_registry.login(m_session_key);
+		m_session_registry->login(m_session_key);
 		user_data.m_logged_in = true;
 
 		response = response.get_packet(Packet::LOGIN_SUCCESS);
@@ -138,7 +138,7 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 			m_pool_nbits = pool_manager_shared->get_pool_nbits();
 			pool_manager_shared->get_block([self = shared_from_this()](auto block)
 			{
-				auto session = self->m_session_registry.get_session(self->m_session_key);
+				auto session = self->m_session_registry->get_session(self->m_session_key);
 				session->set_block(block);
 
 				//prepend pool nbits to the packet
@@ -220,7 +220,7 @@ void Miner_connection::set_current_height(std::uint32_t height)
 
 void Miner_connection::process_accepted()
 {
-	auto session = m_session_registry.get_session(m_session_key);
+	auto session = m_session_registry->get_session(m_session_key);
 	auto& user_data = session->get_user_data();
 
 	// create new account

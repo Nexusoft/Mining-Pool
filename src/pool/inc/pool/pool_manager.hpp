@@ -69,7 +69,7 @@ private:
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
     network::Socket::Sptr m_listen_socket;
 
-    Session_registry m_session_registry;    // holds all sessions -> each session contains a miner_connection
+    Session_registry::Sptr m_session_registry;    // holds all sessions -> each session contains a miner_connection
     chrono::Timer::Uptr m_session_registry_maintenance;
     chrono::Timer::Uptr m_end_round_timer;
 

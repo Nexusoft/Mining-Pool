@@ -25,7 +25,7 @@ public:
         network::Connection::Sptr&& connection, 
         std::weak_ptr<Pool_manager> pool_manager,
         Session_key session_key,
-        Session_registry& session_registry);
+        Session_registry::Sptr session_registry);
 
     void stop();
 
@@ -49,7 +49,7 @@ private:
     std::string m_remote_address;
     bool m_connection_closed;	// indicator for server if the network connection has been closed
     Session_key m_session_key;
-    Session_registry& m_session_registry;
+    Session_registry::Sptr m_session_registry;
     std::uint32_t m_pool_nbits;
 };
 }
