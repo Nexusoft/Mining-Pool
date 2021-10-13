@@ -23,7 +23,6 @@ namespace nexuspool
 	{
 		m_config = config::create_config();
 		m_logger = spdlog::stdout_color_mt("logger");
-		m_logger->set_level(spdlog::level::trace);
 		m_logger->set_pattern("[%D %H:%M:%S.%e][%^%l%$] %v");
 		// Register to handle the signals that indicate when the server should exit.
 	// It is safe to register for the same signal multiple times in a program,
@@ -71,6 +70,8 @@ namespace nexuspool
 		{
 			return false;
 		}
+
+		m_logger->set_level(static_cast<spdlog::level::level_enum>(m_config->get_log_level()));
 
 		m_timer_component = chrono::create_component(m_io_context);
 

@@ -27,6 +27,7 @@ public:
 	std::string const& get_local_ip() const override  { return m_local_ip; }
 	common::Mining_mode get_mining_mode() const override  { return m_mining_mode; }
 	std::string const& get_logfile() const override  { return m_logfile; }
+	std::uint8_t get_log_level() const override { return m_log_level; }
 	std::uint16_t get_connection_retry_interval() const override  { return m_connection_retry_interval; }
 	std::uint16_t get_print_statistics_interval() const override  { return m_print_statistics_interval; }
 	std::uint16_t get_height_interval() const override  { return m_get_height_interval; }
@@ -49,6 +50,7 @@ private:
 	Pool_config  m_pool_config;
 	Persistance_config m_persistance_config;
 	std::string  m_logfile;
+	std::uint8_t m_log_level;
 
 	// stats printers
 	std::vector<Stats_printer_config> m_stats_printer_config;

@@ -191,6 +191,14 @@ bool Validator::check(std::string const& config_file)
                 m_optional_fields.push_back(Validator_error{ "session_expiry_time", "Not a number" });
             }
         } 
+
+        if (j.count("log_level") != 0)
+        {
+            if (!j.at("log_level").is_number())
+            {
+                m_optional_fields.push_back(Validator_error{ "log_level", "Not a number" });
+            }
+        }
     }
     catch(const std::exception& e)
     {

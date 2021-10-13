@@ -21,6 +21,7 @@ namespace config
 		, m_pool_config{}
 		, m_persistance_config{}
 		, m_logfile{""}		// no logfile usage, default
+		, m_log_level{ 2 }	// info level
 		, m_connection_retry_interval{5}
 		, m_print_statistics_interval{5}
 		, m_get_height_interval{2}
@@ -123,6 +124,11 @@ namespace config
 			if (j.count("logfile") != 0)
 			{
 				j.at("logfile").get_to(m_logfile);
+			}
+
+			if (j.count("log_level") != 0)
+			{
+				j.at("log_level").get_to(m_log_level);
 			}
 
 			return true;

@@ -40,6 +40,7 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "connection_retry_interval" // retry time in seconds trying to connect to NXS wallet if a connection attempt failed.
     "get_height_interval"       // time in seconds polling for current BLOCK height of NXS wallet.
     "session_expiry_time"       // time in seconds after which a miner session expires.
+    "log_level"             // optional, default=2 (info), sets the verbosity of log messages ranges from 0 (trace) - 5 (critical)
 
     "persistance"       // Option group regarding used storage for the POOL
         "type"          // which storage type the POOL uses. Currently only 'sqlite' is supported.

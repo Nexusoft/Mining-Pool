@@ -20,6 +20,7 @@ public:
     MOCK_METHOD(std::string const&, get_local_ip, (), (const override));
     MOCK_METHOD(common::Mining_mode, get_mining_mode, (), (const override));
     MOCK_METHOD(std::string const&, get_logfile, (), (const override));
+    MOCK_METHOD(std::uint8_t, get_log_level, (), (const override));
     MOCK_METHOD(std::uint16_t, get_connection_retry_interval, (), (const override));
     MOCK_METHOD(std::uint16_t, get_print_statistics_interval, (), (const override));
     MOCK_METHOD(std::uint16_t, get_height_interval, (), (const override));

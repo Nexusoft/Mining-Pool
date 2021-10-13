@@ -29,6 +29,7 @@ public:
 	virtual std::string const& get_local_ip() const = 0;
 	virtual common::Mining_mode get_mining_mode() const = 0;
 	virtual std::string const& get_logfile() const = 0;
+	virtual std::uint8_t get_log_level() const = 0;
 	virtual std::uint16_t get_connection_retry_interval() const = 0;
 	virtual std::uint16_t get_print_statistics_interval() const = 0;
 	virtual std::uint16_t get_height_interval() const = 0;
