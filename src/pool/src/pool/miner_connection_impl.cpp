@@ -1,4 +1,4 @@
-#include "pool/miner_connection.hpp"
+#include "pool/miner_connection_impl.hpp"
 #include "pool/pool_manager.hpp"
 #include "packet.hpp"
 #include "block.hpp"
@@ -8,7 +8,7 @@
 
 namespace nexuspool
 {
-Miner_connection::Miner_connection(std::shared_ptr<spdlog::logger> logger,
+Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> logger,
 	chrono::Timer_factory::Sptr timer_factory, 
 	network::Connection::Sptr&& connection, 
 	std::weak_ptr<Pool_manager> pool_manager,
@@ -26,14 +26,14 @@ Miner_connection::Miner_connection(std::shared_ptr<spdlog::logger> logger,
 {
 }
 
-void Miner_connection::stop()
+void Miner_connection_impl::stop()
 {
     m_timer_manager.stop();
 
     m_connection->close();
 }
 
-network::Connection::Handler Miner_connection::connection_handler()
+network::Connection::Handler Miner_connection_impl::connection_handler()
 {
 	return[self = shared_from_this()](network::Result::Code result, network::Shared_payload&& receive_buffer)
 	{
@@ -62,7 +62,7 @@ network::Connection::Handler Miner_connection::connection_handler()
 	};
 }
 
-void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
+void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffer)
 {
 	// if we don't have a connection to the wallet we cant do anything useful.
 	if (!m_connection)
@@ -212,13 +212,13 @@ void Miner_connection::process_data(network::Shared_payload&& receive_buffer)
 	session->set_update_time(std::chrono::steady_clock::now());
 }
 
-void Miner_connection::set_current_height(std::uint32_t height)
+void Miner_connection_impl::set_current_height(std::uint32_t height)
 {
 	m_current_height = height;
 	send_height();
 }
 
-void Miner_connection::process_accepted()
+void Miner_connection_impl::process_accepted()
 {
 	auto session = m_session_registry->get_session(m_session_key);
 	auto& user_data = session->get_user_data();
@@ -243,7 +243,7 @@ void Miner_connection::process_accepted()
 	session->set_update_time(std::chrono::steady_clock::now());
 }
 
-void Miner_connection::send_height()
+void Miner_connection_impl::send_height()
 {
 	if (!m_connection)
 	{

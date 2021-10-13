@@ -1,7 +1,7 @@
 #include "pool/pool_manager.hpp"
 #include "pool/session_impl.hpp"
 #include "pool/wallet_connection.hpp"
-#include "pool/miner_connection.hpp"
+#include "pool/miner_connection_impl.hpp"
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
@@ -100,7 +100,7 @@ void Pool_manager::start()
 	auto socket_handler = [self](network::Connection::Sptr&& connection)
 	{
 		auto const session_key = self->m_session_registry->create_session();
-		auto miner_connection = std::make_shared<Miner_connection>(self->m_logger, self->m_timer_factory, std::move(connection), self, session_key, self->m_session_registry);
+		auto miner_connection = std::make_shared<Miner_connection_impl>(self->m_logger, self->m_timer_factory, std::move(connection), self, session_key, self->m_session_registry);
 
 		auto session = self->m_session_registry->get_session(session_key);
 		session->update_connection(miner_connection);
