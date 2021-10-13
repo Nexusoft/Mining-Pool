@@ -9,7 +9,6 @@
 namespace nexuspool
 {
 Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> logger,
-	chrono::Timer_factory::Sptr timer_factory, 
 	network::Connection::Sptr&& connection, 
 	std::weak_ptr<Pool_manager> pool_manager,
 	Session_key session_key,
@@ -17,7 +16,6 @@ Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> log
     : m_logger{ std::move(logger) }
 	, m_connection{ std::move(connection) }
 	, m_pool_manager{std::move(pool_manager)}
-    , m_timer_manager{ std::move(timer_factory) }
     , m_current_height{ 0 }
 	, m_remote_address{""}
 	, m_connection_closed{true}
@@ -28,8 +26,6 @@ Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> log
 
 void Miner_connection_impl::stop()
 {
-    m_timer_manager.stop();
-
     m_connection->close();
 }
 

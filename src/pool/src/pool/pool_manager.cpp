@@ -100,7 +100,7 @@ void Pool_manager::start()
 	auto socket_handler = [self](network::Connection::Sptr&& connection)
 	{
 		auto const session_key = self->m_session_registry->create_session();
-		auto miner_connection = std::make_shared<Miner_connection_impl>(self->m_logger, self->m_timer_factory, std::move(connection), self, session_key, self->m_session_registry);
+		auto miner_connection = std::make_shared<Miner_connection_impl>(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
 
 		auto session = self->m_session_registry->get_session(session_key);
 		session->update_connection(miner_connection);

@@ -5,7 +5,7 @@
 #include "network/socket.hpp"
 #include "network/types.hpp"
 #include "chrono/timer_factory.hpp"
-#include "pool/timer_manager.hpp"
+#include "pool/timer_manager_wallet.hpp"
 #include "pool/wallet_connection.hpp"
 #include "block.hpp"
 #include "pool/types.hpp"
@@ -59,7 +59,7 @@ private:
     std::uint16_t const m_get_height_interval;
     network::Socket::Sptr m_socket;
     network::Connection::Sptr m_connection;
-    Timer_manager m_timer_manager;
+    Timer_manager_wallet m_timer_manager;
     std::uint32_t m_current_height;
 
     // get_block variables

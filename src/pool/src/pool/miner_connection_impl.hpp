@@ -3,8 +3,6 @@
 
 #include "pool/miner_connection.hpp"
 #include "network/connection.hpp"
-#include "chrono/timer_factory.hpp"
-#include "pool/timer_manager.hpp"
 #include "pool/session.hpp"
 
 #include <memory>
@@ -22,7 +20,6 @@ class Miner_connection_impl : public Miner_connection, public std::enable_shared
 public:
 
     Miner_connection_impl(std::shared_ptr<spdlog::logger> logger,
-        chrono::Timer_factory::Sptr timer_factory,
         network::Connection::Sptr&& connection,
         std::weak_ptr<Pool_manager> pool_manager,
         Session_key session_key,
@@ -43,7 +40,6 @@ private:
     std::shared_ptr<spdlog::logger> m_logger;
     network::Connection::Sptr m_connection;
     std::weak_ptr<Pool_manager> m_pool_manager;
-    Timer_manager m_timer_manager;
     std::atomic<std::uint32_t> m_current_height;
     std::string m_remote_address;
     bool m_connection_closed;	// indicator for server if the network connection has been closed

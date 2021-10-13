@@ -1,4 +1,4 @@
-#include "pool/timer_manager.hpp"
+#include "pool/timer_manager_wallet.hpp"
 #include "network/endpoint.hpp"
 #include "network/connection.hpp"
 #include "packet.hpp"
@@ -6,32 +6,32 @@
 
 namespace nexuspool
 {
-Timer_manager::Timer_manager(chrono::Timer_factory::Sptr timer_factory)
+Timer_manager_wallet::Timer_manager_wallet(chrono::Timer_factory::Sptr timer_factory)
 : m_timer_factory{std::move(timer_factory)}
 {
     m_connection_retry_timer = m_timer_factory->create_timer();
     m_get_height_timer = m_timer_factory->create_timer();
 }
 
-void Timer_manager::start_connection_retry_timer(std::uint16_t timer_interval, std::weak_ptr<Wallet_connection> worker_manager, 
+void Timer_manager_wallet::start_connection_retry_timer(std::uint16_t timer_interval, std::weak_ptr<Wallet_connection> worker_manager,
     network::Endpoint const& wallet_endpoint)
 {
     m_connection_retry_timer->start(chrono::Seconds(timer_interval), 
         connection_retry_handler(std::move(worker_manager), wallet_endpoint));
 }
 
-void Timer_manager::start_get_height_timer(std::uint16_t timer_interval, std::weak_ptr<network::Connection> connection)
+void Timer_manager_wallet::start_get_height_timer(std::uint16_t timer_interval, std::weak_ptr<network::Connection> connection)
 {
     m_get_height_timer->start(chrono::Seconds(timer_interval), get_height_handler(timer_interval, std::move(connection)));
 }
 
-void Timer_manager::stop()
+void Timer_manager_wallet::stop()
 {
     m_connection_retry_timer->cancel();
     m_get_height_timer->cancel();
 }
 
-chrono::Timer::Handler Timer_manager::connection_retry_handler(std::weak_ptr<Wallet_connection> worker_manager,
+chrono::Timer::Handler Timer_manager_wallet::connection_retry_handler(std::weak_ptr<Wallet_connection> worker_manager,
     network::Endpoint const& wallet_endpoint)
 {
     return[worker_manager, wallet_endpoint](bool canceled)
@@ -49,7 +49,7 @@ chrono::Timer::Handler Timer_manager::connection_retry_handler(std::weak_ptr<Wal
     }; 
 }
 
-chrono::Timer::Handler Timer_manager::get_height_handler(std::uint16_t get_height_interval, std::weak_ptr<network::Connection> connection)
+chrono::Timer::Handler Timer_manager_wallet::get_height_handler(std::uint16_t get_height_interval, std::weak_ptr<network::Connection> connection)
 {
     return[this, connection, get_height_interval](bool canceled)
     {

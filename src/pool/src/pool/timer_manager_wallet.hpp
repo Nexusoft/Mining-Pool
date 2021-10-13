@@ -1,5 +1,5 @@
-#ifndef NEXUSPOOL_TIMER_MANAGER_HPP
-#define NEXUSPOOL_TIMER_MANAGER_HPP
+#ifndef NEXUSPOOL_TIMER_MANAGER_WALLET_HPP
+#define NEXUSPOOL_TIMER_MANAGER_WALLET_HPP
 
 #include "chrono/timer_factory.hpp"
 #include "chrono/timer.hpp"
@@ -17,11 +17,11 @@ namespace network
 
 class Wallet_connection;
 
-class Timer_manager
+class Timer_manager_wallet
 {
 public:
 
-    Timer_manager(chrono::Timer_factory::Sptr timer_factory);
+    explicit Timer_manager_wallet(chrono::Timer_factory::Sptr timer_factory);
 
     void start_connection_retry_timer(std::uint16_t timer_interval, std::weak_ptr<Wallet_connection> worker_manager, 
         network::Endpoint const& wallet_endpoint);

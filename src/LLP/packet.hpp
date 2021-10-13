@@ -132,16 +132,6 @@ namespace nexuspool
 			return packet;
 		}
 
-		inline Packet get_height(uint32_t height) const
-		{
-			Packet packet;
-			packet.m_header = GET_HEIGHT;
-			packet.m_length = 4;
-			packet.m_data = std::make_shared<std::vector<uint8_t>>(uint2bytes(height));
-
-			return packet;
-		}
-
 		/** Convert the Header of a Block into a Byte Stream for Reading and Writing Across Sockets. **/
 		// inline network::Shared_payload serialize_block(LLP::CBlock const& block, uint32_t min_share)
 		// {
