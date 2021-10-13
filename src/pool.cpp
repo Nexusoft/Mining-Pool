@@ -9,7 +9,7 @@
 #include "pool_manager.hpp"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 #include <chrono>
 #include <fstream>
@@ -70,7 +70,18 @@ namespace nexuspool
 		{
 			return false;
 		}
+		// logger settings
+		if (!m_config->get_logfile().empty())
+		{
+			// initialise a new logger
+			spdlog::drop("logger");
+			auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+			auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(m_config->get_logfile(), true);
 
+			m_logger = std::make_shared<spdlog::logger>(spdlog::logger("logger", { console_sink, file_sink }));
+			m_logger->set_pattern("[%D %H:%M:%S.%e][%^%l%$] %v");
+
+		}
 		m_logger->set_level(static_cast<spdlog::level::level_enum>(m_config->get_log_level()));
 
 		m_timer_component = chrono::create_component(m_io_context);
