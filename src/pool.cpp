@@ -6,7 +6,7 @@
 #include "config/validator.hpp"
 #include "common/types.hpp"
 #include "api/server.hpp"
-#include "pool_manager.hpp"
+#include "pool/pool_manager.hpp"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>

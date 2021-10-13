@@ -1,5 +1,5 @@
-#include "session.hpp"
-#include "miner_connection.hpp"
+#include "pool/session.hpp"
+#include "pool/miner_connection.hpp"
 #include "LLC/random.h"
 #include "common/types.hpp"
 #include <assert.h>

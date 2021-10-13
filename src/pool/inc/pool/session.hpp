@@ -10,7 +10,7 @@
 #include "persistance/data_writer.hpp"
 #include "persistance/data_reader.hpp"
 #include "persistance/types.hpp"
-#include "utils.hpp"
+#include "pool/utils.hpp"
 #include "block.hpp"
 
 namespace nexuspool

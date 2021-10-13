@@ -3,8 +3,8 @@
 
 #include "network/connection.hpp"
 #include "chrono/timer_factory.hpp"
-#include "timer_manager.hpp"
-#include "session.hpp"
+#include "pool/timer_manager.hpp"
+#include "pool/session.hpp"
 
 #include <memory>
 #include <string>

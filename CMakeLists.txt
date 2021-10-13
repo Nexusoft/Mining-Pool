@@ -49,6 +49,7 @@ add_subdirectory(src/TAO)
 add_subdirectory(src/persistance)
 add_subdirectory(src/reward)
 add_subdirectory(src/nexus_http_interface)
+add_subdirectory(src/pool)
 
 if(WITH_TESTS)
     add_subdirectory(tests)
@@ -56,15 +57,10 @@ endif()
 
 add_executable(NexusPool 
                 src/main.cpp 
-                src/pool.cpp
-                src/wallet_connection.cpp
-                src/timer_manager.cpp 
-                src/pool_manager.cpp
-                src/miner_connection.cpp
-                src/session.cpp)
+                src/pool.cpp)
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
-target_link_libraries(NexusPool chrono network config LLP TAO api persistance reward)
+target_link_libraries(NexusPool pool)
 
 target_link_libraries(NexusPool Threads::Threads)

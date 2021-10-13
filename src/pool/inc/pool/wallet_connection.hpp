@@ -5,9 +5,9 @@
 #include "network/socket.hpp"
 #include "network/types.hpp"
 #include "chrono/timer_factory.hpp"
-#include "timer_manager.hpp"
+#include "pool/timer_manager.hpp"
 #include "block.hpp"
-#include "types.hpp"
+#include "pool/types.hpp"
 #include "common/types.hpp"
 
 #include <memory>

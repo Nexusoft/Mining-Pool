@@ -1,7 +1,7 @@
-#include "wallet_connection.hpp"
-#include "pool_manager.hpp"
+#include "pool/wallet_connection.hpp"
+#include "pool/pool_manager.hpp"
 #include "packet.hpp"
-#include "LLP/block.hpp"
+#include "block.hpp"
 #include <spdlog/spdlog.h>
 #include <algorithm>
 
