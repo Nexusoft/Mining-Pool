@@ -28,7 +28,6 @@ struct Persistance_config
 
 struct Pool_config
 {
-	std::string m_address{};
 	std::string m_account{};
 	std::string m_pin{};
 	std::uint16_t m_fee{};

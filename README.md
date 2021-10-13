@@ -47,7 +47,6 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
         "file"          // filename of the storage.
 
     "pool"              // Option group regarding POOL mining.
-        "address"               // NXS address for the POOL mined blocks.
         "account"               // NXS account name used for transfer NXS rewards to the miners.
         "pin"                   // PIN for the used NXS account to transfer NXS rewards to the miners.
         "fee"                   // POOL fee in %

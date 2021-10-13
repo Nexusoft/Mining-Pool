@@ -65,11 +65,6 @@ bool Validator::check(std::string const& config_file)
             }
         }
 
-
-        if(j.count("pool")["address"] == 0)
-        {
-            m_mandatory_fields.push_back(Validator_error{"pool/address", ""});
-        }
         if (j.count("pool")["account"] == 0)
         {
             m_mandatory_fields.push_back(Validator_error{ "pool/account", "" });
