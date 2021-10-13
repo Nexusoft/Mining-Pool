@@ -1,6 +1,6 @@
 #include "pool/pool_manager.hpp"
 #include "pool/session_impl.hpp"
-#include "pool/wallet_connection.hpp"
+#include "pool/wallet_connection_impl.hpp"
 #include "pool/miner_connection_impl.hpp"
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
@@ -52,7 +52,7 @@ void Pool_manager::start()
 
 	auto self = shared_from_this();
 	// connect to wallet
-	m_wallet_connection = std::make_shared<Wallet_connection>(
+	m_wallet_connection = std::make_shared<Wallet_connection_impl>(
 		m_io_context, 
 		m_logger, 
 		self, 

@@ -1,4 +1,4 @@
-#include "pool/wallet_connection.hpp"
+#include "pool/wallet_connection_impl.hpp"
 #include "pool/pool_manager.hpp"
 #include "packet.hpp"
 #include "block.hpp"
@@ -7,7 +7,7 @@
 
 namespace nexuspool
 {
-Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_context,
+Wallet_connection_impl::Wallet_connection_impl(std::shared_ptr<asio::io_context> io_context,
     std::shared_ptr<spdlog::logger> logger,
     std::weak_ptr<Pool_manager> pool_manager,
     common::Mining_mode mining_mode,
@@ -28,7 +28,7 @@ Wallet_connection::Wallet_connection(std::shared_ptr<asio::io_context> io_contex
 {
 }
 
-void Wallet_connection::stop()
+void Wallet_connection_impl::stop()
 {
     m_timer_manager.stop();
 
@@ -36,7 +36,7 @@ void Wallet_connection::stop()
     m_connection.reset();
 }
 
-void Wallet_connection::retry_connect(network::Endpoint const& wallet_endpoint)
+void Wallet_connection_impl::retry_connect(network::Endpoint const& wallet_endpoint)
 {
     m_connection = nullptr;		// close connection (socket etc)
 
@@ -45,9 +45,9 @@ void Wallet_connection::retry_connect(network::Endpoint const& wallet_endpoint)
     m_timer_manager.start_connection_retry_timer(m_connection_retry_interval, shared_from_this(), wallet_endpoint);
 }
 
-bool Wallet_connection::connect(network::Endpoint const& wallet_endpoint)
+bool Wallet_connection_impl::connect(network::Endpoint const& wallet_endpoint)
 {
-    std::weak_ptr<Wallet_connection> weak_self = shared_from_this();
+    std::weak_ptr<Wallet_connection_impl> weak_self = shared_from_this();
     auto connection = m_socket->connect(wallet_endpoint, [weak_self, wallet_endpoint](auto result, auto receive_buffer)
         {
             auto self = weak_self.lock();
@@ -89,7 +89,7 @@ bool Wallet_connection::connect(network::Endpoint const& wallet_endpoint)
     return true;
 }
 
-void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
+void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buffer)
 {
     // if we don't have a connection to the wallet we cant do anything useful.
     if (!m_connection)
@@ -210,7 +210,7 @@ void Wallet_connection::process_data(network::Shared_payload&& receive_buffer)
     }
 }
 
-void Wallet_connection::submit_block(network::Shared_payload&& block_data, std::uint32_t block_map_id, Submit_block_handler&& handler)
+void Wallet_connection_impl::submit_block(network::Shared_payload&& block_data, std::uint32_t block_map_id, Submit_block_handler&& handler)
 {
     m_logger->info("Submitting Block...");
 
@@ -226,7 +226,7 @@ void Wallet_connection::submit_block(network::Shared_payload&& block_data, std::
     m_pending_submit_block_handlers.emplace(std::make_pair(block_map_id, handler));
 }
 
-void Wallet_connection::get_block(Get_block_handler&& handler)
+void Wallet_connection_impl::get_block(Get_block_handler&& handler)
 {
     if (!m_connection)
     {

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 add_library(pool STATIC   src/pool/timer_manager.cpp 
                           src/pool/miner_connection_impl.cpp 
-                          src/pool/wallet_connection.cpp 
+                          src/pool/wallet_connection_impl.cpp 
                           src/pool/pool_manager.cpp 
                           src/pool/session_impl.cpp)
                     

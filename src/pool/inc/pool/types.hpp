@@ -4,6 +4,7 @@
 #include <memory>
 #include <cstdint>
 #include <functional>
+#include "block.hpp"
 
 
 namespace nexuspool
