@@ -32,6 +32,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_blocks_from_round_cmd = m_command_factory->create_command(Type::get_blocks_from_round);
 	m_get_total_shares_from_accounts_cmd = m_command_factory->create_command(Type::get_total_shares_from_accounts);
 	m_get_not_paid_data_from_round_cmd = m_command_factory->create_command(Type::get_not_paid_data_from_round);
+	m_get_unpaid_rounds_cmd = m_command_factory->create_command(Type::get_unpaid_rounds);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -245,6 +246,23 @@ std::vector<Payment_data> Data_reader_impl::get_not_paid_data_from_round(std::ui
 	}
 
 	return payments;
+}
+
+std::vector<std::uint32_t> Data_reader_impl::get_unpaid_rounds()
+{
+	std::vector<std::uint32_t> rounds{};
+	if (!m_data_storage->execute_command(m_get_unpaid_rounds_cmd))
+	{
+		return rounds;	// return empty result
+	}
+
+	auto result = std::any_cast<Result_sqlite>(m_get_unpaid_rounds_cmd->get_result());
+	for (auto& row : result.m_rows)
+	{
+		rounds.push_back(static_cast<std::uint32_t>(std::get<std::int64_t>(row[0].m_data)));
+	}
+
+	return rounds;
 }
 
 

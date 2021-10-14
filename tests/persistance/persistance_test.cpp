@@ -270,6 +270,13 @@ TEST_F(Persistance_fixture, command_update_round)
 	m_test_data.delete_latest_round();
 }
 
+TEST_F(Persistance_fixture, command_get_unpaid_rounds)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto unpaid_results = data_reader->get_unpaid_rounds();
+	EXPECT_FALSE(unpaid_results.empty());
+}
+
 TEST_F(Persistance_fixture, commands_config)
 {
 	std::string config_mining_mode_input{ "HASH" };

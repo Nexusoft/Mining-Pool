@@ -353,6 +353,18 @@ void Command_get_not_paid_data_from_round_impl::set_params(std::any params)
 	auto casted_params = std::any_cast<std::int64_t>(m_params);
 	bind_param(m_stmt, ":round", casted_params);
 }
+// -----------------------------------------------------------------------------------------------
+Command_get_unpaid_rounds_impl::Command_get_unpaid_rounds_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT round_number FROM round WHERE is_paid = 0 AND is_active = 0", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_unpaid_rounds_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt}, {{Column_sqlite::int64}} };
+	return command;
+}
 
 // -----------------------------------------------------------------------------------------------
 // Write commands

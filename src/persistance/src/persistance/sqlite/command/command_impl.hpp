@@ -175,6 +175,17 @@ public:
 	void set_params(std::any params) override;
 };
 
+class Command_get_unpaid_rounds_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_unpaid_rounds_impl(sqlite3* handle);
+
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_unpaid_rounds; }
+	//void set_params(std::any params) override;
+};
+
 
 // ------------------------------------------------------------------------------------
 // Write commands
