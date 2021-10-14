@@ -11,8 +11,6 @@ using ::nexuspool::persistance::command::Type;
 /*
 get_active_accounts_from_round,
 reset_shares_from_accounts,
-update_round,
-get_not_paid_data_from_round,
 */
 
 TEST_F(Persistance_fixture, create_shared_data_writer)
@@ -237,6 +235,39 @@ TEST_F(Persistance_fixture, command_create_round)
 	// cleanup db
 	m_test_data.delete_latest_round();
 
+}
+
+TEST_F(Persistance_fixture, command_update_round)
+{
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_writer->create_round("end_datetime");
+	EXPECT_TRUE(result);
+
+	auto result_before_update = data_reader->get_latest_round();
+	EXPECT_TRUE(result_before_update.m_round);
+
+	// update round
+	result_before_update.m_is_paid = true;
+	result_before_update.m_is_active = false;
+	result_before_update.m_total_rewards = 100.256;
+	result_before_update.m_total_shares = 200;
+	result_before_update.m_blocks = 10;
+
+	auto update_round_result = data_writer->update_round(result_before_update);
+	EXPECT_TRUE(update_round_result);
+
+	auto result_after_update = data_reader->get_latest_round();
+	EXPECT_TRUE(result_after_update.m_round);
+
+	EXPECT_EQ(result_before_update.m_is_paid, result_after_update.m_is_paid);
+	EXPECT_EQ(result_before_update.m_is_active, result_after_update.m_is_active);
+	EXPECT_EQ(result_before_update.m_total_rewards, result_after_update.m_total_rewards);
+	EXPECT_EQ(result_before_update.m_total_shares, result_after_update.m_total_shares);
+	EXPECT_EQ(result_before_update.m_blocks, result_after_update.m_blocks);
+
+	// cleanup db
+	m_test_data.delete_latest_round();
 }
 
 TEST_F(Persistance_fixture, commands_config)
