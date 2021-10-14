@@ -30,8 +30,7 @@ public:
 
     Pool_manager(std::shared_ptr<asio::io_context> io_context, 
         std::shared_ptr<spdlog::logger> logger,
-        config::Config::Sptr config, 
-        persistance::Config_data storage_config_data,
+        config::Config::Sptr config,
         chrono::Timer_factory::Sptr timer_factory,
         network::Socket_factory::Sptr socket_factory,
         persistance::Data_writer_factory::Sptr data_writer_factory,
@@ -55,6 +54,7 @@ private:
     chrono::Timer::Handler session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval);
     chrono::Timer::Handler end_round_handler();
     void end_round();
+    persistance::Config_data storage_config_check();
 
     std::shared_ptr<::asio::io_context> m_io_context;
     std::shared_ptr<spdlog::logger> m_logger;

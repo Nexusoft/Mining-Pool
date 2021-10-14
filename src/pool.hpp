@@ -32,8 +32,6 @@ public:
 
 private:
 
-	persistance::Config_data storage_config_check();
-
 	std::unique_ptr<network::Component> m_network_component;
 	std::unique_ptr<persistance::Component> m_persistance_component;
 	chrono::Component::Uptr m_timer_component;

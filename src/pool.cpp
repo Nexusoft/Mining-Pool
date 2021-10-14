@@ -90,14 +90,11 @@ namespace nexuspool
 		// data storage initialisation
 		m_persistance_component = persistance::create_component(m_logger, m_config->get_persistance_config());
 
-		auto const config_data = storage_config_check();
-
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
 		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, 
 			m_logger,
-			m_config, 
-			config_data,
+			m_config,
 			m_timer_component->get_timer_factory(),
 			m_network_component->get_socket_factory(), 
 			m_persistance_component->get_data_writer_factory(),
@@ -113,43 +110,5 @@ namespace nexuspool
 		m_api_server->start();
 		m_pool_manager->start();
 		m_io_context->run();
-	}
-
-	persistance::Config_data Pool::storage_config_check()
-	{
-		persistance::Config_data config_data{};
-		auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
-		auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
-
-		config_data = data_reader->get_config();
-		std::string const mining_mode{ m_config->get_mining_mode() == common::Mining_mode::HASH ? "HASH" : "PRIME" };
-		if (config_data.m_version.empty())
-		{
-			// No config present
-			data_writer->create_config(mining_mode, m_config->get_pool_config().m_fee, m_config->get_pool_config().m_difficulty_divider, m_config->get_pool_config().m_round_duration_hours);
-		}
-		else
-		{
-			if (mining_mode != config_data.m_mining_mode &&
-				m_config->get_pool_config().m_fee != config_data.m_fee &&
-				m_config->get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider &&
-				m_config->get_pool_config().m_round_duration_hours != config_data.m_round_duration_hours)
-			{
-				// update config but only if there is no round active
-				auto const round_data = data_reader->get_latest_round();
-				if (round_data.m_is_active)
-				{
-					m_logger->warn("Pool config can't be changed now. Round {} is active until {}.", round_data.m_round, round_data.m_end_date_time);
-				}
-				else
-				{
-					data_writer->update_config(mining_mode, m_config->get_pool_config().m_fee, m_config->get_pool_config().m_difficulty_divider, m_config->get_pool_config().m_round_duration_hours);
-				}
-			}
-		}
-
-		// Get the latest (maybe updated) config from storage
-		config_data = data_reader->get_config();
-		return config_data;
 	}
 }

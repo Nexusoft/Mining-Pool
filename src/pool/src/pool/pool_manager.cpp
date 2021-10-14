@@ -14,7 +14,6 @@ namespace nexuspool
 Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, 
 	std::shared_ptr<spdlog::logger> logger,
 	config::Config::Sptr config,
-	persistance::Config_data storage_config_data,
 	chrono::Timer_factory::Sptr timer_factory,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
@@ -22,7 +21,6 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	: m_io_context{std::move(io_context) }
 	, m_logger{ std::move(logger)}
 	, m_config{std::move(config)}
-	, m_storage_config_data{std::move(storage_config_data)}
 	, m_timer_factory{ std::move(timer_factory) }
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
@@ -45,6 +43,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 
 void Pool_manager::start()
 {
+	m_storage_config_data = storage_config_check();
 	network::Endpoint wallet_endpoint{ network::Transport_protocol::tcp, m_config->get_wallet_ip(), m_config->get_wallet_port() };
 	network::Endpoint local_endpoint{ network::Transport_protocol::tcp, m_config->get_local_ip(), m_config->get_local_port() };
 	auto local_socket = m_socket_factory->create_socket(local_endpoint);
@@ -266,6 +265,48 @@ void Pool_manager::end_round()
 	auto const current_round = m_reward_component->get_current_round();
 	m_reward_component->end_round(current_round);
 	m_reward_component->pay_all(current_round);
+
+	// update config in storage
+	m_storage_config_data = storage_config_check();
+}
+
+
+persistance::Config_data Pool_manager::storage_config_check()
+{
+	persistance::Config_data config_data{};
+	auto data_writer = m_data_writer_factory->create_shared_data_writer();
+	auto data_reader = m_data_reader_factory->create_data_reader();
+
+	config_data = data_reader->get_config();
+	std::string const mining_mode{ m_config->get_mining_mode() == common::Mining_mode::HASH ? "HASH" : "PRIME" };
+	if (config_data.m_version.empty())
+	{
+		// No config present
+		data_writer->create_config(mining_mode, m_config->get_pool_config().m_fee, m_config->get_pool_config().m_difficulty_divider, m_config->get_pool_config().m_round_duration_hours);
+	}
+	else
+	{
+		if (mining_mode != config_data.m_mining_mode &&
+			m_config->get_pool_config().m_fee != config_data.m_fee &&
+			m_config->get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider &&
+			m_config->get_pool_config().m_round_duration_hours != config_data.m_round_duration_hours)
+		{
+			// update config but only if there is no round active
+			auto const round_data = data_reader->get_latest_round();
+			if (round_data.m_is_active)
+			{
+				m_logger->warn("Pool config can't be changed now. Round {} is active until {}.", round_data.m_round, round_data.m_end_date_time);
+			}
+			else
+			{
+				data_writer->update_config(mining_mode, m_config->get_pool_config().m_fee, m_config->get_pool_config().m_difficulty_divider, m_config->get_pool_config().m_round_duration_hours);
+			}
+		}
+	}
+
+	// Get the latest (maybe updated) config from storage
+	config_data = data_reader->get_config();
+	return config_data;
 }
 
 
