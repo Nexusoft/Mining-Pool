@@ -286,9 +286,9 @@ persistance::Config_data Pool_manager::storage_config_check()
 	}
 	else
 	{
-		if (mining_mode != config_data.m_mining_mode &&
-			m_config->get_pool_config().m_fee != config_data.m_fee &&
-			m_config->get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider &&
+		if (mining_mode != config_data.m_mining_mode ||
+			m_config->get_pool_config().m_fee != config_data.m_fee ||
+			m_config->get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider ||
 			m_config->get_pool_config().m_round_duration_hours != config_data.m_round_duration_hours)
 		{
 			// update config but only if there is no round active
