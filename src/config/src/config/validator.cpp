@@ -84,17 +84,6 @@ bool Validator::check(std::string const& config_file)
                 m_mandatory_fields.push_back(Validator_error{ "pool/fee", "Not a number" });
             }
         }
-        if (j.count("pool")["min_share"] == 0)
-        {
-            m_mandatory_fields.push_back(Validator_error{ "pool/min_share", "" });
-        }
-        else
-        {
-            if (!j.at("pool")["min_share"].is_number())
-            {
-                m_mandatory_fields.push_back(Validator_error{ "pool/min_share", "Not a number" });
-            }
-        }
         if (j.count("pool")["difficulty_divider"] == 0)
         {
             m_mandatory_fields.push_back(Validator_error{ "pool/difficulty_divider", "" });

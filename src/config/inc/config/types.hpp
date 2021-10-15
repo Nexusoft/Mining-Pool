@@ -31,7 +31,6 @@ struct Pool_config
 	std::string m_account{};
 	std::string m_pin{};
 	std::uint16_t m_fee{};
-	std::uint32_t m_min_share{};
 	std::uint16_t m_difficulty_divider{};
 	std::uint16_t m_round_duration_hours{};
 };
