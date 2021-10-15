@@ -207,6 +207,17 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 void Miner_connection_impl::set_current_height(std::uint32_t height)
 {
 	m_current_height = height;
+	if (!m_connection)
+	{
+		return;
+	}
+
+	Packet response;
+	response.m_header = Packet::BLOCK_HEIGHT;
+	response.m_data = std::make_shared<std::vector<uint8_t>>(uint2bytes(m_current_height));
+	response.m_length = response.m_data->size();
+
+	m_connection->transmit(response.get_bytes());
 }
 
 void Miner_connection_impl::process_accepted()
