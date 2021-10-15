@@ -64,13 +64,13 @@ bool Data_writer_impl::update_account(Account_data data)
 
 bool Data_writer_impl::create_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours)
 {
-	m_create_config_cmd->set_params(command::Command_config_params{fee, difficulty_divider, std::move(mining_mode), round_duration_hours });
+	m_create_config_cmd->set_params(command::Command_config_params{difficulty_divider, fee, std::move(mining_mode), round_duration_hours });
 	return m_data_storage->execute_command(m_create_config_cmd);
 }
 
 bool Data_writer_impl::update_config(std::string mining_mode, int fee, int difficulty_divider, int round_duration_hours)
 {
-	m_update_config_cmd->set_params(command::Command_config_params{ fee, difficulty_divider, std::move(mining_mode), round_duration_hours });
+	m_update_config_cmd->set_params(command::Command_config_params{difficulty_divider, fee, std::move(mining_mode), round_duration_hours });
 	return m_data_storage->execute_command(m_update_config_cmd);
 }
 
