@@ -176,11 +176,14 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
     else if (packet.m_header == Packet::ACCEPT)
     {
         m_logger->info("Block Accepted By Nexus Network.");
-        //m_stats_collector->block_accepted();
-        // store block into DB
         auto pool_manager_shared = m_pool_manager.lock();
         if (!pool_manager_shared)
             return;
+
+        // get_height immediately to get the next block faster than waiting on get_height_timer
+        Packet packet_get_height;
+        packet_get_height.m_header = Packet::GET_HEIGHT;
+        m_connection->transmit(packet_get_height.get_bytes());
 
         // the oldest handler is the first one who submitted the block
         std::scoped_lock lock(m_submit_block_mutex);
