@@ -264,7 +264,7 @@ void Pool_manager::end_round()
 {
 	auto const current_round = m_reward_component->get_current_round();
 	m_reward_component->end_round(current_round);
-	m_reward_component->pay_all(current_round);
+	m_reward_component->pay_round(current_round);
 
 	// update config in storage
 	m_storage_config_data = storage_config_check();

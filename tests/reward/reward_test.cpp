@@ -83,32 +83,32 @@ TEST_F(Reward_fixture_created_component, get_start_end_round_times_test)
 	EXPECT_EQ(common::get_datetime_string(round_end_time), test_round_data.m_end_date_time);
 }
 
-TEST_F(Reward_fixture_created_component, pay_all_with_unknown_round_test)
+TEST_F(Reward_fixture_created_component, pay_round_with_unknown_round_test)
 {
 	auto const unknown_round = 100U;
 	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(unknown_round)).WillOnce(Return(persistance::Round_data{}));
 
-	auto result = m_component->pay_all(unknown_round);
+	auto result = m_component->pay_round(unknown_round);
 	EXPECT_FALSE(result);
 }
 
-TEST_F(Reward_fixture_created_component, pay_all_with_active_round_test)
+TEST_F(Reward_fixture_created_component, pay_round_with_active_round_test)
 {
 	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(test_round_data.m_round)).WillOnce(Return(test_round_data));
 
-	auto result = m_component->pay_all(test_round_data.m_round);
+	auto result = m_component->pay_round(test_round_data.m_round);
 	EXPECT_FALSE(result);
 }
 
-TEST_F(Reward_fixture_created_component, pay_all_with_already_paid_round_test)
+TEST_F(Reward_fixture_created_component, pay_round_with_already_paid_round_test)
 {
 	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(test_round_not_active_paid_data.m_round)).WillOnce(Return(test_round_not_active_paid_data));
 
-	auto result = m_component->pay_all(test_round_not_active_paid_data.m_round);
+	auto result = m_component->pay_round(test_round_not_active_paid_data.m_round);
 	EXPECT_FALSE(result);
 }
 
-TEST_F(Reward_fixture_created_component, pay_all_calculate_rewards_tests)
+TEST_F(Reward_fixture_created_component, pay_round_calculate_rewards_tests)
 {
 	
 	EXPECT_CALL(*m_test_data.m_data_reader_mock_raw, get_round(test_round_not_active_not_paid_data.m_round)).WillOnce(Return(test_round_not_active_not_paid_data));
@@ -121,7 +121,7 @@ TEST_F(Reward_fixture_created_component, pay_all_calculate_rewards_tests)
 		EXPECT_CALL(*m_test_data.m_shared_data_writer_mock, update_block_rewards(block.m_hash, _, _)).WillOnce(Return(true));
 	}
 
-	auto result = m_component->pay_all(test_round_not_active_not_paid_data.m_round);
+	auto result = m_component->pay_round(test_round_not_active_not_paid_data.m_round);
 	EXPECT_TRUE(result);
 	
 }

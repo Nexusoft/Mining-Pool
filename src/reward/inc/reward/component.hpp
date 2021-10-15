@@ -31,7 +31,7 @@ public:
 
     virtual Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const = 0;
     //pay all miners with unpaid shares.
-    virtual bool pay_all(std::uint32_t round) = 0;
+    virtual bool pay_round(std::uint32_t round) = 0;
 
 
 };

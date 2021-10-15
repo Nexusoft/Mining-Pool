@@ -162,7 +162,7 @@ Difficulty_result Component_impl::check_difficulty(const LLP::CBlock& block, uin
 
 }
 
-bool Component_impl::pay_all(std::uint32_t round)
+bool Component_impl::pay_round(std::uint32_t round)
 {
 	// check if round is ended and not paid.
 	auto round_data = m_data_reader->get_round(round);
