@@ -171,15 +171,16 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 
 void Pool_manager::add_block_to_storage(std::uint32_t block_map_id)
 {
-	auto block = m_block_map[block_map_id];
-	auto const block_hash = block->GetHash().ToString();
+	auto submit_block_data = m_block_map[block_map_id];
+	auto const block_hash = submit_block_data.m_block->GetHash().ToString();
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
 	persistance::Block_data block_data;
 	block_data.m_hash = block_hash;
-	block_data.m_height = block->nHeight;
-	block_data.m_type = block->nChannel == 1 ? "prime" : "hash";
+	block_data.m_height = submit_block_data.m_block->nHeight;
+	block_data.m_type = submit_block_data.m_block->nChannel == 1 ? "prime" : "hash";
 	block_data.m_orphan = 0;
-	block_data.m_difficulty = TAO::Ledger::GetDifficulty(block->nBits, block->nChannel);
+	block_data.m_block_finder = submit_block_data.m_blockfinder;
+	block_data.m_difficulty = TAO::Ledger::GetDifficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
 }
@@ -189,7 +190,7 @@ void Pool_manager::get_block(Get_block_handler&& handler)
 	m_wallet_connection->get_block(std::move(handler));
 }
 
-void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, Submit_block_handler handler)
+void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler)
 {
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
 	switch (difficulty_result)
@@ -206,7 +207,7 @@ void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, Submit_block
 		auto nonce = nexuspool::uint2bytes64(block->nNonce);
 		auto block_data = std::make_shared<std::vector<std::uint8_t>>(block->hashMerkleRoot.GetBytes());
 		block_data->insert(block_data->end(), nonce.begin(), nonce.end());
-		m_block_map.emplace(std::make_pair(m_block_map_id.load(), std::make_shared<LLP::CBlock>(*block)));
+		m_block_map.emplace(std::make_pair(m_block_map_id.load(), Submit_block_data{ std::make_shared<LLP::CBlock>(*block), blockfinder }));
 		m_wallet_connection->submit_block(std::move(block_data), m_block_map_id, std::move(handler));
 		m_block_map_id++;
 		break;

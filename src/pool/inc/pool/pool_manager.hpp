@@ -46,7 +46,7 @@ public:
 
     // Methods towards miner_connection
     void get_block(Get_block_handler&& handler);
-    void submit_block(std::unique_ptr<LLP::CBlock> block, Submit_block_handler handler);
+    void submit_block(std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler);
     std::uint32_t get_pool_nbits() const;
 
 private:
@@ -80,8 +80,13 @@ private:
     std::uint32_t m_pool_nBits;
 
     // variables for block to storage
+    struct Submit_block_data
+    {
+        std::shared_ptr<LLP::CBlock> m_block;
+        std::string m_blockfinder;
+    };
     std::atomic<std::uint32_t> m_block_map_id;
-    std::map<std::uint32_t, std::shared_ptr<LLP::CBlock>> m_block_map;
+    std::map<std::uint32_t, Submit_block_data> m_block_map;
 };
 }
 
