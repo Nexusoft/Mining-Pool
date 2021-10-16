@@ -31,8 +31,15 @@ void Miner_connection_impl::stop()
 
 network::Connection::Handler Miner_connection_impl::connection_handler()
 {
-	return[self = shared_from_this()](network::Result::Code result, network::Shared_payload&& receive_buffer)
+	std::weak_ptr<Miner_connection_impl> weak_self = shared_from_this();
+	return[weak_self](network::Result::Code result, network::Shared_payload&& receive_buffer)
 	{
+		auto self = weak_self.lock();
+		if (!self)
+		{
+			return;
+		}
+
 		if (result == network::Result::connection_declined ||
 			result == network::Result::connection_aborted ||
 			result == network::Result::connection_error)
