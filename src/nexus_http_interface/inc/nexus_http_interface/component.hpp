@@ -28,6 +28,9 @@ public:
     // Get the reward data from a block identified by the block hash
     virtual bool get_block_reward_data(std::string hash, common::Block_reward_data& reward_data) = 0;
 
+    // Get the block hash by height
+    virtual bool get_block_hash(std::uint32_t height, std::string& hash) = 0;
+
     // Payout all miners that are given to this method
     virtual bool payout(std::string account_from, std::string pin, Payout_recipients const& recipients) = 0;
 

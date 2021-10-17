@@ -48,6 +48,25 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 	return true;
 }
 
+bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
+{
+	std::string parameter{ "?height=" };
+	parameter += std::to_string(height);
+	auto response = m_client->get_blockhash(parameter.c_str());
+	auto const status_code = response->getStatusCode();
+	if (status_code != 200)
+	{
+		m_logger->error("API error. Code: {} Message: {}", status_code, response->readBodyToString()->c_str());
+		return false;
+	}
+
+	auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
+	m_logger->info(data_json.dump());
+	hash = data_json["result"]["hash"];
+
+	return true;
+}
+
 bool Component_impl::payout(std::string account_from, std::string pin, Payout_recipients const& recipients)
 {
 	auto dto = Payout_dto::createShared();

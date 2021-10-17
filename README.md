@@ -11,8 +11,9 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     -llpallowip=<ip-port>   ex: -llpallowip=192.168.0.1:9325 
                             note: this is not needed if you mine to localhost (127.0.0.1). This is primarily used for a local-area-network setup
 
-    -mining                 Ensure mining LLP servers are initialized.
-    -apiauth=0              API calls to the wallet need no authorization (will be changed in future releases)
+    -mining               Ensure mining LLP servers are initialized.
+    -apiauth=0            API calls to the wallet need no authorization (will be changed in future releases)
+    -indexheight          needed to query the wallet for blocks with height param
 ```
 
 ## COMMAND LINE OPTION ARGUMENTS
