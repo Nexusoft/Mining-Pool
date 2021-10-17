@@ -175,7 +175,6 @@ void Pool_manager::add_block_to_storage(std::uint32_t block_map_id)
 	auto const block_hash = submit_block_data.m_block->GetHash().ToString();
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
 	persistance::Block_data block_data;
-	block_data.m_hash = block_hash;
 	block_data.m_height = submit_block_data.m_block->nHeight;
 	block_data.m_type = submit_block_data.m_block->nChannel == 1 ? "prime" : "hash";
 	block_data.m_orphan = 0;

@@ -510,7 +510,7 @@ Command_add_block_impl::Command_add_block_impl(sqlite3* handle)
 {
 	std::string add_block{ R"(INSERT INTO block 
 		(hash, height, type, difficulty, orphan, block_finder, round, block_found_time, mainnet_reward) 
-		VALUES(:hash, :height, :type, :difficulty, :orphan, :block_finder, :round, CURRENT_TIMESTAMP, :mainnet_reward))" };
+		VALUES("", :height, :type, :difficulty, :orphan, :block_finder, :round, CURRENT_TIMESTAMP, :mainnet_reward))" };
 
 	sqlite3_prepare_v2(m_handle, add_block.c_str(), -1, &m_stmt, NULL);
 }
@@ -519,7 +519,6 @@ void Command_add_block_impl::set_params(std::any params)
 {
 	m_params = std::move(params);
 	auto casted_params = std::any_cast<Command_add_block_params>(m_params);
-	bind_param(m_stmt, ":hash", casted_params.m_hash);
 	bind_param(m_stmt, ":height", casted_params.m_height);
 	bind_param(m_stmt, ":type", casted_params.m_type);
 	bind_param(m_stmt, ":difficulty", casted_params.m_difficulty);

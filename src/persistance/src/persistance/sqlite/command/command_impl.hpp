@@ -294,7 +294,6 @@ public:
 
 struct Command_add_block_params
 {
-	std::string m_hash;
 	int m_height;
 	std::string m_type;
 	double m_difficulty;
@@ -304,6 +303,7 @@ struct Command_add_block_params
 	double m_mainnet_reward;
 };
 
+// the block_hash is not included in this command. It has to be queried from nxs wallet and updated later
 class Command_add_block_impl : public Command_base_database_sqlite
 {
 public:

@@ -49,9 +49,9 @@ public:
 		delete_from_table("payment", "name", std::move(account));
 	}
 
-	void delete_from_block_table(std::string blockhash)
+	void delete_from_block_table(std::int64_t block_height)
 	{
-		delete_from_table("block", "hash", std::move(blockhash));
+		delete_from_table("block", "height", block_height);
 	}
 
 	void delete_latest_round()

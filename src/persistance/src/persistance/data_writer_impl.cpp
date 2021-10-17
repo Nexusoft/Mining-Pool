@@ -82,14 +82,13 @@ bool Data_writer_impl::reset_shares_from_accounts()
 bool Data_writer_impl::add_block(Block_data data)
 {
 	m_add_block_cmd->set_params(command::Command_add_block_params{
-	std::move(data.m_hash),
-	static_cast<int>(data.m_height),
-	std::move(data.m_type),
-	data.m_difficulty,
-	data.m_orphan,
-	std::move(data.m_block_finder),
-	data.m_round,
-	data.m_mainnet_reward});
+		static_cast<int>(data.m_height),
+		std::move(data.m_type),
+		data.m_difficulty,
+		data.m_orphan,
+		std::move(data.m_block_finder),
+		data.m_round,
+		data.m_mainnet_reward});
 	return m_data_storage->execute_command(m_add_block_cmd);
 }
 
