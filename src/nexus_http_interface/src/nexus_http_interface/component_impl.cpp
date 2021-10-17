@@ -61,7 +61,6 @@ bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
 	}
 
 	auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
-	m_logger->info(data_json.dump());
 	hash = data_json["result"]["hash"];
 
 	return true;
