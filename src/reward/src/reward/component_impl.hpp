@@ -35,6 +35,8 @@ public:
 
 private:
 
+    void update_block_hashes(std::uint32_t round);
+
     std::shared_ptr<spdlog::logger> m_logger;
     nexus_http_interface::Component::Uptr m_http_interface;
     persistance::Shared_data_writer::Sptr m_shared_data_writer;

@@ -86,6 +86,8 @@ bool Component_impl::end_round(std::uint32_t round_number)
         return false;
     }
 
+	update_block_hashes(round_number);
+
 	round_data.m_total_rewards += m_payout_manager.calculate_reward_of_blocks(round_number);
 	round_data.m_total_shares = m_data_reader->get_total_shares_from_accounts();
 
@@ -187,6 +189,33 @@ bool Component_impl::pay_round(std::uint32_t round)
 		m_shared_data_writer->update_round(round_data);
 	}
 	return true;
+}
+
+void Component_impl::update_block_hashes(std::uint32_t round)
+{
+	auto updated_blocks = 0U;
+	auto const block_heights = m_data_reader->get_blocks_without_hash_from_round(round);
+	for (auto& height : block_heights)
+	{
+		std::string block_hash{};
+		auto result = m_http_interface->get_block_hash(height, block_hash);
+		if (!result)
+		{
+			continue;
+		}
+
+		result = m_shared_data_writer->update_block_hash(height, block_hash);
+		if (result)
+		{
+			updated_blocks++;
+		}
+		else
+		{
+			m_logger->error("Failed to update block_hash for height {}", height);
+		}
+	}
+
+	m_logger->debug("Updated block hashes from {} blocks in round {}", updated_blocks, round);
 }
 
 }
