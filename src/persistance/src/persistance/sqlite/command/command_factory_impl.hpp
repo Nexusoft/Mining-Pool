@@ -75,6 +75,8 @@ public:
             std::make_shared<Command_update_round_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::account_paid,
             std::make_shared<Command_account_paid_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::update_block_hash,
+            std::make_shared<Command_update_block_hash_impl>(m_storage_manager->get_handle<sqlite3*>())));
         
     }
 
@@ -168,6 +170,9 @@ private:
             break;
         case Type::account_paid:
             result = std::any_cast<std::shared_ptr<Command_account_paid_impl>>(m_commands[command_type]);
+            break;
+        case Type::update_block_hash:
+            result = std::any_cast<std::shared_ptr<Command_update_block_hash_impl>>(m_commands[command_type]);
             break;
         }
         

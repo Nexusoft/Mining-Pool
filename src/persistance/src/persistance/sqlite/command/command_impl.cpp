@@ -593,6 +593,22 @@ void Command_account_paid_impl::set_params(std::any params)
 	bind_param(m_stmt, ":name", casted_params.m_account);
 }
 
+// -----------------------------------------------------------------------------------------------
+Command_update_block_hash_impl::Command_update_block_hash_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string update_block_hash{ R"(UPDATE block SET hash = :hash WHERE height = :height)" };
+	sqlite3_prepare_v2(m_handle, update_block_hash.c_str(), -1, &m_stmt, NULL);
+}
+
+void Command_update_block_hash_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_update_block_hash_params>(m_params);
+	bind_param(m_stmt, ":hash", casted_params.m_hash);
+	bind_param(m_stmt, ":height", casted_params.m_height);
+}
+
 }
 }
 }

@@ -29,6 +29,7 @@ public:
     virtual bool update_block_rewards(std::string hash, bool orphan, double reward) = 0;
     virtual bool update_round(Round_data round) = 0;
     virtual bool account_paid(std::uint32_t round_number, std::string account) = 0;
+    virtual bool update_block_hash(std::uint32_t height, std::string block_hash) = 0;
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -51,6 +52,7 @@ public:
     virtual bool update_block_rewards(std::string hash, bool orphan, double reward) = 0;
     virtual bool update_round(Round_data round) = 0;
     virtual bool account_paid(std::uint32_t round_number, std::string account) = 0;
+    virtual bool update_block_hash(std::uint32_t height, std::string block_hash) = 0;
 };
 }
 }

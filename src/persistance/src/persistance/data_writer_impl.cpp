@@ -31,6 +31,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_update_block_rewards_cmd = m_command_factory->create_command(Type::update_block_rewards);
 	m_update_round_cmd = m_command_factory->create_command(Type::update_round);
 	m_account_paid_cmd = m_command_factory->create_command(Type::account_paid);
+	m_update_block_hash_cmd = m_command_factory->create_command(Type::update_block_hash);
 }
 
 bool Data_writer_impl::create_account(std::string account)
@@ -120,6 +121,12 @@ bool Data_writer_impl::account_paid(std::uint32_t round_number, std::string acco
 	return m_data_storage->execute_command(m_account_paid_cmd);
 }
 
+bool Data_writer_impl::update_block_hash(std::uint32_t height, std::string block_hash)
+{
+	m_update_block_hash_cmd->set_params(command::Command_update_block_hash_params{ static_cast<int>(height), std::move(block_hash) });
+	return m_data_storage->execute_command(m_update_block_hash_cmd);
+}
+
 // --------------------------------------------------------------------------------------
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
@@ -190,6 +197,12 @@ bool Shared_data_writer_impl::account_paid(std::uint32_t round_number, std::stri
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->account_paid(round_number, std::move(account));
+}
+
+bool Shared_data_writer_impl::update_block_hash(std::uint32_t height, std::string block_hash)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->update_block_hash(height, std::move(block_hash));
 }
 
 }
