@@ -20,7 +20,7 @@ public:
         persistance::Shared_data_writer& shared_data_writer,
         persistance::Data_reader& data_reader);
 
-    double calculate_reward_of_blocks(std::uint32_t round);
+    double calculate_reward_of_blocks(std::uint32_t round, bool& calculation_finished);
     bool payout(std::string const& account_from, std::string const& pin, std::uint32_t current_round);
 
 private:

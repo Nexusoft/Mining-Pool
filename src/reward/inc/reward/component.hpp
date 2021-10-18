@@ -18,6 +18,8 @@ public:
 
     virtual ~Component() = default;
 
+    virtual Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const = 0;
+
     // Starts a new round
     virtual bool start_round(std::uint16_t round_duration_hours) = 0;
 
@@ -29,7 +31,8 @@ public:
     // End round
     virtual bool end_round(std::uint32_t round_number) = 0;
 
-    virtual Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const = 0;
+    // calculate the rewards for each miner for the given round
+    virtual bool calculate_rewards(std::uint32_t round_number) = 0;
     //pay all miners with unpaid shares.
     virtual bool pay_round(std::uint32_t round) = 0;
 

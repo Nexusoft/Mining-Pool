@@ -19,8 +19,9 @@ Payout_manager::Payout_manager(
 
 }
 
-double Payout_manager::calculate_reward_of_blocks(std::uint32_t round)
+double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& calculation_finished)
 {
+	calculation_finished = false;
 	double total_rewards = 0;
 	auto blocks_update_count = 0U;
 	auto blocks_orphaned = 0U;
@@ -68,6 +69,12 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round)
 	}
 	m_logger->debug("Updated reward_data of {} blocks in round {}. {} blocks are ORPHAN. Total rewards calculated {}", 
 		blocks_update_count, round, blocks_orphaned, total_rewards);
+
+	// all blocks of the round are confirmed or orphaned
+	if (blocks_update_count == blocks.size())
+	{
+		calculation_finished = true;
+	}
 
 	return total_rewards;
 }

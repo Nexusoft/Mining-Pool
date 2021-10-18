@@ -25,12 +25,14 @@ public:
         std::string pin,
         std::uint16_t pool_fee);
 
+    Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const override;
+
     bool start_round(std::uint16_t round_duration_hours) override;
     bool is_round_active() override;
     std::uint32_t get_current_round() const;
     void get_start_end_round_times(std::chrono::system_clock::time_point& start_time, std::chrono::system_clock::time_point& end_time) override;
     bool end_round(std::uint32_t round_number) override;
-    Difficulty_result check_difficulty(const LLP::CBlock& block, std::uint32_t pool_nbits) const override;
+    bool calculate_rewards(std::uint32_t round_number) override;
     bool pay_round(std::uint32_t round) override;
 
 private:

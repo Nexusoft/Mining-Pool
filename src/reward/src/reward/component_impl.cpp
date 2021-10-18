@@ -28,6 +28,53 @@ Component_impl::Component_impl(
 {
 }
 
+Difficulty_result Component_impl::check_difficulty(const LLP::CBlock& block, uint32_t pool_nbits) const
+{
+	Difficulty_result result = Difficulty_result::reject;
+
+	//hash channel
+	if (block.nChannel == 2)
+	{
+		uint1024_t block_hash = block.GetHash();
+		uint1024_t mainnet_difficulty_target;
+		mainnet_difficulty_target.SetCompact(block.nBits);
+		uint1024_t pool_difficulty_target;
+		pool_difficulty_target.SetCompact(pool_nbits);
+		if (block_hash < mainnet_difficulty_target)
+		{
+			result = Difficulty_result::block_found;
+		}
+		else if (block_hash < pool_difficulty_target)
+		{
+			result = Difficulty_result::accept;
+		}
+	}
+	//prime channel
+	else if (block.nChannel == 1)
+	{
+		uint1024_t block_prime = block.GetPrime();
+		std::vector<uint8_t> offsets;
+		double actual_prime_difficulty = TAO::Ledger::GetPrimeDifficulty(block_prime, offsets);
+		double mainnet_difficulty_target = TAO::Ledger::GetDifficulty(block.nBits, block.nChannel);
+		double pool_difficulty_target = TAO::Ledger::GetDifficulty(pool_nbits, block.nChannel);
+		if (actual_prime_difficulty >= mainnet_difficulty_target)
+		{
+			result = Difficulty_result::block_found;
+		}
+		else if (actual_prime_difficulty >= pool_difficulty_target)
+		{
+			result = Difficulty_result::accept;
+		}
+
+	}
+	else
+	{
+		result = Difficulty_result::reject;
+	}
+
+	return result;
+}
+
 bool Component_impl::start_round(std::uint16_t round_duration_hours)
 {
 	m_logger->info("Starting new round");
@@ -87,22 +134,18 @@ bool Component_impl::end_round(std::uint32_t round_number)
     }
 
 	update_block_hashes(round_number);
-
-	round_data.m_total_rewards += m_payout_manager.calculate_reward_of_blocks(round_number);
 	round_data.m_total_shares = m_data_reader->get_total_shares_from_accounts();
-
-    if (round_data.m_total_rewards > 0 && round_data.m_total_shares > 0) // did the pool actually earned something this round?
-    {
-        // get all accounts which contribute to the current round
-        auto const active_accounts = m_data_reader->get_active_accounts_from_round();
-        for (auto& active_account : active_accounts)
-        {
-            // calculate reward for account. First reduce the total_rewards with pool_fee % 
-            auto account_reward = (round_data.m_total_rewards * ( 1.0 - static_cast<double>(m_pool_fee / 100))) * (active_account.m_shares / round_data.m_total_shares);
-            // add account to payment table (without datetime -> not paid yet)
-            m_shared_data_writer->add_payment(persistance::Payment_data{ active_account.m_address, account_reward, active_account.m_shares, "", round_data.m_round });
-        }
-    }
+	if (round_data.m_total_shares > 0) // did the pool actually earned something this round?
+	{
+		// get all accounts which contribute to the current round
+		auto const active_accounts = m_data_reader->get_active_accounts_from_round();
+		for (auto& active_account : active_accounts)
+		{
+			// add account to payment table (without datetime -> not paid yet)
+			// reward is not set yet
+			m_shared_data_writer->add_payment(persistance::Payment_data{ active_account.m_address, 0.0, active_account.m_shares, "", round_data.m_round });
+		}
+	}
 
     // reset shares of all accounts (round end)
     m_shared_data_writer->reset_shares_from_accounts();
@@ -115,71 +158,48 @@ bool Component_impl::end_round(std::uint32_t round_number)
     return true;
 }
 
-Difficulty_result Component_impl::check_difficulty(const LLP::CBlock& block, uint32_t pool_nbits) const
+bool Component_impl::calculate_rewards(std::uint32_t round_number)
 {
-	Difficulty_result result = Difficulty_result::reject;
-	
-	//hash channel
-	if (block.nChannel == 2)
+	auto round_data = m_data_reader->get_round(round_number);
+	if (round_data.is_empty())
 	{
-		uint1024_t block_hash = block.GetHash();
-		uint1024_t mainnet_difficulty_target;
-		mainnet_difficulty_target.SetCompact(block.nBits);
-		uint1024_t pool_difficulty_target;
-		pool_difficulty_target.SetCompact(pool_nbits);
-		if (block_hash < mainnet_difficulty_target)
-		{
-			result = Difficulty_result::block_found;
-		}
-		else if (block_hash < pool_difficulty_target)
-		{
-			result = Difficulty_result::accept;
-		}
+		m_logger->error("calculate_rewards error. Round {} does not exists.", round_number);
+		return false;
 	}
-	//prime channel
-	else if (block.nChannel == 1)
+	if (round_data.m_is_paid)	// already paid
 	{
-		uint1024_t block_prime = block.GetPrime();
-		std::vector<uint8_t> offsets;
-		double actual_prime_difficulty = TAO::Ledger::GetPrimeDifficulty(block_prime, offsets);
-		double mainnet_difficulty_target = TAO::Ledger::GetDifficulty(block.nBits, block.nChannel);
-		double pool_difficulty_target = TAO::Ledger::GetDifficulty(pool_nbits, block.nChannel);
-		if (actual_prime_difficulty >= mainnet_difficulty_target)
-		{
-			result = Difficulty_result::block_found;
-		}
-		else if (actual_prime_difficulty >= pool_difficulty_target)
-		{
-			result = Difficulty_result::accept;
-		}
+		m_logger->error("calculate_rewards error. Round {} is already paid.", round_number);
+		return false;
+	}
 
+	bool calculation_finished = false;
+	round_data.m_total_rewards = m_payout_manager.calculate_reward_of_blocks(round_number, calculation_finished);
+	if (calculation_finished)
+	{
+		// now all account rewards can be credited
+			// calculate reward for account. First reduce the total_rewards with pool_fee % 
+		//	auto account_reward = (round_data.m_total_rewards * (1.0 - static_cast<double>(m_pool_fee / 100))) * (active_account.m_shares / round_data.m_total_shares);
+		return true;
 	}
 	else
 	{
-		result = Difficulty_result::reject;
+		m_logger->debug("Round {} calculate_reward_of_blocks is not finished yet.", round_number);
+		return false;
 	}
-
-
-	return result;
-
 }
 
 bool Component_impl::pay_round(std::uint32_t round)
 {
-	// check if round is ended and not paid.
-	auto round_data = m_data_reader->get_round(round);
-	if (round_data.is_empty())
+	if (!calculate_rewards(round))
 	{
 		return false;
 	}
 
-	if (round_data.m_is_paid)
-	{
-		return false;	// already paid
-	}
-
+	// check if round is ended and not paid.
+	auto round_data = m_data_reader->get_round(round);
 	if (round_data.m_is_active)
 	{
+		m_logger->error("pay_round error. Round {} is still active.", round);
 		return false;	// round is still active
 	}
 
