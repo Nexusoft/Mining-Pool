@@ -183,9 +183,18 @@ public:
 
 	std::any get_command() const override;
 	Type get_type() const override { return Type::get_unpaid_rounds; }
-	//void set_params(std::any params) override;
 };
 
+class Command_get_blocks_without_hash_from_round_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_blocks_without_hash_from_round_impl(sqlite3* handle);
+
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_blocks_without_hash_from_round; }
+	void set_params(std::any params) override;
+};
 
 // ------------------------------------------------------------------------------------
 // Write commands

@@ -51,6 +51,8 @@ public:
             std::make_shared<Command_get_not_paid_data_from_round_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::get_unpaid_rounds,
             std::make_shared<Command_get_unpaid_rounds_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::get_blocks_without_hash_from_round,
+            std::make_shared<Command_get_blocks_without_hash_from_round_impl>(m_storage_manager->get_handle<sqlite3*>())));
         
         // Write commands
         m_commands.emplace(std::make_pair(Type::create_account,
@@ -136,6 +138,9 @@ private:
             break;
         case Type::get_unpaid_rounds:
             result = std::any_cast<std::shared_ptr<Command_get_unpaid_rounds_impl>>(m_commands[command_type]);
+            break;
+        case Type::get_blocks_without_hash_from_round:
+            result = std::any_cast<std::shared_ptr<Command_get_blocks_without_hash_from_round_impl>>(m_commands[command_type]);
             break;
             // Write commands
         case Type::create_account:

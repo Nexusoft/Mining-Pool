@@ -33,6 +33,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_total_shares_from_accounts_cmd = m_command_factory->create_command(Type::get_total_shares_from_accounts);
 	m_get_not_paid_data_from_round_cmd = m_command_factory->create_command(Type::get_not_paid_data_from_round);
 	m_get_unpaid_rounds_cmd = m_command_factory->create_command(Type::get_unpaid_rounds);
+	m_get_blocks_without_hash_from_round_cmd = m_command_factory->create_command(Type::get_blocks_without_hash_from_round);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -263,6 +264,24 @@ std::vector<std::uint32_t> Data_reader_impl::get_unpaid_rounds()
 	}
 
 	return rounds;
+}
+
+std::vector<std::uint32_t> Data_reader_impl::get_blocks_without_hash_from_round(std::uint32_t round)
+{
+	std::vector<std::uint32_t> heights{};
+	m_get_blocks_without_hash_from_round_cmd->set_params(static_cast<std::int64_t>(round));
+	if (!m_data_storage->execute_command(m_get_blocks_without_hash_from_round_cmd))
+	{
+		return heights;	// return empty result
+	}
+
+	auto result = std::any_cast<Result_sqlite>(m_get_blocks_without_hash_from_round_cmd->get_result());
+	for (auto& row : result.m_rows)
+	{
+		heights.push_back(static_cast<std::uint32_t>(std::get<std::int32_t>(row[0].m_data)));
+	}
+
+	return heights;
 }
 
 

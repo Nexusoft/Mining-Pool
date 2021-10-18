@@ -322,7 +322,7 @@ TEST_F(Persistance_fixture, commands_config)
 
 TEST_F(Persistance_fixture, command_add_block)
 {
-	std::int64_t block_height_input = 5983133;
+	std::int64_t const block_height_input = 5983133;
 	persistance::Block_data const block_input{"", static_cast<std::uint32_t>(block_height_input), "HASH", 7896, false, "blockfinder", 5, "current_datetime", 2.54};
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
 	auto result = data_writer->add_block(block_input);
@@ -332,22 +332,69 @@ TEST_F(Persistance_fixture, command_add_block)
 	m_test_data.delete_from_block_table(block_height_input);
 }
 
-/*
+TEST_F(Persistance_fixture, command_update_block_hash)
+{
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	std::uint32_t const round_input = 999;
+	std::int64_t const block_height_input_1 = 5983133;
+	std::int64_t const block_height_input_2 = 5983134;
+	std::string const block_hash_input_1 = "blockhash1";
+	std::string const block_hash_input_2 = "blockhash2";
+
+	// add 2 blocks without hash
+	persistance::Block_data const block_input_1{ "", static_cast<std::uint32_t>(block_height_input_1), "HASH", 7896, false, "blockfinder", round_input, "current_datetime", 2.54 };
+	auto result = data_writer->add_block(block_input_1);
+	EXPECT_TRUE(result);
+
+	persistance::Block_data const block_input_2{ "", static_cast<std::uint32_t>(block_height_input_2), "HASH", 6895, false, "blockfinder", round_input, "current_datetime", 2.64 };
+	result = data_writer->add_block(block_input_2);
+	EXPECT_TRUE(result);
+
+	// get the 2 added blocks without hash
+	auto heights = data_reader->get_blocks_without_hash_from_round(round_input);
+	EXPECT_TRUE(!heights.empty());
+
+	// update the hash of the 2 blocks
+	result = data_writer->update_block_hash(heights[0], block_hash_input_1);
+	EXPECT_TRUE(result);
+	result = data_writer->update_block_hash(heights[1], block_hash_input_2);
+	EXPECT_TRUE(result);
+
+	// compare the blocks
+	auto blocks = data_reader->get_blocks_from_round(round_input);
+	EXPECT_TRUE(!blocks.empty());
+
+	EXPECT_EQ(blocks[0].m_hash, block_hash_input_1);
+	EXPECT_EQ(blocks[1].m_hash, block_hash_input_2);
+
+
+	// cleanup db
+	m_test_data.delete_from_block_table(block_height_input_1);
+	m_test_data.delete_from_block_table(block_height_input_2);
+}
+
 TEST_F(Persistance_fixture, command_update_block_rewards)
 {
-	std::int64_t block_height_input = 5983133;
+	std::int64_t const block_height_input = 5983133;
+	std::string const block_hash_input_1 = "blockhash1";
 	persistance::Block_data const block_input{ "", block_height_input, "HASH", 7896, false, "blockfinder", 5, "current_datetime", 2.54 };
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
 	auto result = data_writer->add_block(block_input);
 	EXPECT_TRUE(result);
 
-	result = data_writer->update_block_rewards(block_hash_input, true, 5.0);
+	// update block_hash
+	result = data_writer->update_block_hash(block_height_input, block_hash_input_1);
+	EXPECT_TRUE(result);
+
+	// update rewards
+	result = data_writer->update_block_rewards(block_hash_input_1, true, 5.0);
 	EXPECT_TRUE(result);
 
 	// cleanup db
 	m_test_data.delete_from_block_table(block_height_input);
 }
-*/
+
 
 TEST_F(Persistance_fixture, command_account_paid)
 {
