@@ -398,6 +398,24 @@ public:
 	void set_params(std::any params) override;
 };
 
+struct Command_update_reward_of_payment_params
+{
+	double m_amount;
+	std::string m_name;
+	std::int64_t m_round;
+};
+
+class Command_update_reward_of_payment_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_update_reward_of_payment_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::update_reward_of_payment; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
+	void set_params(std::any params) override;
+};
+
 }
 }
 }

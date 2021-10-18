@@ -629,6 +629,23 @@ void Command_update_block_hash_impl::set_params(std::any params)
 	bind_param(m_stmt, ":height", casted_params.m_height);
 }
 
+// -----------------------------------------------------------------------------------------------
+Command_update_reward_of_payment_impl::Command_update_reward_of_payment_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string update_reward_of_payment{ R"(UPDATE payment SET amount = :amount WHERE name = :name AND round = :round)" };
+	sqlite3_prepare_v2(m_handle, update_reward_of_payment.c_str(), -1, &m_stmt, NULL);
+}
+
+void Command_update_reward_of_payment_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_update_reward_of_payment_params>(m_params);
+	bind_param(m_stmt, ":amount", casted_params.m_amount);
+	bind_param(m_stmt, ":name", casted_params.m_name);
+	bind_param(m_stmt, ":round", casted_params.m_round);
+}
+
 }
 }
 }

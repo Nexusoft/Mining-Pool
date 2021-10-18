@@ -177,8 +177,18 @@ bool Component_impl::calculate_rewards(std::uint32_t round_number)
 	if (calculation_finished)
 	{
 		// now all account rewards can be credited
+		auto payments = m_data_reader->get_not_paid_data_from_round(round_number);
+		if (payments.empty())
+		{
+			return false;
+		}
+		for (auto& payment : payments)
+		{
 			// calculate reward for account. First reduce the total_rewards with pool_fee % 
-		//	auto account_reward = (round_data.m_total_rewards * (1.0 - static_cast<double>(m_pool_fee / 100))) * (active_account.m_shares / round_data.m_total_shares);
+			auto account_reward = (round_data.m_total_rewards * (1.0 - static_cast<double>(m_pool_fee / 100))) * (payment.m_shares / round_data.m_total_shares);
+			m_shared_data_writer->update_reward_of_payment(account_reward, payment.m_account, round_number);
+		}
+
 		return true;
 	}
 	else

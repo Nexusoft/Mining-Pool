@@ -431,7 +431,7 @@ TEST_F(Persistance_fixture, command_account_paid)
 	result_not_paid_payments = data_reader->get_not_paid_data_from_round(round_number_input);
 	EXPECT_TRUE(result_not_paid_payments.empty());
 
-	// get the payments data through other command (for frontent api)
+	// get the payments data through other command (for frontend api)
 	auto const result_payments = data_reader->get_payments(account_input);
 	for (auto& result_payment : result_payments)
 	{
@@ -444,6 +444,32 @@ TEST_F(Persistance_fixture, command_account_paid)
 
 	// cleanup db
 	m_test_data.delete_from_payment_table(payment_input.m_account);
+}
+
+TEST_F(Persistance_fixture, command_update_reward_of_payment)
+{
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+
+	// add a new payment record
+	std::int64_t const round_number_input{ 500 };
+	std::string const account_input{ "testaccount" };
+	double const reward_input{ 40.5 };
+	persistance::Payment_data const payment_input{ account_input, 0.0, 200.0, "", round_number_input };
+	auto result = data_writer->add_payment(payment_input);
+	EXPECT_TRUE(result);
+
+	//update
+	result = data_writer->update_reward_of_payment(reward_input, account_input, round_number_input);
+	EXPECT_TRUE(result);
+
+	// compare the update
+	auto const result_payments = data_reader->get_payments(account_input);
+	EXPECT_EQ(result_payments.front().m_amount, reward_input);
+
+	// cleanup db
+	m_test_data.delete_from_payment_table(payment_input.m_account);
+
 }
 
 
