@@ -100,7 +100,7 @@ bool Data_storage_impl::exec_statement_with_result(Command_type_sqlite sql_comma
 			}
 			case Column_sqlite::int64:
 			{
-				column.m_data = sqlite3_column_int64(sql_command.m_statements.front(), column_index);
+				column.m_data = static_cast<std::int64_t>(sqlite3_column_int64(sql_command.m_statements.front(), column_index));
 				column.m_type = Column_sqlite::int64;
 				break;
 			}
