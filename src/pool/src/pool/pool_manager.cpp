@@ -133,7 +133,6 @@ void Pool_manager::set_current_height(std::uint32_t height)
 		m_block_map_id = 0;
 	}
 
-	m_logger->trace("Setting height for miners");
 	// give the miners the height
 	m_session_registry->update_height(m_current_height);
 }

@@ -135,9 +135,22 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		if (pool_manager_shared)
 		{
 			m_pool_nbits = pool_manager_shared->get_pool_nbits();
-			pool_manager_shared->get_block([self = shared_from_this()](auto block)
+			std::weak_ptr<Miner_connection_impl> weak_self = shared_from_this();
+			pool_manager_shared->get_block([weak_self](auto block)
 			{
+				auto self = weak_self.lock();
+				if (!self)
+				{
+					self->m_logger->debug("GET_BLOCK, miner_connection invalid.");
+					return;
+				}
+
 				auto session = self->m_session_registry->get_session(self->m_session_key);
+				if (!session)
+				{
+					self->m_logger->debug("GET_BLOCK, session invalid.");
+					return;
+				}
 				session->set_block(block);
 
 				//prepend pool nbits to the packet
@@ -164,7 +177,6 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		auto pool_manager_shared = m_pool_manager.lock();
 		if (pool_manager_shared)
 		{
-			
 			std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };			
 			std::uint64_t nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
 			auto block = session->get_block();
@@ -178,8 +190,16 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 			//TODO compare block merkle_root with received merkle_root (block_data)
 
 			//update hashrate
-			pool_manager_shared->submit_block(std::move(block), session->get_user_data().m_account.m_address, [self = shared_from_this()](auto result)
+			std::weak_ptr<Miner_connection_impl> weak_self = shared_from_this();
+			pool_manager_shared->submit_block(std::move(block), session->get_user_data().m_account.m_address, [weak_self](auto result)
 			{
+				auto self = weak_self.lock();
+				if (!self)
+				{
+					self->m_logger->debug("SUBMIT_BLOCK handler, miner_connection invalid.");
+					return;
+				}
+
 				Packet response;
 				if (result == Submit_block_result::accept)
 				{

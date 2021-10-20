@@ -7,12 +7,14 @@
 #include "common/types.hpp"
 #include "api/server.hpp"
 #include "pool/pool_manager.hpp"
+#include "version.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
 #include <chrono>
 #include <fstream>
+#include <iostream>
 
 namespace nexuspool
 {
@@ -70,6 +72,9 @@ namespace nexuspool
 		{
 			return false;
 		}
+		// print header
+		std::cout << "NexusPool Version " << NexusPool_VERSION_MAJOR << "." << NexusPool_VERSION_MINOR << "\n" << std::endl;
+
 		// logger settings
 		if (!m_config->get_logfile().empty())
 		{
