@@ -12,14 +12,14 @@ namespace api
 
 Server::Server(std::shared_ptr<spdlog::logger> logger, 
 	persistance::Data_reader::Uptr data_reader,
-	std::string local_ip,
+	std::string public_ip,
 	std::uint16_t api_listen_port, 
 	network::Socket_factory::Sptr socket_factory)
 	: m_logger{std::move(logger)}
 	, m_shared_data_reader{std::make_shared<Shared_data_reader>(std::move(data_reader))}
-	, m_local_ip{ std::move(local_ip) }
+	, m_public_ip{ std::move(public_ip) }
 	, m_api_listen_port{ api_listen_port }
-	, m_local_endpoint{ network::Transport_protocol::tcp, m_local_ip, m_api_listen_port }
+	, m_local_endpoint{ network::Transport_protocol::tcp, m_public_ip, m_api_listen_port }
 	, m_socket_factory{ std::move(socket_factory) }
 	, m_listen_socket{}
 	, m_parser{std::make_shared<Parser_impl>(m_logger, std::make_shared<Methods_factory_impl>(m_logger, m_shared_data_reader))}

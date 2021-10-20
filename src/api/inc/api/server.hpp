@@ -25,7 +25,7 @@ public:
 
     Server(std::shared_ptr<spdlog::logger> logger,
         persistance::Data_reader::Uptr data_reader,
-        std::string local_ip, 
+        std::string public_ip, 
         std::uint16_t api_listen_port, 
         network::Socket_factory::Sptr socket_factory);
 
@@ -37,7 +37,7 @@ private:
 
     std::shared_ptr<spdlog::logger> m_logger;
     std::shared_ptr<Shared_data_reader> m_shared_data_reader;
-    std::string m_local_ip;
+    std::string m_public_ip;
     std::uint16_t m_api_listen_port;
     network::Endpoint m_local_endpoint;
     network::Socket_factory::Sptr m_socket_factory;
