@@ -22,7 +22,8 @@ public:
 	std::string const& get_wallet_ip() const override  { return m_wallet_ip; }
 	std::uint16_t get_wallet_port() const override  { return m_wallet_port; }
 	std::uint16_t get_local_port() const override  { return m_local_port; }
-	std::uint16_t get_local_listen_port() const override  { return m_local_listen_port; }
+	std::string const& get_public_ip() const override { return m_public_ip; }
+	std::uint16_t get_miner_listen_port() const override  { return m_miner_listen_port; }
 	std::uint16_t get_api_listen_port() const override  { return m_api_listen_port; }
 	std::string const& get_local_ip() const override  { return m_local_ip; }
 	common::Mining_mode get_mining_mode() const override  { return m_mining_mode; }
@@ -43,7 +44,8 @@ private:
 	std::string  m_wallet_ip;
 	std::uint16_t m_wallet_port;
 	std::uint16_t m_local_port;
-	std::uint16_t m_local_listen_port;
+	std::string  m_public_ip;
+	std::uint16_t m_miner_listen_port;
 	std::uint16_t m_api_listen_port;
 	std::string m_local_ip;
 	common::Mining_mode	 m_mining_mode;

@@ -24,7 +24,8 @@ public:
 	virtual std::string const& get_wallet_ip() const = 0;
 	virtual	std::uint16_t get_wallet_port() const = 0;
 	virtual	std::uint16_t get_local_port() const = 0;
-	virtual std::uint16_t get_local_listen_port() const = 0;
+	virtual std::string const& get_public_ip() const = 0;
+	virtual std::uint16_t get_miner_listen_port() const = 0;
 	virtual std::uint16_t get_api_listen_port() const = 0;
 	virtual std::string const& get_local_ip() const = 0;
 	virtual common::Mining_mode get_mining_mode() const = 0;

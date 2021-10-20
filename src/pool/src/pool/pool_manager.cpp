@@ -90,8 +90,8 @@ void Pool_manager::start()
 		m_end_round_timer->start(chrono::Seconds(std::chrono::duration_cast<std::chrono::seconds>(round_end_time - time_now).count()), end_round_handler());
 	}
 
-	// listen
-	network::Endpoint local_listen_endpoint{ network::Transport_protocol::tcp, m_config->get_local_ip(), m_config->get_local_listen_port() };
+	// listen to connecting miners
+	network::Endpoint local_listen_endpoint{ network::Transport_protocol::tcp, m_config->get_public_ip(), m_config->get_miner_listen_port() };
 	m_listen_socket = m_socket_factory->create_socket(local_listen_endpoint);
 
 	
