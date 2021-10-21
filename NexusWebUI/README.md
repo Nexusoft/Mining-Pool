@@ -13,15 +13,15 @@ The final Setup depends highly on the chosen approach regarding the final Enviro
 4. Install required Python Libraries
 pip install -r requirements.txt
 (This downloads the necessary Dependencies)
-5. Run the necessary Migrations (from NexusWebUI Folder)
-python manage.py migrate
-6. Generate the Secret Key (This should stay secret in Prod as the name suggests)
+5. Generate the Secret Key (This should stay secret in Prod as the name suggests)
    1. Create a File called .env in the same folder as manage.py
    2. Open it in the a Text Editor
    3. Run the following command in the shell:
       1. python -c "import secrets; print(secrets.token_urlsafe())"
    4. Create a line with the secret key you got from above command in the .env file
       1. Example: SECRET_KEY=123123$%/$%ghjhghjk
+6. Run the necessary Migrations (from NexusWebUI Folder)
+python manage.py migrate
 7. Run Testserver
 8. python manage.py runserver
 
