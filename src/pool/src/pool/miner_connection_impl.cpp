@@ -82,6 +82,11 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
     }
 
 	auto session = m_session_registry->get_session(m_session_key);
+	if (!session)
+	{
+		m_logger->trace("process_data, session invalid");
+		return;
+	}
 
     if (packet.m_header == Packet::PING)
     {
@@ -250,6 +255,11 @@ void Miner_connection_impl::set_current_height(std::uint32_t height)
 void Miner_connection_impl::process_accepted()
 {
 	auto session = m_session_registry->get_session(m_session_key);
+	if (!session)
+	{
+		m_logger->trace("process_accepted, session invalid");
+		return;
+	}
 	auto& user_data = session->get_user_data();
 
 	// create new account

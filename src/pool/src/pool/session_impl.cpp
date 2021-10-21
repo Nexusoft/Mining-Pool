@@ -82,6 +82,10 @@ Session_key Session_registry_impl::create_session()
 std::shared_ptr<Session> Session_registry_impl::get_session(Session_key key)
 {
 	std::scoped_lock lock(m_sessions_mutex);
+	if (m_sessions.count(key) == 0)
+	{
+		return nullptr;
+	}
 	return m_sessions[key];
 
 }
