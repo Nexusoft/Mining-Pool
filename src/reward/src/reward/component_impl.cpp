@@ -193,6 +193,8 @@ bool Component_impl::calculate_rewards(std::uint32_t round_number)
 	}
 	else
 	{
+		// TODO add case when reward is also 0.0 -> this means no blocks where found at all in this round
+		// Nothing to payout -> close the round
 		m_logger->debug("Round {} calculate_reward_of_blocks is not finished yet.", round_number);
 		return false;
 	}

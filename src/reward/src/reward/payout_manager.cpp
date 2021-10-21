@@ -28,6 +28,12 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& cal
 	m_logger->info("Loading blocks from round {}", round);
 	auto const blocks = m_data_reader.get_blocks_from_round(round);
 
+	if (blocks.empty())
+	{
+		m_logger->debug("No blocks in round {}", round);
+		return 0.0;
+	}
+
 	for (auto& block : blocks)
 	{
 		// all blocks which already have a reward for this round are filtered out

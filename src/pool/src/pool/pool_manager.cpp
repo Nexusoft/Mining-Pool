@@ -250,12 +250,6 @@ chrono::Timer::Handler Pool_manager::end_round_handler()
 		}
 
 		end_round();
-		// start next round
-		if (!m_reward_component->start_round(m_storage_config_data.m_round_duration_hours))
-		{
-			// error
-			return;
-		}
 	};
 }
 
@@ -267,8 +261,13 @@ void Pool_manager::end_round()
 
 	// update config in storage
 	m_storage_config_data = storage_config_check();
-}
 
+	// start next round
+	if (!m_reward_component->start_round(m_storage_config_data.m_round_duration_hours))
+	{
+		return;
+	}
+}
 
 persistance::Config_data Pool_manager::storage_config_check()
 {
