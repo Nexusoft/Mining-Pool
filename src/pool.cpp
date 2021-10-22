@@ -97,7 +97,7 @@ namespace nexuspool
 
 		// network initialisation
 		m_network_component = network::create_component(m_io_context);
-		m_pool_manager = std::make_shared<Pool_manager>(m_io_context, 
+		m_pool_manager = create_pool_manager(m_io_context, 
 			m_logger,
 			m_config,
 			m_timer_component->get_timer_factory(),

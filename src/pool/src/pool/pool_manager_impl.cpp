@@ -1,4 +1,4 @@
-#include "pool/pool_manager.hpp"
+#include "pool/pool_manager_impl.hpp"
 #include "pool/session_impl.hpp"
 #include "pool/wallet_connection_impl.hpp"
 #include "pool/miner_connection_impl.hpp"
@@ -11,7 +11,7 @@
 namespace nexuspool
 {
 
-Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context, 
+Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_context,
 	std::shared_ptr<spdlog::logger> logger,
 	config::Config::Sptr config,
 	chrono::Timer_factory::Sptr timer_factory,
@@ -41,7 +41,7 @@ Pool_manager::Pool_manager(std::shared_ptr<asio::io_context> io_context,
 	m_end_round_timer = m_timer_factory->create_timer();
 }
 
-void Pool_manager::start()
+void Pool_manager_impl::start()
 {
 	m_storage_config_data = storage_config_check();
 	network::Endpoint wallet_endpoint{ network::Transport_protocol::tcp, m_config->get_wallet_ip(), m_config->get_wallet_port() };
@@ -115,7 +115,7 @@ void Pool_manager::start()
 	
 }
 
-void Pool_manager::stop()
+void Pool_manager_impl::stop()
 {
 	m_session_registry_maintenance->cancel();
 	m_end_round_timer->cancel();
@@ -123,7 +123,7 @@ void Pool_manager::stop()
 	m_listen_socket->stop_listen();
 }
 
-void Pool_manager::set_current_height(std::uint32_t height) 
+void Pool_manager_impl::set_current_height(std::uint32_t height)
 { 
 	if (height > m_current_height)
 	{
@@ -137,7 +137,7 @@ void Pool_manager::set_current_height(std::uint32_t height)
 	m_session_registry->update_height(m_current_height);
 }
 
-void Pool_manager::set_block(LLP::CBlock const& block)
+void Pool_manager_impl::set_block(LLP::CBlock const& block)
 {
 	std::scoped_lock(m_block_mutex);
 	m_block = block;
@@ -168,7 +168,7 @@ void Pool_manager::set_block(LLP::CBlock const& block)
 
 }
 
-void Pool_manager::add_block_to_storage(std::uint32_t block_map_id)
+void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 {
 	auto submit_block_data = m_block_map[block_map_id];
 	auto const block_hash = submit_block_data.m_block->GetHash().ToString();
@@ -183,12 +183,12 @@ void Pool_manager::add_block_to_storage(std::uint32_t block_map_id)
 	data_writer->add_block(std::move(block_data));
 }
 
-void Pool_manager::get_block(Get_block_handler&& handler)
+void Pool_manager_impl::get_block(Get_block_handler&& handler)
 {
 	m_wallet_connection->get_block(std::move(handler));
 }
 
-void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler)
+void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler)
 {
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
 	switch (difficulty_result)
@@ -216,13 +216,13 @@ void Pool_manager::submit_block(std::unique_ptr<LLP::CBlock> block, std::string 
 	}	
 }
 
-std::uint32_t Pool_manager::get_pool_nbits() const
+std::uint32_t Pool_manager_impl::get_pool_nbits() const
 {
 	std::scoped_lock(m_block_mutex);
 	return m_pool_nBits;
 }
 
-chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
+chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
 {
 	return[this, session_registry_maintenance_interval](bool canceled)
 	{
@@ -240,7 +240,7 @@ chrono::Timer::Handler Pool_manager::session_registry_maintenance_handler(std::u
 
 }
 
-chrono::Timer::Handler Pool_manager::end_round_handler()
+chrono::Timer::Handler Pool_manager_impl::end_round_handler()
 {
 	return[this](bool canceled)
 	{
@@ -253,7 +253,7 @@ chrono::Timer::Handler Pool_manager::end_round_handler()
 	};
 }
 
-void Pool_manager::end_round()
+void Pool_manager_impl::end_round()
 {
 	auto const current_round = m_reward_component->get_current_round();
 	m_reward_component->end_round(current_round);
@@ -269,7 +269,7 @@ void Pool_manager::end_round()
 	}
 }
 
-persistance::Config_data Pool_manager::storage_config_check()
+persistance::Config_data Pool_manager_impl::storage_config_check()
 {
 	persistance::Config_data config_data{};
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
