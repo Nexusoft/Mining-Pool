@@ -1,5 +1,5 @@
 #include "pool/miner_connection_impl.hpp"
-#include "pool/pool_manager.hpp"
+#include "pool/pool_manager_impl.hpp"
 #include "packet.hpp"
 #include "block.hpp"
 #include "TAO/Register/types/address.h"
@@ -9,6 +9,20 @@
 
 namespace nexuspool
 {
+Miner_connection::Sptr create_miner_connection(std::shared_ptr<spdlog::logger> logger,
+	network::Connection::Sptr connection,
+	std::weak_ptr<Pool_manager> pool_manager,
+	Session_key session_key,
+	Session_registry::Sptr session_registry)
+{
+	return std::make_shared<Miner_connection_impl>(
+		std::move(logger),
+		std::move(connection),
+		std::move(pool_manager),
+		session_key,
+		std::move(session_registry));
+}
+
 Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> logger,
 	network::Connection::Sptr&& connection, 
 	std::weak_ptr<Pool_manager> pool_manager,

@@ -11,6 +11,24 @@
 namespace nexuspool
 {
 
+Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_context,
+	std::shared_ptr<spdlog::logger> logger,
+	config::Config::Sptr config,
+	chrono::Timer_factory::Sptr timer_factory,
+	network::Socket_factory::Sptr socket_factory,
+	persistance::Data_writer_factory::Sptr data_writer_factory,
+	persistance::Data_reader_factory::Sptr data_reader_factory)
+{
+	return std::make_shared<Pool_manager_impl>(std::move(io_context),
+		std::move(logger),
+		std::move(config),
+		std::move(timer_factory),
+		std::move(socket_factory),
+		std::move(data_writer_factory),
+		std::move(data_reader_factory));
+}
+
+
 Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_context,
 	std::shared_ptr<spdlog::logger> logger,
 	config::Config::Sptr config,
@@ -99,7 +117,7 @@ void Pool_manager_impl::start()
 	auto socket_handler = [self](network::Connection::Sptr&& connection)
 	{
 		auto const session_key = self->m_session_registry->create_session();
-		auto miner_connection = std::make_shared<Miner_connection_impl>(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
+		auto miner_connection = create_miner_connection(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
 
 		auto session = self->m_session_registry->get_session(session_key);
 		session->update_connection(miner_connection);

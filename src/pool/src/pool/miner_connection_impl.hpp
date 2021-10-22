@@ -2,13 +2,12 @@
 #define NEXUSPOOL_MINER_CONNECTION_IMPL_HPP
 
 #include "pool/miner_connection.hpp"
-#include "network/connection.hpp"
-#include "pool/session.hpp"
+
 
 #include <memory>
 #include <atomic>
 
-namespace spdlog { class logger; }
+
 
 namespace nexuspool
 {
@@ -45,6 +44,7 @@ private:
     Session_registry::Sptr m_session_registry;
     std::uint32_t m_pool_nbits;
 };
+
 }
 
 #endif

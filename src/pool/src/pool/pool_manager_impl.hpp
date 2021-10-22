@@ -3,7 +3,6 @@
 
 #include "pool/pool_manager.hpp"
 #include "network/types.hpp"
-#include "pool/session.hpp"
 
 #include <mutex>
 #include <atomic>
@@ -11,6 +10,7 @@
 namespace nexuspool
 {
 class Wallet_connection;
+class Session_registry;
 
 class Pool_manager_impl : public Pool_manager, public std::enable_shared_from_this<Pool_manager_impl>
 {
@@ -57,7 +57,7 @@ private:
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
     network::Socket::Sptr m_listen_socket;
 
-    Session_registry::Sptr m_session_registry;    // holds all sessions -> each session contains a miner_connection
+    std::shared_ptr<Session_registry> m_session_registry;    // holds all sessions -> each session contains a miner_connection
     chrono::Timer::Uptr m_session_registry_maintenance;
     chrono::Timer::Uptr m_end_round_timer;
 
@@ -76,23 +76,6 @@ private:
     std::atomic<std::uint32_t> m_block_map_id;
     std::map<std::uint32_t, Submit_block_data> m_block_map;
 };
-
-Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_context,
-    std::shared_ptr<spdlog::logger> logger,
-    config::Config::Sptr config,
-    chrono::Timer_factory::Sptr timer_factory,
-    network::Socket_factory::Sptr socket_factory,
-    persistance::Data_writer_factory::Sptr data_writer_factory,
-    persistance::Data_reader_factory::Sptr data_reader_factory)
-{
-    return std::make_shared<Pool_manager_impl>(std::move(io_context),
-        std::move(logger),
-        std::move(config),
-        std::move(timer_factory),
-        std::move(socket_factory),
-        std::move(data_writer_factory),
-        std::move(data_reader_factory));
-}
 
 }
 
