@@ -5,6 +5,7 @@
 #include "TAO/Register/types/address.h"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
+#include <string>
 
 namespace nexuspool
 {
@@ -17,10 +18,10 @@ Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> log
 	, m_connection{ std::move(connection) }
 	, m_pool_manager{std::move(pool_manager)}
     , m_current_height{ 0 }
-	, m_remote_address{""}
 	, m_connection_closed{true}
 	, m_session_key{session_key}
 	, m_session_registry{std::move(session_registry)}
+	, m_pool_nbits{ 0 }
 {
 }
 
@@ -44,7 +45,7 @@ network::Connection::Handler Miner_connection_impl::connection_handler()
 			result == network::Result::connection_aborted ||
 			result == network::Result::connection_error)
 		{
-			self->m_logger->error("Connection to {0} was not successful. Result: {1}", self->m_remote_address, result);
+			self->m_logger->error("Connection to {} was not successful. Result: {}", self->m_connection->remote_endpoint().to_string(), result);
 			self->m_connection.reset();
 			self->m_connection_closed = true;
 		}
@@ -55,8 +56,7 @@ network::Connection::Handler Miner_connection_impl::connection_handler()
 		}
 		else if (result == network::Result::connection_ok)
 		{
-			self->m_connection->remote_endpoint().address(self->m_remote_address);
-			self->m_logger->info("Connection to {} established", self->m_remote_address);
+			self->m_logger->info("Connection to {} established", self->m_connection->remote_endpoint().to_string());
 		}
 		else
 		{	// data received
@@ -100,7 +100,7 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		// check if already logged in
 		if (user_data.m_logged_in)
 		{
-			m_logger->warn("Multiple login attempts of user {} with ip {} ", user_data.m_account.m_address, m_remote_address);
+			m_logger->warn("Multiple login attempts of user {} with endpoint {} ", user_data.m_account.m_address, m_connection->remote_endpoint().to_string());
 			// increase ddos score
 			return;
 		}

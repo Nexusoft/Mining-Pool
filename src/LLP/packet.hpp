@@ -57,7 +57,10 @@ namespace nexuspool
 			CLOSE = 254
 		};
 
-        Packet() : m_header{255}, m_length{0} 
+        Packet() 
+			: m_header{255}
+			, m_length{0}
+			, m_is_valid{true}
 		{
 		}
 		// creates a packet from received buffer

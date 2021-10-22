@@ -58,7 +58,7 @@ bool Wallet_connection_impl::connect(network::Endpoint const& wallet_endpoint)
                     result == network::Result::connection_closed ||
                     result == network::Result::connection_error)
                 {
-                    self->m_logger->error("Connection to wallet not sucessful. Result: {}", result);
+                    self->m_logger->error("Connection to wallet {} not sucessful. Result: {}", wallet_endpoint.to_string(), result);
                     self->retry_connect(wallet_endpoint);
                 }
                 else if (result == network::Result::connection_ok)
