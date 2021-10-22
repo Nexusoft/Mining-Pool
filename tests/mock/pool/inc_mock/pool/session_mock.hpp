@@ -6,7 +6,6 @@
 
 namespace nexuspool
 {
-
 class Session_mock : public Session
 {
 public:
@@ -15,7 +14,7 @@ public:
 	MOCK_METHOD(std::weak_ptr<Miner_connection>, get_connection, (), (override));
 	MOCK_METHOD(Session_user&, get_user_data, (), (override));
 	MOCK_METHOD(std::chrono::steady_clock::time_point, get_update_time, (), (const override));
-	MOCK_METHOD(void set_update_time, (std::chrono::steady_clock::time_point update_time), (override));
+	MOCK_METHOD(void, set_update_time, (std::chrono::steady_clock::time_point update_time), (override));
 	MOCK_METHOD(bool, add_share, (std::uint32_t pool_nbits), (override));
 	MOCK_METHOD(double, get_hashrate, (), (const override));
 	MOCK_METHOD(void, set_block, (LLP::CBlock const& block), (override));
@@ -35,6 +34,7 @@ public:
 	MOCK_METHOD(bool, does_account_exists, (std::string account), (override));
 	MOCK_METHOD(void, login, (Session_key key), (override));
 };
+
 
 }
 
