@@ -20,10 +20,13 @@ pip install -r requirements.txt
       1. python -c "import secrets; print(secrets.token_urlsafe())"
    4. Create a line with the secret key you got from above command in the .env file
       1. Example: SECRET_KEY=123123$%/$%ghjhghjk
-6. Run the necessary Migrations (from NexusWebUI Folder)
+6. Add your Server IP to the "Allowed Hosts" - Settings in settings.py
+   1. Example: ALLOWED_HOSTS = ['192.168.1.1']
+7. Run the necessary Migrations (from NexusWebUI Folder)
 python manage.py migrate
-7. Run Testserver
-8. python manage.py runserver
+8. In settings.py configure the IP of your server
+9. Run Testserver (for example python ./manage.py runserver 0.0.0.0:8000 to run it on port (8000))
+10. python manage.py runserver
 
 
 ## Recommended Setup
@@ -45,3 +48,6 @@ The above setup should only be used in a small scale Test Environment due its po
 1. https://medium.com/analytics-vidhya/dajngo-with-nginx-gunicorn-aaf8431dc9e0
 2. https://www.youtube.com/watch?v=BBKq6H9Rm5g
 
+
+## Settings
+All local Settings are either to be done in the .env or settings.py

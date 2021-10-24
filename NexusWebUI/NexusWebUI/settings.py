@@ -23,13 +23,15 @@ LOG_DIR = os.path.join(BASE_DIR, 'logs')
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Todo describe in readme!
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Todo move to .env file!
+# >>> os.environ['ALLOWED_HOSTS'] = '.localhost, .herokuapp.com'
+# >>> config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -143,15 +145,16 @@ STATICFILES_FINDERS = (
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#         'TIMEOUT': 60,
+#     }
+# }
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
             'format': "%(asctime)s | %(levelname)s | %(name)s:%(lineno)s | %(message)s",
@@ -179,3 +182,7 @@ LOGGING = {
 
     }
 }
+
+# POOL SETTINGS
+POOL_IP = config('POOL_IP')
+POOL_PORT = config('POOL_PORT', cast=int, default=1)

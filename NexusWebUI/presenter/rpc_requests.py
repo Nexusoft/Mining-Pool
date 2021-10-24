@@ -9,7 +9,10 @@ logger = logging.getLogger('NexusWebUI')
 
 
 def socket_connect(_ip, _port):
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    logger.info(f"Trying to connect to: {_ip}:{_port}")
+    print(f"Trying to connect to: {_ip}:{_port}")
     s.connect((_ip, _port))
 
     # Todo Log Message
