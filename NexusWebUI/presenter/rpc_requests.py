@@ -88,8 +88,10 @@ def get_account_header(_socket, _account):
     """
     payload = {"jsonrpc": "2.0", "method": "get_account_header", "params": [_account], "id": 1}
 
+    print(payload)
+
     _socket.send(pybson.dumps(payload))
-    response = _socket.recv(1024)
+    response = _socket.recv(20000)
     json_data = bson.loads(response)
 
     return json_data

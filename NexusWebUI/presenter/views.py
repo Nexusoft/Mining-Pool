@@ -83,6 +83,7 @@ class ErrorUnknownWallet(TemplateView):
 
 def wallet_detail(request):
     # Todo implement Cache
+    # Todo get no result from backend!?
 
     template_name = 'presenter/wallet_detail.html'
     socket = None
@@ -106,6 +107,7 @@ def wallet_detail(request):
 
         # Get the Account Detail Page Header Information
         account_header_json = get_account_header(_socket=socket, _account=wallet_id)
+        print(account_header_json)
 
         if None in account_header_json['result']:
             print("Received no Result for Wallet Request")

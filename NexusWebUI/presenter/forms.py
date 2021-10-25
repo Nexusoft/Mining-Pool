@@ -10,6 +10,9 @@ logger = logging.getLogger('NexusWebUI')
 
 
 class WalletSearchForm(forms.Form):
+    """
+    Checks if a given Wallet ID is already in the local DB (validated), exists (insert) or return one of two Errors
+    """
     wallet_id = forms.CharField(max_length=100)
 
     def clean(self):
@@ -27,6 +30,8 @@ class WalletSearchForm(forms.Form):
             socket = socket_connect(_ip=getattr(settings, "POOL_IP", None),
                                     _port=getattr(settings, "POOL_PORT", None))
             get_account_json = get_account(_socket=socket, _account=wallet_id)
+
+            print("get_account_json: ", get_account_json)
 
             if 'error' in get_account_json:
                 logger.info(f"Error when validating Wallet ID: {get_account_json}")
