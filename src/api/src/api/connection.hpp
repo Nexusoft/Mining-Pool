@@ -29,7 +29,6 @@ private:
     network::Connection::Sptr m_connection;
     std::shared_ptr<spdlog::logger> m_logger;
     Parser::Sptr m_parser;
-    std::string m_remote_address;
 };
 
 }

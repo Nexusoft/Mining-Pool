@@ -12,7 +12,6 @@ Connection::Connection(std::shared_ptr<spdlog::logger> logger, network::Connecti
 	: m_connection{ std::move(connection) }
 	, m_logger{ std::move(logger)}
 	, m_parser{std::move(parser)}
-	, m_remote_address{ "" }
 {
 }
 
@@ -29,7 +28,7 @@ network::Connection::Handler Connection::connection_handler()
 			result == network::Result::connection_aborted ||
 			result == network::Result::connection_error)
 		{
-			self->m_logger->error("Connection to {0} was not successful. Result: {1}", self->m_remote_address, result);
+			self->m_logger->error("Connection to {} was not successful. Result: {}", self->m_connection->remote_endpoint().to_string(), result);
 			self->m_connection.reset();
 		}
 		else if (result == network::Result::connection_closed)
@@ -38,8 +37,7 @@ network::Connection::Handler Connection::connection_handler()
 		}
 		else if (result == network::Result::connection_ok)
 		{
-			self->m_connection->remote_endpoint().address(self->m_remote_address);
-			self->m_logger->info("Connection to {} established", self->m_remote_address);
+			self->m_logger->info("Connection to {} established", self->m_connection->remote_endpoint().to_string());
 		}
 		else
 		{	// data received
@@ -73,12 +71,12 @@ void Connection::process_data(network::Shared_payload&& receive_buffer)
 	{
 		m_logger->debug("{} Reason: {}", e.error().message(), e.error().data().dump() );
 		// increase ddos
-		m_logger->warn("Received invalid jsonrpc request from {}", m_remote_address);
+		m_logger->warn("Received invalid jsonrpc request from {}", m_connection->remote_endpoint().to_string());
 	}
 	catch (std::exception& e)
 	{
 		m_logger->debug("{}", e.what());
-		m_logger->warn("Received invalid jsonrpc request from {}", m_remote_address);
+		m_logger->warn("Received invalid jsonrpc request from {}", m_connection->remote_endpoint().to_string());
 	}
 }
 
