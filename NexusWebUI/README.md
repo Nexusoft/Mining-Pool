@@ -13,20 +13,27 @@ The final Setup depends highly on the chosen approach regarding the final Enviro
 4. Install required Python Libraries
 pip install -r requirements.txt
 (This downloads the necessary Dependencies)
-5. Generate the Secret Key (This should stay secret in Prod as the name suggests)
-   1. Create a File called .env in the same folder as manage.py
-   2. Open it in the a Text Editor
-   3. Run the following command in the shell:
-      1. python -c "import secrets; print(secrets.token_urlsafe())"
-   4. Create a line with the secret key you got from above command in the .env file
-      1. Example: SECRET_KEY=123123$%/$%ghjhghjk
-6. Add your Server IP to the "Allowed Hosts" - Settings in settings.py
-   1. Example: ALLOWED_HOSTS = ['192.168.1.1']
-7. Run the necessary Migrations (from NexusWebUI Folder)
+5. Configure the Application via the .env file
+   1. To make it easier, a .env_example file was added to see the general form of the file
+   2. Generate the Secret Key (This should stay secret in Prod as the name suggests)
+      1. Create a File called .env in the same folder as manage.py or rename the.env_example file to .env
+      2. Open it in a Text Editor
+      3. Run the following command in the shell:
+         1. python -c "import secrets; print(secrets.token_urlsafe())"
+      4. Create a line with the secret key you got from above command in the .env file
+         1. Example: SECRET_KEY=123123$%/$%ghjhghjk
+   3. Add your Server IP to the "Allowed Hosts" - Settings in .env
+      1. Example: ALLOWED_HOSTS=192.168.1.1, 
+         1. (This is optional, but highly recommended, you can add more than one IP splitting the entries with a comma)
+   4. Add the IP of the Server running the Pool 
+      1. Example: POOL_IP=10.1.1.55
+   5. Add the Port of the Server running the Pool
+      1. Example: POOL_PORT=5000
+6. Run the necessary Migrations (from NexusWebUI Folder)
 python manage.py migrate
-8. In settings.py configure the IP of your server
-9. Run Testserver (for example python ./manage.py runserver 0.0.0.0:8000 to run it on port (8000))
-10. python manage.py runserver
+7. In settings.py configure the IP of your server
+8. Run Testserver (for example python ./manage.py runserver 0.0.0.0:8000 to run it on port (8000))
+9. python manage.py runserver
 
 
 ## Recommended Setup
@@ -50,4 +57,5 @@ The above setup should only be used in a small scale Test Environment due its po
 
 
 ## Settings
-All local Settings are either to be done in the .env or settings.py
+All local Settings are to be done in the .env file
+
