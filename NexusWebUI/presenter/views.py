@@ -33,9 +33,11 @@ def block_overview_list(request):
 
             # Get the Data for the Main Table
             block_overview_latest_json = get_latest_blocks(_socket=socket)
+            print(block_overview_latest_json)
 
             # Get the Meta Info
             block_overview_meta_json = get_meta_info(_socket=socket)
+            print(block_overview_meta_json)
 
             # Save data in the cache
             cache.set('block_overview_latest_json', block_overview_latest_json, 30)
