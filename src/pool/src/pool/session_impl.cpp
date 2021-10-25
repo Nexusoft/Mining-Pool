@@ -43,11 +43,11 @@ bool Session_impl::create_account()
 	return m_data_writer->create_account(m_user_data.m_account.m_address);
 }
 
-std::unique_ptr<LLP::CBlock> Session_impl::get_block()
+std::shared_ptr<LLP::CBlock> Session_impl::get_block()
 {
 	if (m_block)
 	{
-		return std::move(m_block);
+		return m_block;
 	}
 	return nullptr;
 }

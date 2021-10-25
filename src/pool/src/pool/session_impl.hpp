@@ -31,8 +31,8 @@ public:
 	void set_update_time(std::chrono::steady_clock::time_point update_time) override { m_update_time = update_time; }
 	bool add_share(std::uint32_t pool_nbits) override;
 	double get_hashrate() const override;
-	void set_block(LLP::CBlock const& block) override { m_block = std::make_unique<LLP::CBlock>(block); }
-	std::unique_ptr<LLP::CBlock> get_block() override;
+	void set_block(LLP::CBlock const& block) override { m_block = std::make_shared<LLP::CBlock>(block); }
+	std::shared_ptr<LLP::CBlock> get_block() override;
 
 	bool create_account() override;
 
@@ -43,7 +43,7 @@ private:
 	std::shared_ptr<Miner_connection> m_miner_connection;
 	std::chrono::steady_clock::time_point m_update_time;
 	Hashrate_helper m_hashrate_helper;
-	std::unique_ptr<LLP::CBlock> m_block;
+	std::shared_ptr<LLP::CBlock> m_block;
 };
 
 // Manages all sessions

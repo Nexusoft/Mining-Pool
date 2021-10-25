@@ -206,7 +206,7 @@ void Pool_manager_impl::get_block(Get_block_handler&& handler)
 	m_wallet_connection->get_block(std::move(handler));
 }
 
-void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler)
+void Pool_manager_impl::submit_block(std::shared_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler)
 {
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
 	switch (difficulty_result)
@@ -223,7 +223,7 @@ void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, std::st
 		auto nonce = nexuspool::uint2bytes64(block->nNonce);
 		auto block_data = std::make_shared<std::vector<std::uint8_t>>(block->hashMerkleRoot.GetBytes());
 		block_data->insert(block_data->end(), nonce.begin(), nonce.end());
-		m_block_map.emplace(std::make_pair(m_block_map_id.load(), Submit_block_data{ std::make_shared<LLP::CBlock>(*block), blockfinder }));
+		m_block_map.emplace(std::make_pair(m_block_map_id.load(), Submit_block_data{ std::move(block), blockfinder }));
 		m_wallet_connection->submit_block(std::move(block_data), m_block_map_id, std::move(handler));
 		m_block_map_id++;
 		break;

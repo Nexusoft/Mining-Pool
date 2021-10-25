@@ -17,7 +17,7 @@ public:
     MOCK_METHOD(void, set_block, (LLP::CBlock const& block), (override));
     MOCK_METHOD(void, add_block_to_storage, (std::uint32_t block_map_id), (override));
     MOCK_METHOD(void, get_block, (Get_block_handler&& handler), (override));
-    MOCK_METHOD(void, submit_block, (std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler), (override));
+    MOCK_METHOD(void, submit_block, (std::shared_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler), (override));
     MOCK_METHOD(std::uint32_t, get_pool_nbits, (), (const override));
 };
 
