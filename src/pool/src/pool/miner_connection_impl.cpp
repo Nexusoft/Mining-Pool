@@ -160,7 +160,12 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 				auto self = weak_self.lock();
 				if (!self)
 				{
-					self->m_logger->debug("GET_BLOCK, miner_connection invalid.");
+					self->m_logger->debug("GET_BLOCK handler, miner_connection invalid.");
+					return;
+				}
+				if (!self->m_connection)
+				{
+					self->m_logger->debug("GET_BLOCK handler, miner_connection connection invalid.");
 					return;
 				}
 
@@ -216,6 +221,11 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 				if (!self)
 				{
 					self->m_logger->debug("SUBMIT_BLOCK handler, miner_connection invalid.");
+					return;
+				}
+				if (!self->m_connection)
+				{
+					self->m_logger->debug("SUBMIT_BLOCK handler, miner_connection connection invalid.");
 					return;
 				}
 
