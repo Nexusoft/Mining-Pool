@@ -118,8 +118,17 @@ Method_result Method_account_header::execute(Method_params const& params)
         return result;
     }
 
-    result.m_result = nlohmann::json{};
-    result.m_result["account"] = account;
+    if (m_data_reader->does_account_exists(account))
+    {
+        result.m_result = nlohmann::json{};
+        result.m_result["account"] = account;
+    }
+    else
+    {
+        result.m_is_error = true;
+        result.m_error_message = "Account doesn't exist";
+        result.m_error_code = -11;
+    }
 
     return result;
 }
