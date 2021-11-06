@@ -34,6 +34,12 @@ public:
         return m_data_reader->get_latest_blocks();
     }
 
+    persistance::Account_data get_account(std::string const& account)
+    {
+        std::scoped_lock lock(m_db_mutex);
+        return m_data_reader->get_account(account);
+    }
+
 private:
 
     persistance::Data_reader::Uptr m_data_reader;

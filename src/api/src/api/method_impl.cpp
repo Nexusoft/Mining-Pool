@@ -90,7 +90,13 @@ Method_result Method_account::execute(Method_params const& params)
 
     if (m_data_reader->does_account_exists(account))
     {
+        auto const account_data = m_data_reader->get_account(account);
         result.m_result = nlohmann::json{};
+        result.m_result["account"] = account_data.m_address;
+        result.m_result["created_at"] = account_data.m_created_at;
+        result.m_result["last_active"] = account_data.m_last_active;
+        result.m_result["shares"] = account_data.m_shares;
+        result.m_result["hashrate"] = account_data.m_hashrate;
     }
     else
     {
