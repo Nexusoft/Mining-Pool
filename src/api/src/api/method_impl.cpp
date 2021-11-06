@@ -118,8 +118,10 @@ Method_result Method_account_header::execute(Method_params const& params)
         return result;
     }
 
-    return result;
+    result.m_result = nlohmann::json{};
+    result.m_result["account"] = account;
 
+    return result;
 }
 
 Method_account_works::Method_account_works(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader)
