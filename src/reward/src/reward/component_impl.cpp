@@ -266,5 +266,24 @@ void Component_impl::update_block_hashes(std::uint32_t round)
 	m_logger->debug("Updated block hashes from {} blocks in round {}", updated_blocks, round);
 }
 
+bool Component_impl::process_unpaid_rounds()
+{
+	auto const round_numbers = m_data_reader->get_unpaid_rounds();
+	if (round_numbers.empty())
+	{
+		return true;
+	}
+
+	for (auto& round_number : round_numbers)
+	{
+		auto result = pay_round(round_number);
+		if (!result)
+		{
+			m_logger->error("process_unpaid_rounds: pay_round of round {} failed.", round_number);
+		}
+	}
+	return true;
+}
+
 }
 }

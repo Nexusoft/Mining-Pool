@@ -34,6 +34,7 @@ public:
     bool end_round(std::uint32_t round_number) override;
     bool calculate_rewards(std::uint32_t round_number) override;
     bool pay_round(std::uint32_t round) override;
+    bool process_unpaid_rounds() override;
 
 private:
 

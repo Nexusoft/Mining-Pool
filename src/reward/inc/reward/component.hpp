@@ -36,6 +36,9 @@ public:
     //pay all miners with unpaid shares.
     virtual bool pay_round(std::uint32_t round) = 0;
 
+    // check all unpaid rounds (update block rewards, calculate round rewards etc)
+    virtual bool process_unpaid_rounds() = 0;
+
 
 };
 
