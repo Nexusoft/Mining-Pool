@@ -10,6 +10,7 @@ namespace nexuspool {
 namespace reward {
 
 enum class Difficulty_result : std::uint8_t { accept = 0, reject, block_found };
+enum class Calculate_rewards_result : std::uint8_t { finished = 0, failed, no_rewards };
 
 class Component 
 {
@@ -32,7 +33,7 @@ public:
     virtual bool end_round(std::uint32_t round_number) = 0;
 
     // calculate the rewards for each miner for the given round
-    virtual bool calculate_rewards(std::uint32_t round_number) = 0;
+    virtual Calculate_rewards_result calculate_rewards(std::uint32_t round_number) = 0;
     //pay all miners with unpaid shares.
     virtual bool pay_round(std::uint32_t round) = 0;
 

@@ -158,18 +158,19 @@ bool Component_impl::end_round(std::uint32_t round_number)
     return true;
 }
 
-bool Component_impl::calculate_rewards(std::uint32_t round_number)
+Calculate_rewards_result Component_impl::calculate_rewards(std::uint32_t round_number)
 {
+	Calculate_rewards_result result{ Calculate_rewards_result::failed};
 	auto round_data = m_data_reader->get_round(round_number);
 	if (round_data.is_empty())
 	{
 		m_logger->error("calculate_rewards error. Round {} does not exists.", round_number);
-		return false;
+		return result;
 	}
 	if (round_data.m_is_paid)	// already paid
 	{
 		m_logger->error("calculate_rewards error. Round {} is already paid.", round_number);
-		return false;
+		return result;
 	}
 
 	bool calculation_finished = false;
@@ -182,7 +183,8 @@ bool Component_impl::calculate_rewards(std::uint32_t round_number)
 			m_logger->trace("Round {} calculate_reward_of_blocks is finished. No reward in this round", round_number);
 			round_data.m_is_paid = true;
 			m_shared_data_writer->update_round(round_data);
-			return false;
+			result = Calculate_rewards_result::no_rewards;
+			return result;
 		}
 		else
 		{
@@ -190,7 +192,7 @@ bool Component_impl::calculate_rewards(std::uint32_t round_number)
 			auto payments = m_data_reader->get_not_paid_data_from_round(round_number);
 			if (payments.empty())
 			{
-				return false;
+				return result;
 			}
 			for (auto& payment : payments)
 			{
@@ -198,26 +200,30 @@ bool Component_impl::calculate_rewards(std::uint32_t round_number)
 				auto account_reward = (round_data.m_total_rewards * (1.0 - static_cast<double>(m_pool_fee / 100))) * (payment.m_shares / round_data.m_total_shares);
 				m_shared_data_writer->update_reward_of_payment(account_reward, payment.m_account, round_number);
 			}
-
-			return true;
+			result = Calculate_rewards_result::finished;
+			return result;
 		}
 	}
 	else
 	{
-		// TODO add case when reward is also 0.0 -> this means no blocks where found at all in this round
-		// Nothing to payout -> close the round
 		m_logger->debug("Round {} calculate_reward_of_blocks is not finished yet.", round_number);
-		return false;
+		return result;
 	}
 }
 
 bool Component_impl::pay_round(std::uint32_t round)
 {
-	if (!calculate_rewards(round))
+	auto const calculate_rewards_result = calculate_rewards(round);
+	if (calculate_rewards_result == Calculate_rewards_result::failed)
 	{
 		return false;
 	}
+	else if (calculate_rewards_result == Calculate_rewards_result::no_rewards)
+	{
+		return true;
+	}
 
+	// calculate_rewards is finished now
 	// check if round is ended and not paid.
 	auto round_data = m_data_reader->get_round(round);
 	if (round_data.m_is_active)
