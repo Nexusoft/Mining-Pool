@@ -176,20 +176,31 @@ bool Component_impl::calculate_rewards(std::uint32_t round_number)
 	round_data.m_total_rewards = m_payout_manager.calculate_reward_of_blocks(round_number, calculation_finished);
 	if (calculation_finished)
 	{
-		// now all account rewards can be credited
-		auto payments = m_data_reader->get_not_paid_data_from_round(round_number);
-		if (payments.empty())
+		if (round_data.m_total_rewards == 0.0)
 		{
+			// no blocks were found in this round -> no rewards
+			m_logger->trace("Round {} calculate_reward_of_blocks is finished. No reward in this round", round_number);
+			round_data.m_is_paid = true;
+			m_shared_data_writer->update_round(round_data);
 			return false;
 		}
-		for (auto& payment : payments)
+		else
 		{
-			// calculate reward for account. First reduce the total_rewards with pool_fee % 
-			auto account_reward = (round_data.m_total_rewards * (1.0 - static_cast<double>(m_pool_fee / 100))) * (payment.m_shares / round_data.m_total_shares);
-			m_shared_data_writer->update_reward_of_payment(account_reward, payment.m_account, round_number);
-		}
+			// now all account rewards can be credited
+			auto payments = m_data_reader->get_not_paid_data_from_round(round_number);
+			if (payments.empty())
+			{
+				return false;
+			}
+			for (auto& payment : payments)
+			{
+				// calculate reward for account. First reduce the total_rewards with pool_fee % 
+				auto account_reward = (round_data.m_total_rewards * (1.0 - static_cast<double>(m_pool_fee / 100))) * (payment.m_shares / round_data.m_total_shares);
+				m_shared_data_writer->update_reward_of_payment(account_reward, payment.m_account, round_number);
+			}
 
-		return true;
+			return true;
+		}
 	}
 	else
 	{
@@ -213,6 +224,11 @@ bool Component_impl::pay_round(std::uint32_t round)
 	{
 		m_logger->error("pay_round error. Round {} is still active.", round);
 		return false;	// round is still active
+	}
+	if (round_data.m_is_paid)
+	{
+		m_logger->error("pay_round error. Round {} is already paid.", round);
+		return false;	// round is already paid
 	}
 
 	if (m_payout_manager.payout(m_account_from, m_pin, round))

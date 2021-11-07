@@ -102,6 +102,13 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 		payments.erase(payments.begin(), payments.begin() + 98);
 		for (auto& payment : payments_reduced)
 		{
+			if (payment.m_amount == 0.0)
+			{
+				// nothing to pay -> no blocks in this round
+				m_logger->trace("payout: Nthing to pay for account {} in round {}", payment.m_account, current_round);
+				m_shared_data_writer.account_paid(current_round, payment.m_account);
+				continue;
+			}
 			payout_recipients.push_back(nexus_http_interface::Payout_recipient_data{ payment.m_account, payment.m_amount });
 		}
 		m_logger->info("Could only pay 99 miners! {} are unpaid", payments.size());
@@ -110,6 +117,13 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 	{
 		for (auto& payment : payments)
 		{
+			if (payment.m_amount == 0.0)
+			{
+				// nothing to pay -> no blocks in this round
+				m_logger->trace("payout: Nthing to pay for account {} in round {}", payment.m_account, current_round);
+				m_shared_data_writer.account_paid(current_round, payment.m_account);
+				continue;
+			}
 			payout_recipients.push_back(nexus_http_interface::Payout_recipient_data{ payment.m_account, payment.m_amount });
 		}
 	}
