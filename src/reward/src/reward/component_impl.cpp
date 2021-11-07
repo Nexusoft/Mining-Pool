@@ -282,6 +282,7 @@ bool Component_impl::process_unpaid_rounds()
 
 	for (auto& round_number : round_numbers)
 	{
+		update_block_hashes(round_number);
 		auto result = pay_round(round_number);
 		if (!result)
 		{
