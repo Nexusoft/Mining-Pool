@@ -31,6 +31,7 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& cal
 	if (blocks.empty())
 	{
 		m_logger->debug("No blocks in round {}", round);
+		calculation_finished = true;
 		return 0.0;
 	}
 
