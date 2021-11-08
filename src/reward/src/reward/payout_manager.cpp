@@ -41,6 +41,7 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& cal
 		if (block.m_mainnet_reward > 0)
 		{
 			total_rewards += block.m_mainnet_reward;
+			++blocks_update_count;
 			continue;
 		}
 
