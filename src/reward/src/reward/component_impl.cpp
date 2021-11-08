@@ -293,5 +293,12 @@ bool Component_impl::process_unpaid_rounds()
 	return true;
 }
 
+void Component_impl::block_found()
+{
+	auto round_data = m_data_reader->get_latest_round();
+	round_data.m_blocks++;
+	m_shared_data_writer->update_round(round_data);
+}
+
 }
 }

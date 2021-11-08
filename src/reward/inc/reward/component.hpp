@@ -40,6 +40,9 @@ public:
     // check all unpaid rounds (update block rewards, calculate round rewards etc)
     virtual bool process_unpaid_rounds() = 0;
 
+    // increments the block count for the current round in storage
+    virtual void block_found() = 0;
+
 
 };
 

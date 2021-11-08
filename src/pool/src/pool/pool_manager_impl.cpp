@@ -202,6 +202,8 @@ void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 	block_data.m_difficulty = TAO::Ledger::GetDifficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
+
+	m_reward_component->block_found();
 }
 
 void Pool_manager_impl::get_block(Get_block_handler&& handler)
