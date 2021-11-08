@@ -201,6 +201,7 @@ Calculate_rewards_result Component_impl::calculate_rewards(std::uint32_t round_n
 				m_shared_data_writer->update_reward_of_payment(account_reward, payment.m_account, round_number);
 			}
 			result = Calculate_rewards_result::finished;
+			m_shared_data_writer->update_round(round_data);
 			return result;
 		}
 	}
