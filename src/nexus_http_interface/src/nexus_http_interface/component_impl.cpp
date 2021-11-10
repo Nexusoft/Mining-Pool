@@ -66,6 +66,21 @@ bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
 	return true;
 }
 
+bool Component_impl::does_account_exists(std::string const& account)
+{
+	std::string parameter{ "?address=" };
+	parameter += account;
+	auto response = m_client->get_account(parameter.c_str());
+	auto const status_code = response->getStatusCode();
+	if (status_code != 200)
+	{
+		m_logger->error("API error. Code: {} Message: {}", status_code, response->readBodyToString()->c_str());
+		return false;
+	}
+
+	return true;
+}
+
 bool Component_impl::payout(std::string account_from, std::string pin, Payout_recipients const& recipients)
 {
 	auto dto = Payout_dto::createShared();

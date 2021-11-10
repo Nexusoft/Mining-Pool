@@ -31,6 +31,9 @@ public:
     // Get the block hash by height
     virtual bool get_block_hash(std::uint32_t height, std::string& hash) = 0;
 
+    // Checks if the given account address exists on the blockchain
+    virtual bool does_account_exists(std::string const& account) = 0;
+
     // Payout all miners that are given to this method
     virtual bool payout(std::string account_from, std::string pin, Payout_recipients const& recipients) = 0;
 
