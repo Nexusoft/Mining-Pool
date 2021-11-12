@@ -290,6 +290,13 @@ void Pool_manager_impl::end_round()
 	{
 		return;
 	}
+
+	// start timer for next end_round
+	// calculate round duration and start timer for end_round
+	std::chrono::system_clock::time_point round_start_time, round_end_time;
+	m_reward_component->get_start_end_round_times(round_start_time, round_end_time);
+	auto time_now = std::chrono::system_clock::now();
+	m_end_round_timer->start(chrono::Seconds(std::chrono::duration_cast<std::chrono::seconds>(round_end_time - time_now).count()), end_round_handler());
 }
 
 persistance::Config_data Pool_manager_impl::storage_config_check()
