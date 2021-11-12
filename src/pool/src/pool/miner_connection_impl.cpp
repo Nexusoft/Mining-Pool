@@ -2,7 +2,6 @@
 #include "pool/pool_manager_impl.hpp"
 #include "packet.hpp"
 #include "block.hpp"
-#include "TAO/Register/types/address.h"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
 #include <string>
@@ -125,8 +124,8 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		login_fail_response = login_fail_response.get_packet(Packet::LOGIN_FAIL);
 		
 		auto const nxs_address = std::string(packet.m_data->begin(), packet.m_data->end());
-		TAO::Register::Address address_check{ nxs_address };
-		if (!address_check.IsValid())
+		auto const nxs_address_valid = m_session_registry->valid_nxs_address(nxs_address);
+		if (!nxs_address_valid)
 		{
 			m_logger->warn("Bad Account {}", nxs_address);
 			//if (m_isDDOS)

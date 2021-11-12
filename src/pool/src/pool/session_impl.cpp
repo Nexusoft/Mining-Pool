@@ -1,6 +1,7 @@
 #include "pool/session_impl.hpp"
 #include "pool/miner_connection.hpp"
 #include "LLC/random.h"
+#include "TAO/Register/types/address.h"
 #include "common/types.hpp"
 #include <assert.h>
 
@@ -122,6 +123,19 @@ void Session_registry_impl::update_height(std::uint32_t height)
 			miner_connection_shared->set_current_height(height);
 		}
 	}
+}
+
+bool Session_registry_impl::valid_nxs_address(std::string const& nxs_address)
+{
+	// check if nxs_address has a valid format
+	TAO::Register::Address address_check{ nxs_address };
+	if (!address_check.IsValid())
+	{
+		return false;
+	}
+
+	// check if nxs_address is registered on blockchain
+	return true;
 }
 
 bool Session_registry_impl::does_account_exists(std::string account)

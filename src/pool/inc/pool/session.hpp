@@ -60,6 +60,7 @@ public:
 	// update height on active sessions
 	virtual void update_height(std::uint32_t height) = 0;
 
+	virtual bool valid_nxs_address(std::string const& nxs_address) = 0;
 	virtual bool does_account_exists(std::string account) = 0;
 	virtual void login(Session_key key) = 0;	// fetch user data from storage for the specific session
 };
