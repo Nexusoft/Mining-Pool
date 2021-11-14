@@ -35,7 +35,7 @@ public:
 
     // Methods towards miner_connection
     virtual void get_block(Get_block_handler&& handler) = 0;
-    virtual void submit_block(std::shared_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler) = 0;
+    virtual void submit_block(std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler) = 0;
     virtual std::uint32_t get_pool_nbits() const = 0;
 };
 
