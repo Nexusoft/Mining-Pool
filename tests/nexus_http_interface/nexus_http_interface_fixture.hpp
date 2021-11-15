@@ -28,7 +28,7 @@ public:
 
 protected:
 	std::shared_ptr<spdlog::logger> m_logger;
-	Component::Uptr m_component;
+	Component::Sptr m_component;
 
 	void TearDown() override
 	{

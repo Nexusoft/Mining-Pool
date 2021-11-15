@@ -2,6 +2,7 @@
 #define NEXUSPOOL_POOL_MANAGER_IMPL_HPP
 
 #include "pool/pool_manager.hpp"
+#include "nexus_http_interface/create_component.hpp"
 #include "network/types.hpp"
 
 #include <mutex>
@@ -52,6 +53,7 @@ private:
     network::Socket_factory::Sptr m_socket_factory;
     persistance::Data_writer_factory::Sptr m_data_writer_factory;
     persistance::Data_reader_factory::Sptr m_data_reader_factory;
+    nexus_http_interface::Component::Sptr m_http_component;
     reward::Component::Uptr m_reward_component;
 
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet

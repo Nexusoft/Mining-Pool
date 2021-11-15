@@ -18,7 +18,7 @@ class Component_impl : public Component
 public:
     Component_impl(
         std::shared_ptr<spdlog::logger> logger, 
-        nexus_http_interface::Component::Uptr http_interface,
+        nexus_http_interface::Component::Sptr http_interface,
         persistance::Shared_data_writer::Sptr shared_data_writer, 
         persistance::Data_reader::Uptr data_reader,
         std::string account_from,
@@ -42,7 +42,7 @@ private:
     void update_block_hashes(std::uint32_t round);
 
     std::shared_ptr<spdlog::logger> m_logger;
-    nexus_http_interface::Component::Uptr m_http_interface;
+    nexus_http_interface::Component::Sptr m_http_interface;
     persistance::Shared_data_writer::Sptr m_shared_data_writer;
     persistance::Data_reader::Uptr m_data_reader;
     std::uint32_t m_current_round;

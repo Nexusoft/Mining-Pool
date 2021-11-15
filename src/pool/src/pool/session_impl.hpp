@@ -9,6 +9,7 @@
 #include "LLC/types/uint1024.h"
 #include "persistance/data_writer.hpp"
 #include "persistance/data_reader.hpp"
+#include "nexus_http_interface/component.hpp"
 #include "pool/utils.hpp"
 #include "pool/session.hpp"
 #include "block.hpp"
@@ -53,6 +54,7 @@ public:
 
 	Session_registry_impl(persistance::Data_reader::Uptr data_reader,
 		persistance::Shared_data_writer::Sptr data_writer,
+		nexus_http_interface::Component::Sptr http_interface,
 		std::uint32_t session_expiry_time);
 
 	void stop() override;
@@ -73,6 +75,7 @@ private:
 
 	persistance::Data_reader::Uptr m_data_reader;			// hold ownership over data_reader/writer
 	persistance::Shared_data_writer::Sptr m_data_writer;
+	nexus_http_interface::Component::Sptr m_http_interface;
 	std::mutex m_sessions_mutex;
 	std::mutex m_data_reader_mutex;
 	std::map<Session_key, std::shared_ptr<Session>> m_sessions;

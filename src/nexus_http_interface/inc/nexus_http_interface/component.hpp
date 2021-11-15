@@ -21,7 +21,7 @@ using Payout_recipients = std::vector<Payout_recipient_data>;
 class Component 
 {
 public:
-    using Uptr = std::unique_ptr<Component>;
+    using Sptr = std::shared_ptr<Component>;
 
     virtual ~Component() = default;
 

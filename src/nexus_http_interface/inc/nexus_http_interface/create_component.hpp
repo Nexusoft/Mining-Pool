@@ -11,7 +11,7 @@ namespace nexus_http_interface {
 
 // Component factory
 
-Component::Uptr create_component(std::shared_ptr<spdlog::logger> logger, std::string wallet_ip);
+Component::Sptr create_component(std::shared_ptr<spdlog::logger> logger, std::string wallet_ip);
 
 }
 }

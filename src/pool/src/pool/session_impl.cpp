@@ -57,9 +57,11 @@ std::unique_ptr<LLP::CBlock> Session_impl::get_block()
 
 Session_registry_impl::Session_registry_impl(persistance::Data_reader::Uptr data_reader,
 	persistance::Shared_data_writer::Sptr data_writer,
+	nexus_http_interface::Component::Sptr http_interface,
 	std::uint32_t session_expiry_time)
 	: m_data_reader{ std::move(data_reader) }
 	, m_data_writer{ std::move(data_writer) }
+	, m_http_interface{std::move(http_interface)}
 	, m_sessions{}
 	, m_session_expiry_time{ session_expiry_time }
 {}
@@ -135,7 +137,7 @@ bool Session_registry_impl::valid_nxs_address(std::string const& nxs_address)
 	}
 
 	// check if nxs_address is registered on blockchain
-	return true;
+	return m_http_interface->does_account_exists(nxs_address);
 }
 
 bool Session_registry_impl::does_account_exists(std::string account)

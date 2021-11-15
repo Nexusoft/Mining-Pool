@@ -5,7 +5,6 @@
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
-#include "nexus_http_interface/create_component.hpp"
 #include "TAO/Ledger/difficulty.h"
 
 namespace nexuspool
@@ -43,15 +42,20 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
+	, m_http_component{ nexus_http_interface::create_component(m_logger, m_config->get_wallet_ip())}
 	, m_reward_component{reward::create_component(m_logger, 
-		nexus_http_interface::create_component(m_logger, m_config->get_wallet_ip()), 
+		m_http_component,
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_data_reader_factory->create_data_reader(),
 		m_config->get_pool_config().m_account,
 		m_config->get_pool_config().m_pin,
 		m_config->get_pool_config().m_fee)}
 	, m_listen_socket{}
-	, m_session_registry{std::make_shared<Session_registry_impl>(m_data_reader_factory->create_data_reader(), m_data_writer_factory->create_shared_data_writer(), m_config->get_session_expiry_time())}
+	, m_session_registry{std::make_shared<Session_registry_impl>(
+		m_data_reader_factory->create_data_reader(), 
+		m_data_writer_factory->create_shared_data_writer(), 
+		m_http_component, 
+		m_config->get_session_expiry_time())}
 	, m_current_height{0}
 	, m_block_map_id{0}
 {

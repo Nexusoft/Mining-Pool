@@ -15,7 +15,7 @@ namespace reward {
 // Component factory
 Component::Uptr create_component(
 	std::shared_ptr<spdlog::logger> logger, 
-	nexus_http_interface::Component::Uptr http_interface,
+	nexus_http_interface::Component::Sptr http_interface,
 	persistance::Shared_data_writer::Sptr shared_data_writer, 
 	persistance::Data_reader::Uptr data_reader,
 	std::string account_from,
