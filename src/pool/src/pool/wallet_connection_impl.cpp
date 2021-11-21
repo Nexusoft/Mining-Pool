@@ -22,7 +22,8 @@ Wallet_connection_impl::Wallet_connection_impl(std::shared_ptr<asio::io_context>
     , m_connection_retry_interval{ connection_retry_interval }
     , m_get_height_interval{ get_height_interval }
     , m_socket{ std::move(socket) }
-    , m_timer_manager{ std::move(timer_factory) }
+    , m_timer_factory{ std::move(timer_factory) }
+    , m_timer_manager{ m_timer_factory }
     , m_current_height{0}
     , m_get_block_pool_manager{false}
 {
@@ -132,8 +133,8 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
 
             // clear pending get_block handlers
             std::scoped_lock lock(m_get_block_mutex);
-            std::queue<Get_block_handler> empty_queue;
-            std::swap(m_pending_get_block_handlers, empty_queue);
+            std::queue<Get_block_data> empty_queue;
+            std::swap(m_pending_get_blocks, empty_queue);
         }
         else
         {
@@ -160,11 +161,12 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
             {
                 // get oldest pending_get_block handler from miner_connection and call it then pop()
                 std::scoped_lock lock(m_get_block_mutex);
-                if (!m_pending_get_block_handlers.empty())
+                if (!m_pending_get_blocks.empty())
                 {
-                    auto handler = m_pending_get_block_handlers.front();
-                    handler(block);
-                    m_pending_get_block_handlers.pop();
+                    auto& get_block_data = m_pending_get_blocks.front();
+                    get_block_data.m_timer->cancel();
+                    get_block_data.m_handler(block);
+                    m_pending_get_blocks.pop();
                 }
             }
         }
@@ -242,7 +244,20 @@ void Wallet_connection_impl::get_block(Get_block_handler&& handler)
 
     // store block request handler in pending list (handler comes from miner_connection)
     std::scoped_lock lock(m_get_block_mutex);
-    m_pending_get_block_handlers.emplace(handler);
+    Get_block_data get_block_data{ handler, m_timer_factory->create_timer() };
+    std::weak_ptr<Wallet_connection_impl> weak_self = shared_from_this();
+    get_block_data.m_timer->start(chrono::Seconds(3), [weak_self](auto canceled)
+        {
+            auto self = weak_self.lock();
+            if (self && !canceled)
+            {
+                Packet packet_get_block;
+                packet_get_block.m_header = Packet::GET_BLOCK;
+                self->m_connection->transmit(packet_get_block.get_bytes());
+            }
+
+        });
+    m_pending_get_blocks.emplace(std::move(get_block_data));
 }
 
 }

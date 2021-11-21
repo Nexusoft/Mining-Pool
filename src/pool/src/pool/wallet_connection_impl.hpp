@@ -59,13 +59,14 @@ private:
     std::uint16_t const m_get_height_interval;
     network::Socket::Sptr m_socket;
     network::Connection::Sptr m_connection;
+    chrono::Timer_factory::Sptr m_timer_factory;
     Timer_manager_wallet m_timer_manager;
     std::uint32_t m_current_height;
 
     // get_block variables
     std::mutex m_get_block_mutex;
     std::atomic<bool> m_get_block_pool_manager;
-    std::queue<Get_block_handler> m_pending_get_block_handlers;
+    std::queue<Get_block_data> m_pending_get_blocks;
 
     // submit_block variables
     std::mutex m_submit_block_mutex;
