@@ -58,7 +58,7 @@ network::Connection::Handler Miner_connection_impl::connection_handler()
 			result == network::Result::connection_aborted ||
 			result == network::Result::connection_error)
 		{
-			self->m_logger->error("Connection to {} was not successful. Result: {}", self->m_connection->remote_endpoint().to_string(), result);
+			self->m_logger->error("Connection to {} was not successful. Result: {}", self->m_connection->remote_endpoint().to_string(), network::Result::code_to_string(result));
 			self->m_connection.reset();
 			self->m_connection_closed = true;
 		}

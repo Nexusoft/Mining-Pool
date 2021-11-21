@@ -58,7 +58,7 @@ bool Wallet_connection_impl::connect(network::Endpoint const& wallet_endpoint)
                     result == network::Result::connection_closed ||
                     result == network::Result::connection_error)
                 {
-                    self->m_logger->error("Connection to wallet {} not sucessful. Result: {}", wallet_endpoint.to_string(), result);
+                    self->m_logger->error("Connection to wallet {} not sucessful. Result: {}", wallet_endpoint.to_string(), network::Result::code_to_string(result));
                     self->retry_connect(wallet_endpoint);
                 }
                 else if (result == network::Result::connection_ok)
@@ -101,7 +101,7 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
     if (!packet.is_valid())
     {
         // log invalid packet
-        m_logger->error("Received packet is invalid. Header: {0}", packet.m_header);
+        m_logger->error("Received packet is invalid. Header: {}", packet.m_header);
         return;
     }
 
