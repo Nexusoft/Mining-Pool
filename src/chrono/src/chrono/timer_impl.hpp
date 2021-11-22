@@ -6,6 +6,7 @@
 #include "asio/io_service.hpp"
 #include <functional>
 #include <memory>
+#include <mutex>
 
 namespace nexuspool {
 namespace chrono {
@@ -30,17 +31,30 @@ public:
         start_int(expires_in, std::move(handler));
     }
 
-    void stop() override { m_timer.cancel(); }
+    void stop() override 
+    {
+        {
+            std::scoped_lock lock(m_timer_mutex);
+            // destroy current active timer invocation
+            m_active.reset();
 
+            ::asio::error_code error;
+            m_timer.cancel(error);
+
+        }
+    }
 
 private:
     std::shared_ptr<asio::io_context> m_io_context;
+    std::mutex m_timer_mutex;
     asio::basic_waitable_timer<std::chrono::steady_clock> m_timer;
     std::shared_ptr<bool> m_active{}; // keep current active timer invocation alive
 
     template<typename T>
     void start_int(T expires_in, Handler&& handler)
     {
+        std::scoped_lock lock(m_timer_mutex);
+
         // create new current active timer invocation / invalidate old
         m_active = std::make_shared<bool>();
 
