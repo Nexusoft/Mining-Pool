@@ -172,7 +172,7 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
         }
         else
         {
-            m_logger->warn("Block Obsolete Height = {}, Skipping over.", block.nHeight);
+            m_logger->trace("Block Obsolete Height = {}, Skipping over.", block.nHeight);
         }
     }
     else if (packet.m_header == Packet::ACCEPT)
@@ -251,6 +251,7 @@ void Wallet_connection_impl::get_block(Get_block_handler&& handler)
             auto self = weak_self.lock();
             if (self)
             {
+                self->m_logger->trace("Send GET_BLOCK through timeout timer.");
                 Packet packet_get_block;
                 packet_get_block.m_header = Packet::GET_BLOCK;
                 self->m_connection->transmit(packet_get_block.get_bytes());
