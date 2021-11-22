@@ -13,7 +13,7 @@ public:
 
     MOCK_METHOD(void, start, (Milliseconds expires_in, Handler handler), (override));
     MOCK_METHOD(void, start, (Seconds expires_in, Handler handler), (override));
-    MOCK_METHOD(void, cancel, (), (override));
+    MOCK_METHOD(void, stop, (), (override));
 };
 
 }

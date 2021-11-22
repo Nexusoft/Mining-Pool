@@ -20,41 +20,46 @@ public:
     {
     }
 
-    void start(Milliseconds expires_in, Handler handler)
+    void start(Milliseconds expires_in, Handler handler) override
     {
         start_int(expires_in, std::move(handler));
     }
 
-    void start(Seconds expires_in, Handler handler)
+    void start(Seconds expires_in, Handler handler) override
     {
         start_int(expires_in, std::move(handler));
     }
 
-    void cancel() { m_timer.cancel(); }
+    void stop() override { m_timer.cancel(); }
 
 
 private:
     std::shared_ptr<asio::io_context> m_io_context;
     asio::basic_waitable_timer<std::chrono::steady_clock> m_timer;
+    std::shared_ptr<bool> m_active{}; // keep current active timer invocation alive
 
     template<typename T>
     void start_int(T expires_in, Handler&& handler)
     {
-        cancel();
+        // create new current active timer invocation / invalidate old
+        m_active = std::make_shared<bool>();
 
-        m_timer.expires_after(expires_in);
-        m_timer.async_wait([lambda_handler = std::move(handler)](const asio::error_code& error) {
-            if (error) {
-                // timer was canceled or restartet
-                lambda_handler(true);
-            }
-            else {
-                lambda_handler(false);
+        // new call to expires_from_now() also cancels the current active expirations
+        ::asio::error_code error;
+        m_timer.expires_from_now(expires_in, error);
+        m_timer.async_wait([lambda_handler = std::move(handler), weak_active = std::weak_ptr<bool>(m_active)](::asio::error_code const& error) 
+        {
+            auto const active = weak_active.lock();
+            if (active) 
+            {
+                if (!error) 
+                {
+                    lambda_handler();
+                }
             }
         });
     }
 };
-
 
 }
 }

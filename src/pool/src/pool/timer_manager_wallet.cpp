@@ -27,20 +27,15 @@ void Timer_manager_wallet::start_get_height_timer(std::uint16_t timer_interval, 
 
 void Timer_manager_wallet::stop()
 {
-    m_connection_retry_timer->cancel();
-    m_get_height_timer->cancel();
+    m_connection_retry_timer->stop();
+    m_get_height_timer->stop();
 }
 
 chrono::Timer::Handler Timer_manager_wallet::connection_retry_handler(std::weak_ptr<Wallet_connection> worker_manager,
     network::Endpoint const& wallet_endpoint)
 {
-    return[worker_manager, wallet_endpoint](bool canceled)
+    return[worker_manager, wallet_endpoint]()
     {
-        if (canceled)	// don't do anything if the timer has been canceled
-        {
-            return;
-        }
-
         auto worker_manager_shared = worker_manager.lock();
         if(worker_manager_shared)
         {
@@ -51,13 +46,8 @@ chrono::Timer::Handler Timer_manager_wallet::connection_retry_handler(std::weak_
 
 chrono::Timer::Handler Timer_manager_wallet::get_height_handler(std::uint16_t get_height_interval, std::weak_ptr<network::Connection> connection)
 {
-    return[this, connection, get_height_interval](bool canceled)
+    return[this, connection, get_height_interval]()
     {
-        if (canceled)	// don't do anything if the timer has been canceled
-        {
-            return;
-        }
-
         auto connection_shared = connection.lock();
         if(connection_shared)
         {

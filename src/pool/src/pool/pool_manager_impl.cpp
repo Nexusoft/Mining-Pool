@@ -142,8 +142,8 @@ void Pool_manager_impl::start()
 
 void Pool_manager_impl::stop()
 {
-	m_session_registry_maintenance->cancel();
-	m_end_round_timer->cancel();
+	m_session_registry_maintenance->stop();
+	m_end_round_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_listen_socket->stop_listen();
 }
@@ -251,13 +251,8 @@ std::uint32_t Pool_manager_impl::get_pool_nbits() const
 
 chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
 {
-	return[this, session_registry_maintenance_interval](bool canceled)
+	return[this, session_registry_maintenance_interval]()
 	{
-		if (canceled)	// don't do anything if the timer has been canceled
-		{
-			return;
-		}
-
 		m_session_registry->clear_unused_sessions();
 
 		// restart timer
@@ -269,13 +264,8 @@ chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(s
 
 chrono::Timer::Handler Pool_manager_impl::end_round_handler()
 {
-	return[this](bool canceled)
+	return[this]()
 	{
-		if (canceled)	// don't do anything if the timer has been canceled
-		{
-			return;
-		}
-
 		end_round();
 	};
 }

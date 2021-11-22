@@ -164,7 +164,7 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
                 if (!m_pending_get_blocks.empty())
                 {
                     auto& get_block_data = m_pending_get_blocks.front();
-                    get_block_data.m_timer->cancel();
+                    get_block_data.m_timer->stop();
                     get_block_data.m_handler(block);
                     m_pending_get_blocks.pop();
                 }
@@ -246,10 +246,10 @@ void Wallet_connection_impl::get_block(Get_block_handler&& handler)
     std::scoped_lock lock(m_get_block_mutex);
     Get_block_data get_block_data{ handler, m_timer_factory->create_timer() };
     std::weak_ptr<Wallet_connection_impl> weak_self = shared_from_this();
-    get_block_data.m_timer->start(chrono::Seconds(3), [weak_self](auto canceled)
+    get_block_data.m_timer->start(chrono::Seconds(3), [weak_self]()
         {
             auto self = weak_self.lock();
-            if (self && !canceled)
+            if (self)
             {
                 Packet packet_get_block;
                 packet_get_block.m_header = Packet::GET_BLOCK;
