@@ -61,7 +61,7 @@ private:
     network::Connection::Sptr m_connection;
     chrono::Timer_factory::Sptr m_timer_factory;
     Timer_manager_wallet m_timer_manager;
-    std::uint32_t m_current_height;
+    std::atomic<std::uint32_t> m_current_height;
 
     // get_block variables
     std::mutex m_get_block_mutex;

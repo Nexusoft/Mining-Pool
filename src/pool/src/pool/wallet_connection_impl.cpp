@@ -124,17 +124,19 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
 
             // update height at pool_manager
             pool_manager_shared->set_current_height(m_current_height);
+            m_get_block_pool_manager = true; 
+
+            // clear pending get_block handlers
+            {
+                std::scoped_lock lock(m_get_block_mutex);
+                std::queue<Get_block_data> empty_queue;
+                std::swap(m_pending_get_blocks, empty_queue);
+            }
 
             // get new block from wallet for pool_manager
             Packet packet_get_block;
             packet_get_block.m_header = Packet::GET_BLOCK;
             m_connection->transmit(packet_get_block.get_bytes());
-            m_get_block_pool_manager = true; 
-
-            // clear pending get_block handlers
-            std::scoped_lock lock(m_get_block_mutex);
-            std::queue<Get_block_data> empty_queue;
-            std::swap(m_pending_get_blocks, empty_queue);
         }
         else
         {
@@ -172,7 +174,8 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
         }
         else
         {
-            m_logger->trace("Block Obsolete Height = {}, Skipping over.", block.nHeight);
+            std::scoped_lock lock(m_get_block_mutex);
+            m_logger->trace("Block Obsolete Height = {}, Pending miner blocks = {}", block.nHeight, m_pending_get_blocks.size());
         }
     }
     else if (packet.m_header == Packet::ACCEPT)
