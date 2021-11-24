@@ -66,7 +66,7 @@ private:
     // get_block variables
     std::mutex m_get_block_mutex;
     std::atomic<bool> m_get_block_pool_manager;
-    std::queue<Get_block_data> m_pending_get_blocks;
+    std::queue<Get_block_handler> m_pending_get_blocks;
 
     // submit_block variables
     std::mutex m_submit_block_mutex;

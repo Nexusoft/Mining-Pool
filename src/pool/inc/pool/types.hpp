@@ -11,11 +11,6 @@
 namespace nexuspool
 {
     using Get_block_handler = std::function<void(LLP::CBlock const& block)>;
-    struct Get_block_data
-    {
-        Get_block_handler m_handler{};
-        chrono::Timer::Uptr m_timer{};
-    };
 
     enum class Submit_block_result : std::uint8_t
     {

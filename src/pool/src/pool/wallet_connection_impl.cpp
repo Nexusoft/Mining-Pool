@@ -129,7 +129,7 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
             // clear pending get_block handlers
             {
                 std::scoped_lock lock(m_get_block_mutex);
-                std::queue<Get_block_data> empty_queue;
+                std::queue<Get_block_handler> empty_queue;
                 std::swap(m_pending_get_blocks, empty_queue);
             }
 
@@ -165,9 +165,8 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
                 std::scoped_lock lock(m_get_block_mutex);
                 if (!m_pending_get_blocks.empty())
                 {
-                    auto& get_block_data = m_pending_get_blocks.front();
-                    get_block_data.m_timer->stop();
-                    get_block_data.m_handler(block);
+                    auto handler = m_pending_get_blocks.front();
+                    handler(block);
                     m_pending_get_blocks.pop();
                 }
             }
@@ -176,6 +175,13 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
         {
             std::scoped_lock lock(m_get_block_mutex);
             m_logger->trace("Block Obsolete Height = {}, Pending miner blocks = {}", block.nHeight, m_pending_get_blocks.size());
+            if (block.nHeight == 256)
+            {
+                //request a new block if the wallet sends garbage height
+                Packet packet_get_block;
+                packet_get_block.m_header = Packet::GET_BLOCK;
+                m_connection->transmit(packet_get_block.get_bytes());
+            }
         }
     }
     else if (packet.m_header == Packet::ACCEPT)
@@ -247,21 +253,7 @@ void Wallet_connection_impl::get_block(Get_block_handler&& handler)
 
     // store block request handler in pending list (handler comes from miner_connection)
     std::scoped_lock lock(m_get_block_mutex);
-    Get_block_data get_block_data{ handler, m_timer_factory->create_timer() };
-    std::weak_ptr<Wallet_connection_impl> weak_self = shared_from_this();
-    get_block_data.m_timer->start(chrono::Seconds(3), [weak_self]()
-        {
-            auto self = weak_self.lock();
-            if (self)
-            {
-                self->m_logger->trace("Send GET_BLOCK through timeout timer.");
-                Packet packet_get_block;
-                packet_get_block.m_header = Packet::GET_BLOCK;
-                self->m_connection->transmit(packet_get_block.get_bytes());
-            }
-
-        });
-    m_pending_get_blocks.emplace(std::move(get_block_data));
+    m_pending_get_blocks.emplace(std::move(handler));
 }
 
 }
