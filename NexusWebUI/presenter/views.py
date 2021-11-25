@@ -27,13 +27,15 @@ def block_overview_list(request):
         block_overview_meta_json = cache.get('block_overview_meta_json')
 
         if not block_overview_latest_json or not block_overview_meta_json:
+            logger.info("Rebuilding Cache")
+            print("Rebuilding Cache")
 
             socket = socket_connect(_ip=getattr(settings, "POOL_IP", None),
                                     _port=getattr(settings, "POOL_PORT", None))
 
             # Get the Data for the Main Table
             block_overview_latest_json = get_latest_blocks(_socket=socket)
-            print(block_overview_latest_json)
+            print("Blocks Received: ", block_overview_latest_json)
 
             # Get the Meta Info
             block_overview_meta_json = get_meta_info(_socket=socket)
@@ -42,9 +44,14 @@ def block_overview_list(request):
             # Save data in the cache
             cache.set('block_overview_latest_json', block_overview_latest_json, 30)
             cache.set('block_overview_meta_json', block_overview_meta_json, 30)
+        else:
+            logger.info("Serving from Cache")
+            print("Serving from Cache")
 
         # Main Table
+        # Todo Sort JSON by height
         table_data = OverviewTable(block_overview_latest_json['result'])
+
 
         # Meta Table
         pool_hashrate = block_overview_meta_json['result']['pool_hashrate']
@@ -116,8 +123,8 @@ def wallet_detail(request):
             logger.error(f"Received no Result for Wallet Request with ID: {wallet_id}")
             raise Exception(f"Received no Result for Wallet Request with ID: {wallet_id}")
 
-        last_day_recv = account_header_json['result']['last_day_recv']
-        unpaid_balance = account_header_json['result']['unpaid_balance']
+        # last_day_recv = account_header_json['result']['last_day_recv']
+        # unpaid_balance = account_header_json['result']['unpaid_balance']
         total_revenue = account_header_json['result']['total_revenue']
 
         # Get the Account Works List
@@ -161,8 +168,8 @@ def wallet_detail(request):
         #                                        })
 
         return render(request, template_name, {'wallet_id': wallet_id,
-                                               'last_day_recv': last_day_recv,
-                                               'unpaid_balance': unpaid_balance,
+                                               # 'last_day_recv': last_day_recv,
+                                               # 'unpaid_balance': unpaid_balance,
                                                'total_revenue': total_revenue,
                                                'table_account_works': account_works_table,
                                                'table_account_payouts': account_payouts_table

@@ -42,10 +42,10 @@ The above setup should only be used in a small scale Test Environment due its po
 1. Install a WSGI Server and configure accordingly:
    1. For Windows https://docs.pylonsproject.org/projects/waitress/en/latest/
    2. For Linux/Unix: https://gunicorn.org/
+      1. An example gunicorn script to start worker thread is part of the package (gunicorn_startscript_example.sh), this highly depends on your paths and needs so make sure to adapt it!
 2. Run your WSGI Server as a Service, examples 
    1. Windows: https://www.devdungeon.com/content/run-python-script-windows-service
    2. Linux/Unix: http://supervisord.org/
-      1. There is an example config in the Gunicorn Documentation
 3. Use a proper Webserver like NGINX or Tomcat to handle higher loads and heighten security:
    1. https://nginx.org/
    2. http://tomcat.apache.org/
