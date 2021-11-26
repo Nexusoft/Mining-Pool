@@ -171,7 +171,7 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
                 }
             }
         }
-        else
+        else if(block.nHeight < m_current_height)
         {
             std::scoped_lock lock(m_get_block_mutex);
             m_logger->trace("Block Obsolete Height = {}, Pending miner blocks = {}", block.nHeight, m_pending_get_blocks.size());
@@ -182,6 +182,10 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
                 packet_get_block.m_header = Packet::GET_BLOCK;
                 m_connection->transmit(packet_get_block.get_bytes());
             }
+        }
+        else
+        {
+            m_logger->trace("Block Obsolete Height = {}", block.nHeight);
         }
     }
     else if (packet.m_header == Packet::ACCEPT)
