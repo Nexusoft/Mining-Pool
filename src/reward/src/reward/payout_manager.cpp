@@ -107,8 +107,8 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 			if (payment.m_amount == 0.0)
 			{
 				// nothing to pay -> no blocks in this round
-				m_logger->trace("payout: Nthing to pay for account {} in round {}", payment.m_account, current_round);
-				m_shared_data_writer.account_paid(current_round, payment.m_account);
+				m_logger->trace("payout: Nothing to pay for account {} in round {}", payment.m_account, current_round);
+				m_shared_data_writer.account_paid(current_round, payment.m_account, "");
 				continue;
 			}
 			payout_recipients.push_back(nexus_http_interface::Payout_recipient_data{ payment.m_account, payment.m_amount });
@@ -123,14 +123,15 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 			{
 				// nothing to pay -> no blocks in this round
 				m_logger->trace("payout: Nthing to pay for account {} in round {}", payment.m_account, current_round);
-				m_shared_data_writer.account_paid(current_round, payment.m_account);
+				m_shared_data_writer.account_paid(current_round, payment.m_account, "");
 				continue;
 			}
 			payout_recipients.push_back(nexus_http_interface::Payout_recipient_data{ payment.m_account, payment.m_amount });
 		}
 	}
 
-	auto result = m_http_interface.payout(account_from, pin, payout_recipients);
+	std::string tx_id{};
+	auto result = m_http_interface.payout(account_from, pin, payout_recipients, tx_id);
 	if (!result)
 	{
 		m_logger->error("Couldn't pay miners. {} accounts from round {} not paid!", payments.size(), current_round);
@@ -139,7 +140,7 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 	// update payment storage
 	for (auto& recipient : payout_recipients)
 	{
-		m_shared_data_writer.account_paid(current_round, recipient.m_address);
+		m_shared_data_writer.account_paid(current_round, recipient.m_address, tx_id);
 	}
 
 	return true;

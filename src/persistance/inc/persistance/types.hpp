@@ -65,6 +65,7 @@ struct Payment_data
 	double m_shares{ 0 };
 	std::string m_payment_date_time{};
 	std::int64_t m_round{ 0 };
+	std::string m_tx_id{};
 
 	bool is_empty() const { return (m_account.empty()); }
 };

@@ -42,6 +42,7 @@ TEST_F(Nexus_http_interface_fixture, does_account_exists_test)
 
 TEST_F(Nexus_http_interface_fixture, payout_test)
 {
+	std::string tx_id;
 	nexus_http_interface::Payout_recipients payout_recipients{ {"asdasddas", 5}, {"zrztrtztrzre", 15}, {"yxcyxc", 50}, };
-	m_component->payout("default", "1111", payout_recipients);
+	m_component->payout("default", "1111", payout_recipients, tx_id);
 }

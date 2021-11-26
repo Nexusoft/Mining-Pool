@@ -233,7 +233,7 @@ void Command_get_round_impl::set_params(std::any params)
 Command_get_payments_impl::Command_get_payments_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT name, amount, shares, payment_date_time, round FROM payment WHERE name = :name;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT name, amount, shares, payment_date_time, round, tx_id FROM payment WHERE name = :name;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_payments_impl::get_command() const
@@ -243,7 +243,8 @@ std::any Command_get_payments_impl::get_command() const
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
 		{Column_sqlite::string},
-		{Column_sqlite::int64}} };
+		{Column_sqlite::int64},
+		{Column_sqlite::string}} };
 	return command;
 }
 
@@ -333,7 +334,7 @@ std::any Command_get_total_shares_from_accounts_impl::get_command() const
 Command_get_not_paid_data_from_round_impl::Command_get_not_paid_data_from_round_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT name, amount, shares, payment_date_time, round FROM payment WHERE round = :round AND payment_date_time = ''", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT name, amount, shares, payment_date_time, round, tx_id FROM payment WHERE round = :round AND payment_date_time = ''", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_not_paid_data_from_round_impl::get_command() const
@@ -343,7 +344,8 @@ std::any Command_get_not_paid_data_from_round_impl::get_command() const
 		 {Column_sqlite::double_t},
 		 {Column_sqlite::double_t},
 		 {Column_sqlite::string},
-		 {Column_sqlite::int64}}};
+		 {Column_sqlite::int64},
+		 {Column_sqlite::string}}};
 	return command;
 }
 
@@ -416,7 +418,7 @@ Command_add_payment_impl::Command_add_payment_impl(sqlite3* handle)
 {
 	std::string add_payment{ R"(INSERT INTO payment 
 		(name, amount, shares, payment_date_time, round) 
-		VALUES(:name, :amount, :shares, :datetime, :round))" };
+		VALUES(:name, :amount, :shares, :datetime, :round, :tx_id))" };
 
 	sqlite3_prepare_v2(m_handle, add_payment.c_str(), -1, &m_stmt, NULL);
 }
@@ -430,6 +432,7 @@ void Command_add_payment_impl::set_params(std::any params)
 	bind_param(m_stmt, ":shares", casted_params.m_shares);
 	bind_param(m_stmt, ":datetime", casted_params.m_payment_datetime);
 	bind_param(m_stmt, ":round", casted_params.m_round);
+	bind_param(m_stmt, ":tx_id", casted_params.m_tx_id);
 }
 
 // -----------------------------------------------------------------------------------------------
@@ -598,7 +601,7 @@ Command_account_paid_impl::Command_account_paid_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string account_paid{ R"(UPDATE payment SET 
-			payment_date_time = CURRENT_TIMESTAMP
+			payment_date_time = CURRENT_TIMESTAMP, tx_id = :tx_id
 			WHERE round = :round
 				AND name = :name)" };
 
@@ -609,6 +612,7 @@ void Command_account_paid_impl::set_params(std::any params)
 {
 	m_params = std::move(params);
 	auto casted_params = std::any_cast<Command_account_paid_params>(m_params);
+	bind_param(m_stmt, ":tx_id", casted_params.m_tx_id);
 	bind_param(m_stmt, ":round", casted_params.m_round_number);
 	bind_param(m_stmt, ":name", casted_params.m_account);
 }

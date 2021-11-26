@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS payment (
   shares REAL,
   payment_date_time TEXT,
   round INTEGER NOT NULL,
+  tx_id TEXT,
   FOREIGN KEY(round) REFERENCES round(round_number),
   FOREIGN KEY(name) REFERENCES account(name)
 );

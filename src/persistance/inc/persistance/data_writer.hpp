@@ -28,7 +28,7 @@ public:
     virtual bool add_block(Block_data data) = 0;
     virtual bool update_block_rewards(std::string hash, bool orphan, double reward) = 0;
     virtual bool update_round(Round_data round) = 0;
-    virtual bool account_paid(std::uint32_t round_number, std::string account) = 0;
+    virtual bool account_paid(std::uint32_t round_number, std::string account, std::string tx_id) = 0;
     virtual bool update_block_hash(std::uint32_t height, std::string block_hash) = 0;
     virtual bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) = 0;
 };
@@ -52,7 +52,7 @@ public:
     virtual bool add_block(Block_data data) = 0;
     virtual bool update_block_rewards(std::string hash, bool orphan, double reward) = 0;
     virtual bool update_round(Round_data round) = 0;
-    virtual bool account_paid(std::uint32_t round_number, std::string account) = 0;
+    virtual bool account_paid(std::uint32_t round_number, std::string account, std::string tx_id) = 0;
     virtual bool update_block_hash(std::uint32_t height, std::string block_hash) = 0;
     virtual bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) = 0;
 };

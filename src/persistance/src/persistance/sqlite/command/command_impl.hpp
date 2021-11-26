@@ -217,6 +217,7 @@ struct Command_add_payment_params
 	double m_shares;
 	std::string m_payment_datetime;
 	std::int64_t m_round;
+	std::string m_tx_id;
 };
 
 class Command_add_payment_impl : public Command_base_database_sqlite
@@ -368,6 +369,7 @@ struct Command_account_paid_params
 {
 	std::int64_t m_round_number;
 	std::string m_account;
+	std::string m_tx_id;
 };
 
 class Command_account_paid_impl : public Command_base_database_sqlite

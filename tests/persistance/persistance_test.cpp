@@ -404,6 +404,7 @@ TEST_F(Persistance_fixture, command_account_paid)
 	// add a new payment record which is not paid yet (no datetime set)
 	std::int64_t const round_number_input{ 500 };
 	std::string const account_input{ "testaccount" };
+	std::string const tx_id_input{ "test_tx_id" };
 	persistance::Payment_data const payment_input{ account_input, 1000.0, 200.0, "", round_number_input };
 	auto result = data_writer->add_payment(payment_input);
 	EXPECT_TRUE(result);
@@ -421,10 +422,11 @@ TEST_F(Persistance_fixture, command_account_paid)
 		EXPECT_EQ(result_payment.m_round, payment_input.m_round);
 		EXPECT_EQ(result_payment.m_shares, payment_input.m_shares);
 		EXPECT_TRUE(result_payment.m_payment_date_time.empty());		// datetime empty = not paid yet
+		EXPECT_TRUE(result_payment.m_tx_id.empty());					// tx_id empty = not paid yet
 	}
 
 	// pay account
-	result = data_writer->account_paid(round_number_input, account_input);
+	result = data_writer->account_paid(round_number_input, account_input, tx_id_input);
 	EXPECT_TRUE(result);
 
 	// now this command doesn't deliver any results
@@ -440,6 +442,7 @@ TEST_F(Persistance_fixture, command_account_paid)
 		EXPECT_EQ(result_payment.m_round, payment_input.m_round);
 		EXPECT_EQ(result_payment.m_shares, payment_input.m_shares);
 		EXPECT_FALSE(result_payment.m_payment_date_time.empty());
+		EXPECT_FALSE(result_payment.m_tx_id.empty());
 	}
 
 	// cleanup db

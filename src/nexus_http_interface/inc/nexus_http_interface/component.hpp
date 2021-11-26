@@ -35,7 +35,7 @@ public:
     virtual bool does_account_exists(std::string const& account) = 0;
 
     // Payout all miners that are given to this method
-    virtual bool payout(std::string account_from, std::string pin, Payout_recipients const& recipients) = 0;
+    virtual bool payout(std::string account_from, std::string pin, Payout_recipients const& recipients, std::string& tx_id) = 0;
 
 };
 

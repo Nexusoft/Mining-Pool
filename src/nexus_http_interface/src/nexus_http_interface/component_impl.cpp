@@ -81,7 +81,7 @@ bool Component_impl::does_account_exists(std::string const& account)
 	return true;
 }
 
-bool Component_impl::payout(std::string account_from, std::string pin, Payout_recipients const& recipients)
+bool Component_impl::payout(std::string account_from, std::string pin, Payout_recipients const& recipients, std::string& tx_id)
 {
 	auto dto = Payout_dto::createShared();
 	dto->pin = oatpp::String(pin.c_str());
@@ -100,7 +100,7 @@ bool Component_impl::payout(std::string account_from, std::string pin, Payout_re
 	}
 
 	auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
-	std::string const tx_id = data_json["result"]["txid"];
+	tx_id = data_json["result"]["txid"];
 
 	m_logger->info("Successfully paid all miners. Tx_id: {}", tx_id);
 

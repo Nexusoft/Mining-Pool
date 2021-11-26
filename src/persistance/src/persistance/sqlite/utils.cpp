@@ -60,7 +60,7 @@ Round_data convert_to_round_data(Row_sqlite row)
 
 Payment_data convert_to_payment_data(Row_sqlite row)
 {
-	assert(row.size() == 5U);
+	assert(row.size() == 6U);
 	Payment_data result{};
 
 	result.m_account = std::get<std::string>(row[0].m_data);
@@ -68,6 +68,7 @@ Payment_data convert_to_payment_data(Row_sqlite row)
 	result.m_shares = std::get<double>(row[2].m_data);
 	result.m_payment_date_time = std::get<std::string>(row[3].m_data);
 	result.m_round = std::get<std::int64_t>(row[4].m_data);
+	result.m_tx_id = std::get<std::string>(row[5].m_data);
 
 	return result;
 }

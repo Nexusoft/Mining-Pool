@@ -36,7 +36,7 @@ public:
     bool add_block(Block_data data) override;
     bool update_block_rewards(std::string hash, bool orphan, double reward) override;
     bool update_round(Round_data round) override;
-    bool account_paid(std::uint32_t round_number, std::string account) override;
+    bool account_paid(std::uint32_t round_number, std::string account, std::string tx_id) override;
     bool update_block_hash(std::uint32_t height, std::string block_hash) override;
     bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) override;
 
@@ -78,7 +78,7 @@ public:
     bool add_block(Block_data data) override;
     bool update_block_rewards(std::string hash, bool orphan, double reward) override;
     bool update_round(Round_data round) override;
-    bool account_paid(std::uint32_t round_number, std::string account) override;
+    bool account_paid(std::uint32_t round_number, std::string account, std::string tx_id) override;
     bool update_block_hash(std::uint32_t height, std::string block_hash) override;
     bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) override;
 

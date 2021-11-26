@@ -43,7 +43,7 @@ bool Data_writer_impl::create_account(std::string account)
 
 bool Data_writer_impl::add_payment(Payment_data data)
 {
-	m_add_payment_cmd->set_params(command::Command_add_payment_params{ std::move(data.m_account), data.m_amount, data.m_shares, data.m_payment_date_time, data.m_round });
+	m_add_payment_cmd->set_params(command::Command_add_payment_params{ std::move(data.m_account), data.m_amount, data.m_shares, data.m_payment_date_time, data.m_round, data.m_tx_id });
 	return m_data_storage->execute_command(m_add_payment_cmd);
 }
 
@@ -116,9 +116,9 @@ bool Data_writer_impl::update_round(Round_data round)
 	return m_data_storage->execute_command(m_update_round_cmd);
 }
 
-bool Data_writer_impl::account_paid(std::uint32_t round_number, std::string account)
+bool Data_writer_impl::account_paid(std::uint32_t round_number, std::string account, std::string tx_id)
 {
-	m_account_paid_cmd->set_params(command::Command_account_paid_params{round_number, std::move(account) });
+	m_account_paid_cmd->set_params(command::Command_account_paid_params{round_number, std::move(account), std::move(tx_id) });
 	return m_data_storage->execute_command(m_account_paid_cmd);
 }
 
@@ -200,10 +200,10 @@ bool Shared_data_writer_impl::update_round(Round_data round)
 	return m_data_writer->update_round(std::move(round));
 }
 
-bool Shared_data_writer_impl::account_paid(std::uint32_t round_number, std::string account)
+bool Shared_data_writer_impl::account_paid(std::uint32_t round_number, std::string account, std::string tx_id)
 {
 	std::scoped_lock lock(m_writer_mutex);
-	return m_data_writer->account_paid(round_number, std::move(account));
+	return m_data_writer->account_paid(round_number, std::move(account), std::move(tx_id));
 }
 
 bool Shared_data_writer_impl::update_block_hash(std::uint32_t height, std::string block_hash)
