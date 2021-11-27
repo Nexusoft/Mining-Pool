@@ -40,6 +40,12 @@ public:
         return m_data_reader->get_account(account);
     }
 
+    persistance::Config_data get_config()
+    {
+        std::scoped_lock lock(m_db_mutex);
+        return m_data_reader->get_config();
+    }
+
 private:
 
     persistance::Data_reader::Uptr m_data_reader;

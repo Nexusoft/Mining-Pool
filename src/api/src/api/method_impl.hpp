@@ -66,20 +66,6 @@ private:
 
 };
 
-class Method_account_works : public Method
-{
-public:
-
-    Method_account_works(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader);
-    Method_result execute(Method_params const& params) override;
-
-private:
-
-    std::shared_ptr<spdlog::logger> m_logger;
-    Shared_data_reader::Sptr m_data_reader;
-
-};
-
 class Method_account_payouts: public Method
 {
 public:
