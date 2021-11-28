@@ -34,16 +34,22 @@ public:
         return m_data_reader->get_latest_blocks();
     }
 
-    persistance::Account_data get_account(std::string const& account)
+    persistance::Account_data get_account(std::string account)
     {
         std::scoped_lock lock(m_db_mutex);
-        return m_data_reader->get_account(account);
+        return m_data_reader->get_account(std::move(account));
     }
 
     persistance::Config_data get_config()
     {
         std::scoped_lock lock(m_db_mutex);
         return m_data_reader->get_config();
+    }
+
+    std::vector<persistance::Payment_data> get_payments(std::string account)
+    {
+        std::scoped_lock lock(m_db_mutex);
+        return m_data_reader->get_payments(std::move(account));
     }
 
 private:

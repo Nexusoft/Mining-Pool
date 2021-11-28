@@ -127,7 +127,6 @@ Method_result Method_account_header::execute(Method_params const& params)
     if (m_data_reader->does_account_exists(account))
     {
         result.m_result = nlohmann::json{};
-        result.m_result["total_reward"] = 0.0;      // todo
     }
     else
     {
@@ -155,8 +154,17 @@ Method_result Method_account_payouts::execute(Method_params const& params)
         return result;
     }
 
-    return result;
+    auto const payments = m_data_reader->get_payments(account);
+    for (auto const& payment : payments)
+    {
+        nlohmann::json json_payment;
+        json_payment["time"] = payment.m_payment_date_time;
+        json_payment["amount"] = payment.m_amount;
+        json_payment["txhash"] = payment.m_tx_id;
+        result.m_result.push_back(json_payment);
+    }
 
+    return result;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
