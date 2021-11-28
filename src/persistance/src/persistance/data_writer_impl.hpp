@@ -39,6 +39,7 @@ public:
     bool account_paid(std::uint32_t round_number, std::string account, std::string tx_id) override;
     bool update_block_hash(std::uint32_t height, std::string block_hash) override;
     bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) override;
+    bool delete_empty_payments() override;
 
 private:
 
@@ -60,6 +61,7 @@ private:
     std::shared_ptr<Command> m_account_paid_cmd;
     std::shared_ptr<Command> m_update_block_hash_cmd;
     std::shared_ptr<Command> m_update_reward_of_payment_cmd;
+    std::shared_ptr<Command> m_delete_empty_payments_cmd;
  };
 
 class Shared_data_writer_impl : public Shared_data_writer
@@ -81,6 +83,7 @@ public:
     bool account_paid(std::uint32_t round_number, std::string account, std::string tx_id) override;
     bool update_block_hash(std::uint32_t height, std::string block_hash) override;
     bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) override;
+    bool delete_empty_payments() override;
 
 private:
 

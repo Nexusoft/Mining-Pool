@@ -418,6 +418,17 @@ public:
 	void set_params(std::any params) override;
 };
 
+class Command_delete_empty_payments_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_delete_empty_payments_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::delete_empty_payments; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
+
+};
+
 }
 }
 }

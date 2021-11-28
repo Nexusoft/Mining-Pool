@@ -46,7 +46,8 @@ enum class Type : std::uint8_t
 	get_unpaid_rounds,
 	update_block_hash,
 	get_blocks_without_hash_from_round,
-	update_reward_of_payment
+	update_reward_of_payment,
+	delete_empty_payments
 };
 
 

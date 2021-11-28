@@ -29,6 +29,7 @@ public:
     MOCK_METHOD(bool, account_paid, (std::uint32_t round_number, std::string account, std::string tx_id), (override));
     MOCK_METHOD(bool, update_block_hash, (std::uint32_t height, std::string block_hash), (override));
     MOCK_METHOD(bool, update_reward_of_payment, (double reward, std::string account, std::uint32_t round_number), (override));
+    MOCK_METHOD(bool, delete_empty_payments, (), (override));
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -49,6 +50,7 @@ public:
     MOCK_METHOD(bool, account_paid, (std::uint32_t round_number, std::string account, std::string tx_id), (override));
     MOCK_METHOD(bool, update_block_hash, (std::uint32_t height, std::string block_hash), (override));
     MOCK_METHOD(bool, update_reward_of_payment, (double reward, std::string account, std::uint32_t round_number), (override));
+    MOCK_METHOD(bool, delete_empty_payments, (), (override));
 };
 
 }

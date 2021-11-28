@@ -33,6 +33,7 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_account_paid_cmd = m_command_factory->create_command(Type::account_paid);
 	m_update_block_hash_cmd = m_command_factory->create_command(Type::update_block_hash);
 	m_update_reward_of_payment_cmd = m_command_factory->create_command(Type::update_reward_of_payment);
+	m_delete_empty_payments_cmd = m_command_factory->create_command(Type::delete_empty_payments);
 }
 
 bool Data_writer_impl::create_account(std::string account)
@@ -134,6 +135,11 @@ bool Data_writer_impl::update_reward_of_payment(double reward, std::string accou
 	return m_data_storage->execute_command(m_update_reward_of_payment_cmd);
 }
 
+bool Data_writer_impl::delete_empty_payments()
+{
+	return m_data_storage->execute_command(m_delete_empty_payments_cmd);
+}
+
 // --------------------------------------------------------------------------------------
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
@@ -216,6 +222,12 @@ bool Shared_data_writer_impl::update_reward_of_payment(double reward, std::strin
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->update_reward_of_payment(reward, std::move(account), round_number);
+}
+
+bool Shared_data_writer_impl::delete_empty_payments()
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->delete_empty_payments();
 }
 
 }

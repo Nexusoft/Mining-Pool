@@ -650,6 +650,14 @@ void Command_update_reward_of_payment_impl::set_params(std::any params)
 	bind_param(m_stmt, ":round", casted_params.m_round);
 }
 
+// -----------------------------------------------------------------------------------------------
+Command_delete_empty_payments_impl::Command_delete_empty_payments_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string delete_empty_payments{ R"(DELETE FROM payment WHERE amount = 0 AND tx_id = '')" };
+	sqlite3_prepare_v2(m_handle, delete_empty_payments.c_str(), -1, &m_stmt, NULL);
+}
+
 }
 }
 }
