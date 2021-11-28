@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <cmath>
 
 namespace nexuspool
 {
@@ -39,6 +40,49 @@ inline double get_difficulty(uint32_t nBits, int nChannel)
 
 	/** Offset the number by 64 to give larger starting reference. **/
 	return dDiff * ((nChannel == 2) ? 64 : 1024 * 1024 * 256);
+}
+
+//Estimate the network hashrate or prime search rate.
+//Hash channel units are hashes/second. Prime channel units is range searched per second. 
+//nBits is the network nBits.  avg_seconds_between_blocks is the average time between blocks for that channel. This value is available from the wallet. 
+inline double get_network_hash_rate(uint32_t nBits, int nChannel, double avg_seconds_between_blocks = 155.0)
+{
+	double difficulty = get_difficulty(nBits, nChannel);
+	//Prime
+	if (nChannel == 1)
+	{
+		double search_rate = 7.47101117 * std::exp(4.31557609 * difficulty) / avg_seconds_between_blocks;
+		return search_rate;
+	}
+	else
+	//Hash
+	{
+		constexpr uint64_t C = (1ull << 34);
+		double hash_rate = C * difficulty / avg_seconds_between_blocks;
+		return hash_rate;
+	}
+}
+
+//Estimate the hash rate for a worker based on the rate of shares submitted.
+//prime_shares_to_blocks_ratio is only required for the prime channel.  It is dependent on the miner implementation and the pool difficulty setting.
+//prime_shares_to_blocks_ratio can be measured directly as total shares/total blocks if the pool has enough history. 
+inline double get_miner_hash_rate(uint32_t pool_nBits, uint32_t network_nBits, int nChannel, double avg_seconds_between_shares, double prime_shares_to_blocks_ratio = 352.0)
+{
+	//Prime
+	if (nChannel == 1)
+	{
+
+		double estimated_seconds_between_blocks = avg_seconds_between_shares * prime_shares_to_blocks_ratio;
+		double search_rate = get_network_hash_rate(network_nBits, nChannel, estimated_seconds_between_blocks);
+		return search_rate;
+	}
+	else
+	//Hash
+	{
+		double hash_rate = get_network_hash_rate(pool_nBits, nChannel, avg_seconds_between_shares);
+		return hash_rate;
+	}
+
 }
 
 /** Convert a 32 bit Unsigned Integer to Byte Vector using Bitwise Shifts. **/
