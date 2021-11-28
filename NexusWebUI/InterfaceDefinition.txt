@@ -13,11 +13,11 @@ Pool API's:
         # Result
         Fields:
             - fee
-            - network_hashrate
-            - payout_threshold
+            - round_duration
             - pool_hashrate
+			- mining_mode  (string HASH or PRIME)
         JSON:
-        {'id': 1, 'jsonrpc': '2.0', 'result': {'fee': 5, 'network_hashrate': 40.1, 'payout_threshold': 0.1, 'pool_hashrate': 95.3}}
+        {'id': 1, 'jsonrpc': '2.0', 'result': {'fee': 5, 'mining_mode': 'prime', 'round_duration': 0.1, 'pool_hashrate': 95.3}}
 
     #######################
     get_latest_blocks
@@ -32,10 +32,9 @@ Pool API's:
             - hash
             - height
             - network diff
-            - payment_method
             - time
         JSON:
-        {'id': 1, 'jsonrpc': '2.0', 'result': [{'block_reward': 0.06, 'hash': '012f77d1fe0f58f0b814c80d98979085', 'height': 56, 'network_diff': 62.45, 'payment_method': 'test', 'time': '2021-09-22 22:42:24.000000'}]}
+        {'id': 1, 'jsonrpc': '2.0', 'result': [{'block_reward': 0.06, 'hash': '012f77d1fe0f58f0b814c80d98979085', 'height': 56, 'network_diff': 62.45, 'time': '2021-09-22 22:42:24.000000'}]}
 
 ############################
 Wallet Detail API's:
@@ -48,13 +47,12 @@ Wallet Detail API's:
         {"jsonrpc": "2.0", "method": "get_account_header", "params": [_account], "id": 1}
 
         # Result
-        Fields:
-            - total_revenue
+			empty or error
         JSON:
-        {'id': 1, 'jsonrpc': '2.0', 'result': [{'total_revenue': 0.06}]}
+        {'id': 1, 'jsonrpc': '2.0', 'result': [{'total_reward': 0.06}]}
 
     ########################
-    get_account_works
+    get_account
 
         # Request
         JSON:
@@ -62,9 +60,12 @@ Wallet Detail API's:
 
         # Result
         Fields:
-            - status
-            - hslast10
-            - rejectratio
+			- account
+			- created_at
+			- last_active_time
+            - shares
+            - hashrate
+
 
     ########################
     get_account_payouts
