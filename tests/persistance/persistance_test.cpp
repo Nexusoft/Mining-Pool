@@ -395,7 +395,6 @@ TEST_F(Persistance_fixture, command_update_block_rewards)
 	m_test_data.delete_from_block_table(block_height_input);
 }
 
-
 TEST_F(Persistance_fixture, command_account_paid)
 {
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
@@ -447,6 +446,32 @@ TEST_F(Persistance_fixture, command_account_paid)
 
 	// cleanup db
 	m_test_data.delete_from_payment_table(payment_input.m_account);
+}
+
+TEST_F(Persistance_fixture, command_delete_empty_payment)
+{
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+
+	// add a new payment record which is not paid yet (no datetime set)
+	std::int64_t const round_number_input{ 500 };
+	std::string const account_input{ "testaccount" };
+	std::string const tx_id_input{ "test_tx_id" };
+	persistance::Payment_data const payment_input{ account_input, 0.0, 200.0, "", round_number_input, ""};
+	auto result = data_writer->add_payment(payment_input);
+	EXPECT_TRUE(result);
+
+	// add another payment for this account
+	result = data_writer->add_payment(payment_input);
+	EXPECT_TRUE(result);
+
+	// delelte those not paid data
+	result = data_writer->delete_empty_payments();
+	EXPECT_TRUE(result);
+
+	// check that there are no unpaid payments in db
+	auto result_not_paid_payments = data_reader->get_not_paid_data_from_round(round_number_input);
+	EXPECT_TRUE(result_not_paid_payments.empty());
 }
 
 TEST_F(Persistance_fixture, command_update_reward_of_payment)
