@@ -116,8 +116,8 @@ def wallet_detail(request):
                                 _port=getattr(settings, "POOL_PORT", None))
 
         # Get the Account Detail Page Header Information
-        account_json = get_account_header(_socket=socket, _account=wallet_id)
-        print("get_account json: ", account_json)
+        account_json = get_account(_socket=socket, _account=wallet_id)
+        print("account_json json: ", account_json)
 
         if None in account_json['result']:
             print("Received no Result for Wallet Request")
@@ -134,16 +134,15 @@ def wallet_detail(request):
 
         last_active = last_active[:19]
 
-        print("account: ", account)
-        print("Created At: ", created_at)
-
         # # Get the Account Works List
         # account_works_json = get_account_works(_socket=socket, _account=wallet_id)
         # account_works_table = AccountWorksTable(account_works_json['result'])
         #
-        # # Get the Account Payouts List
-        # account_payouts_json = get_account_payouts(_socket=socket, _account=wallet_id)
-        # account_payouts_table = AccountPayoutsTable(account_payouts_json['result'])
+        # Get the Account Payouts List
+        get_account_payouts_json = get_account_payouts(_socket=socket, _account=wallet_id)
+        get_account_payouts_table = AccountPayoutsTable(get_account_payouts_json['result'])
+
+        print("get_account_payouts_json: ", get_account_payouts_json)
 
         socket_disconnect(_socket=socket)
 
@@ -156,7 +155,7 @@ def wallet_detail(request):
                                                'shares': shares,
                                                'hashrate': hashrate,
                                                # 'table_account_works': account_works_table,
-                                               # 'table_account_payouts': account_payouts_table
+                                               'table_account_payouts': get_account_payouts_table
                                                })
 
     except Exception as ex:

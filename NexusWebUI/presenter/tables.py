@@ -35,7 +35,6 @@ class AccountWorksTable(tables.Table):
 class AccountPayoutsTable(tables.Table):
     time = tables.Column(orderable=False)
     amount = tables.Column(orderable=False)
-    state = tables.Column(orderable=False)
     txhash = tables.Column(orderable=False)
 
     class Meta:
