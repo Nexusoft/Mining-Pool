@@ -225,6 +225,7 @@ def create_payment_test_data(connection):
         'shares',
         'payment_date_time',
         'round',
+        'tx_id',
     ]
     )
 
@@ -239,6 +240,7 @@ def create_payment_test_data(connection):
         shares = round(random.uniform(1, 100), 2)
         payment_date_time = fake.past_datetime()
         round_value = random.choice(round_list)
+        tx_id_value = fake.md5(raw_output=False)
 
         data_dict = {
             'name': name,
@@ -246,6 +248,7 @@ def create_payment_test_data(connection):
             'shares': shares,
             'payment_date_time': payment_date_time,
             'round': round_value,
+            'tx_id': tx_id_value,
         }
 
         dataframe_payment = dataframe_payment.append(data_dict, ignore_index=True)
