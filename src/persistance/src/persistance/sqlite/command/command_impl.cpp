@@ -417,7 +417,7 @@ Command_add_payment_impl::Command_add_payment_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string add_payment{ R"(INSERT INTO payment 
-		(name, amount, shares, payment_date_time, round) 
+		(name, amount, shares, payment_date_time, round, tx_id) 
 		VALUES(:name, :amount, :shares, :datetime, :round, :tx_id))" };
 
 	sqlite3_prepare_v2(m_handle, add_payment.c_str(), -1, &m_stmt, NULL);
