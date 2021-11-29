@@ -243,6 +243,10 @@ bool Component_impl::pay_round(std::uint32_t round)
 		round_data.m_is_paid = true;
 		m_shared_data_writer->update_round(round_data);
 	}
+
+	// cleanup empty payment records of this round
+	m_shared_data_writer->delete_empty_payments();
+
 	return true;
 }
 
