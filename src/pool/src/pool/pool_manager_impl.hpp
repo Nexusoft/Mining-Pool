@@ -4,6 +4,7 @@
 #include "pool/pool_manager.hpp"
 #include "nexus_http_interface/create_component.hpp"
 #include "network/types.hpp"
+#include "pool/session.hpp"
 
 #include <mutex>
 #include <atomic>
@@ -11,7 +12,6 @@
 namespace nexuspool
 {
 class Wallet_connection;
-class Session_registry;
 
 class Pool_manager_impl : public Pool_manager, public std::enable_shared_from_this<Pool_manager_impl>
 {
@@ -35,7 +35,7 @@ public:
 
     // Methods towards miner_connection
     void get_block(Get_block_handler&& handler) override;
-    void submit_block(std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler) override;
+    void submit_block(std::unique_ptr<LLP::CBlock> block, Session_key miner_key, Submit_block_handler handler) override;
     std::uint32_t get_pool_nbits() const override;
 
 private:
@@ -62,6 +62,9 @@ private:
     std::shared_ptr<Session_registry> m_session_registry;    // holds all sessions -> each session contains a miner_connection
     chrono::Timer::Uptr m_session_registry_maintenance;
     chrono::Timer::Uptr m_end_round_timer;
+
+    std::atomic<std::uint32_t> m_total_blocks;
+    std::atomic<std::uint32_t> m_total_shares;
 
     // connection variables
     std::atomic<std::uint32_t> m_current_height;

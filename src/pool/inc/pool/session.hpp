@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include <chrono>
-#include "LLC/types/uint1024.h"
+#include "pool/types.hpp"
 #include "persistance/types.hpp"
 #include "block.hpp"
 
@@ -19,8 +19,6 @@ struct Session_user
 	persistance::Account_data m_account;
 	std::chrono::steady_clock::time_point m_login_time;
 };
-
-using Session_key = uint256_t;
 
 // Holds relevant user data and miner_connection
 class Session

@@ -5,7 +5,7 @@
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
-#include "TAO/Ledger/difficulty.h"
+#include "utils.hpp"
 
 namespace nexuspool
 {
@@ -56,6 +56,8 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_http_component, 
 		m_config->get_session_expiry_time())}
+	, m_total_blocks{0}
+	, m_total_shares{0}
 	, m_current_height{0}
 	, m_block_map_id{0}
 {
@@ -203,11 +205,12 @@ void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 	block_data.m_type = submit_block_data.m_block->nChannel == 1 ? "prime" : "hash";
 	block_data.m_orphan = 0;
 	block_data.m_block_finder = submit_block_data.m_blockfinder;
-	block_data.m_difficulty = TAO::Ledger::GetDifficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
+	block_data.m_difficulty = get_difficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
 
 	m_reward_component->block_found();
+	m_total_blocks++;
 }
 
 void Pool_manager_impl::get_block(Get_block_handler&& handler)
@@ -215,8 +218,9 @@ void Pool_manager_impl::get_block(Get_block_handler&& handler)
 	m_wallet_connection->get_block(std::move(handler));
 }
 
-void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, std::string const& blockfinder, Submit_block_handler handler)
+void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, Session_key miner_key, Submit_block_handler handler)
 {
+	auto session = m_session_registry->get_session(miner_key);
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
 	switch (difficulty_result)
 	{
@@ -224,6 +228,7 @@ void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, std::st
 	{
 		// record share for this miner connection but don't submit block to wallet
 		handler(Submit_block_result::accept);
+		m_total_shares++;
 		break;
 	}
 	case reward::Difficulty_result::block_found:
@@ -232,7 +237,7 @@ void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, std::st
 		auto nonce = nexuspool::uint2bytes64(block->nNonce);
 		auto block_data = std::make_shared<std::vector<std::uint8_t>>(block->hashMerkleRoot.GetBytes());
 		block_data->insert(block_data->end(), nonce.begin(), nonce.end());
-		m_block_map.emplace(std::make_pair(m_block_map_id.load(), Submit_block_data{ std::move(block), blockfinder }));
+		m_block_map.emplace(std::make_pair(m_block_map_id.load(), Submit_block_data{ std::move(block), session->get_user_data().m_account.m_address }));
 		m_wallet_connection->submit_block(std::move(block_data), m_block_map_id, std::move(handler));
 		m_block_map_id++;
 		break;
@@ -240,7 +245,9 @@ void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, std::st
 	case reward::Difficulty_result::reject:
 		handler(Submit_block_result::reject);
 		break;
-	}	
+	}
+
+	// TODO update hashrate of miner
 }
 
 std::uint32_t Pool_manager_impl::get_pool_nbits() const
@@ -275,6 +282,7 @@ void Pool_manager_impl::end_round()
 	auto const current_round = m_reward_component->get_current_round();
 	m_reward_component->end_round(current_round);
 	m_reward_component->pay_round(current_round);
+	m_logger->trace("Total_blocks: {}, Total_shares {}", m_total_blocks, m_total_shares);
 
 	// update config in storage
 	m_storage_config_data = storage_config_check();
@@ -322,6 +330,12 @@ persistance::Config_data Pool_manager_impl::storage_config_check()
 			else
 			{
 				data_writer->update_config(mining_mode, m_config->get_pool_config().m_fee, m_config->get_pool_config().m_difficulty_divider, m_config->get_pool_config().m_round_duration_hours);
+				// reset total blocks/total shares only if the difficulty has changed
+				if (m_config->get_pool_config().m_difficulty_divider != config_data.m_difficulty_divider)
+				{
+					m_total_blocks = 0;
+					m_total_shares = 0;
+				}
 			}
 		}
 	}

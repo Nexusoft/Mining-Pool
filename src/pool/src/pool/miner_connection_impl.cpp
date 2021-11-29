@@ -214,7 +214,7 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 
 			//update hashrate
 			std::weak_ptr<Miner_connection_impl> weak_self = shared_from_this();
-			pool_manager_shared->submit_block(std::move(block), session->get_user_data().m_account.m_address, [weak_self](auto result)
+			pool_manager_shared->submit_block(std::move(block), m_session_key, [weak_self](auto result)
 			{
 				auto self = weak_self.lock();
 				if (!self)

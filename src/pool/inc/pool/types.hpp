@@ -6,6 +6,7 @@
 #include <functional>
 #include "block.hpp"
 #include "chrono/timer.hpp"
+#include "LLC/types/uint1024.h"
 
 
 namespace nexuspool
@@ -19,6 +20,8 @@ namespace nexuspool
         block_found 
     };
     using Submit_block_handler = std::function<void(Submit_block_result result)>;
+
+    using Session_key = uint256_t;
 }
 
 #endif
