@@ -154,6 +154,7 @@ Method_result Method_account_payouts::execute(Method_params const& params)
         return result;
     }
 
+    result.m_result = nlohmann::json::array();
     auto const payments = m_data_reader->get_payments(account);
     for (auto const& payment : payments)
     {
