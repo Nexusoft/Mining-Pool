@@ -222,6 +222,13 @@ void Pool_manager_impl::get_block(Get_block_handler&& handler)
 void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, Session_key miner_key, Submit_block_handler handler)
 {
 	auto session = m_session_registry->get_session(miner_key);
+	// TODO update hashrate of miner
+	if (m_total_blocks > 0)
+	{
+		double miner_hashrate = session->get_hashrate(m_pool_nBits, block->nBits, m_total_shares / m_total_blocks);
+		m_logger->trace("Miner hashrate: {}", miner_hashrate);
+	}
+
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
 	switch (difficulty_result)
 	{
@@ -247,8 +254,6 @@ void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, Session
 		handler(Submit_block_result::reject);
 		break;
 	}
-
-	// TODO update hashrate of miner
 }
 
 std::uint32_t Pool_manager_impl::get_pool_nbits() const

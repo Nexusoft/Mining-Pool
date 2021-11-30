@@ -18,7 +18,6 @@ public:
 		, m_t2{ std::chrono::steady_clock::now() }
 		, m_share_timepoints{}
 		, m_current_timepoint_index{ 0U }
-		, m_hashrate{ 0 }
 	{}
 
 	void add_share()
@@ -46,32 +45,24 @@ public:
 		}
 	}
 
-	double get_hashrate() const
-	{
-		return m_hashrate;
-	}
-
-private:
-
-	void calculate_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
+	double get_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
 	{
 		if (m_average_time.count() == 0)
 		{
-			return;
+			return 0.0;
 		}
 
-
 		int const channel = m_mining_mode == common::Mining_mode::PRIME ? 1 : 2;
-		m_hashrate = get_miner_hash_rate(pool_nbits, network_nbits, channel, m_average_time.count() / 1000, prime_shares_to_blocks_ratio);
+		return get_miner_hash_rate(pool_nbits, network_nbits, channel, m_average_time.count() / 1000, prime_shares_to_blocks_ratio);
 	}
+
+private:
 
 	common::Mining_mode m_mining_mode;
 	std::chrono::steady_clock::time_point m_t1, m_t2;
 	std::array<std::chrono::milliseconds, 5U> m_share_timepoints;
 	std::chrono::milliseconds m_average_time{ 0 };
 	std::size_t m_current_timepoint_index;
-	double m_hashrate;
-
 };
 
 }

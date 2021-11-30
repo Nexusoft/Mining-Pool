@@ -1,5 +1,5 @@
-#ifndef NEXUSPOOL_UTILS_H
-#define NEXUSPOOL_UTILS_H
+#ifndef NEXUSPOOL_LLP_UTILS_H
+#define NEXUSPOOL_LLP_UTILS_H
 
 #include <string>
 #include <vector>
@@ -166,23 +166,6 @@ inline double bytes2double(std::vector<uint8_t> const& BYTES)
 	u.UINT64 = n64;
 	return u.DOUBLE;
 }
-
-//inline const std::string time2datetimestring(time_t nTime)
-//{
-//	struct tm  tstruct;
-//	char       buf[80];
-//	tstruct = *gmtime(&nTime);
-//	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-//
-//	return buf;
-//}
-//
-//// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-//inline const std::string currentDateTime()
-//{
-//	return time2datetimestring(time(0));
-//}
-
 
 }
 

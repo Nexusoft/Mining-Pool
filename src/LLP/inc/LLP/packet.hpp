@@ -1,5 +1,5 @@
-#ifndef NEXUSPOOL_PACKET_HPP
-#define NEXUSPOOL_PACKET_HPP
+#ifndef NEXUSPOOL_LLP_PACKET_HPP
+#define NEXUSPOOL_LLP_PACKET_HPP
 
 #include <vector>
 #include <cstdint>
