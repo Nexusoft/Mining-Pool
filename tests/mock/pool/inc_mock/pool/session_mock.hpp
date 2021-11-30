@@ -15,7 +15,7 @@ public:
 	MOCK_METHOD(Session_user&, get_user_data, (), (override));
 	MOCK_METHOD(std::chrono::steady_clock::time_point, get_update_time, (), (const override));
 	MOCK_METHOD(void, set_update_time, (std::chrono::steady_clock::time_point update_time), (override));
-	MOCK_METHOD(bool, add_share, (std::uint32_t pool_nbits), (override));
+	MOCK_METHOD(bool, add_share, (), (override));
 	MOCK_METHOD(double, get_hashrate, (), (const override));
 	MOCK_METHOD(void, set_block, (LLP::CBlock const& block), (override));
 	MOCK_METHOD(std::unique_ptr<LLP::CBlock>, get_block, (), (override));

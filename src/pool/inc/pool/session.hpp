@@ -6,7 +6,7 @@
 #include <chrono>
 #include "pool/types.hpp"
 #include "persistance/types.hpp"
-#include "block.hpp"
+#include "LLP/block.hpp"
 
 namespace nexuspool
 {
@@ -32,7 +32,7 @@ public:
 	virtual Session_user& get_user_data() = 0;
 	virtual std::chrono::steady_clock::time_point get_update_time() const = 0;
 	virtual void set_update_time(std::chrono::steady_clock::time_point update_time) = 0;
-	virtual bool add_share(std::uint32_t pool_nbits) = 0;
+	virtual bool add_share() = 0;
 	virtual double get_hashrate() const = 0;
 	virtual void set_block(LLP::CBlock const& block) = 0;
 	virtual std::unique_ptr<LLP::CBlock> get_block() = 0;

@@ -1,7 +1,7 @@
 #include "pool/miner_connection_impl.hpp"
 #include "pool/pool_manager_impl.hpp"
-#include "packet.hpp"
-#include "block.hpp"
+#include "LLP/packet.hpp"
+#include "LLP/block.hpp"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
 #include <string>
@@ -297,7 +297,7 @@ void Miner_connection_impl::process_accepted()
 	}
 
 	// add share
-	if (!session->add_share(m_pool_nbits))
+	if (!session->add_share())
 	{
 		m_logger->error("Failed to update account for miner {}", user_data.m_account.m_address);
 	}

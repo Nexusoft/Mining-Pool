@@ -1,7 +1,7 @@
 #ifndef NEXUSPOOL_POOL_MANAGER_HPP
 #define NEXUSPOOL_POOL_MANAGER_HPP
 
-#include "block.hpp"
+#include "LLP/block.hpp"
 #include "pool/types.hpp"
 #include "reward/component.hpp"
 #include "persistance/data_writer_factory.hpp"

@@ -12,7 +12,7 @@
 #include "nexus_http_interface/component.hpp"
 #include "pool/utils.hpp"
 #include "pool/session.hpp"
-#include "block.hpp"
+#include "LLP/block.hpp"
 
 namespace nexuspool
 {
@@ -30,7 +30,7 @@ public:
 	Session_user& get_user_data() override { return m_user_data; }
 	std::chrono::steady_clock::time_point get_update_time() const override { return m_update_time; }
 	void set_update_time(std::chrono::steady_clock::time_point update_time) override { m_update_time = update_time; }
-	bool add_share(std::uint32_t pool_nbits) override;
+	bool add_share() override;
 	double get_hashrate() const override;
 	void set_block(LLP::CBlock const& block) override { m_block = std::make_unique<LLP::CBlock>(block); }
 	std::unique_ptr<LLP::CBlock> get_block() override;

@@ -1,13 +1,11 @@
-#ifndef NEXUSPOOL_UTILS_HPP
-#define NEXUSPOOL_UTILS_HPP
+#ifndef NEXUSPOOL_POOL_UTILS_HPP
+#define NEXUSPOOL_POOL_UTILS_HPP
 
 #include <cstdint>
 #include <chrono>
 #include <array>
-#include <cmath>
-#include <optional>
 #include "common/types.hpp"
-#include "TAO/Ledger/difficulty.h"
+#include "LLP/utils.hpp"
 
 namespace nexuspool
 {
@@ -23,7 +21,7 @@ public:
 		, m_hashrate{ 0 }
 	{}
 
-	void add_share(std::uint32_t pool_nbits)
+	void add_share()
 	{
 		if (m_t1 >= m_t2)
 		{
@@ -38,7 +36,12 @@ public:
 			if (m_current_timepoint_index >= m_share_timepoints.size())
 			{
 				m_current_timepoint_index = 0U;
-				calculate_hashrate(pool_nbits);
+				std::chrono::milliseconds total_time{ 0 };
+				for (auto& time : m_share_timepoints)
+				{
+					total_time += time;
+				}
+				m_average_time = total_time / m_share_timepoints.size();
 			}
 		}
 	}
@@ -50,25 +53,22 @@ public:
 
 private:
 
-	void calculate_hashrate(std::uint32_t pool_nbits)
+	void calculate_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
 	{
-		std::chrono::milliseconds total_time{ 0 };
-		std::chrono::milliseconds average_time{ 0 };
-		for (auto& time : m_share_timepoints)
+		if (m_average_time.count() == 0)
 		{
-			total_time += time;
+			return;
 		}
-		average_time = total_time / m_share_timepoints.size();
 
-		if (m_mining_mode == common::Mining_mode::HASH)
-		{
-			m_hashrate = (TAO::Ledger::GetDifficulty(pool_nbits, 2) * std::pow(2, 34)) / average_time.count();
-		}
+
+		int const channel = m_mining_mode == common::Mining_mode::PRIME ? 1 : 2;
+		m_hashrate = get_miner_hash_rate(pool_nbits, network_nbits, channel, m_average_time.count() / 1000, prime_shares_to_blocks_ratio);
 	}
 
 	common::Mining_mode m_mining_mode;
 	std::chrono::steady_clock::time_point m_t1, m_t2;
 	std::array<std::chrono::milliseconds, 5U> m_share_timepoints;
+	std::chrono::milliseconds m_average_time{ 0 };
 	std::size_t m_current_timepoint_index;
 	double m_hashrate;
 

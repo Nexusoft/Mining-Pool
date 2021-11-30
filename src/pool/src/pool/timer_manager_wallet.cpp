@@ -1,7 +1,7 @@
 #include "pool/timer_manager_wallet.hpp"
 #include "network/endpoint.hpp"
 #include "network/connection.hpp"
-#include "packet.hpp"
+#include "LLP/packet.hpp"
 #include "pool/wallet_connection.hpp"
 
 namespace nexuspool

@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstdio>
 #include <gtest/gtest.h>
-#include "block.hpp"
+#include "LLP/block.hpp"
 #include "persistance/component_mock.hpp"
 #include "persistance/data_reader_factory_mock.hpp"
 #include "persistance/data_writer_factory_mock.hpp"

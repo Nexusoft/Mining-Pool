@@ -5,7 +5,7 @@
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
-#include "utils.hpp"
+#include "LLP/utils.hpp"
 
 namespace nexuspool
 {
@@ -211,6 +211,7 @@ void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 
 	m_reward_component->block_found();
 	m_total_blocks++;
+	m_total_shares++;
 }
 
 void Pool_manager_impl::get_block(Get_block_handler&& handler)

@@ -7,7 +7,7 @@
 #include "chrono/timer_factory.hpp"
 #include "pool/timer_manager_wallet.hpp"
 #include "pool/wallet_connection.hpp"
-#include "block.hpp"
+#include "LLP/block.hpp"
 #include "pool/types.hpp"
 #include "common/types.hpp"
 

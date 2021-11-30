@@ -23,10 +23,10 @@ void Session_impl::update_connection(std::shared_ptr<Miner_connection> miner_con
 	m_miner_connection = std::move(miner_connection);
 }
 
-bool Session_impl::add_share(std::uint32_t pool_nbits)
+bool Session_impl::add_share()
 {
 	m_user_data.m_account.m_shares++;
-	m_hashrate_helper.add_share(pool_nbits);
+	m_hashrate_helper.add_share();
 	return m_data_writer->update_account(m_user_data.m_account);
 }
 

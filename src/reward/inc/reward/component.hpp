@@ -1,7 +1,7 @@
 #ifndef NEXUSPOOL_REWARD_COMPONENT_HPP
 #define NEXUSPOOL_REWARD_COMPONENT_HPP
 
-#include "block.hpp"
+#include "LLP/block.hpp"
 #include <string>
 #include <memory>
 #include <chrono>
