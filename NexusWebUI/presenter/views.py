@@ -1,7 +1,8 @@
+import collections
 import json
 import logging
-
 import requests
+from collections import OrderedDict
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import TemplateView
@@ -35,6 +36,18 @@ def block_overview_list(request):
 
             # Get the Data for the Main Table
             block_overview_latest_json = get_latest_blocks(_socket=socket)
+
+            # Extract the necessary data as list of dicts
+            block_overview_latest_list = block_overview_latest_json['result']
+
+            # Add the new Hash column to show only a part of the hash
+            for item in block_overview_latest_list:
+                item.update({"hash_short": item['hash'][:10] + '...' + item['hash'][-10:]})
+
+            # Sort the Block Data
+            block_overview_latest_list_dict = sorted(block_overview_latest_list,
+                                                     key=lambda i: i['height'], reverse=True)
+
             print("Blocks Received: ", block_overview_latest_json)
 
             # Get the Meta Info
@@ -51,7 +64,8 @@ def block_overview_list(request):
 
         # Main Table
         # Todo Sort JSON by height
-        table_data = OverviewTable(block_overview_latest_json['result'])
+        # table_data = OverviewTable(block_overview_latest_json['result'])
+        table_data = OverviewTable(block_overview_latest_list_dict)
 
         # Meta Table
         pool_hashrate = block_overview_meta_json['result']['pool_hashrate']
@@ -134,13 +148,21 @@ def wallet_detail(request):
 
         last_active = last_active[:19]
 
-        # # Get the Account Works List
-        # account_works_json = get_account_works(_socket=socket, _account=wallet_id)
-        # account_works_table = AccountWorksTable(account_works_json['result'])
-        #
         # Get the Account Payouts List
         get_account_payouts_json = get_account_payouts(_socket=socket, _account=wallet_id)
-        get_account_payouts_table = AccountPayoutsTable(get_account_payouts_json['result'])
+
+        # Extract the necessary data as list of dicts
+        get_account_payouts_list = get_account_payouts_json['result']
+
+        # Add the new Hash column to show only a part of the hash
+        for item in get_account_payouts_list:
+            item.update({"txhash": item['txhash'][:10] + '...' + item['txhash'][-10:]})
+
+        # Sort the Block Data
+        get_account_payouts_list = sorted(get_account_payouts_list,
+                                          key=lambda i: i['time'], reverse=True)
+
+        get_account_payouts_table = AccountPayoutsTable(get_account_payouts_list)
 
         print("get_account_payouts_json: ", get_account_payouts_json)
 
@@ -169,4 +191,3 @@ def wallet_detail(request):
 
 def block_detail(request, hash):
     return redirect(f'https://explorer.nexus.io/search/{hash}')
-
