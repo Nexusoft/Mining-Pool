@@ -6,6 +6,7 @@
 #include <array>
 #include "common/types.hpp"
 #include "LLP/utils.hpp"
+#include <spdlog/spdlog.h>
 
 namespace nexuspool
 {
@@ -47,12 +48,15 @@ public:
 
 	double get_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
 	{
+		auto logger_temp = spdlog::get("logger");		// TODO: remove this after testing
 		if (m_average_time.count() == 0)
 		{
 			return 0.0;
 		}
 
 		int const channel = m_mining_mode == common::Mining_mode::PRIME ? 1 : 2;
+		logger_temp->trace("[get_hashrate] pool_nbits: {}, network_nbits: {}, channel: {}, m_average_time: {}, prime_shares_to_blocks_ratio: {}",
+			pool_nbits, network_nbits, channel, m_average_time.count() / 1000, prime_shares_to_blocks_ratio);
 		return get_miner_hash_rate(pool_nbits, network_nbits, channel, m_average_time.count() / 1000, prime_shares_to_blocks_ratio);
 	}
 
