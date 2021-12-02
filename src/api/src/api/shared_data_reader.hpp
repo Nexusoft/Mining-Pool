@@ -52,6 +52,12 @@ public:
         return m_data_reader->get_payments(std::move(account));
     }
 
+    double get_pool_hashrate()
+    {
+        std::scoped_lock lock(m_db_mutex);
+        return m_data_reader->get_pool_hashrate();
+    }
+
 private:
 
     persistance::Data_reader::Uptr m_data_reader;

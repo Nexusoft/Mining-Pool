@@ -39,7 +39,7 @@ Method_result Method_meta_infos::execute(Method_params const& params)
     result.m_result = nlohmann::json{};
 
     auto const config = m_data_reader->get_config();
-    result.m_result["pool_hashrate"] = 95.3;        // todo
+    result.m_result["pool_hashrate"] = m_data_reader->get_pool_hashrate();
     result.m_result["round_duration"] = config.m_round_duration_hours;
     result.m_result["fee"] = config.m_fee;
     result.m_result["mining_mode"] = config.m_mining_mode;
