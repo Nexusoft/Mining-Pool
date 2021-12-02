@@ -34,6 +34,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_not_paid_data_from_round_cmd = m_command_factory->create_command(Type::get_not_paid_data_from_round);
 	m_get_unpaid_rounds_cmd = m_command_factory->create_command(Type::get_unpaid_rounds);
 	m_get_blocks_without_hash_from_round_cmd = m_command_factory->create_command(Type::get_blocks_without_hash_from_round);
+	m_get_pool_hashrate_cmd = m_command_factory->create_command(Type::get_pool_hashrate);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -282,6 +283,13 @@ std::vector<std::uint32_t> Data_reader_impl::get_blocks_without_hash_from_round(
 	}
 
 	return heights;
+}
+
+double Data_reader_impl::get_pool_hashrate()
+{
+	auto return_value = m_data_storage->execute_command(m_get_pool_hashrate_cmd);
+	auto result = std::any_cast<Result_sqlite>(m_get_pool_hashrate_cmd->get_result());
+	return std::get<std::double_t>(result.m_rows.front()[0].m_data);
 }
 
 

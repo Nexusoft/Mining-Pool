@@ -82,7 +82,9 @@ public:
         m_commands.emplace(std::make_pair(Type::update_reward_of_payment,
             std::make_shared<Command_update_reward_of_payment_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::delete_empty_payments,
-            std::make_shared<Command_delete_empty_payments_impl>(m_storage_manager->get_handle<sqlite3*>())));        
+            std::make_shared<Command_delete_empty_payments_impl>(m_storage_manager->get_handle<sqlite3*>())));   
+        m_commands.emplace(std::make_pair(Type::get_pool_hashrate,
+            std::make_shared<Command_get_pool_hashrate_impl>(m_storage_manager->get_handle<sqlite3*>())));
     }
 
     ~Command_factory_impl()
@@ -144,6 +146,9 @@ private:
             break;
         case Type::get_blocks_without_hash_from_round:
             result = std::any_cast<std::shared_ptr<Command_get_blocks_without_hash_from_round_impl>>(m_commands[command_type]);
+            break;
+        case Type::get_pool_hashrate:
+            result = std::any_cast<std::shared_ptr<Command_get_pool_hashrate_impl>>(m_commands[command_type]);
             break;
             // Write commands
         case Type::create_account:
