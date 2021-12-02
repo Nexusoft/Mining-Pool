@@ -6,7 +6,7 @@ from collections import OrderedDict
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import TemplateView
-from .tables import OverviewTable, AccountWorksTable, AccountPayoutsTable
+from .tables import OverviewTable, AccountPayoutsTable
 from .forms import WalletSearchForm
 from .rpc_requests import get_latest_blocks, get_meta_info, socket_connect, socket_disconnect, get_account, \
     get_account_works, get_account_payouts, get_account_header
@@ -39,10 +39,6 @@ def block_overview_list(request):
 
             # Extract the necessary data as list of dicts
             block_overview_latest_list = block_overview_latest_json['result']
-
-            # Add the new Hash column to show only a part of the hash
-            for item in block_overview_latest_list:
-                item.update({"hash_short": item['hash'][:10] + '...' + item['hash'][-10:]})
 
             # Sort the Block Data
             block_overview_latest_list_dict = sorted(block_overview_latest_list,
@@ -138,8 +134,6 @@ def wallet_detail(request):
             logger.error(f"Received no Result for Wallet Request with ID: {wallet_id}")
             raise Exception(f"Received no Result for Wallet Request with ID: {wallet_id}")
 
-        # last_day_recv = account_header_json['result']['last_day_recv']
-        # unpaid_balance = account_header_json['result']['unpaid_balance']
         account = account_json['result']['account']
         created_at = account_json['result']['created_at']
         last_active = account_json['result']['last_active']
@@ -154,9 +148,10 @@ def wallet_detail(request):
         # Extract the necessary data as list of dicts
         get_account_payouts_list = get_account_payouts_json['result']
 
-        # Add the new Hash column to show only a part of the hash
+        # Rename the txhash column to re-use the hash logic from the overview page
         for item in get_account_payouts_list:
-            item.update({"txhash": item['txhash'][:10] + '...' + item['txhash'][-10:]})
+            item.update({"hash": item['txhash']})
+            del item['txhash']
 
         # Sort the Block Data
         get_account_payouts_list = sorted(get_account_payouts_list,
@@ -169,14 +164,11 @@ def wallet_detail(request):
         socket_disconnect(_socket=socket)
 
         return render(request, template_name, {'wallet_id': wallet_id,
-                                               # 'last_day_recv': last_day_recv,
-                                               # 'unpaid_balance': unpaid_balance,
                                                'account': account,
                                                'created_at': created_at,
                                                'last_active': last_active,
                                                'shares': shares,
                                                'hashrate': hashrate,
-                                               # 'table_account_works': account_works_table,
                                                'table_account_payouts': get_account_payouts_table
                                                })
 
