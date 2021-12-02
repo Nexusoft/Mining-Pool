@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load render_table from django_tables2 %}
+
+{% block body_block %}
+
+    <br>
+    
+    <div class="d-flex justify-content-center"><h1>Account Overview</h1></div>
+    <div class="d-flex justify-content-center">{{ wallet_id }}</div>
+
+    <br>
+
+     <div class="row row-cols-1 row-cols-md-2 mb-2 text-center">
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Last Active</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ last_active }}</h1>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3 text-white bg-primary">
+            <h4 class="my-0 fw-normal">Created At</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ created_at }}</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <div class="row row-cols-1 row-cols-md-2 mb-2 text-center">
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Shares</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ shares }}</h1>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3 text-white bg-primary">
+            <h4 class="my-0 fw-normal">Hash-Rate</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">{{ hashrate }}</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% render_table table_account_payouts %}
+
+
+{##}
+{#        <!-- Tabs navs -->#}
+{#        <ul class="nav nav-tabs nav-fill mb-3" id="ex-2" role="tablist">#}
+{#          <li class="nav-item" role="presentation">#}
+{#            <a#}
+{#               class="nav-link active"#}
+{#               id="ex-2-tab-1"#}
+{#               data-mdb-toggle="pill"#}
+{#               href="#ex-2-tabs-1"#}
+{#               role="tab"#}
+{#               aria-controls="pills-1"#}
+{#               aria-selected="true"#}
+{#               >Works</a#}
+{#              >#}
+{#          </li>#}
+{#          <li class="nav-item" role="presentation">#}
+{#            <a#}
+{#               class="nav-link"#}
+{#               id="ex-2-tab-2"#}
+{#               data-mdb-toggle="pill"#}
+{#               href="#ex-2-tabs-2"#}
+{#               role="tab"#}
+{#               aria-controls="pills-2"#}
+{#               aria-selected="false"#}
+{#               >Payouts</a#}
+{#              >#}
+{#          </li>#}
+{#        </ul>#}
+{#        <!-- Tabs navs -->#}
+{##}
+{#        <!-- Tabs content-->#}
+{#        <div class="tab-content" id="ex-2-content">#}
+{#          <div#}
+{#               class="tab-pane fade show active"#}
+{#               id="ex-2-tabs-1"#}
+{#               role="tabpanel"#}
+{#               aria-labelledby="pills-1-tab"#}
+{#               >#}
+{#            {% render_table table_account_works %}#}
+{#          </div>#}
+{#          <div#}
+{#               class="tab-pane fade"#}
+{#               id="ex-2-tabs-2"#}
+{#               role="tabpanel"#}
+{#               aria-labelledby="pills-2-tab"#}
+{#               >#}
+{#            {% render_table table_account_payouts %}#}
+{#          </div>#}
+{#        </div>#}
+
+{% endblock %}
