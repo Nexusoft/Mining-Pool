@@ -1,34 +1,44 @@
 import logging
 from django import forms
-from .models import ValidAccounts
-from .rpc_requests import get_account, socket_connect
+from django.conf import settings
+from django.shortcuts import redirect
+
+# from .models import ValidAccounts
+from .rpc_requests import get_account_header, socket_connect, get_account
 
 logger = logging.getLogger('NexusWebUI')
 
 
 class WalletSearchForm(forms.Form):
+    """
+    Checks if a given Wallet ID is already in the local DB (validated), exists (insert) or return one of two Errors
+    """
     wallet_id = forms.CharField(max_length=100)
 
     def clean(self):
         cleaned_data = super(WalletSearchForm, self).clean()
 
+        if not cleaned_data:
+            logger.info("Invalid Wallet ID")
+            raise forms.ValidationError(-10)
+
         wallet_id = cleaned_data['wallet_id']
 
-        if not ValidAccounts.objects.filter(account=wallet_id).exists():
-            logger.info("Given Wallet ID is unknown, checking with Backend")
+        logger.info("Sending Request for Wallet ID verficiation to Backend")
 
-            socket = socket_connect(_ip='127.0.0.1', _port=5000)
-            get_account_json = get_account(_socket=socket, _account=wallet_id)
+        socket = socket_connect(_ip=getattr(settings, "POOL_IP", None),
+                                _port=getattr(settings, "POOL_PORT", None))
+        # get_account_json = get_account(_socket=socket, _account=wallet_id)
+        get_account_header_json = get_account_header(_socket=socket, _account=wallet_id)
 
-            if 'error' in get_account_json:
-                logger.info(f"Error when validating Wallet ID: {get_account_json}")
-                if get_account_json['error']['code'] == -10:
-                    raise forms.ValidationError(f'The Wallet ID you entered is not valid!')
-                if get_account_json['error']['code'] == -11:
-                    raise forms.ValidationError(f'The Wallet ID you entered does not exist')
-            else:
-                logger.info("Inserting validated ID into Table")
-                ValidAccounts.objects.create(account=wallet_id)
-        else:
-            logger.info(f"Found Wallet ID in DB: {wallet_id}")
+        print("get_account_header_json: ", get_account_header_json)
+
+        if 'error' in get_account_header_json:
+            logger.info(f"Error when validating Wallet ID: {get_account_header_json}")
+            if get_account_header_json['error']['code'] == -10:
+                logger.info("Invalid Wallet ID")
+                raise forms.ValidationError(-10)
+            if get_account_header_json['error']['code'] == -11:
+                logger.info("Unknown Wallet ID")
+                raise forms.ValidationError(-11)
 

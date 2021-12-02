@@ -1,125 +1,193 @@
+import collections
 import json
 import logging
-
 import requests
+from collections import OrderedDict
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import TemplateView
 from .tables import OverviewTable, AccountWorksTable, AccountPayoutsTable
 from .forms import WalletSearchForm
-from .rpc_requests import get_latest_blocks, get_meta_info, socket_connect, socket_disconnect, get_account_header, \
-    get_account_works, get_account_payouts
+from .rpc_requests import get_latest_blocks, get_meta_info, socket_connect, socket_disconnect, get_account, \
+    get_account_works, get_account_payouts, get_account_header
+from django.conf import settings
+from django.core.cache import cache
 
-logger = logging.getLogger('django')
+logger = logging.getLogger('NexusWebUI')
+
 
 def block_overview_list(request):
     template_name = 'presenter/overview_list.html'
+    socket = None
 
-    # Todo Get from .env
+    # Todo Test Cache when Backend not available
+
     try:
-        socket = socket_connect(_ip='127.0.0.1', _port=5000)
+        # Try to retrieve from cache
+        block_overview_latest_json = cache.get('block_overview_latest_json')
+        block_overview_meta_json = cache.get('block_overview_meta_json')
 
-        # Get the Data for the Main Table
-        latest_block_json = get_latest_blocks(_socket=socket)
-        table_data = OverviewTable(latest_block_json['result'])
+        if not block_overview_latest_json or not block_overview_meta_json:
+            logger.info("Rebuilding Cache")
+            print("Rebuilding Cache")
 
-        # Get the Meta Info
-        meta_info_json = get_meta_info(_socket=socket)
-        pool_hashrate = meta_info_json['result']['pool_hashrate']
-        network_hashrate = meta_info_json['result']['network_hashrate']
-        payout_threshold = meta_info_json['result']['payout_threshold']
-        fee = meta_info_json['result']['fee']
+            socket = socket_connect(_ip=getattr(settings, "POOL_IP", None),
+                                    _port=getattr(settings, "POOL_PORT", None))
 
-        socket_disconnect(_socket=socket)
+            # Get the Data for the Main Table
+            block_overview_latest_json = get_latest_blocks(_socket=socket)
+
+            # Extract the necessary data as list of dicts
+            block_overview_latest_list = block_overview_latest_json['result']
+
+            # Add the new Hash column to show only a part of the hash
+            for item in block_overview_latest_list:
+                item.update({"hash_short": item['hash'][:10] + '...' + item['hash'][-10:]})
+
+            # Sort the Block Data
+            block_overview_latest_list_dict = sorted(block_overview_latest_list,
+                                                     key=lambda i: i['height'], reverse=True)
+
+            print("Blocks Received: ", block_overview_latest_json)
+
+            # Get the Meta Info
+            block_overview_meta_json = get_meta_info(_socket=socket)
+            print("Block Overview: ", block_overview_meta_json)
+
+            # Save data in the cache
+            if settings.DEBUG is False:
+                cache.set('block_overview_latest_json', block_overview_latest_json, 1)
+                cache.set('block_overview_meta_json', block_overview_meta_json, 1)
+        else:
+            logger.info("Serving from Cache")
+            print("Serving from Cache")
+
+        # Main Table
+        # Todo Sort JSON by height
+        # table_data = OverviewTable(block_overview_latest_json['result'])
+        table_data = OverviewTable(block_overview_latest_list_dict)
+
+        # Meta Table
+        pool_hashrate = block_overview_meta_json['result']['pool_hashrate']
+        mining_mode = block_overview_meta_json['result']['mining_mode']
+        round_duration = block_overview_meta_json['result']['round_duration']
+        fee = block_overview_meta_json['result']['fee']
 
         return render(request, template_name, {'table': table_data,
                                                'pool_hashrate': pool_hashrate,
-                                               'network_hashrate': network_hashrate,
-                                               'payout_threshold': payout_threshold,
+                                               'mining_mode': mining_mode,
+                                               'round_duration': round_duration,
                                                'fee': fee,
                                                })
 
     except Exception as ex:
+        print(ex)
         logger.error(ex)
-        messages.error(request, 'Could not establish connection to the Backend Server')
-        return redirect('presenter:error')
+        return redirect('presenter:error_pool')
+    finally:
+        if socket:
+            socket_disconnect(_socket=socket)
 
 
 class ErrorView(TemplateView):
     template_name = 'presenter/error.html'
 
 
+class ErrorPoolView(TemplateView):
+    template_name = 'presenter/errors/error_pool_not_available.html'
+
+
+class ErrorInvalidWalletIdView(TemplateView):
+    template_name = 'presenter/errors/error_invalid_wallet_id.html'
+
+
+class ErrorUnknownWallet(TemplateView):
+    template_name = 'presenter/errors/error_unknown_wallet.html'
+
+
 def wallet_detail(request):
+    # Todo implement Cache
+    # Todo get no result from backend!?
+
     template_name = 'presenter/wallet_detail.html'
+    socket = None
 
-    form = WalletSearchForm(request.POST)
+    try:
+        form = WalletSearchForm(request.POST)
 
-    if not form.is_valid():
-        print(f"Form is invalid")
-        errors_json = json.loads(form.errors.as_json())
-        error_message = errors_json['__all__'][0]['message']
-        messages.error(request, error_message)
-        return redirect('presenter:index')
+        if not form.is_valid():
+            print(f"Form is invalid")
+            errors_json = json.loads(form.errors.as_json())
+            wallet_error = errors_json['__all__'][0]['message']
+            if wallet_error == -11:
+                return redirect('presenter:error_wallet_id')
+            else:
+                return redirect('presenter:error_wallet_id')
 
-    # Todo Get from .env
-    url = "http://127.0.0.1:5000/"
+        wallet_id = request.POST.get('wallet_id')
 
-    wallet_id = request.POST.get('wallet_id')
-    # Todo if wallet ID is not valid (from get_account)
-    #  --> return message to user and redirect to overview
+        socket = socket_connect(_ip=getattr(settings, "POOL_IP", None),
+                                _port=getattr(settings, "POOL_PORT", None))
 
-    # Todo Get Infos for Wallet (params)
+        # Get the Account Detail Page Header Information
+        account_json = get_account(_socket=socket, _account=wallet_id)
+        print("account_json json: ", account_json)
 
-    # socket = socket_connect(_ip='127.0.0.1', _port=5000)
+        if None in account_json['result']:
+            print("Received no Result for Wallet Request")
+            logger.error(f"Received no Result for Wallet Request with ID: {wallet_id}")
+            raise Exception(f"Received no Result for Wallet Request with ID: {wallet_id}")
 
-    # Get the Account Detail Page Header Information
-    # account_header_json = get_account_header(_socket=socket)
-    # last_day_recv = account_header_json['result']['last_day_recv']
-    # unpaid_balance = account_header_json['result']['unpaid_balance']
-    # total_revenue = account_header_json['result']['total_revenue']
+        # last_day_recv = account_header_json['result']['last_day_recv']
+        # unpaid_balance = account_header_json['result']['unpaid_balance']
+        account = account_json['result']['account']
+        created_at = account_json['result']['created_at']
+        last_active = account_json['result']['last_active']
+        shares = account_json['result']['shares']
+        hashrate = account_json['result']['hashrate']
 
-    # Get the Account Works List
-    # account_works_json = get_account_works(_socket=socket)
-    # account_works_table = AccountWorksTable(account_works_json['result'])
+        last_active = last_active[:19]
 
-    # Get the Account Payouts List
-    # account_payouts_json = get_account_payouts(_socket=socket)
-    # account_payouts_table = AccountPayoutsTable(account_payouts_json['result'])
+        # Get the Account Payouts List
+        get_account_payouts_json = get_account_payouts(_socket=socket, _account=wallet_id)
 
+        # Extract the necessary data as list of dicts
+        get_account_payouts_list = get_account_payouts_json['result']
 
-    # Test Data
-    last_day_recv = 5
-    unpaid_balance = 10
-    total_revenue = 0.2341234
+        # Add the new Hash column to show only a part of the hash
+        for item in get_account_payouts_list:
+            item.update({"txhash": item['txhash'][:10] + '...' + item['txhash'][-10:]})
 
-    account_works_json = json.dumps({'id': 1, 'jsonrpc': '2.0', 'result': [
-        {'id': 1, 'status': 'bla', 'hslast10': 5, 'hslast1d': 10, 'lastshare': 1, 'rejectratio': 5},
-        {'id': 2, 'status': 'bla', 'hslast10': 5, 'hslast1d': 10, 'lastshare': 1, 'rejectratio': 5},
-        {'id': 3, 'status': 'bla', 'hslast10': 5, 'hslast1d': 10, 'lastshare': 1, 'rejectratio': 5},
-    ]})
+        # Sort the Block Data
+        get_account_payouts_list = sorted(get_account_payouts_list,
+                                          key=lambda i: i['time'], reverse=True)
 
-    account_works_json = json.loads(account_works_json)
+        get_account_payouts_table = AccountPayoutsTable(get_account_payouts_list)
 
-    account_payouts_json = json.dumps({'id': 1, 'jsonrpc': '2.0', 'result': [
-        {'time': 15, 'amount': 5, 'state': 10, 'txhash': 10},
-        {'time': 15, 'amount': 5, 'state': 10, 'txhash': 10},
-        {'time': 15, 'amount': 5, 'state': 10, 'txhash': 10},
-    ]})
+        print("get_account_payouts_json: ", get_account_payouts_json)
 
-    account_payouts_json = json.loads(account_payouts_json)
+        socket_disconnect(_socket=socket)
 
-    table_account_works = AccountWorksTable(account_works_json['result'])
-    table_account_payouts = AccountPayoutsTable(account_payouts_json['result'])
+        return render(request, template_name, {'wallet_id': wallet_id,
+                                               # 'last_day_recv': last_day_recv,
+                                               # 'unpaid_balance': unpaid_balance,
+                                               'account': account,
+                                               'created_at': created_at,
+                                               'last_active': last_active,
+                                               'shares': shares,
+                                               'hashrate': hashrate,
+                                               # 'table_account_works': account_works_table,
+                                               'table_account_payouts': get_account_payouts_table
+                                               })
 
-    return render(request, template_name, {'wallet_id': wallet_id,
-                                           'last_day_recv': last_day_recv,
-                                           'unpaid_balance': unpaid_balance,
-                                           'total_revenue': total_revenue,
-                                           'table_account_works': table_account_works,
-                                           'table_account_payouts': table_account_payouts
-                                           })
+    except Exception as ex:
+        print("Exception when trying to fetch Wallet Info: ", ex)
+        logger.error(ex)
+        return redirect('presenter:error_pool')
+    finally:
+        if socket:
+            socket_disconnect(_socket=socket)
 
 
 def block_detail(request, hash):
     return redirect(f'https://explorer.nexus.io/search/{hash}')
-

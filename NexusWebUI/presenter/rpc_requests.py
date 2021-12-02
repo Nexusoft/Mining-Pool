@@ -9,7 +9,11 @@ logger = logging.getLogger('NexusWebUI')
 
 
 def socket_connect(_ip, _port):
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(10)
+    logger.info(f"Trying to connect to: {_ip}:{_port}")
+    print(f"Trying to connect to: {_ip}:{_port}")
     s.connect((_ip, _port))
 
     # Todo Log Message
@@ -30,23 +34,33 @@ def get_latest_blocks(_socket):
     # Todo Documentation
     # Todo Error Handling
 
-    payload = {"jsonrpc": "2.0", "method": "get_latest_blocks", "id": 1}
+    try:
 
-    _socket.send(pybson.dumps(payload))
-    response = _socket.recv(20000)
-    json_data = bson.loads(response)
+        payload = {"jsonrpc": "2.0", "method": "get_latest_blocks", "id": 1}
 
-    return json_data
+        _socket.send(pybson.dumps(payload))
+        response = _socket.recv(20000)
+        json_data = bson.loads(response)
+
+        return json_data
+
+    except Exception as ex:
+        print(ex)
+        return None
 
 
 def get_meta_info(_socket):
-    payload = {"jsonrpc": "2.0", "method": "get_meta_info", "id": 1}
+    try:
+        payload = {"jsonrpc": "2.0", "method": "get_meta_info", "id": 1}
 
-    _socket.send(pybson.dumps(payload))
-    response = _socket.recv(1024)
-    json_data = bson.loads(response)
+        _socket.send(pybson.dumps(payload))
+        response = _socket.recv(1024)
+        json_data = bson.loads(response)
 
-    return json_data
+        return json_data
+    except Exception as ex:
+        print(ex)
+        return None
 
 
 def get_block_details(_url):
@@ -78,6 +92,7 @@ def get_account(_socket, _account):
     return json_data
 
 
+
 def get_account_header(_socket, _account):
     """
     :param _url:
@@ -85,8 +100,10 @@ def get_account_header(_socket, _account):
     """
     payload = {"jsonrpc": "2.0", "method": "get_account_header", "params": [_account], "id": 1}
 
+    print(payload)
+
     _socket.send(pybson.dumps(payload))
-    response = _socket.recv(1024)
+    response = _socket.recv(20000)
     json_data = bson.loads(response)
 
     return json_data

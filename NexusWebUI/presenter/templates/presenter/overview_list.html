@@ -7,7 +7,7 @@
 
 {% block body_block %}
 
-    {% include 'presenter/messages.html' %}
+{#    {% include 'presenter/messages.html' %}#}
     <br>
     <hr>
 
@@ -16,30 +16,30 @@
           <div class="col">
             <div class="card mb-4 rounded-3 shadow-sm">
               <div class="card-header py-3">
-                <h4 class="my-0 fw-normal">Pool Hashrate</h4>
+                <h4 class="my-0 fw-normal">Pool Search Rate</h4>
               </div>
               <div class="card-body">
-                <h1 class="card-title pricing-card-title">{{ pool_hashrate }}<small class="text-muted fw-light"> GH/s</small></h1>
+                <h1 class="card-title pricing-card-title">{{ pool_hashrate }}<small class="text-muted fw-light"> GI/s</small></h1>
               </div>
             </div>
           </div>
           <div class="col">
             <div class="card mb-4 rounded-3 shadow-sm">
               <div class="card-header py-3">
-                <h4 class="my-0 fw-normal">Network Hashrate</h4>
+                <h4 class="my-0 fw-normal">Mining Mode</h4>
               </div>
               <div class="card-body">
-                <h1 class="card-title pricing-card-title">{{ network_hashrate }}<small class="text-muted fw-light"> H/s</small></h1>
+                <h1 class="card-title pricing-card-title">{{ mining_mode }}</h1>
               </div>
             </div>
           </div>
           <div class="col">
             <div class="card mb-4 rounded-3 shadow-sm">
               <div class="card-header py-3 text-white bg-primary">
-                <h4 class="my-0 fw-normal">Payout Threshold</h4>
+                <h4 class="my-0 fw-normal">Round Duration</h4>
               </div>
               <div class="card-body">
-                <h1 class="card-title pricing-card-title">{{ payout_threshold }}<small class="text-muted fw-light"> NXS</small></h1>
+                <h1 class="card-title pricing-card-title">{{ round_duration }}<small class="text-muted fw-light"> Hrs</small></h1>
               </div>
             </div>
           </div>
