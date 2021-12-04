@@ -1,13 +1,15 @@
 import collections
 import json
 import logging
+import math
+
 import requests
 from collections import OrderedDict
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import TemplateView
 from .tables import OverviewTable, AccountPayoutsTable
-from .forms import WalletSearchForm
+from .forms import WalletSearchForm, CalcForm
 from .rpc_requests import get_latest_blocks, get_meta_info, socket_connect, socket_disconnect, get_account, \
     get_account_works, get_account_payouts, get_account_header
 from django.conf import settings
@@ -44,7 +46,7 @@ def block_overview_list(request):
             block_overview_latest_list_dict = sorted(block_overview_latest_list,
                                                      key=lambda i: i['height'], reverse=True)
 
-            print("Blocks Received: ", block_overview_latest_json)
+            # print("Blocks Received: ", block_overview_latest_json)
 
             # Get the Meta Info
             block_overview_meta_json = get_meta_info(_socket=socket)
@@ -183,3 +185,45 @@ def wallet_detail(request):
 
 def block_detail(request, hash):
     return redirect(f'https://explorer.nexus.io/search/{hash}')
+
+
+def mining_calc(request):
+    template_name = 'presenter/mining_calc.html'
+
+    try:
+        form = CalcForm(request.POST)
+
+        if form.is_valid():
+            search_rate = int(form.cleaned_data['hardware'])
+            network_difficulty = form.cleaned_data['network_difficulty']
+            block_reward = form.cleaned_data['block_reward']
+            power_consumption = form.cleaned_data['power_consumption']
+            electricity_cost = form.cleaned_data['electricity_cost']
+            exchange_rate = form.cleaned_data['exchange_rate']
+
+            # blocks_per_day = 24*3600/(7.47101117*pow(4.31557609*network_difficulty)/1000000000/search_rate)
+            # blocks_per_day = 24*3600/pow(7.47101117, 4.31557609*network_difficulty)/1000000000/search_rate
+            blocks_per_day = 24*3600/((7.47101117 * math.exp(4.31557609*network_difficulty))/1000000000/search_rate)
+            nexus_per_day = blocks_per_day * block_reward
+            cost_per_day = power_consumption/1000*electricity_cost*24
+            profit_per_day = nexus_per_day*exchange_rate-cost_per_day
+
+            print(blocks_per_day)
+            print(search_rate)
+
+            return render(request, template_name, {'form': form,
+                                                   'blocks_per_day': blocks_per_day,
+                                                   'nexus_per_day': nexus_per_day,
+                                                   'cost_per_day': cost_per_day,
+                                                   'profit_per_day': profit_per_day,
+                                                   }
+                          )
+        return render(request, template_name, {'form': form})
+
+    except Exception as ex:
+        print("Exception when trying to calculate: ", ex)
+        logger.error(ex)
+        return redirect('presenter:error_pool')
+
+
+

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load render_table from django_tables2 %}
+
+<style>
+    table {
+        class: "table table-striped"
+    }
+
+    select option {
+        class: "note note-primary"
+    }
+</style>
+
+{% block body_block %}
+
+    <form method="post">
+        {% csrf_token %}
+
+
+        <div class="form-outline mb-4">
+            {{ form.hardware.label_tag }}
+            <div class="form-outline">
+                {{ form.hardware }}
+            </div>
+        </div>
+
+        <div class="row mb-4">
+
+            <div class="col">
+                {{ form.network_difficulty.label_tag }}
+                <div class="form-outline">
+                    {{ form.network_difficulty }}
+                    <div class="form-notch">
+                        <div
+                                class="form-notch-leading"
+                                style="width: 9px"
+                        ></div>
+                        {#                        <div#}
+                        {#                                class="form-notch-middle"#}
+                        {#                                style="width: 68.8px"#}
+                        {#                        ></div>#}
+                        <div class="form-notch-trailing"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                {{ form.exchange_rate.label_tag }}
+                <div class="form-outline">
+                    {{ form.exchange_rate }}
+                    <div class="form-notch">
+                        <div
+                                class="form-notch-leading"
+                                style="width: 9px"
+                        ></div>
+                        <div class="form-notch-trailing"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                {{ form.block_reward.label_tag }}
+                <div class="form-outline">
+                    {{ form.block_reward }}
+                    <div class="form-notch">
+                        <div
+                                class="form-notch-leading"
+                                style="width: 9px"
+                        ></div>
+                        <div class="form-notch-trailing"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        {#    Second Row#}
+        <div class="row mb-4">
+
+            <div class="col">
+                {{ form.power_consumption.label_tag }}
+                <div class="form-outline">
+                    {{ form.power_consumption }}
+                    <div class="form-notch">
+                        <div
+                                class="form-notch-leading"
+                                style="width: 9px"
+                        ></div>
+                        <div class="form-notch-trailing"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                {{ form.electricity_cost.label_tag }}
+                <div class="form-outline">
+                    {{ form.electricity_cost }}
+                    <div class="form-notch">
+                        <div
+                                class="form-notch-leading"
+                                style="width: 9px"
+                        ></div>
+                        <div class="form-notch-trailing"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <button type="submit" class="btn btn-outline-primary" data-mdb-ripple-color="dark">Calculate</button>
+    </form>
+
+    {% if blocks_per_day %}
+
+        <hr class="my-5"/>
+
+
+        <div class="col-md-4 mb-4">
+            <!--Section: Summary-->
+            <section>
+
+                <div class="card">
+                    <div class="card-header bg-white text-center py-3">
+                        <h5 class="mb-0 fw-bold">Daily Overview</h5>
+                    </div>
+
+                    <div class="card-body">
+                        <ul>
+                            <li><strong>Blocks: </strong>{{ blocks_per_day }}</li>
+                            <li><strong>Nexus: </strong>{{ nexus_per_day }}</li>
+                            <li><strong>Cost: </strong>{{ cost_per_day }}</li>
+                        </ul>
+                    </div>
+
+                    <div
+                            class="card-footer bg-white d-flex justify-content-between py-3"
+                    >
+                        <strong>Profit:</strong>
+                        <strong>{{ profit_per_day }}</strong>
+                    </div>
+                </div>
+            </section>
+            <!--Section: Summary-->
+        </div>
+
+    {% endif %}
+
+{% endblock %}

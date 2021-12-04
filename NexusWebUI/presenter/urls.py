@@ -16,6 +16,7 @@ urlpatterns = [
                   path('error_unknown_wallet/', views.ErrorUnknownWallet.as_view(), name='error_unknown_wallet'),
                   path('wallet/', views.wallet_detail, name='wallet'),
                   path('detail/<str:hash>/', views.block_detail, name='detail'),
+                  path('mining_calc/', views.mining_calc, name='mining_calc'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
