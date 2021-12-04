@@ -55,7 +55,8 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_data_reader_factory->create_data_reader(), 
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_http_component, 
-		m_config->get_session_expiry_time())}
+		m_config->get_session_expiry_time(),
+		m_config->get_mining_mode())}
 	, m_total_blocks{0}
 	, m_total_shares{0}
 	, m_current_height{0}

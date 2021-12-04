@@ -8,12 +8,12 @@
 namespace nexuspool
 {
 
-Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer)
+Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, common::Mining_mode mining_mode)
 	: m_data_writer{ std::move(data_writer) }
 	, m_user_data{}
 	, m_miner_connection{}
 	, m_update_time{ std::chrono::steady_clock::now() }
-	, m_hashrate_helper{ common::Mining_mode::HASH }	// TODO get mining mode from config
+	, m_hashrate_helper{ mining_mode }
 	, m_block{}
 {
 }
@@ -57,12 +57,14 @@ std::unique_ptr<LLP::CBlock> Session_impl::get_block()
 Session_registry_impl::Session_registry_impl(persistance::Data_reader::Uptr data_reader,
 	persistance::Shared_data_writer::Sptr data_writer,
 	nexus_http_interface::Component::Sptr http_interface,
-	std::uint32_t session_expiry_time)
+	std::uint32_t session_expiry_time,
+	common::Mining_mode mining_mode)
 	: m_data_reader{ std::move(data_reader) }
 	, m_data_writer{ std::move(data_writer) }
 	, m_http_interface{std::move(http_interface)}
 	, m_sessions{}
 	, m_session_expiry_time{ session_expiry_time }
+	, m_mining_mode{mining_mode}
 {}
 
 void Session_registry_impl::stop()
@@ -77,7 +79,7 @@ Session_key Session_registry_impl::create_session()
 	std::scoped_lock lock(m_sessions_mutex);
 
 	auto const session_key = LLC::GetRand256();
-	m_sessions.emplace(std::make_pair(session_key, std::make_shared<Session_impl>(m_data_writer)));
+	m_sessions.emplace(std::make_pair(session_key, std::make_shared<Session_impl>(m_data_writer, m_mining_mode)));
 	return session_key;
 }
 

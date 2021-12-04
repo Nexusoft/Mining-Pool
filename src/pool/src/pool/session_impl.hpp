@@ -23,7 +23,7 @@ class Session_impl : public Session
 {
 public:
 
-	Session_impl(persistance::Shared_data_writer::Sptr data_writer);
+	Session_impl(persistance::Shared_data_writer::Sptr data_writer, common::Mining_mode mining_mode);
 
 	void update_connection(std::shared_ptr<Miner_connection> miner_connection) override;
 	std::weak_ptr<Miner_connection> get_connection() override { return m_miner_connection; }
@@ -55,7 +55,8 @@ public:
 	Session_registry_impl(persistance::Data_reader::Uptr data_reader,
 		persistance::Shared_data_writer::Sptr data_writer,
 		nexus_http_interface::Component::Sptr http_interface,
-		std::uint32_t session_expiry_time);
+		std::uint32_t session_expiry_time,
+		common::Mining_mode mining_mode);
 
 	void stop() override;
 
@@ -80,6 +81,7 @@ private:
 	std::mutex m_data_reader_mutex;
 	std::map<Session_key, std::shared_ptr<Session>> m_sessions;
 	std::uint32_t m_session_expiry_time;
+	common::Mining_mode m_mining_mode;
 
 };
 
