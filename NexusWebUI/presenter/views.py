@@ -191,33 +191,41 @@ def mining_calc(request):
     template_name = 'presenter/mining_calc.html'
 
     try:
-        form = CalcForm(request.POST)
 
-        if form.is_valid():
-            search_rate = int(form.cleaned_data['hardware'])
-            network_difficulty = form.cleaned_data['network_difficulty']
-            block_reward = form.cleaned_data['block_reward']
-            power_consumption = form.cleaned_data['power_consumption']
-            electricity_cost = form.cleaned_data['electricity_cost']
-            exchange_rate = form.cleaned_data['exchange_rate']
+        if request.GET & CalcForm.base_fields.keys():
+            form = CalcForm(request.GET)
 
-            # blocks_per_day = 24*3600/(7.47101117*pow(4.31557609*network_difficulty)/1000000000/search_rate)
-            # blocks_per_day = 24*3600/pow(7.47101117, 4.31557609*network_difficulty)/1000000000/search_rate
-            blocks_per_day = 24*3600/((7.47101117 * math.exp(4.31557609*network_difficulty))/1000000000/search_rate)
-            nexus_per_day = blocks_per_day * block_reward
-            cost_per_day = power_consumption/1000*electricity_cost*24
-            profit_per_day = nexus_per_day*exchange_rate-cost_per_day
+        elif request.POST:
 
-            print(blocks_per_day)
-            print(search_rate)
+            form = CalcForm(request.POST)
 
-            return render(request, template_name, {'form': form,
-                                                   'blocks_per_day': blocks_per_day,
-                                                   'nexus_per_day': nexus_per_day,
-                                                   'cost_per_day': cost_per_day,
-                                                   'profit_per_day': profit_per_day,
-                                                   }
-                          )
+            if form.is_valid():
+                search_rate = int(form.cleaned_data['hardware'])
+                network_difficulty = form.cleaned_data['network_difficulty']
+                block_reward = form.cleaned_data['block_reward']
+                power_consumption = form.cleaned_data['power_consumption']
+                electricity_cost = form.cleaned_data['electricity_cost']
+                exchange_rate = form.cleaned_data['exchange_rate']
+
+                blocks_per_day = 24*3600/((7.47101117 * math.exp(4.31557609*network_difficulty))/1000000000/search_rate)
+                nexus_per_day = blocks_per_day * block_reward
+                cost_per_day = power_consumption/1000*electricity_cost*24
+                profit_per_day = nexus_per_day*exchange_rate-cost_per_day
+
+                print(blocks_per_day)
+                print(search_rate)
+
+                return render(request, template_name, {'form': form,
+                                                       'blocks_per_day': blocks_per_day,
+                                                       'nexus_per_day': nexus_per_day,
+                                                       'cost_per_day': cost_per_day,
+                                                       'profit_per_day': profit_per_day,
+                                                       }
+                              )
+
+        else:
+            form = CalcForm(initial={'network_difficulty': 8})
+
         return render(request, template_name, {'form': form})
 
     except Exception as ex:

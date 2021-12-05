@@ -65,7 +65,7 @@ class CalcForm(forms.Form):
             visible.field.widget.attrs['class'] = 'form-control'
 
         self.fields['hardware'].widget.attrs['class'] = 'btn btn-light dropdown-toggle'
-        self.fields['hardware'].widget.attrs['style'] = 'width: 340px'
+        self.fields['hardware'].widget.attrs['style'] = 'width: 355px'
 
 
 

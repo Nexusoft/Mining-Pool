@@ -62,7 +62,7 @@ Wallet Detail API's:
         Fields:
 			- account
 			- created_at
-			- last_active_time
+			- last_active
             - shares
             - hashrate
 
