@@ -225,7 +225,7 @@ void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, Session
 	auto session = m_session_registry->get_session(miner_key);
 	if (m_total_blocks > 0)
 	{
-		session->update_hashrate(m_pool_nBits, block->nBits, m_total_shares / m_total_blocks);
+		session->update_hashrate(m_pool_nBits, block->nBits, static_cast<double>(m_total_shares) / static_cast<double>(m_total_blocks));
 	}
 
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
