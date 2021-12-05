@@ -30,9 +30,10 @@ bool Session_impl::add_share()
 	return m_data_writer->update_account(m_user_data.m_account);
 }
 
-double Session_impl::get_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
+void Session_impl::update_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
 {
-	return m_hashrate_helper.get_hashrate(pool_nbits, network_nbits, prime_shares_to_blocks_ratio);
+	m_user_data.m_account.m_hashrate = m_hashrate_helper.get_hashrate(pool_nbits, network_nbits, prime_shares_to_blocks_ratio);
+	m_data_writer->update_account(m_user_data.m_account);
 }
 
 bool Session_impl::create_account()

@@ -212,7 +212,6 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 			block->nNonce = nonce;	// update nonce
 			//TODO compare block merkle_root with received merkle_root (block_data)
 
-			//update hashrate
 			std::weak_ptr<Miner_connection_impl> weak_self = shared_from_this();
 			pool_manager_shared->submit_block(std::move(block), m_session_key, [weak_self](auto result)
 			{
