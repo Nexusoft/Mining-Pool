@@ -14,6 +14,7 @@ from .rpc_requests import get_latest_blocks, get_meta_info, socket_connect, sock
     get_account_works, get_account_payouts, get_account_header
 from django.conf import settings
 from django.core.cache import cache
+from .helpers import get_exchange_rate_nxs2usd
 
 logger = logging.getLogger('NexusWebUI')
 
@@ -66,7 +67,7 @@ def block_overview_list(request):
         table_data = OverviewTable(block_overview_latest_list_dict)
 
         # Meta Table
-        pool_hashrate = block_overview_meta_json['result']['pool_hashrate']
+        pool_hashrate = round((float(block_overview_meta_json['result']['pool_hashrate']) / 1000000000), 2)
         mining_mode = block_overview_meta_json['result']['mining_mode']
         round_duration = block_overview_meta_json['result']['round_duration']
         fee = block_overview_meta_json['result']['fee']
@@ -207,13 +208,11 @@ def mining_calc(request):
                 electricity_cost = form.cleaned_data['electricity_cost']
                 exchange_rate = form.cleaned_data['exchange_rate']
 
-                blocks_per_day = 24*3600/((7.47101117 * math.exp(4.31557609*network_difficulty))/1000000000/search_rate)
+                blocks_per_day = 24 * 3600 / (
+                            (7.47101117 * math.exp(4.31557609 * network_difficulty)) / 1000000000 / search_rate)
                 nexus_per_day = blocks_per_day * block_reward
-                cost_per_day = power_consumption/1000*electricity_cost*24
-                profit_per_day = nexus_per_day*exchange_rate-cost_per_day
-
-                print(blocks_per_day)
-                print(search_rate)
+                cost_per_day = power_consumption / 1000 * electricity_cost * 24
+                profit_per_day = nexus_per_day * exchange_rate - cost_per_day
 
                 return render(request, template_name, {'form': form,
                                                        'blocks_per_day': blocks_per_day,
@@ -224,7 +223,9 @@ def mining_calc(request):
                               )
 
         else:
-            form = CalcForm(initial={'network_difficulty': 8})
+
+            form = CalcForm(initial={'network_difficulty': 8,
+                                     'exchange_rate': get_exchange_rate_nxs2usd()})
 
         return render(request, template_name, {'form': form})
 
@@ -232,6 +233,3 @@ def mining_calc(request):
         print("Exception when trying to calculate: ", ex)
         logger.error(ex)
         return redirect('presenter:error_pool')
-
-
-
