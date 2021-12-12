@@ -44,7 +44,7 @@ Method_result Method_meta_infos::execute(Method_params const& params)
     result.m_result["round_duration"] = config.m_round_duration_hours;
     result.m_result["fee"] = config.m_fee;
     result.m_result["mining_mode"] = config.m_mining_mode;
-   // result.m_result["active_miners"] = m_pool_api_data_exchange->get_active_miners();
+    result.m_result["active_miners"] = m_pool_api_data_exchange->get_active_miners();
 
     return result;
 }
