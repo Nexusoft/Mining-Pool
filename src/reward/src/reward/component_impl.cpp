@@ -143,7 +143,7 @@ bool Component_impl::end_round(std::uint32_t round_number)
 		{
 			// add account to payment table (without datetime -> not paid yet)
 			// reward is not set yet
-			m_shared_data_writer->add_payment(persistance::Payment_data{ active_account.m_address, 0.0, active_account.m_shares, "", round_data.m_round });
+			m_shared_data_writer->add_payment(persistance::Payment_data{ active_account.m_address, 0.0, active_account.m_shares, "", round_data.m_round, ""});
 		}
 	}
 

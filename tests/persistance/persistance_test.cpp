@@ -10,7 +10,6 @@ using ::nexuspool::persistance::command::Type;
 
 /*
 get_active_accounts_from_round,
-reset_shares_from_accounts,
 */
 
 TEST_F(Persistance_fixture, create_shared_data_writer)
@@ -504,6 +503,38 @@ TEST_F(Persistance_fixture, command_update_reward_of_payment)
 
 	// cleanup db
 	m_test_data.delete_from_payment_table(payment_input.m_account);
+
+}
+
+TEST_F(Persistance_fixture, command_reset_shares_from_accounts)
+{
+	std::string account_name{ "testaccount" };
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	// create a new testaccount
+	auto result_create_account = data_writer->create_account(account_name);
+	EXPECT_TRUE(result_create_account);
+
+	// Data to update
+	Account_data account_data;
+	account_data.m_hashrate = 1000;
+	account_data.m_shares = 10000;
+	account_data.m_connections = 1;
+	account_data.m_address = account_name;
+
+	auto result_update_account = data_writer->update_account(account_data);
+	EXPECT_TRUE(result_update_account);
+
+	// reset shares from accounts
+	auto result_shares_reset = data_writer->reset_shares_from_accounts();
+	EXPECT_TRUE(result_shares_reset);
+
+	// get updated account to compare shares
+	auto result_account = data_reader->get_account(account_name);
+	EXPECT_EQ(result_account.m_shares, 0);
+
+	// cleanup db
+	m_test_data.delete_from_account_table(account_name);
 
 }
 
