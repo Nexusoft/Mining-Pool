@@ -139,7 +139,7 @@ bool Component_impl::end_round(std::uint32_t round_number)
 	{
 		// get all accounts which contribute to the current round
 		auto const active_accounts = m_data_reader->get_active_accounts_from_round();
-		for (auto& active_account : active_accounts)
+		for (auto const& active_account : active_accounts)
 		{
 			// add account to payment table (without datetime -> not paid yet)
 			// reward is not set yet
@@ -148,7 +148,10 @@ bool Component_impl::end_round(std::uint32_t round_number)
 	}
 
     // reset shares of all accounts (round end)
-    m_shared_data_writer->reset_shares_from_accounts();
+	if (!m_shared_data_writer->reset_shares_from_accounts())
+	{
+		m_logger->error("Failed to reset the shares from accounts in round {}", round_number);
+	}
 	m_current_round = 0;
 
     // end round now
