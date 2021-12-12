@@ -16,7 +16,8 @@ Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_cont
 	chrono::Timer_factory::Sptr timer_factory,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
-	persistance::Data_reader_factory::Sptr data_reader_factory)
+	persistance::Data_reader_factory::Sptr data_reader_factory,
+	common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
 {
 	return std::make_shared<Pool_manager_impl>(std::move(io_context),
 		std::move(logger),
@@ -24,7 +25,8 @@ Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_cont
 		std::move(timer_factory),
 		std::move(socket_factory),
 		std::move(data_writer_factory),
-		std::move(data_reader_factory));
+		std::move(data_reader_factory),
+		std::move(pool_api_data_exchange));
 }
 
 
@@ -34,7 +36,8 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	chrono::Timer_factory::Sptr timer_factory,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
-	persistance::Data_reader_factory::Sptr data_reader_factory)
+	persistance::Data_reader_factory::Sptr data_reader_factory,
+	common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
 	: m_io_context{std::move(io_context) }
 	, m_logger{ std::move(logger)}
 	, m_config{std::move(config)}
@@ -42,6 +45,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
+	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
 	, m_http_component{ nexus_http_interface::create_component(m_logger, m_config->get_wallet_ip())}
 	, m_reward_component{reward::create_component(m_logger, 
 		m_http_component,

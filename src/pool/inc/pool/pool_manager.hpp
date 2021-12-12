@@ -10,6 +10,7 @@
 #include "chrono/timer_factory.hpp"
 #include "config/config.hpp"
 #include "network/socket_factory.hpp"
+#include "common/pool_api_data_exchange.hpp"
 
 #include <memory>
 
@@ -45,7 +46,8 @@ Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_cont
     chrono::Timer_factory::Sptr timer_factory,
     network::Socket_factory::Sptr socket_factory,
     persistance::Data_writer_factory::Sptr data_writer_factory,
-    persistance::Data_reader_factory::Sptr data_reader_factory);
+    persistance::Data_reader_factory::Sptr data_reader_factory,
+    common::Pool_api_data_exchange::Sptr pool_api_data_exchange);
 
 }
 

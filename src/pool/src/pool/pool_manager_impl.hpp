@@ -23,7 +23,8 @@ public:
         chrono::Timer_factory::Sptr timer_factory,
         network::Socket_factory::Sptr socket_factory,
         persistance::Data_writer_factory::Sptr data_writer_factory,
-        persistance::Data_reader_factory::Sptr data_reader_factory);
+        persistance::Data_reader_factory::Sptr data_reader_factory,
+        common::Pool_api_data_exchange::Sptr pool_api_data_exchange);
 
     void start() override;
     void stop() override;
@@ -53,6 +54,7 @@ private:
     network::Socket_factory::Sptr m_socket_factory;
     persistance::Data_writer_factory::Sptr m_data_writer_factory;
     persistance::Data_reader_factory::Sptr m_data_reader_factory;
+    common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
     nexus_http_interface::Component::Sptr m_http_component;
     reward::Component::Uptr m_reward_component;
 
