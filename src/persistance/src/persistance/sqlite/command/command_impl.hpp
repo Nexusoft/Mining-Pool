@@ -429,6 +429,18 @@ public:
 
 };
 
+class Command_get_pool_hashrate_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_pool_hashrate_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::get_pool_hashrate; }
+	std::any get_command() const override;
+
+};
+
+
 }
 }
 }

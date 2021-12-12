@@ -23,40 +23,31 @@ public:
 
 	void add_share()
 	{
-		if (m_t1 >= m_t2)
-		{
-			m_t1 = std::chrono::steady_clock::now();
-		}
-		else
-		{
-			m_t2 = std::chrono::steady_clock::now();
-			m_share_timepoints[m_current_timepoint_index] = std::chrono::duration_cast<std::chrono::milliseconds>(m_t2 - m_t1);
-			m_current_timepoint_index++;
+		m_t2 = std::chrono::steady_clock::now();
+		m_share_timepoints[m_current_timepoint_index] = std::chrono::duration_cast<std::chrono::milliseconds>(m_t2 - m_t1);
+		m_current_timepoint_index++;
+		m_t1 = m_t2;
 
-			if (m_current_timepoint_index >= m_share_timepoints.size())
+		if (m_current_timepoint_index >= m_share_timepoints.size())
+		{
+			m_current_timepoint_index = 0U;
+			std::chrono::milliseconds total_time{ 0 };
+			for (auto& time : m_share_timepoints)
 			{
-				m_current_timepoint_index = 0U;
-				std::chrono::milliseconds total_time{ 0 };
-				for (auto& time : m_share_timepoints)
-				{
-					total_time += time;
-				}
-				m_average_time = total_time / m_share_timepoints.size();
+				total_time += time;
 			}
-		}
+			m_average_time = total_time / m_share_timepoints.size();
+		}	
 	}
 
 	double get_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
 	{
-		auto logger_temp = spdlog::get("logger");		// TODO: remove this after testing
 		if (m_average_time.count() == 0)
 		{
 			return 0.0;
 		}
 
 		int const channel = m_mining_mode == common::Mining_mode::PRIME ? 1 : 2;
-		logger_temp->trace("[get_hashrate] pool_nbits: {}, network_nbits: {}, channel: {}, m_average_time: {}, prime_shares_to_blocks_ratio: {}",
-			pool_nbits, network_nbits, channel, m_average_time.count() / 1000, prime_shares_to_blocks_ratio);
 		return get_miner_hash_rate(pool_nbits, network_nbits, channel, m_average_time.count() / 1000, prime_shares_to_blocks_ratio);
 	}
 

@@ -5,6 +5,7 @@
 #include "network/types.hpp"
 #include "network/endpoint.hpp"
 #include "persistance/data_reader.hpp"
+#include "common/pool_api_data_exchange.hpp"
 #include "api/parser.hpp"
 
 #include <memory>
@@ -27,7 +28,8 @@ public:
         persistance::Data_reader::Uptr data_reader,
         std::string public_ip, 
         std::uint16_t api_listen_port, 
-        network::Socket_factory::Sptr socket_factory);
+        network::Socket_factory::Sptr socket_factory,
+        common::Pool_api_data_exchange::Sptr pool_api_data_exchange);
 
     void start();
     void stop();
@@ -41,6 +43,7 @@ private:
     std::uint16_t m_api_listen_port;
     network::Endpoint m_local_endpoint;
     network::Socket_factory::Sptr m_socket_factory;
+    common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
     network::Socket::Sptr m_listen_socket;
     Parser::Sptr m_parser;
     std::vector<std::shared_ptr<api::Connection>> m_api_connections;

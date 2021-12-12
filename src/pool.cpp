@@ -7,6 +7,7 @@
 #include "common/types.hpp"
 #include "api/server.hpp"
 #include "pool/pool_manager.hpp"
+#include "common/pool_api_data_exchange.hpp"
 #include "version.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -91,6 +92,7 @@ namespace nexuspool
 		m_logger->set_level(static_cast<spdlog::level::level_enum>(m_config->get_log_level()));
 
 		m_timer_component = chrono::create_component(m_io_context);
+		m_pool_api_data_exchange = common::create_pool_api_data_exchange();
 
 		// data storage initialisation
 		m_persistance_component = persistance::create_component(m_logger, m_config->get_persistance_config());
@@ -103,9 +105,10 @@ namespace nexuspool
 			m_timer_component->get_timer_factory(),
 			m_network_component->get_socket_factory(), 
 			m_persistance_component->get_data_writer_factory(),
-			m_persistance_component->get_data_reader_factory());
+			m_persistance_component->get_data_reader_factory(),
+			m_pool_api_data_exchange);
 		m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
-			m_config->get_public_ip(), m_config->get_api_listen_port(), m_network_component->get_socket_factory());
+			m_config->get_public_ip(), m_config->get_api_listen_port(), m_network_component->get_socket_factory(), m_pool_api_data_exchange);
 
 		return true;
 	}

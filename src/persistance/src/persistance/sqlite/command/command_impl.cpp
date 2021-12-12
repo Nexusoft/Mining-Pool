@@ -326,8 +326,7 @@ Command_get_total_shares_from_accounts_impl::Command_get_total_shares_from_accou
 
 std::any Command_get_total_shares_from_accounts_impl::get_command() const
 {
-	Command_type_sqlite command{ {m_stmt},
-		{{Column_sqlite::double_t}} };
+	Command_type_sqlite command{ {m_stmt}, {{Column_sqlite::double_t}} };
 	return command;
 }
 // -----------------------------------------------------------------------------------------------
@@ -656,6 +655,19 @@ Command_delete_empty_payments_impl::Command_delete_empty_payments_impl(sqlite3* 
 {
 	std::string delete_empty_payments{ R"(DELETE FROM payment WHERE amount = 0 AND tx_id = '')" };
 	sqlite3_prepare_v2(m_handle, delete_empty_payments.c_str(), -1, &m_stmt, NULL);
+}
+
+// -----------------------------------------------------------------------------------------------
+Command_get_pool_hashrate_impl::Command_get_pool_hashrate_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT SUM(hashrate) FROM account", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_pool_hashrate_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt}, {{Column_sqlite::double_t}} };
+	return command;
 }
 
 }

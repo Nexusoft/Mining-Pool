@@ -40,6 +40,7 @@ public:
     std::vector<Payment_data> get_not_paid_data_from_round(std::uint32_t round) override;
     std::vector<std::uint32_t> get_unpaid_rounds() override;
     std::vector<std::uint32_t> get_blocks_without_hash_from_round(std::uint32_t round) override;
+    double get_pool_hashrate() override;
 
 private:
 
@@ -63,6 +64,7 @@ private:
     std::shared_ptr<Command> m_get_not_paid_data_from_round_cmd;
     std::shared_ptr<Command> m_get_unpaid_rounds_cmd;
     std::shared_ptr<Command> m_get_blocks_without_hash_from_round_cmd;
+    std::shared_ptr<Command> m_get_pool_hashrate_cmd;
 };
 
 }

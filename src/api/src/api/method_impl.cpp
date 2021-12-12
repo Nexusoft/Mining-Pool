@@ -27,9 +27,10 @@ namespace nexuspool
 namespace api
 {
 
-Method_meta_infos::Method_meta_infos(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader)
+Method_meta_infos::Method_meta_infos(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader, common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
 	: m_logger{ std::move(logger) }
     , m_data_reader{ std::move(data_reader) }
+    , m_pool_api_data_exchange{ std::move(pool_api_data_exchange) }
 {
 }
 
@@ -39,10 +40,11 @@ Method_result Method_meta_infos::execute(Method_params const& params)
     result.m_result = nlohmann::json{};
 
     auto const config = m_data_reader->get_config();
-    result.m_result["pool_hashrate"] = 95.3;        // todo
+    result.m_result["pool_hashrate"] = m_data_reader->get_pool_hashrate();
     result.m_result["round_duration"] = config.m_round_duration_hours;
     result.m_result["fee"] = config.m_fee;
     result.m_result["mining_mode"] = config.m_mining_mode;
+    result.m_result["active_miners"] = m_pool_api_data_exchange->get_active_miners();
 
     return result;
 }
@@ -170,16 +172,17 @@ Method_result Method_account_payouts::execute(Method_params const& params)
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
-Methods_factory_impl::Methods_factory_impl(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader)
+Methods_factory_impl::Methods_factory_impl(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader, common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
 	: m_logger{ std::move(logger) }
     , m_data_reader{std::move(data_reader)}
+    , m_pool_api_data_exchange{ std::move(pool_api_data_exchange) }
 {
 }
 
 Methods Methods_factory_impl::create_api_methods()
 {
     Methods methods;
-    methods.emplace(std::make_pair("get_meta_info", std::make_unique<Method_meta_infos>(m_logger, m_data_reader)));
+    methods.emplace(std::make_pair("get_meta_info", std::make_unique<Method_meta_infos>(m_logger, m_data_reader, m_pool_api_data_exchange)));
     methods.emplace(std::make_pair("get_latest_blocks", std::make_unique<Method_latest_blocks>(m_logger, m_data_reader)));
     methods.emplace(std::make_pair("get_account", std::make_unique<Method_account>(m_logger, m_data_reader)));
     methods.emplace(std::make_pair("get_account_header", std::make_unique<Method_account_header>(m_logger, m_data_reader)));

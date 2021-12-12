@@ -7,11 +7,14 @@
 namespace nexuspool {
 namespace network {
 
-class Socket_factory_mock : public Socket_factory 
+class Socket_factory_mock : public Socket_factory
 {
 public:
     MOCK_METHOD(Socket::Uptr, create_socket_impl, (Endpoint), (override));
 };
 
 }
+}
+
+#endif
 

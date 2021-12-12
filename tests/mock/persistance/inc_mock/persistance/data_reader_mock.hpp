@@ -31,6 +31,7 @@ public:
     MOCK_METHOD(std::vector<Payment_data>, get_not_paid_data_from_round, (std::uint32_t round), (override));
     MOCK_METHOD(std::vector<std::uint32_t>, get_unpaid_rounds, (), (override));
     MOCK_METHOD(std::vector<std::uint32_t>, get_blocks_without_hash_from_round, (std::uint32_t round), (override));
+    MOCK_METHOD(double, get_pool_hashrate, (), (override));
 };
 
 }

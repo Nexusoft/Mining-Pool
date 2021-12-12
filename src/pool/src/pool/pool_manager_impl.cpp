@@ -16,7 +16,8 @@ Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_cont
 	chrono::Timer_factory::Sptr timer_factory,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
-	persistance::Data_reader_factory::Sptr data_reader_factory)
+	persistance::Data_reader_factory::Sptr data_reader_factory,
+	common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
 {
 	return std::make_shared<Pool_manager_impl>(std::move(io_context),
 		std::move(logger),
@@ -24,7 +25,8 @@ Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_cont
 		std::move(timer_factory),
 		std::move(socket_factory),
 		std::move(data_writer_factory),
-		std::move(data_reader_factory));
+		std::move(data_reader_factory),
+		std::move(pool_api_data_exchange));
 }
 
 
@@ -34,7 +36,8 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	chrono::Timer_factory::Sptr timer_factory,
 	network::Socket_factory::Sptr socket_factory,
 	persistance::Data_writer_factory::Sptr data_writer_factory,
-	persistance::Data_reader_factory::Sptr data_reader_factory)
+	persistance::Data_reader_factory::Sptr data_reader_factory,
+	common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
 	: m_io_context{std::move(io_context) }
 	, m_logger{ std::move(logger)}
 	, m_config{std::move(config)}
@@ -42,6 +45,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
+	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
 	, m_http_component{ nexus_http_interface::create_component(m_logger, m_config->get_wallet_ip())}
 	, m_reward_component{reward::create_component(m_logger, 
 		m_http_component,
@@ -55,7 +59,8 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_data_reader_factory->create_data_reader(), 
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_http_component, 
-		m_config->get_session_expiry_time())}
+		m_config->get_session_expiry_time(),
+		m_config->get_mining_mode())}
 	, m_total_blocks{0}
 	, m_total_shares{0}
 	, m_current_height{0}
@@ -222,11 +227,9 @@ void Pool_manager_impl::get_block(Get_block_handler&& handler)
 void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, Session_key miner_key, Submit_block_handler handler)
 {
 	auto session = m_session_registry->get_session(miner_key);
-	// TODO update hashrate of miner
 	if (m_total_blocks > 0)
 	{
-		double miner_hashrate = session->get_hashrate(m_pool_nBits, block->nBits, m_total_shares / m_total_blocks);
-		m_logger->trace("Miner hashrate: {}", miner_hashrate);
+		session->update_hashrate(m_pool_nBits, block->nBits, static_cast<double>(m_total_shares) / static_cast<double>(m_total_blocks));
 	}
 
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
@@ -267,6 +270,7 @@ chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(s
 	return[this, session_registry_maintenance_interval]()
 	{
 		m_session_registry->clear_unused_sessions();
+		m_pool_api_data_exchange->set_active_miners(m_session_registry->get_sessions_size());	// update the currently active miners on pool
 
 		// restart timer
 		m_session_registry_maintenance->start(chrono::Seconds(session_registry_maintenance_interval),

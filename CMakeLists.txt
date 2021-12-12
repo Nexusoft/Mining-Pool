@@ -57,7 +57,7 @@ endif()
 
 add_executable(NexusPool 
                 src/main.cpp 
-                src/pool.cpp "src/LLP/src/LLP/block.cpp")
+                src/pool.cpp)
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 

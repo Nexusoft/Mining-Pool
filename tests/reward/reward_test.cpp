@@ -4,6 +4,19 @@
 
 using namespace ::nexuspool;
 
+TEST_F(Reward_fixture_created_component, miner_prime_search_rate_test)
+{
+	const std::uint32_t pool_nbits = 59276097;
+	const std::uint32_t network_nbits = 79276097;
+	const double avg_seconds_between_shares = 71.363;
+	const double prime_shares_to_blocks_ratio = 604.0;
+	const int channel = 1;
+	double miner_searchrate = nexuspool::get_miner_hash_rate(pool_nbits, network_nbits, channel, avg_seconds_between_shares, prime_shares_to_blocks_ratio);
+	double miner_serach_rate_gisps = miner_searchrate / 1.0e9;
+	const double expected_miner_searchrate = 125.2;
+	EXPECT_NEAR(miner_serach_rate_gisps, expected_miner_searchrate, 1.0);
+}
+
 TEST_F(Reward_fixture_created_component, difficulty_test)
 {
 	LLP::CBlock test_block = m_test_data.create_hash_channel_test_block();

@@ -89,6 +89,13 @@ TEST_F(Persistance_fixture, command_get_total_shares_from_accounts)
 	EXPECT_GE(result, 0);
 }
 
+TEST_F(Persistance_fixture, command_get_pool_hashrate)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->get_pool_hashrate();
+	EXPECT_GE(result, 0);
+}
+
 TEST_F(Persistance_fixture, command_get_latest_blocks)
 {
 	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();

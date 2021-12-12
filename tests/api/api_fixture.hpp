@@ -7,6 +7,7 @@
 #include <network/create_component.hpp>
 #include <persistance/create_component.hpp>
 #include <api/server.hpp>
+#include <common/pool_api_data_exchange.hpp>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -40,7 +41,7 @@ public:
 			m_persistance_component = persistance::create_component(m_logger, m_config);
 
 			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
-				"127.0.0.1", 0, m_network_component->get_socket_factory());
+				"127.0.0.1", 0, m_network_component->get_socket_factory(), common::create_pool_api_data_exchange());
 		}
 
 protected:
