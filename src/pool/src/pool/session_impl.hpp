@@ -64,6 +64,7 @@ public:
 	Session_key create_session() override;
 	std::shared_ptr<Session> get_session(Session_key key) override;
 	void clear_unused_sessions() override;
+	std::size_t get_sessions_size() override;
 
 	// update height on active sessions
 	void update_height(std::uint32_t height) override;

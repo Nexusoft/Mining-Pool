@@ -114,6 +114,12 @@ void Session_registry_impl::clear_unused_sessions()
 	}
 }
 
+std::size_t Session_registry_impl::get_sessions_size()
+{
+	std::scoped_lock lock(m_sessions_mutex);
+	return m_sessions.size();
+}
+
 void Session_registry_impl::update_height(std::uint32_t height)
 {
 	std::scoped_lock lock(m_sessions_mutex);

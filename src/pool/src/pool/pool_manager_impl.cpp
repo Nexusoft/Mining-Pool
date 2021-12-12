@@ -270,6 +270,7 @@ chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(s
 	return[this, session_registry_maintenance_interval]()
 	{
 		m_session_registry->clear_unused_sessions();
+		m_pool_api_data_exchange->set_active_miners(m_session_registry->get_sessions_size());	// update the currently active miners on pool
 
 		// restart timer
 		m_session_registry_maintenance->start(chrono::Seconds(session_registry_maintenance_interval),

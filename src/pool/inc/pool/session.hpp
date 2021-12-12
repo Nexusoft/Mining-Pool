@@ -54,6 +54,7 @@ public:
 	virtual Session_key create_session() = 0;
 	virtual std::shared_ptr<Session> get_session(Session_key key) = 0;
 	virtual void clear_unused_sessions() = 0;
+	virtual std::size_t get_sessions_size() = 0;
 
 	// update height on active sessions
 	virtual void update_height(std::uint32_t height) = 0;

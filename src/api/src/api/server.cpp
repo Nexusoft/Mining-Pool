@@ -24,7 +24,7 @@ Server::Server(std::shared_ptr<spdlog::logger> logger,
 	, m_socket_factory{ std::move(socket_factory) }
 	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
 	, m_listen_socket{}
-	, m_parser{std::make_shared<Parser_impl>(m_logger, std::make_shared<Methods_factory_impl>(m_logger, m_shared_data_reader))}
+	, m_parser{std::make_shared<Parser_impl>(m_logger, std::make_shared<Methods_factory_impl>(m_logger, m_shared_data_reader, m_pool_api_data_exchange))}
 {
 }
 

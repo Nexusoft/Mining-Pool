@@ -3,6 +3,7 @@
 
 #include "api/method.hpp"
 #include "api/shared_data_reader.hpp"
+#include "common/pool_api_data_exchange.hpp"
 #include <memory>
 #include <vector>
 
@@ -15,13 +16,14 @@ class Method_meta_infos : public Method
 {
 public:
 
-    Method_meta_infos(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader);
+    Method_meta_infos(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader, common::Pool_api_data_exchange::Sptr pool_api_data_exchange);
     Method_result execute(Method_params const& params) override;
 
 private:
 
     std::shared_ptr<spdlog::logger> m_logger;
     Shared_data_reader::Sptr m_data_reader;
+    common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
 };
 
 class Method_latest_blocks : public Method
@@ -84,7 +86,7 @@ class Methods_factory_impl : public Methods_factory
 {
 public:
 
-    Methods_factory_impl(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader);
+    Methods_factory_impl(std::shared_ptr<spdlog::logger> logger, Shared_data_reader::Sptr data_reader, common::Pool_api_data_exchange::Sptr pool_api_data_exchange);
 
     Methods create_api_methods() override;
 
@@ -92,6 +94,7 @@ private:
 
     std::shared_ptr<spdlog::logger> m_logger;
     Shared_data_reader::Sptr m_data_reader;
+    common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
 };
 
 
