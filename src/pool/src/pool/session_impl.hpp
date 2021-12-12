@@ -31,6 +31,7 @@ public:
 	std::chrono::steady_clock::time_point get_update_time() const override { return m_update_time; }
 	void set_update_time(std::chrono::steady_clock::time_point update_time) override { m_update_time = update_time; }
 	bool add_share() override;
+	void reset_shares() override;
 	void update_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio) override;
 	void set_block(LLP::CBlock const& block) override { m_block = std::make_unique<LLP::CBlock>(block); }
 	std::unique_ptr<LLP::CBlock> get_block() override;
@@ -64,6 +65,7 @@ public:
 	Session_key create_session() override;
 	std::shared_ptr<Session> get_session(Session_key key) override;
 	void clear_unused_sessions() override;
+	void end_round() override;
 	std::size_t get_sessions_size() override;
 
 	// update height on active sessions

@@ -30,6 +30,11 @@ bool Session_impl::add_share()
 	return m_data_writer->update_account(m_user_data.m_account);
 }
 
+void Session_impl::reset_shares()
+{
+	m_user_data.m_account.m_shares = 0;
+}
+
 void Session_impl::update_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
 {
 	m_user_data.m_account.m_hashrate = m_hashrate_helper.get_hashrate(pool_nbits, network_nbits, prime_shares_to_blocks_ratio);
@@ -111,6 +116,16 @@ void Session_registry_impl::clear_unused_sessions()
 		{
 			++iter;
 		}
+	}
+}
+
+void Session_registry_impl::end_round()
+{
+	std::scoped_lock lock(m_sessions_mutex);
+
+	for (auto& session : m_sessions)
+	{
+		session.second->reset_shares();
 	}
 }
 

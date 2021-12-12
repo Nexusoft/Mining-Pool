@@ -293,6 +293,7 @@ void Pool_manager_impl::end_round()
 	m_reward_component->end_round(current_round);
 	m_reward_component->pay_round(current_round);
 	m_logger->trace("Total_blocks: {}, Total_shares {}", m_total_blocks, m_total_shares);
+	m_session_registry->end_round();
 
 	// update config in storage
 	m_storage_config_data = storage_config_check();
