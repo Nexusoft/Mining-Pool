@@ -40,10 +40,11 @@ def block_overview_list(request):
             # Get the Data for the Main Table
             block_overview_latest_json = get_latest_blocks(_socket=socket)
 
-            # Extract the necessary data as list of dicts
-            block_overview_latest_list = block_overview_latest_json['result']
+            print("block_overview_latest_json: ", block_overview_latest_json)
 
-            # Sort the Block Data
+            # Extract the necessary data as list of dicts & Sort the Block Data
+
+            block_overview_latest_list = block_overview_latest_json['result']
             block_overview_latest_list_dict = sorted(block_overview_latest_list,
                                                      key=lambda i: i['height'], reverse=True)
 
@@ -54,7 +55,7 @@ def block_overview_list(request):
             print("Block Overview: ", block_overview_meta_json)
 
             # Save data in the cache
-            if settings.DEBUG is False:
+            if settings.DEBUG is False and block_overview_latest_json and block_overview_meta_json:
                 cache.set('block_overview_latest_json', block_overview_latest_json, 1)
                 cache.set('block_overview_meta_json', block_overview_meta_json, 1)
         else:
@@ -62,7 +63,6 @@ def block_overview_list(request):
             print("Serving from Cache")
 
         # Main Table
-        # Todo Sort JSON by height
         # table_data = OverviewTable(block_overview_latest_json['result'])
         table_data = OverviewTable(block_overview_latest_list_dict)
 
@@ -71,11 +71,13 @@ def block_overview_list(request):
         mining_mode = block_overview_meta_json['result']['mining_mode']
         round_duration = block_overview_meta_json['result']['round_duration']
         fee = block_overview_meta_json['result']['fee']
+        active_miners = block_overview_meta_json['result']['active_miners']
 
         return render(request, template_name, {'table': table_data,
                                                'pool_hashrate': pool_hashrate,
                                                'mining_mode': mining_mode,
                                                'round_duration': round_duration,
+                                               'active_miners': active_miners,
                                                'fee': fee,
                                                })
 
@@ -141,7 +143,7 @@ def wallet_detail(request):
         created_at = account_json['result']['created_at']
         last_active = account_json['result']['last_active']
         shares = account_json['result']['shares']
-        hashrate = account_json['result']['hashrate']
+        hashrate = round((float(account_json['result']['hashrate']) / 1000000000), 2)
 
         last_active = last_active[:19]
 
