@@ -18,15 +18,21 @@ class App_component
 public:
 
     App_component(std::string public_ip, std::uint16_t api_listen_port)
-        : m_public_ip{ std::move(m_public_ip) }
+        : m_public_ip{ std::move(public_ip) }
         , m_api_listen_port{ api_listen_port }
     {}
+
+    OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, apiObjectMapper)([] {
+        auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared();
+        objectMapper->getDeserializer()->getConfig()->allowUnknownFields = false;
+        return objectMapper;
+        }());
 
     /**
         *  Create ConnectionProvider component which listens on the port
         */
     OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, serverConnectionProvider)([this] {
-        return oatpp::network::tcp::server::ConnectionProvider::createShared({ m_public_ip.c_str(), m_api_listen_port, oatpp::network::Address::IP_4 });
+        return oatpp::network::tcp::server::ConnectionProvider::createShared({ "localhost", 8000, oatpp::network::Address::IP_4});
         }());
 
     /**

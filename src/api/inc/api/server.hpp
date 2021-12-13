@@ -5,7 +5,6 @@
 #include "network/endpoint.hpp"
 #include "persistance/data_reader.hpp"
 #include "common/pool_api_data_exchange.hpp"
-#include "api/parser.hpp"
 
 #include <memory>
 #include <vector>
@@ -41,7 +40,6 @@ private:
     std::uint16_t m_api_listen_port;
     network::Endpoint m_local_endpoint;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
-    std::vector<std::shared_ptr<api::Connection>> m_api_connections;
 };
 
 }

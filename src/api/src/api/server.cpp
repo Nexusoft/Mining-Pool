@@ -32,8 +32,8 @@ void Server::start()
 	OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
 
 	  /* create ApiControllers and add endpoints to router */
-	auto myController = std::make_shared<MyController>();
-	myController->addEndpointsToRouter(router);
+	auto rest_controller = std::make_shared<Rest_controller>();
+	rest_controller->addEndpointsToRouter(router);
 
 	/* Get connection handler component */
 	OATPP_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, connectionHandler);
@@ -42,7 +42,7 @@ void Server::start()
 	OATPP_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, connectionProvider);
 
 	oatpp::network::Server server(connectionProvider, connectionHandler);
-
+	OATPP_LOGD("Server", "Running on port %s...", connectionProvider->getProperty("port").toString()->c_str());
 	m_logger->info("API server started");
 	server.run();
 

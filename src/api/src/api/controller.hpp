@@ -19,31 +19,34 @@ namespace api
     *  Basic examples of howto create ENDPOINTs
     *  More details on oatpp.io
     */
-class MyController : public oatpp::web::server::api::ApiController 
+class Rest_controller : public oatpp::web::server::api::ApiController 
 {
 public:
     /**
      * Constructor with object mapper.
      * @param objectMapper - default object mapper used to serialize/deserialize DTOs.
      */
-    MyController(OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
+    Rest_controller(OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
         : oatpp::web::server::api::ApiController(objectMapper)
     {}
     /**
         *  Inject @objectMapper component here as default parameter
         *  Do not return bare Controllable* object! use shared_ptr!
         */
-    static std::shared_ptr<MyController> createShared(OATPP_COMPONENT(std::shared_ptr<ObjectMapper>,
-        objectMapper)) {
-        return std::shared_ptr<MyController>(new MyController(objectMapper));
-    }
-
-    ENDPOINT("POST", "demo/api/json", postJson, BODY_DTO(Object<Meta_infos_dto>, dto))
+    static std::shared_ptr<Rest_controller> createShared(OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
     {
-        auto dtoMessage = dto->pool_hashrate;
-        return createResponse(Status::CODE_200, "dtoMessage: " + dtoMessage);
+        return std::shared_ptr<Rest_controller>(new Rest_controller(objectMapper));
     }
 
+    ENDPOINT("GET", "/metainfo", metainfo) {
+        auto dto = Meta_infos_dto::createShared();
+        dto->pool_hashrate = "Hello World!";
+        dto->round_duration = 24;
+        dto->fee = 1;
+        dto->mining_mode = "Hello World!";
+        dto->active_miners = 5;
+        return createDtoResponse(Status::CODE_200, dto);
+    }
 };
 
 #include OATPP_CODEGEN_BEGIN(ApiController) //<-- End codegen
