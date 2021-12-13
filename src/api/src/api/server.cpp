@@ -5,6 +5,7 @@
 #include "oatpp/network/Server.hpp"
 #include <spdlog/spdlog.h>
 
+
 namespace nexuspool
 {
 namespace api
@@ -27,29 +28,30 @@ Server::Server(std::shared_ptr<spdlog::logger> logger,
 void Server::start()
 {
 	oatpp::base::Environment::init();
-	App_component components{ m_public_ip, m_api_listen_port }; // Create scope Environment components
+	m_server_thread = std::thread([this]() {
+		App_component components{ m_public_ip, 5000 }; // Create scope Environment components
 
-	OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
+		OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
 
-	  /* create ApiControllers and add endpoints to router */
-	auto rest_controller = std::make_shared<Rest_controller>();
-	rest_controller->addEndpointsToRouter(router);
+		/* create ApiControllers and add endpoints to router */
+		auto rest_controller = std::make_shared<Rest_controller>();
+		rest_controller->addEndpointsToRouter(router);
 
-	/* Get connection handler component */
-	OATPP_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, connectionHandler);
+		/* Get connection handler component */
+		OATPP_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, connectionHandler);
 
-	/* Get connection provider component */
-	OATPP_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, connectionProvider);
+		/* Get connection provider component */
+		auto connectionProvider = components.get_serverConnectionProvider();
 
-	oatpp::network::Server server(connectionProvider, connectionHandler);
-	OATPP_LOGD("Server", "Running on port %s...", connectionProvider->getProperty("port").toString()->c_str());
-	m_logger->info("API server started");
-	server.run();
-
+		oatpp::network::Server server(connectionProvider, connectionHandler);
+		m_logger->info("API server started");
+		server.run();
+	});
 }
 
 void Server::stop()
 {
+	m_server_thread.join();
 	oatpp::base::Environment::destroy();
 	m_logger->info("API server stopped");
 }

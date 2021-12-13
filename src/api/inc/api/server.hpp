@@ -6,6 +6,7 @@
 #include "persistance/data_reader.hpp"
 #include "common/pool_api_data_exchange.hpp"
 
+#include <thread>
 #include <memory>
 #include <vector>
 #include <string>
@@ -34,12 +35,14 @@ public:
 
 private:
 
+    std::thread m_server_thread;
     std::shared_ptr<spdlog::logger> m_logger;
     std::shared_ptr<Shared_data_reader> m_shared_data_reader;
     std::string m_public_ip;
     std::uint16_t m_api_listen_port;
     network::Endpoint m_local_endpoint;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
+
 };
 
 }
