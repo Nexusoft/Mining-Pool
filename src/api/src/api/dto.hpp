@@ -16,7 +16,7 @@ class Meta_infos_dto : public oatpp::DTO
 
 	DTO_INIT(Meta_infos_dto, DTO)
 
-	DTO_FIELD(String, pool_hashrate);
+	DTO_FIELD(Float64, pool_hashrate);
 	DTO_FIELD(UInt16, round_duration);
 	DTO_FIELD(UInt16, fee);
 	DTO_FIELD(String, mining_mode);
@@ -28,7 +28,7 @@ class Account_dto : public oatpp::DTO
 
 	DTO_INIT(Account_dto, DTO)
 
-		DTO_FIELD(String, account);
+	DTO_FIELD(String, account);
 	DTO_FIELD(String, created_at);
 	DTO_FIELD(String, last_active);
 	DTO_FIELD(UInt16, round_duration);
@@ -40,7 +40,7 @@ class Payout_dto : public oatpp::DTO
 {
 	DTO_INIT(Payout_dto, DTO)
 
-		DTO_FIELD(String, time);
+	DTO_FIELD(String, time);
 	DTO_FIELD(Float64, amount);
 	DTO_FIELD(String, txhash);
 

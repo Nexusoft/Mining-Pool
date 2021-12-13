@@ -34,7 +34,7 @@ void Server::start()
 		OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
 
 		/* create ApiControllers and add endpoints to router */
-		auto rest_controller = std::make_shared<Rest_controller>();
+		auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange);
 		rest_controller->addEndpointsToRouter(router);
 
 		/* Get connection handler component */

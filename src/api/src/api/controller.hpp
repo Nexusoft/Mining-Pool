@@ -2,6 +2,8 @@
 #define NEXUSPOOL_API_CONTROLLER_HPP
 
 #include "api/dto.hpp"
+#include "api/shared_data_reader.hpp"
+#include "common/pool_api_data_exchange.hpp"
 
 #include "oatpp/web/server/api/ApiController.hpp"
 #include "oatpp/core/macro/codegen.hpp"
@@ -11,14 +13,8 @@ namespace nexuspool
 {
 namespace api
 {
-
 #include OATPP_CODEGEN_BEGIN(ApiController) //<-- Begin codegen
 
-/**
-    *  EXAMPLE ApiController
-    *  Basic examples of howto create ENDPOINTs
-    *  More details on oatpp.io
-    */
 class Rest_controller : public oatpp::web::server::api::ApiController 
 {
 public:
@@ -26,27 +22,32 @@ public:
      * Constructor with object mapper.
      * @param objectMapper - default object mapper used to serialize/deserialize DTOs.
      */
-    Rest_controller(OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
-        : oatpp::web::server::api::ApiController(objectMapper)
+    Rest_controller(Shared_data_reader::Sptr data_reader, 
+        common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
+        OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
+        : m_data_reader{std::move(data_reader)}
+        , m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
+        , oatpp::web::server::api::ApiController(objectMapper)
     {}
-    /**
-        *  Inject @objectMapper component here as default parameter
-        *  Do not return bare Controllable* object! use shared_ptr!
-        */
-    static std::shared_ptr<Rest_controller> createShared(OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
-    {
-        return std::shared_ptr<Rest_controller>(new Rest_controller(objectMapper));
-    }
 
-    ENDPOINT("GET", "/metainfo", metainfo) {
+    ENDPOINT("GET", "/metainfo", metainfo) 
+    {
         auto dto = Meta_infos_dto::createShared();
-        dto->pool_hashrate = "Hello World!";
-        dto->round_duration = 24;
-        dto->fee = 1;
-        dto->mining_mode = "Hello World!";
-        dto->active_miners = 5;
+        auto const config = m_data_reader->get_config();
+
+        dto->pool_hashrate = m_data_reader->get_pool_hashrate();
+        dto->round_duration = config.m_round_duration_hours;
+        dto->fee = config.m_fee;
+        dto->mining_mode = config.m_mining_mode.c_str();
+        dto->active_miners = m_pool_api_data_exchange->get_active_miners();
         return createDtoResponse(Status::CODE_200, dto);
     }
+
+private:
+
+    Shared_data_reader::Sptr m_data_reader;
+    common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
+
 };
 
 #include OATPP_CODEGEN_BEGIN(ApiController) //<-- End codegen
