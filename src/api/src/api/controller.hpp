@@ -103,6 +103,35 @@ public:
         }
     }
 
+    
+        ENDPOINT("GET", "/account/payout", accountpayout, QUERY(String, account))
+    {
+        // is account a valid nxs address  
+        TAO::Register::Address address_check{ account };
+        if (!address_check.IsValid())
+        {
+            return createResponse(Status::CODE_400, "invalid account");
+        }
+
+        if (m_data_reader->does_account_exists(account))
+        {
+            auto dto = Account_payouts_dto::createShared();
+            auto const account_data = m_data_reader->get_account(account);
+
+            auto const payments = m_data_reader->get_payments(account);
+            for (auto const& payment : payments)
+            {
+                dto->payouts->push_back(Payout_dto::createShared(payment.m_payment_date_time.c_str(), payment.m_amount, payment.m_tx_id.c_str()));
+            }
+
+            return createDtoResponse(Status::CODE_200, dto);
+        }
+        else
+        {
+            return createResponse(Status::CODE_404, "account doesn't exist");
+        }
+    }
+
 private:
 
     Shared_data_reader::Sptr m_data_reader;
