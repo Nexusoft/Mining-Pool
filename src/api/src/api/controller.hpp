@@ -75,6 +75,34 @@ public:
         }
     }
 
+    ENDPOINT("GET", "/account/detail", accountdetail, QUERY(String, account))
+    {
+        // is account a valid nxs address  
+        TAO::Register::Address address_check{ account };
+        if (!address_check.IsValid())
+        {
+            return createResponse(Status::CODE_400, "invalid account");
+        }
+
+        if (m_data_reader->does_account_exists(account))
+        {
+            auto dto = Account_dto::createShared();      
+            auto const account_data = m_data_reader->get_account(account);
+
+            dto->account = account_data.m_address;
+            dto->created_at = account_data.m_created_at;
+            dto->last_active = account_data.m_last_active;
+            dto->shares = account_data.m_shares;
+            dto->hashrate = account_data.m_hashrate;
+
+            return createDtoResponse(Status::CODE_200, dto);
+        }
+        else
+        {
+            return createResponse(Status::CODE_404, "account doesn't exist");
+        }
+    }
+
 private:
 
     Shared_data_reader::Sptr m_data_reader;
