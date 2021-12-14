@@ -56,20 +56,16 @@ public:
         return createDtoResponse(Status::CODE_200, dto);
     }
 
-
-    /*
     ENDPOINT("GET", "/account/header", accountheader, QUERY(String, account))
     {
-        std::string const account_string{ account };
         // is account a valid nxs address  
-        TAO::Register::Address address_check{ account_string };
+        TAO::Register::Address address_check{ account };
         if (!address_check.IsValid())
         {
             return createResponse(Status::CODE_400, "invalid account");
-
         }
 
-        if (m_data_reader->does_account_exists(account_string))
+        if (m_data_reader->does_account_exists(account))
         {
             return createResponse(Status::CODE_200, "");
         }
@@ -78,7 +74,6 @@ public:
             return createResponse(Status::CODE_404, "account doesn't exist");
         }
     }
-    */
 
 private:
 
