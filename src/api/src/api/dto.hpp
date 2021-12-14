@@ -58,14 +58,14 @@ class Account_payouts_dto : public oatpp::DTO
 
 	DTO_INIT(Account_payouts_dto, DTO)
 
-		DTO_FIELD(Vector<Object<Payout_dto>>, payouts) = {};
+	DTO_FIELD(Vector<Object<Payout_dto>>, payouts) = {};
 };
 
 class Block_dto : public oatpp::DTO
 {
 	DTO_INIT(Block_dto, DTO)
 
-		DTO_FIELD(UInt32, height);
+	DTO_FIELD(UInt32, height);
 	DTO_FIELD(String, hash);
 	DTO_FIELD(Float64, block_reward);
 	DTO_FIELD(String, time);
@@ -87,7 +87,7 @@ class Latest_blocks_dto : public oatpp::DTO
 
 	DTO_INIT(Latest_blocks_dto, DTO)
 
-		DTO_FIELD(Vector<Object<Block_dto>>, blocks) = {};
+	DTO_FIELD(Vector<Object<Block_dto>>, blocks) = {};
 };
 
 #include OATPP_CODEGEN_END(DTO)

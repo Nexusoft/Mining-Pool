@@ -43,6 +43,20 @@ public:
         return createDtoResponse(Status::CODE_200, dto);
     }
 
+    ENDPOINT("GET", "/latestblocks", latestblocks)
+    {
+        auto dto = Latest_blocks_dto::createShared();
+
+        auto dto = Payout_dto::createShared();
+        auto blocks = m_data_reader->get_latest_blocks();
+        for (auto& block : blocks)
+        {
+            dto->blocks->push_back(Block_dto::createShared(block.m_height, block.m_hash, block.m_mainnet_reward, block.m_block_found_time, block.m_difficulty));
+        }
+
+        return createDtoResponse(Status::CODE_200, dto);
+    }
+
 private:
 
     Shared_data_reader::Sptr m_data_reader;
