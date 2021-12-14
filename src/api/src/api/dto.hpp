@@ -46,6 +46,7 @@ class Payout_dto : public oatpp::DTO
 
 public:
 
+	Payout_dto() = default;
 	Payout_dto(const char* ptime, double pamount, const char* ptxhash)
 		: time(ptime)
 		, amount(pamount)
@@ -73,6 +74,7 @@ class Block_dto : public oatpp::DTO
 
 public:
 
+	Block_dto() = default;
 	Block_dto(std::uint32_t pheight, const char* phash, double pblock_reward, const char* ptime, double pnetwork_diff)
 		: height(pheight)
 		, hash(phash)
