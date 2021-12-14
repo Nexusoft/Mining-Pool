@@ -4,6 +4,7 @@
 #include "api/dto.hpp"
 #include "api/shared_data_reader.hpp"
 #include "common/pool_api_data_exchange.hpp"
+#include "TAO/Register/types/address.h"
 
 #include "oatpp/web/server/api/ApiController.hpp"
 #include "oatpp/core/macro/codegen.hpp"
@@ -46,8 +47,6 @@ public:
     ENDPOINT("GET", "/latestblocks", latestblocks)
     {
         auto dto = Latest_blocks_dto::createShared();
-
-        auto dto = Payout_dto::createShared();
         auto blocks = m_data_reader->get_latest_blocks();
         for (auto& block : blocks)
         {
@@ -56,6 +55,30 @@ public:
 
         return createDtoResponse(Status::CODE_200, dto);
     }
+
+
+    /*
+    ENDPOINT("GET", "/account/header", accountheader, QUERY(String, account))
+    {
+        std::string const account_string{ account };
+        // is account a valid nxs address  
+        TAO::Register::Address address_check{ account_string };
+        if (!address_check.IsValid())
+        {
+            return createResponse(Status::CODE_400, "invalid account");
+
+        }
+
+        if (m_data_reader->does_account_exists(account_string))
+        {
+            return createResponse(Status::CODE_200, "");
+        }
+        else
+        {
+            return createResponse(Status::CODE_404, "account doesn't exist");
+        }
+    }
+    */
 
 private:
 
