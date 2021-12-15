@@ -16,6 +16,9 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
 
 namespace nexuspool
 {
@@ -79,10 +82,22 @@ namespace nexuspool
 		// logger settings
 		if (!m_config->get_logfile().empty())
 		{
+			// current time as string
+			auto t = std::time(nullptr);
+			auto tm = *std::localtime(&t);
+			std::ostringstream oss;
+			oss << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S");
+
+			// add timestamp to logfilename
+			auto full_logname = m_config->get_logfile();
+			std::size_t lastindex = full_logname.find_last_of(".");
+			std::string raw_logname = full_logname.substr(0, lastindex);
+			raw_logname += oss.str() + ".log";
+
 			// initialise a new logger
 			spdlog::drop("logger");
 			auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-			auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(m_config->get_logfile(), true);
+			auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(raw_logname, true);
 
 			m_logger = std::make_shared<spdlog::logger>(spdlog::logger("logger", { console_sink, file_sink }));
 			m_logger->set_pattern("[%D %H:%M:%S.%e][%^%l%$] %v");
