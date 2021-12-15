@@ -39,7 +39,6 @@ private:
     network::Connection::Sptr m_connection;
     std::weak_ptr<Pool_manager> m_pool_manager;
     std::atomic<std::uint32_t> m_current_height;
-    bool m_connection_closed;	// indicator for server if the network connection has been closed
     Session_key m_session_key;
     Session_registry::Sptr m_session_registry;
     std::uint32_t m_pool_nbits;

@@ -31,7 +31,6 @@ Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> log
 	, m_connection{ std::move(connection) }
 	, m_pool_manager{std::move(pool_manager)}
     , m_current_height{ 0 }
-	, m_connection_closed{true}
 	, m_session_key{session_key}
 	, m_session_registry{std::move(session_registry)}
 	, m_pool_nbits{ 0 }
@@ -60,12 +59,10 @@ network::Connection::Handler Miner_connection_impl::connection_handler()
 		{
 			self->m_logger->error("Connection to {} was not successful. Result: {}", self->m_connection->remote_endpoint().to_string(), network::Result::code_to_string(result));
 			self->m_connection.reset();
-			self->m_connection_closed = true;
 		}
 		else if (result == network::Result::connection_closed)
 		{
 			self->m_connection.reset();
-			self->m_connection_closed = true;
 		}
 		else if (result == network::Result::connection_ok)
 		{
@@ -247,6 +244,18 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 				}
 			});
 		}
+	}
+	else if (packet.m_header == Packet::SET_CHANNEL)
+	{
+		m_logger->error("Invalid header received. Possibly from miner in SOLO mode");
+		m_connection->close();
+		return;
+	}
+	else if (packet.m_header == Packet::GET_HEIGHT)
+	{
+		m_logger->error("Invalid header received. Possibly from miner in SOLO mode");
+		m_connection->close();
+		return;
 	}
     else
     {
