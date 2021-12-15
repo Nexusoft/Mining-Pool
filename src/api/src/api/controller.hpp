@@ -19,22 +19,19 @@ namespace api
 class Rest_controller : public oatpp::web::server::api::ApiController 
 {
 public:
-    /**
-     * Constructor with object mapper.
-     * @param objectMapper - default object mapper used to serialize/deserialize DTOs.
-     */
-    Rest_controller(Shared_data_reader::Sptr data_reader, 
+
+    Rest_controller::Rest_controller(Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
         OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
-        : m_data_reader{std::move(data_reader)}
-        , m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
+        : m_data_reader{ std::move(data_reader) }
+        , m_pool_api_data_exchange{ std::move(pool_api_data_exchange) }
         , oatpp::web::server::api::ApiController(objectMapper)
     {}
 
     ENDPOINT("GET", "/metainfo", metainfo) 
     {
         auto dto = Meta_infos_dto::createShared();
-        auto const config = m_data_reader->get_config();
+        auto const config = get_config_data();
 
         dto->pool_hashrate = m_data_reader->get_pool_hashrate();
         dto->round_duration = config.m_round_duration_hours;
@@ -134,8 +131,11 @@ public:
 
 private:
 
+    persistance::Config_data get_config_data();
+
     Shared_data_reader::Sptr m_data_reader;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
+    persistance::Config_data m_cached_config;
 
 };
 
