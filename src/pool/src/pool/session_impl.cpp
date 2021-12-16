@@ -8,8 +8,9 @@
 namespace nexuspool
 {
 
-Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, common::Mining_mode mining_mode)
+Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Shared_data_reader::Sptr data_reader, common::Mining_mode mining_mode)
 	: m_data_writer{ std::move(data_writer) }
+	, m_data_reader{ std::move(data_reader) }
 	, m_user_data{}
 	, m_miner_connection{}
 	, m_update_time{ std::chrono::steady_clock::now() }
@@ -25,6 +26,7 @@ void Session_impl::update_connection(std::shared_ptr<Miner_connection> miner_con
 
 bool Session_impl::add_share()
 {
+	m_user_data.m_account = m_data_reader->get_account(m_user_data.m_account.m_address);
 	m_user_data.m_account.m_shares++;
 	m_hashrate_helper.add_share();
 	return m_data_writer->update_account(m_user_data.m_account);
@@ -32,11 +34,14 @@ bool Session_impl::add_share()
 
 void Session_impl::reset_shares()
 {
+	m_user_data.m_account = m_data_reader->get_account(m_user_data.m_account.m_address);
 	m_user_data.m_account.m_shares = 0;
+	m_data_writer->update_account(m_user_data.m_account);
 }
 
 void Session_impl::update_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
 {
+	m_user_data.m_account = m_data_reader->get_account(m_user_data.m_account.m_address);
 	m_user_data.m_account.m_hashrate = m_hashrate_helper.get_hashrate(pool_nbits, network_nbits, prime_shares_to_blocks_ratio);
 	m_data_writer->update_account(m_user_data.m_account);
 }
@@ -65,7 +70,7 @@ Session_registry_impl::Session_registry_impl(persistance::Data_reader::Uptr data
 	nexus_http_interface::Component::Sptr http_interface,
 	std::uint32_t session_expiry_time,
 	common::Mining_mode mining_mode)
-	: m_data_reader{ std::move(data_reader) }
+	: m_data_reader{ std::make_shared<Shared_data_reader>(std::move(data_reader)) }
 	, m_data_writer{ std::move(data_writer) }
 	, m_http_interface{std::move(http_interface)}
 	, m_sessions{}
@@ -85,7 +90,7 @@ Session_key Session_registry_impl::create_session()
 	std::scoped_lock lock(m_sessions_mutex);
 
 	auto const session_key = LLC::GetRand256();
-	m_sessions.emplace(std::make_pair(session_key, std::make_shared<Session_impl>(m_data_writer, m_mining_mode)));
+	m_sessions.emplace(std::make_pair(session_key, std::make_shared<Session_impl>(m_data_writer, m_data_reader, m_mining_mode)));
 	return session_key;
 }
 
@@ -165,8 +170,6 @@ bool Session_registry_impl::valid_nxs_address(std::string const& nxs_address)
 
 bool Session_registry_impl::does_account_exists(std::string account)
 {
-	std::scoped_lock lock(m_data_reader_mutex);
-
 	return m_data_reader->does_account_exists(std::move(account));
 }
 
@@ -176,7 +179,6 @@ void Session_registry_impl::login(Session_key key)
 	auto& user_data = session->get_user_data();
 	persistance::Account_data account_data{};
 	{
-		std::scoped_lock lock(m_data_reader_mutex);
 		account_data = m_data_reader->get_account(user_data.m_account.m_address);
 	}
 

@@ -12,6 +12,7 @@
 #include "nexus_http_interface/component.hpp"
 #include "pool/utils.hpp"
 #include "pool/session.hpp"
+#include "pool/shared_data_reader.hpp"
 #include "LLP/block.hpp"
 
 namespace nexuspool
@@ -23,7 +24,7 @@ class Session_impl : public Session
 {
 public:
 
-	Session_impl(persistance::Shared_data_writer::Sptr data_writer, common::Mining_mode mining_mode);
+	Session_impl(persistance::Shared_data_writer::Sptr data_writer, Shared_data_reader::Sptr data_reader, common::Mining_mode mining_mode);
 
 	void update_connection(std::shared_ptr<Miner_connection> miner_connection) override;
 	std::weak_ptr<Miner_connection> get_connection() override { return m_miner_connection; }
@@ -41,6 +42,7 @@ public:
 private:
 
 	persistance::Shared_data_writer::Sptr m_data_writer;
+	Shared_data_reader::Sptr m_data_reader;
 	Session_user m_user_data;
 	std::shared_ptr<Miner_connection> m_miner_connection;
 	std::chrono::steady_clock::time_point m_update_time;
@@ -77,11 +79,10 @@ public:
 
 private:
 
-	persistance::Data_reader::Uptr m_data_reader;			// hold ownership over data_reader/writer
+	Shared_data_reader::Sptr m_data_reader;			// hold ownership over data_reader/writer
 	persistance::Shared_data_writer::Sptr m_data_writer;
 	nexus_http_interface::Component::Sptr m_http_interface;
 	std::mutex m_sessions_mutex;
-	std::mutex m_data_reader_mutex;
 	std::map<Session_key, std::shared_ptr<Session>> m_sessions;
 	std::uint32_t m_session_expiry_time;
 	common::Mining_mode m_mining_mode;
