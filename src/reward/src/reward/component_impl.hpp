@@ -36,6 +36,7 @@ public:
     bool pay_round(std::uint32_t round) override;
     bool process_unpaid_rounds() override;    
     void block_found() override;
+    void update_block_hashes_from_current_round() override;
 
 private:
 

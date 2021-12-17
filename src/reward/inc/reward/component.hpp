@@ -43,6 +43,9 @@ public:
     // increments the block count for the current round in storage
     virtual void block_found() = 0;
 
+    // Updates the block hashes from all blocks in the current active round
+    virtual void update_block_hashes_from_current_round() = 0;
+
 
 };
 

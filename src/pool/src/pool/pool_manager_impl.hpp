@@ -43,6 +43,7 @@ private:
 
     chrono::Timer::Handler session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval);
     chrono::Timer::Handler end_round_handler();
+    chrono::Timer::Handler update_block_hashes_handler(std::uint16_t update_block_hashes_interval);
     void end_round();
     persistance::Config_data storage_config_check();
 
@@ -62,8 +63,10 @@ private:
     network::Socket::Sptr m_listen_socket;
 
     std::shared_ptr<Session_registry> m_session_registry;    // holds all sessions -> each session contains a miner_connection
+    // periodic timer
     chrono::Timer::Uptr m_session_registry_maintenance;
     chrono::Timer::Uptr m_end_round_timer;
+    chrono::Timer::Uptr m_update_block_hashes_timer;
 
     std::atomic<std::uint32_t> m_total_blocks;
     std::atomic<std::uint32_t> m_total_shares;

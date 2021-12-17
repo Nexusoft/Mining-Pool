@@ -253,6 +253,12 @@ bool Component_impl::pay_round(std::uint32_t round)
 	return true;
 }
 
+void Component_impl::update_block_hashes_from_current_round()
+{
+	assert(m_current_round == 0);
+	update_block_hashes(m_current_round);
+}
+
 void Component_impl::update_block_hashes(std::uint32_t round)
 {
 	auto updated_blocks = 0U;
@@ -277,7 +283,10 @@ void Component_impl::update_block_hashes(std::uint32_t round)
 		}
 	}
 
-	m_logger->debug("Updated block hashes from {} blocks in round {}", updated_blocks, round);
+	if (updated_blocks > 0)
+	{
+		m_logger->debug("Updated block hashes from {} blocks in round {}", updated_blocks, round);
+	}
 }
 
 bool Component_impl::process_unpaid_rounds()

@@ -68,6 +68,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
+	m_update_block_hashes_timer = m_timer_factory->create_timer();
 }
 
 void Pool_manager_impl::start()
@@ -143,6 +144,8 @@ void Pool_manager_impl::start()
 
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
+
+	m_update_block_hashes_timer->start(chrono::Seconds(5*60), session_registry_maintenance_handler(5*60));
 	
 }
 
@@ -150,6 +153,7 @@ void Pool_manager_impl::stop()
 {
 	m_session_registry_maintenance->stop();
 	m_end_round_timer->stop();
+	m_update_block_hashes_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_wallet_connection->stop();
 	m_listen_socket->stop_listen();
@@ -265,6 +269,18 @@ std::uint32_t Pool_manager_impl::get_pool_nbits() const
 	return m_pool_nBits;
 }
 
+chrono::Timer::Handler Pool_manager_impl::update_block_hashes_handler(std::uint16_t update_block_hashes_interval)
+{
+	return[this, update_block_hashes_interval]()
+	{
+		m_reward_component->update_block_hashes_from_current_round();
+
+		// restart timer
+		m_update_block_hashes_timer->start(chrono::Seconds(update_block_hashes_interval),
+			update_block_hashes_handler(update_block_hashes_interval));
+	};
+}
+
 chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
 {
 	return[this, session_registry_maintenance_interval]()
@@ -276,7 +292,6 @@ chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(s
 		m_session_registry_maintenance->start(chrono::Seconds(session_registry_maintenance_interval),
 			session_registry_maintenance_handler(session_registry_maintenance_interval));
 	};
-
 }
 
 chrono::Timer::Handler Pool_manager_impl::end_round_handler()
