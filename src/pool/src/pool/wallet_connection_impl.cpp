@@ -32,9 +32,7 @@ Wallet_connection_impl::Wallet_connection_impl(std::shared_ptr<asio::io_context>
 void Wallet_connection_impl::stop()
 {
     m_timer_manager.stop();
-
-    // close connection
-    m_connection.reset();
+    m_connection->close();
 }
 
 void Wallet_connection_impl::retry_connect(network::Endpoint const& wallet_endpoint)

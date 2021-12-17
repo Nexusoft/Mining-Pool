@@ -51,6 +51,8 @@ namespace nexuspool
 
 	Pool::~Pool()
 	{
+		m_api_server->stop();
+		m_pool_manager->stop();
 		m_io_context->stop();
 	}
 
@@ -89,7 +91,7 @@ namespace nexuspool
 			oss << std::put_time(&tm, "%d-%m-%Y_%H-%M-%S");
 
 			// add timestamp to logfilename
-			auto full_logname = m_config->get_logfile();
+			auto const& full_logname = m_config->get_logfile();
 			std::size_t lastindex = full_logname.find_last_of(".");
 			std::string raw_logname = full_logname.substr(0, lastindex);
 			raw_logname += oss.str() + ".log";

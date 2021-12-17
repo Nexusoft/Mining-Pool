@@ -73,10 +73,9 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 void Pool_manager_impl::start()
 {
 	m_storage_config_data = storage_config_check();
-	network::Endpoint wallet_endpoint{ network::Transport_protocol::tcp, m_config->get_wallet_ip(), m_config->get_wallet_port() };
-	network::Endpoint local_endpoint{ network::Transport_protocol::tcp, m_config->get_local_ip(), m_config->get_local_port() };
-	auto local_socket = m_socket_factory->create_socket(local_endpoint);
-	common::Mining_mode mining_mode = m_storage_config_data.m_mining_mode == "HASH" ? common::Mining_mode::HASH : common::Mining_mode::PRIME;
+	network::Endpoint const wallet_endpoint{ network::Transport_protocol::tcp, m_config->get_wallet_ip(), m_config->get_wallet_port() };
+	network::Endpoint const local_endpoint{ network::Transport_protocol::tcp, m_config->get_local_ip(), m_config->get_local_port() };
+	common::Mining_mode const mining_mode = m_storage_config_data.m_mining_mode == "HASH" ? common::Mining_mode::HASH : common::Mining_mode::PRIME;
 
 	auto self = shared_from_this();
 	// connect to wallet
@@ -88,7 +87,7 @@ void Pool_manager_impl::start()
 		m_config->get_connection_retry_interval(), 
 		m_config->get_height_interval(), 
 		m_timer_factory, 
-		std::move(local_socket));
+		m_socket_factory->create_socket(local_endpoint));
 	if (!m_wallet_connection->connect(wallet_endpoint))
 	{
 		m_logger->critical("Couldn't connect to wallet using ip {} and port {}", m_config->get_wallet_ip(), m_config->get_wallet_port());
@@ -108,7 +107,7 @@ void Pool_manager_impl::start()
 	// calculate round duration and start timer for end_round
 	std::chrono::system_clock::time_point round_start_time, round_end_time;
 	m_reward_component->get_start_end_round_times(round_start_time, round_end_time);
-	auto time_now = std::chrono::system_clock::now();
+	auto const time_now = std::chrono::system_clock::now();
 	if (time_now > round_end_time)
 	{
 		end_round();
@@ -152,6 +151,7 @@ void Pool_manager_impl::stop()
 	m_session_registry_maintenance->stop();
 	m_end_round_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
+	m_wallet_connection->stop();
 	m_listen_socket->stop_listen();
 }
 
