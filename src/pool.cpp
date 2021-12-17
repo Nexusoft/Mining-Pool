@@ -39,7 +39,11 @@ namespace nexuspool
 		m_signals->async_wait([this](auto, auto)
 		{
 			m_logger->info("Shutting down NexusPool");
-			m_api_server->stop();
+			if (m_api_server)
+			{
+				m_api_server->stop();
+			}
+
 			m_pool_manager->stop();
 			m_io_context->stop();
 			exit(1);
@@ -107,15 +111,24 @@ namespace nexuspool
 			m_persistance_component->get_data_writer_factory(),
 			m_persistance_component->get_data_reader_factory(),
 			m_pool_api_data_exchange);
-		m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
-			m_config->get_public_ip(), m_config->get_api_listen_port(), m_pool_api_data_exchange);
+
+		auto const& api_config = m_config->get_api_config();
+		if (api_config.m_use_api)
+		{
+			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
+				m_config->get_public_ip(), api_config.m_listen_port, m_pool_api_data_exchange);
+		}
 
 		return true;
 	}
 
 	void Pool::run()
 	{
-		m_api_server->start();
+		if (m_api_server)
+		{
+			m_api_server->start();
+		}
+
 		m_pool_manager->start();
 		m_io_context->run();
 	}
