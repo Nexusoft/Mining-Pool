@@ -145,7 +145,7 @@ void Pool_manager_impl::start()
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 
-	m_update_block_hashes_timer->start(chrono::Seconds(5*60), session_registry_maintenance_handler(5*60));
+	m_update_block_hashes_timer->start(chrono::Seconds(5*60), update_block_hashes_handler(5*60));
 	
 }
 
