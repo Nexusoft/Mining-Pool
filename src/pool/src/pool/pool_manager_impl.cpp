@@ -145,7 +145,7 @@ void Pool_manager_impl::start()
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 
-	//m_update_block_hashes_timer->start(chrono::Seconds(5*60), update_block_hashes_handler(5*60));
+	m_update_block_hashes_timer->start(chrono::Seconds(5*60), update_block_hashes_handler(5*60));
 	
 }
 
@@ -153,7 +153,7 @@ void Pool_manager_impl::stop()
 {
 	m_session_registry_maintenance->stop();
 	m_end_round_timer->stop();
-	//m_update_block_hashes_timer->stop();
+	m_update_block_hashes_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_wallet_connection->stop();
 	m_listen_socket->stop_listen();

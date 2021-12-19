@@ -255,7 +255,7 @@ bool Component_impl::pay_round(std::uint32_t round)
 
 void Component_impl::update_block_hashes_from_current_round()
 {
-	assert(m_current_round == 0);
+	assert(m_current_round != 0);
 	update_block_hashes(m_current_round);
 }
 
