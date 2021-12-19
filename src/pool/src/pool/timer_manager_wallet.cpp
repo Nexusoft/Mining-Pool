@@ -13,11 +13,11 @@ Timer_manager_wallet::Timer_manager_wallet(chrono::Timer_factory::Sptr timer_fac
     m_get_height_timer = m_timer_factory->create_timer();
 }
 
-void Timer_manager_wallet::start_connection_retry_timer(std::uint16_t timer_interval, std::weak_ptr<Wallet_connection> worker_manager,
+void Timer_manager_wallet::start_connection_retry_timer(std::uint16_t timer_interval, std::weak_ptr<Wallet_connection> wallet_connection,
     network::Endpoint const& wallet_endpoint)
 {
     m_connection_retry_timer->start(chrono::Seconds(timer_interval), 
-        connection_retry_handler(std::move(worker_manager), wallet_endpoint));
+        connection_retry_handler(std::move(wallet_connection), wallet_endpoint));
 }
 
 void Timer_manager_wallet::start_get_height_timer(std::uint16_t timer_interval, std::weak_ptr<network::Connection> connection)
@@ -31,15 +31,15 @@ void Timer_manager_wallet::stop()
     m_get_height_timer->stop();
 }
 
-chrono::Timer::Handler Timer_manager_wallet::connection_retry_handler(std::weak_ptr<Wallet_connection> worker_manager,
+chrono::Timer::Handler Timer_manager_wallet::connection_retry_handler(std::weak_ptr<Wallet_connection> wallet_connection,
     network::Endpoint const& wallet_endpoint)
 {
-    return[worker_manager, wallet_endpoint]()
+    return[wallet_connection, wallet_endpoint]()
     {
-        auto worker_manager_shared = worker_manager.lock();
-        if(worker_manager_shared)
+        auto wallet_connection_shared = wallet_connection.lock();
+        if(wallet_connection_shared)
         {
-            worker_manager_shared->connect(wallet_endpoint);
+            wallet_connection_shared->connect(wallet_endpoint);
         }
     }; 
 }

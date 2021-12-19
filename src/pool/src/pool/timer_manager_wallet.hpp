@@ -23,7 +23,7 @@ public:
 
     explicit Timer_manager_wallet(chrono::Timer_factory::Sptr timer_factory);
 
-    void start_connection_retry_timer(std::uint16_t timer_interval, std::weak_ptr<Wallet_connection> worker_manager, 
+    void start_connection_retry_timer(std::uint16_t timer_interval, std::weak_ptr<Wallet_connection> wallet_connection,
         network::Endpoint const& wallet_endpoint);
     // collect also data from the workers
     void start_get_height_timer(std::uint16_t timer_interval, std::weak_ptr<network::Connection> connection);
@@ -32,7 +32,7 @@ public:
 
 private:
 
-    chrono::Timer::Handler connection_retry_handler(std::weak_ptr<Wallet_connection> worker_manager,
+    chrono::Timer::Handler connection_retry_handler(std::weak_ptr<Wallet_connection> wallet_connection,
         network::Endpoint const& wallet_endpoint);
     chrono::Timer::Handler get_height_handler(std::uint16_t get_height_interval, std::weak_ptr<network::Connection> connection);
 

@@ -37,7 +37,7 @@ void Wallet_connection_impl::stop()
 
 void Wallet_connection_impl::retry_connect(network::Endpoint const& wallet_endpoint)
 {
-    m_connection = nullptr;		// close connection (socket etc)
+    m_connection->close();
 
     // retry connect
     m_logger->info("Connection retry {} seconds", m_connection_retry_interval);
@@ -73,7 +73,13 @@ bool Wallet_connection_impl::connect(network::Endpoint const& wallet_endpoint)
                     self->m_timer_manager.start_get_height_timer(self->m_get_height_interval, self->m_connection);
                 }
                 else
-                {	// data received
+                {	
+                    if (!self->m_connection)
+                    {
+                        self->m_logger->error("No connection to wallet.");
+                        self->retry_connect(wallet_endpoint);
+                    }
+                    // data received
                     self->process_data(std::move(receive_buffer));
                 }
             }
