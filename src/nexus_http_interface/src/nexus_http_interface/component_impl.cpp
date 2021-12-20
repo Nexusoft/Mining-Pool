@@ -3,6 +3,7 @@
 #include "oatpp/web/client/HttpRequestExecutor.hpp"
 #include "oatpp/network/tcp/client/ConnectionProvider.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include "oatpp/core/macro/component.hpp"
 #include <json/json.hpp>
 
 namespace nexuspool {
@@ -13,6 +14,7 @@ Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, std::stri
 	, m_wallet_ip{std::move(wallet_ip)}
 {
 	oatpp::base::Environment::init();
+
 	/* Create ObjectMapper for serialization of DTOs  */
 	auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared();
 
@@ -42,8 +44,25 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 
 	reward_data.m_reward = data_json["result"]["mint"];
 	reward_data.m_timestamp = data_json["result"]["time"];
-	reward_data.m_tx_confirmations = data_json["result"]["tx"][0]["confirmations"];
-	reward_data.m_tx_type = data_json["result"]["tx"][0]["contracts"][0]["OP"];
+
+	auto txs = nlohmann::json::array();
+	txs = data_json["result"]["tx"];
+	for (auto& tx : txs)
+	{
+		if (tx["type"] == "legacy user")
+		{
+			continue;
+		}
+
+		if (tx["type"] == "tritium base")
+		{
+			reward_data.m_tx_confirmations = tx["confirmations"];
+			auto contracts = nlohmann::json::array();
+			contracts = tx["contracts"];
+			reward_data.m_tx_type = contracts.front()["OP"];
+			break;
+		}
+	}
 
 	return true;
 }
