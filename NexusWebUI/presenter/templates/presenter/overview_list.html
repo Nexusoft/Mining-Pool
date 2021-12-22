@@ -62,6 +62,8 @@
         </div>
     {% endif %}
 
-    {% render_table table %}
+    {% if table %}
+        {% render_table table %}
+    {% endif %}
 
 {% endblock %}

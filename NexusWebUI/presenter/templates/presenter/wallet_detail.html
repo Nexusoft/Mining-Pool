@@ -56,7 +56,9 @@
       </div>
     </div>
 
-    {% render_table table_account_payouts %}
+    {% if table_account_payouts %}
+        {% render_table table_account_payouts %}
+    {% endif %}
 
 
 {##}
