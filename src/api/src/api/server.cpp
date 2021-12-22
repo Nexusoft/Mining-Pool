@@ -29,7 +29,7 @@ void Server::start()
 {
 	oatpp::base::Environment::init();
 	m_server_thread = std::thread([this]() {
-		App_component components{ m_public_ip, 5000 }; // Create scope Environment components
+		App_component components{ m_public_ip, m_api_listen_port }; // Create scope Environment components
 
 		OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
 
