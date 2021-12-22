@@ -1,8 +1,6 @@
 #ifndef NEXUSPOOL_API_SERVER_HPP
 #define NEXUSPOOL_API_SERVER_HPP
 
-#include "network/types.hpp"
-#include "network/endpoint.hpp"
 #include "persistance/data_reader.hpp"
 #include "common/pool_api_data_exchange.hpp"
 
@@ -31,7 +29,6 @@ public:
 
     void start();
     void stop();
-    network::Endpoint const& local_endpoint() const { return network::Endpoint{}; }
 
 private:
 
@@ -40,7 +37,6 @@ private:
     std::shared_ptr<Shared_data_reader> m_shared_data_reader;
     std::string m_public_ip;
     std::uint16_t m_api_listen_port;
-    network::Endpoint m_local_endpoint;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
 
 };

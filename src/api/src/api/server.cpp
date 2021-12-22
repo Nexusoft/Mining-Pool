@@ -20,7 +20,6 @@ Server::Server(std::shared_ptr<spdlog::logger> logger,
 	, m_shared_data_reader{std::make_shared<Shared_data_reader>(std::move(data_reader))}
 	, m_public_ip{ std::move(public_ip) }
 	, m_api_listen_port{ api_listen_port }
-	, m_local_endpoint{ network::Transport_protocol::tcp, m_public_ip, m_api_listen_port }
 	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
 {
 }
