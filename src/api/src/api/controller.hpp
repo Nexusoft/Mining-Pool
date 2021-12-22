@@ -20,7 +20,7 @@ class Rest_controller : public oatpp::web::server::api::ApiController
 {
 public:
 
-    Rest_controller::Rest_controller(Shared_data_reader::Sptr data_reader,
+    Rest_controller(Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
         OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
         : m_data_reader{ std::move(data_reader) }
