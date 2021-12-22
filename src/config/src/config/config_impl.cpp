@@ -16,11 +16,11 @@ namespace config
 		, m_local_port{ 0 }
 		, m_public_ip{ "127.0.0.1" }
 		, m_miner_listen_port{ 0 }
-		, m_api_listen_port{0}
 		, m_local_ip{"127.0.0.1"}
 		, m_mining_mode{ common::Mining_mode::HASH}
 		, m_pool_config{}
 		, m_persistance_config{}
+		, m_api_config{}
 		, m_logfile{""}		// no logfile usage, default
 		, m_log_level{ 2 }	// info level
 		, m_connection_retry_interval{5}
@@ -62,10 +62,6 @@ namespace config
 			{
 				j.at("miner_listen_port").get_to(m_miner_listen_port);
 			}
-			if (j.count("api_listen_port") != 0)
-			{
-				j.at("api_listen_port").get_to(m_api_listen_port);
-			}
 
 			std::string mining_mode = j["mining_mode"];
 			std::for_each(mining_mode.begin(), mining_mode.end(), [](char& c) 
@@ -98,6 +94,13 @@ namespace config
 			else
 			{
 				m_persistance_config.m_type = Persistance_type::sqlite;
+			}
+
+			// api config
+			if (j.count("api") != 0)
+			{
+				m_api_config.m_use_api = true;
+				m_api_config.m_listen_port = j.at("api")["listen_port"];
 			}
 
 			// read stats printer config

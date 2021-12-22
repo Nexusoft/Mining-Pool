@@ -17,7 +17,6 @@ public:
     MOCK_METHOD(std::uint16_t, get_local_port, (), (const override));
     MOCK_METHOD(std::string const&, get_public_ip, (), (const override));
     MOCK_METHOD(std::uint16_t, get_miner_listen_port, (), (const override));
-    MOCK_METHOD(std::uint16_t, get_api_listen_port, (), (const override));
     MOCK_METHOD(std::string const&, get_local_ip, (), (const override));
     MOCK_METHOD(common::Mining_mode, get_mining_mode, (), (const override));
     MOCK_METHOD(std::string const&, get_logfile, (), (const override));
@@ -29,6 +28,7 @@ public:
     MOCK_METHOD(std::vector<Stats_printer_config>&, get_stats_printer_config, (), (const override));
     MOCK_METHOD(Pool_config const&, get_pool_config, (), (const override));
     MOCK_METHOD(Persistance_config const&, get_persistance_config, (), (const override));
+    MOCK_METHOD(Api_config const&, get_api_config, (), (const override));
 };
 
 

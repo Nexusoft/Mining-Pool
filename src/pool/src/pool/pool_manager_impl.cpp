@@ -363,6 +363,7 @@ persistance::Config_data Pool_manager_impl::storage_config_check()
 					m_total_blocks = 0;
 					m_total_shares = 0;
 				}
+				m_pool_api_data_exchange->set_config_updated(true);
 			}
 		}
 	}

@@ -7,8 +7,7 @@ Pool API's:
     get_meta_info
 
         # Request
-        JSON:
-        {"jsonrpc": "2.0", "method": "get_meta_info", "id": 1}
+        GET /metainfo
 
         # Result
         Fields:
@@ -16,15 +15,14 @@ Pool API's:
             - round_duration
             - pool_hashrate
 			- mining_mode  (string HASH or PRIME)
+            - active_miners
         JSON:
         {'id': 1, 'jsonrpc': '2.0', 'result': {'fee': 5, 'mining_mode': 'prime', 'round_duration': 0.1, 'pool_hashrate': 95.3}}
 
     #######################
     get_latest_blocks
 
-        # Request
-        JSON:
-        {"jsonrpc": "2.0", "method": "get_latest_blocks", "id": 1}
+        GET /latestblocks
 
         # Result
         Fields:
@@ -42,9 +40,7 @@ Wallet Detail API's:
     ########################
     get_account_header
 
-        # Request
-        JSON:
-        {"jsonrpc": "2.0", "method": "get_account_header", "params": [_account], "id": 1}
+        GET /account/header?account=test
 
         # Result
 			empty or error
@@ -54,15 +50,13 @@ Wallet Detail API's:
     ########################
     get_account
 
-        # Request
-        JSON:
-        {"jsonrpc": "2.0", "method": "get_account_works", "params": [_account], "id": 1}
+        GET /account/detail?account=test
 
         # Result
         Fields:
 			- account
 			- created_at
-			- last_active_time
+			- last_active
             - shares
             - hashrate
 
@@ -70,9 +64,7 @@ Wallet Detail API's:
     ########################
     get_account_payouts
 
-        # Request
-        JSON:
-        {"jsonrpc": "2.0", "method": "get_account_payouts", "params": [_account], "id": 1}
+        GET /account/payout?account=test
 
         # Result
         Fields:

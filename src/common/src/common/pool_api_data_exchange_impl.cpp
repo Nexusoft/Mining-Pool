@@ -18,6 +18,16 @@ void Pool_api_data_exchange_impl::set_active_miners(std::uint32_t active_miners)
     m_active_miners = active_miners;
 }
 
+bool Pool_api_data_exchange_impl::is_config_updated() const
+{
+    return m_config_updated;
+}
+
+void Pool_api_data_exchange_impl::set_config_updated(bool update)
+{
+    m_config_updated = update;
+}
+
 
 }
 }

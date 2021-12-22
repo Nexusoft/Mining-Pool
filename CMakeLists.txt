@@ -35,7 +35,7 @@ if(WIN32)
     add_definitions(-D_WIN32_WINT=0x0601 -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-add_subdirectory(oatpp-1.2.5)
+add_subdirectory(oatpp-1.3.0)
 
 # add submodules
 add_subdirectory(src/chrono)

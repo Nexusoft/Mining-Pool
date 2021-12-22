@@ -24,7 +24,6 @@ public:
 	std::uint16_t get_local_port() const override  { return m_local_port; }
 	std::string const& get_public_ip() const override { return m_public_ip; }
 	std::uint16_t get_miner_listen_port() const override  { return m_miner_listen_port; }
-	std::uint16_t get_api_listen_port() const override  { return m_api_listen_port; }
 	std::string const& get_local_ip() const override  { return m_local_ip; }
 	common::Mining_mode get_mining_mode() const override  { return m_mining_mode; }
 	std::string const& get_logfile() const override  { return m_logfile; }
@@ -36,6 +35,7 @@ public:
 	std::vector<Stats_printer_config>& get_stats_printer_config() override  { return m_stats_printer_config; }
 	Pool_config const& get_pool_config() const override  { return m_pool_config; }
 	Persistance_config const& get_persistance_config() const override  { return m_persistance_config; }
+	virtual Api_config const& get_api_config() const override { return m_api_config;  }
 
 private:
 
@@ -46,11 +46,11 @@ private:
 	std::uint16_t m_local_port;
 	std::string  m_public_ip;
 	std::uint16_t m_miner_listen_port;
-	std::uint16_t m_api_listen_port;
 	std::string m_local_ip;
 	common::Mining_mode	 m_mining_mode;
 	Pool_config  m_pool_config;
 	Persistance_config m_persistance_config;
+	Api_config m_api_config;
 	std::string  m_logfile;
 	std::uint8_t m_log_level;
 

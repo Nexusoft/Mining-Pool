@@ -2,11 +2,20 @@ import logging
 from django import forms
 from django.conf import settings
 from django.shortcuts import redirect
+from .rest_request import rest_request
 
 # from .models import ValidAccounts
-from .rpc_requests import get_account_header, socket_connect, get_account
+# from .rpc_requests import get_account_header, socket_connect, get_account
 
 logger = logging.getLogger('NexusWebUI')
+
+HARDWARE = (
+    ('', '...Choose...'),
+    (33, 'GTX 1070'),
+    (50, 'GTX 1080 TI'),
+    (67, 'RTX 2060'),
+    (135, 'RTX 3090'),
+)
 
 
 class WalletSearchForm(forms.Form):
@@ -24,21 +33,48 @@ class WalletSearchForm(forms.Form):
 
         wallet_id = cleaned_data['wallet_id']
 
-        logger.info("Sending Request for Wallet ID verficiation to Backend")
+        logger.info("Sending Request for Wallet ID verification to Backend")
+        logger.info(f"Wallet ID: {wallet_id}")
 
-        socket = socket_connect(_ip=getattr(settings, "POOL_IP", None),
-                                _port=getattr(settings, "POOL_PORT", None))
-        # get_account_json = get_account(_socket=socket, _account=wallet_id)
-        get_account_header_json = get_account_header(_socket=socket, _account=wallet_id)
+        print("Fetchting account/header")
+        account_header = rest_request(method="account/header", parameters={'account': wallet_id})
+        print(f"account_header: {account_header}")
 
-        print("get_account_header_json: ", get_account_header_json)
+        if account_header is None:
+            logger.error(f"Connectivity Issue when checking Wallet ID")
+            raise forms.ValidationError('pool_error')
+        else:
+            status_code = account_header.status_code
 
-        if 'error' in get_account_header_json:
-            logger.info(f"Error when validating Wallet ID: {get_account_header_json}")
-            if get_account_header_json['error']['code'] == -10:
-                logger.info("Invalid Wallet ID")
-                raise forms.ValidationError(-10)
-            if get_account_header_json['error']['code'] == -11:
-                logger.info("Unknown Wallet ID")
-                raise forms.ValidationError(-11)
+            if status_code != 200:
+                logger.info(f"Invalid Account Request, Status: {status_code}")
+                print(f"Invalid Account Request, Status: {status_code}")
+                if status_code == 400:
+                    logger.info("Invalid Wallet ID")
+                    print("Invalid Wallet ID")
+                    raise forms.ValidationError("invalid_account")
+                elif status_code == 404:
+                    logger.info("Unknown Wallet ID")
+                    print("Unknown Wallet ID")
+                    raise forms.ValidationError("unknown_account")
+                else:
+                    logger.warning(f"Received unknown Status Code: {status_code}")
+                    print(f"Received unknown Status Code: {status_code}")
+                    raise forms.ValidationError("unknown_error")
 
+
+class CalcForm(forms.Form):
+    hardware = forms.ChoiceField(choices=HARDWARE, label='Hardware')
+    network_difficulty = forms.IntegerField(label='Network Difficulty', help_text="Usually around 8")
+    block_reward = forms.FloatField(label="Block Reward (NXS)")
+    exchange_rate = forms.FloatField(label="Exchange Rate (USD/NXS)")
+    power_consumption = forms.FloatField(label="Power Consumption (W)")
+    electricity_cost = forms.FloatField(label="Electricity Cost ($/KWH)")
+
+    def __init__(self, *args, **kwargs):
+        super(CalcForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
+        self.fields['hardware'].widget.attrs['class'] = 'btn btn-light dropdown-toggle'
+        self.fields['hardware'].widget.attrs['style'] = 'width: 355px'

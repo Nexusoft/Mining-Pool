@@ -40,12 +40,14 @@ def get_latest_blocks(_socket):
 
         _socket.send(pybson.dumps(payload))
         response = _socket.recv(20000)
+
         json_data = bson.loads(response)
 
         return json_data
 
     except Exception as ex:
-        print(ex)
+        print("Exception when retrieving latest Blocks: ", ex)
+        logger.error(f"Exception when retrieving latest Blocks: {ex}")
         return None
 
 
@@ -90,7 +92,6 @@ def get_account(_socket, _account):
     json_data = bson.loads(response)
 
     return json_data
-
 
 
 def get_account_header(_socket, _account):

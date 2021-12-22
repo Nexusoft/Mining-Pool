@@ -19,6 +19,7 @@ class Payout_recipient_dto : public oatpp::DTO
 
 public:
 
+	Payout_recipient_dto() = default;
 	Payout_recipient_dto(const char* paddress_to, double pamount)
 		: address_to(paddress_to)
 		, amount(pamount)

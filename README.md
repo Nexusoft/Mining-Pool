@@ -37,12 +37,13 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "local_port" :          // port of the POOL for connecting to NXS wallet. (0 for ephemeral port)
     "public_ip" :            // public ip of the POOL which miners connect to.
     "miner_listen_port" : 0, // port of the POOL for listening to incoming miner connections. Potential miners will use public_ip:miner_listen_port to connect to the POOL.
-    "api_listen_port" : 0,   // port of the POOL for listening to incoming API calls (from the web frontend for example).
     "mining_mode" : "HASH",  // mining mode the POOL is started with. Options are 'HASH' or 'PRIME'. Changes to this config option will only take effect after round end.
     "connection_retry_interval" // retry time in seconds trying to connect to NXS wallet if a connection attempt failed.
     "get_height_interval"       // time in seconds polling for current BLOCK height of NXS wallet.
     "session_expiry_time"       // time in seconds after which a miner session expires.
     "log_level"             // optional, default=2 (info), sets the verbosity of log messages ranges from 0 (trace) - 5 (critical)
+    "api"                // Option group regarding API for frontend of the POOL. If not present then no API server will be started
+        "listen_port" : 0   // port of the POOL for listening to incoming API calls (from the web frontend for example).
 
     "persistance"       // Option group regarding used storage for the POOL
         "type"          // which storage type the POOL uses. Currently only 'sqlite' is supported.

@@ -26,6 +26,12 @@ struct Persistance_config
 	std::string m_file{};
 };
 
+struct Api_config
+{
+	bool m_use_api{ false };
+	std::uint16_t m_listen_port{ 0 };
+};
+
 struct Pool_config
 {
 	std::string m_account{};
