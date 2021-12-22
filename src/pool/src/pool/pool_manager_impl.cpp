@@ -255,6 +255,7 @@ void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, Session
 		m_block_map.emplace(std::make_pair(m_block_map_id.load(), Submit_block_data{ std::move(block), session->get_user_data().m_account.m_address }));
 		m_wallet_connection->submit_block(std::move(block_data), m_block_map_id, std::move(handler));
 		m_block_map_id++;
+		m_total_shares++;
 		break;
 	}
 	case reward::Difficulty_result::reject:
