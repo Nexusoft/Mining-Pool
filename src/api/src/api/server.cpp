@@ -35,9 +35,10 @@ void Server::start()
 		App_component components{ m_public_ip, m_api_listen_port }; // Create scope Environment components
 
 		OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
+		OATPP_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper);
 
 		/* create ApiControllers and add endpoints to router */
-		auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_auth_user, m_auth_pw);
+		auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_auth_user, m_auth_pw, objectMapper);
 		router->addController(rest_controller);
 
 		/* Get connection handler component */
