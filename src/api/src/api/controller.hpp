@@ -7,6 +7,7 @@
 #include "TAO/Register/types/address.h"
 
 #include "oatpp/web/server/api/ApiController.hpp"
+#include "oatpp/web/server/handler/AuthorizationHandler.hpp"
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/macro/component.hpp"
 
@@ -14,6 +15,10 @@ namespace nexuspool
 {
 namespace api
 {
+using  oatpp::web::server::handler::BasicAuthorizationHandler;
+using  oatpp::web::server::handler::DefaultBasicAuthorizationObject;
+
+
 #include OATPP_CODEGEN_BEGIN(ApiController) //<-- Begin codegen
 
 class Rest_controller : public oatpp::web::server::api::ApiController 
@@ -22,14 +27,24 @@ public:
 
     Rest_controller(Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
+        std::string auth_user,
+        std::string auth_pw,
         OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
         : m_data_reader{ std::move(data_reader) }
         , m_pool_api_data_exchange{ std::move(pool_api_data_exchange) }
+        , m_auth_user{std::move(auth_user)}
+        , m_auth_pw{std::move(auth_pw)}
         , oatpp::web::server::api::ApiController(objectMapper)
-    {}
-
-    ENDPOINT("GET", "/metainfo", metainfo) 
     {
+        if (!m_auth_user.empty())
+        {
+            setDefaultAuthorizationHandler(std::make_shared<BasicAuthorizationHandler>("nexuspool"));
+        }
+    }
+
+    ENDPOINT("GET", "/metainfo", metainfo, AUTHORIZATION(std::shared_ptr<DefaultBasicAuthorizationObject>, authObject))
+    {
+        OATPP_ASSERT_HTTP(authObject->userId == m_auth_user && authObject->password == m_auth_pw, Status::CODE_401, "Unauthorized");
         auto dto = Meta_infos_dto::createShared();
         auto const config = get_config_data();
 
@@ -41,8 +56,9 @@ public:
         return createDtoResponse(Status::CODE_200, dto);
     }
 
-    ENDPOINT("GET", "/latestblocks", latestblocks)
+    ENDPOINT("GET", "/latestblocks", latestblocks, AUTHORIZATION(std::shared_ptr<DefaultBasicAuthorizationObject>, authObject))
     {
+        OATPP_ASSERT_HTTP(authObject->userId == m_auth_user && authObject->password == m_auth_pw, Status::CODE_401, "Unauthorized");
         auto dto = Latest_blocks_dto::createShared();
         auto blocks = m_data_reader->get_latest_blocks();
         for (auto& block : blocks)
@@ -53,8 +69,9 @@ public:
         return createDtoResponse(Status::CODE_200, dto);
     }
 
-    ENDPOINT("GET", "/account/header", accountheader, QUERY(String, account))
+    ENDPOINT("GET", "/account/header", accountheader, QUERY(String, account), AUTHORIZATION(std::shared_ptr<DefaultBasicAuthorizationObject>, authObject))
     {
+        OATPP_ASSERT_HTTP(authObject->userId == m_auth_user && authObject->password == m_auth_pw, Status::CODE_401, "Unauthorized");
         // is account a valid nxs address  
         TAO::Register::Address address_check{ account };
         if (!address_check.IsValid())
@@ -72,8 +89,9 @@ public:
         }
     }
 
-    ENDPOINT("GET", "/account/detail", accountdetail, QUERY(String, account))
+    ENDPOINT("GET", "/account/detail", accountdetail, QUERY(String, account), AUTHORIZATION(std::shared_ptr<DefaultBasicAuthorizationObject>, authObject))
     {
+        OATPP_ASSERT_HTTP(authObject->userId == m_auth_user && authObject->password == m_auth_pw, Status::CODE_401, "Unauthorized");
         // is account a valid nxs address  
         TAO::Register::Address address_check{ account };
         if (!address_check.IsValid())
@@ -101,8 +119,9 @@ public:
     }
 
     
-        ENDPOINT("GET", "/account/payout", accountpayout, QUERY(String, account))
+    ENDPOINT("GET", "/account/payout", accountpayout, QUERY(String, account), AUTHORIZATION(std::shared_ptr<DefaultBasicAuthorizationObject>, authObject))
     {
+        OATPP_ASSERT_HTTP(authObject->userId == m_auth_user && authObject->password == m_auth_pw, Status::CODE_401, "Unauthorized");
         // is account a valid nxs address  
         TAO::Register::Address address_check{ account };
         if (!address_check.IsValid())
@@ -135,6 +154,8 @@ private:
 
     Shared_data_reader::Sptr m_data_reader;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
+    std::string m_auth_user;
+    std::string m_auth_pw;
     persistance::Config_data m_cached_config;
 
 };

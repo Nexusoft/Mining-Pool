@@ -101,6 +101,11 @@ namespace config
 			{
 				m_api_config.m_use_api = true;
 				m_api_config.m_listen_port = j.at("api")["listen_port"];
+				if (j.contains("auth_user"))
+				{
+					m_api_config.m_auth_user = j.at("api")["auth_user"];
+					m_api_config.m_auth_pw = j.at("api")["auth_pw"];
+				}
 			}
 
 			// read stats printer config

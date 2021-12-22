@@ -15,11 +15,15 @@ Server::Server(std::shared_ptr<spdlog::logger> logger,
 	persistance::Data_reader::Uptr data_reader,
 	std::string public_ip,
 	std::uint16_t api_listen_port, 
+	std::string auth_user,
+	std::string auth_pw,
 	common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
 	: m_logger{std::move(logger)}
 	, m_shared_data_reader{std::make_shared<Shared_data_reader>(std::move(data_reader))}
 	, m_public_ip{ std::move(public_ip) }
 	, m_api_listen_port{ api_listen_port }
+	, m_auth_user{ std::move(auth_user) }
+	, m_auth_pw{ std::move(auth_pw) }
 	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
 {
 }
@@ -33,7 +37,7 @@ void Server::start()
 		OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
 
 		/* create ApiControllers and add endpoints to router */
-		auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange);
+		auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_auth_user, m_auth_pw);
 		router->addController(rest_controller);
 
 		/* Get connection handler component */

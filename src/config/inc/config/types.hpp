@@ -30,6 +30,8 @@ struct Api_config
 {
 	bool m_use_api{ false };
 	std::uint16_t m_listen_port{ 0 };
+	std::string m_auth_user{};
+	std::string m_auth_pw{};
 };
 
 struct Pool_config
