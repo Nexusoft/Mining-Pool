@@ -314,6 +314,10 @@ void Pool_manager_impl::end_round()
 	// update config in storage
 	m_storage_config_data = storage_config_check();
 
+	// If there are still unpaid rounds pay them also now. (This can happen if not all blocks from previous rounds 
+	// are matured till round end and there are insufficient funds to pay all miners)
+	m_reward_component->process_unpaid_rounds();
+
 	// start next round
 	if (!m_reward_component->start_round(m_storage_config_data.m_round_duration_hours))
 	{
