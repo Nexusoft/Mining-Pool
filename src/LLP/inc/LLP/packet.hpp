@@ -84,6 +84,11 @@ namespace nexuspool
 			{
 				m_length = ((*buffer)[1] << 24) + ((*buffer)[2] << 16) + ((*buffer)[3] << 8) + ((*buffer)[4]);
 				m_data = std::make_shared<std::vector<uint8_t>>(buffer->begin() + 5, buffer->end());
+
+				if (m_data->size() != m_length)
+				{
+					m_is_valid = false;
+				}
 			}
 		}
 
@@ -125,8 +130,6 @@ namespace nexuspool
 			return std::make_shared<std::vector<uint8_t>>(BYTES);
 		}
 
-		inline network::Shared_payload create_respond(uint8_t header) { return get_packet(header).get_bytes(); }
-
 		inline Packet get_packet(uint8_t header) const
 		{
 			Packet packet;
@@ -134,24 +137,6 @@ namespace nexuspool
 
 			return packet;
 		}
-
-		/** Convert the Header of a Block into a Byte Stream for Reading and Writing Across Sockets. **/
-		// inline network::Shared_payload serialize_block(LLP::CBlock const& block, uint32_t min_share)
-		// {
-		// 	std::vector<uint8_t> hash = block.GetHash().GetBytes();
-		// 	std::vector<uint8_t> minimum = uint2bytes(min_share);
-		// 	std::vector<uint8_t> difficulty = uint2bytes(block.nBits);
-		// 	std::vector<uint8_t> height = uint2bytes(block.nHeight);
-
-		// 	std::vector<uint8_t> data;
-		// 	data.insert(data.end(), hash.begin(), hash.end());
-		// 	data.insert(data.end(), minimum.begin(), minimum.end());
-		// 	data.insert(data.end(), difficulty.begin(), difficulty.end());
-		// 	data.insert(data.end(), height.begin(), height.end());
-
-		// 	return std::make_shared<std::vector<uint8_t>>(data);
-		// }
-
     };
 
 }
