@@ -64,10 +64,7 @@ bool Wallet_connection_impl::connect(network::Endpoint const& wallet_endpoint)
                 {
                     self->m_logger->info("Connection to wallet established");
 
-                    Packet packet;
-                    packet.m_header = Packet::SET_CHANNEL;
-                    packet.m_length = 4;
-                    packet.m_data = std::make_shared<network::Payload>(uint2bytes(self->m_mining_mode == common::Mining_mode::PRIME ? 1U : 2U));
+                    Packet packet{ Packet::SET_CHANNEL, uint2bytes(self->m_mining_mode == common::Mining_mode::PRIME ? 1U : 2U) };
                     self->m_connection->transmit(packet.get_bytes());
 
                     self->m_timer_manager.start_get_height_timer(self->m_get_height_interval, self->m_connection);
@@ -102,145 +99,142 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
         return;
     }
 
-    Packet packet{ std::move(receive_buffer) };
-    if (!packet.is_valid())
+    auto remaining_size = receive_buffer->size();
+    do
     {
-        // log invalid packet
-        m_logger->error("Received packet is invalid. Header: {}", packet.m_header);
-        return;
-    }
-
-    if (packet.m_header == Packet::PING)
-    {
-        m_logger->trace("Ping received");
-    }
-    else if (packet.m_header == Packet::BLOCK_HEIGHT)
-    {
-        auto pool_manager_shared = m_pool_manager.lock();
-        if (!pool_manager_shared)
-            return;
-
-        auto const height = bytes2uint(*packet.m_data);
-        if (height > m_current_height)
+        auto packet = extract_packet_from_buffer(receive_buffer, remaining_size, receive_buffer->size() - remaining_size);
+        if (!packet.is_valid())
         {
-            m_current_height = height;
-            m_logger->info("Nexus Network: New Block with height {}", m_current_height);
-
-            // update height at pool_manager
-            pool_manager_shared->set_current_height(m_current_height);
-            m_get_block_pool_manager = true; 
-
-            // clear pending get_block handlers
-            {
-                std::scoped_lock lock(m_get_block_mutex);
-                std::queue<Get_block_handler> empty_queue;
-                std::swap(m_pending_get_blocks, empty_queue);
-            }
-
-            // get new block from wallet for pool_manager
-            Packet packet_get_block;
-            packet_get_block.m_header = Packet::GET_BLOCK;
-            m_connection->transmit(packet_get_block.get_bytes());
+            // log invalid packet
+            m_logger->error("Received packet is invalid. Header: {}", packet.m_header);
+            continue;
         }
-        else
-        {
-            // send the height message to all miners
-            pool_manager_shared->set_current_height(m_current_height);
-        }
-    }
-    // Block from wallet received
-    else if (packet.m_header == Packet::BLOCK_DATA)
-    {
-        auto block = LLP::deserialize_block(std::move(*packet.m_data));
-        if (block.nHeight == m_current_height)
-        {
-            if (m_get_block_pool_manager) // pool_manager get_block has priority
-            {
-                auto pool_manager_shared = m_pool_manager.lock();
-                if (!pool_manager_shared)
-                    return;
 
-                pool_manager_shared->set_block(std::move(block));
-                m_get_block_pool_manager = false;
+        if (packet.m_header == Packet::PING)
+        {
+            m_logger->trace("Ping received");
+        }
+        else if (packet.m_header == Packet::BLOCK_HEIGHT)
+        {
+            auto pool_manager_shared = m_pool_manager.lock();
+            if (!pool_manager_shared)
+                break;
+
+            auto const height = bytes2uint(*packet.m_data);
+            if (height > m_current_height)
+            {
+                m_current_height = height;
+                m_logger->info("Nexus Network: New Block with height {}", m_current_height);
+
+                // update height at pool_manager
+                pool_manager_shared->set_current_height(m_current_height);
+                m_get_block_pool_manager = true;
+
+                // clear pending get_block handlers
+                {
+                    std::scoped_lock lock(m_get_block_mutex);
+                    std::queue<Get_block_handler> empty_queue;
+                    std::swap(m_pending_get_blocks, empty_queue);
+                }
+
+                // get new block from wallet for pool_manager
+                Packet packet_get_block{ Packet::GET_BLOCK, nullptr };
+                m_connection->transmit(packet_get_block.get_bytes());
             }
             else
             {
-                // get oldest pending_get_block handler from miner_connection and call it then pop()
-                std::scoped_lock lock(m_get_block_mutex);
-                if (!m_pending_get_blocks.empty())
-                {
-                    auto handler = m_pending_get_blocks.front();
-                    handler(block);
-                    m_pending_get_blocks.pop();
-                }
+                // send the height message to all miners
+                pool_manager_shared->set_current_height(m_current_height);
             }
         }
-        else if(block.nHeight < m_current_height)
+        // Block from wallet received
+        else if (packet.m_header == Packet::BLOCK_DATA)
         {
-            std::scoped_lock lock(m_get_block_mutex);
-            m_logger->trace("Block Obsolete Height = {}, Pending miner blocks = {}", block.nHeight, m_pending_get_blocks.size());
-            if (block.nHeight == 256)
+            auto block = LLP::deserialize_block(std::move(*packet.m_data));
+            if (block.nHeight == m_current_height)
             {
-                //request a new block if the wallet sends garbage height
-                Packet packet_get_block;
-                packet_get_block.m_header = Packet::GET_BLOCK;
-                m_connection->transmit(packet_get_block.get_bytes());
+                if (m_get_block_pool_manager) // pool_manager get_block has priority
+                {
+                    auto pool_manager_shared = m_pool_manager.lock();
+                    if (!pool_manager_shared)
+                        break;
+
+                    pool_manager_shared->set_block(std::move(block));
+                    m_get_block_pool_manager = false;
+                }
+                else
+                {
+                    // get oldest pending_get_block handler from miner_connection and call it then pop()
+                    std::scoped_lock lock(m_get_block_mutex);
+                    if (!m_pending_get_blocks.empty())
+                    {
+                        auto handler = m_pending_get_blocks.front();
+                        handler(block);
+                        m_pending_get_blocks.pop();
+                    }
+                }
             }
+            else if (block.nHeight < m_current_height)
+            {
+                std::scoped_lock lock(m_get_block_mutex);
+                m_logger->trace("Block Obsolete Height = {}, Pending miner blocks = {}", block.nHeight, m_pending_get_blocks.size());
+                if (block.nHeight == 256)
+                {
+                    //request a new block if the wallet sends garbage height
+                    Packet packet_get_block{ Packet::GET_BLOCK, nullptr };
+                    m_connection->transmit(packet_get_block.get_bytes());
+                }
+            }
+            else
+            {
+                m_logger->trace("Block Obsolete Height = {}", block.nHeight);
+            }
+        }
+        else if (packet.m_header == Packet::ACCEPT)
+        {
+            m_logger->info("Block Accepted By Nexus Network.");
+            auto pool_manager_shared = m_pool_manager.lock();
+            if (!pool_manager_shared)
+                break;
+
+            // get_height immediately to get the next block faster than waiting on get_height_timer
+            Packet packet_get_height{ Packet::GET_HEIGHT, nullptr };
+            m_connection->transmit(packet_get_height.get_bytes());
+
+            // the oldest handler is the first one who submitted the block
+            std::scoped_lock lock(m_submit_block_mutex);
+            auto handler = m_pending_submit_block_handlers.front();
+            pool_manager_shared->add_block_to_storage(handler.first);
+            handler.second(Submit_block_result::block_found);
+            m_pending_submit_block_handlers.pop();
+        }
+        else if (packet.m_header == Packet::REJECT)
+        {
+            m_logger->warn("Block Rejected by Nexus Network.");
+
+
+            Packet packet_get_block{ Packet::GET_BLOCK, nullptr };
+            m_connection->transmit(packet_get_block.get_bytes());
+            //  m_stats_collector->block_rejected();
+
+            std::scoped_lock lock(m_submit_block_mutex);
+            auto handler = m_pending_submit_block_handlers.front();
+            handler.second(Submit_block_result::reject);
+            m_pending_submit_block_handlers.pop();
         }
         else
         {
-            m_logger->trace("Block Obsolete Height = {}", block.nHeight);
+            m_logger->error("Invalid header received.");
         }
     }
-    else if (packet.m_header == Packet::ACCEPT)
-    {
-        m_logger->info("Block Accepted By Nexus Network.");
-        auto pool_manager_shared = m_pool_manager.lock();
-        if (!pool_manager_shared)
-            return;
-
-        // get_height immediately to get the next block faster than waiting on get_height_timer
-        Packet packet_get_height;
-        packet_get_height.m_header = Packet::GET_HEIGHT;
-        m_connection->transmit(packet_get_height.get_bytes());
-
-        // the oldest handler is the first one who submitted the block
-        std::scoped_lock lock(m_submit_block_mutex);
-        auto handler = m_pending_submit_block_handlers.front();
-        pool_manager_shared->add_block_to_storage(handler.first);
-        handler.second(Submit_block_result::block_found);
-        m_pending_submit_block_handlers.pop();
-    }
-    else if (packet.m_header == Packet::REJECT)
-    {
-        m_logger->warn("Block Rejected by Nexus Network.");
-
-
-        Packet packet_get_block;
-        packet_get_block.m_header = Packet::GET_BLOCK;
-        m_connection->transmit(packet_get_block.get_bytes());
-        //  m_stats_collector->block_rejected();
-
-        std::scoped_lock lock(m_submit_block_mutex);
-        auto handler = m_pending_submit_block_handlers.front();
-        handler.second(Submit_block_result::reject);
-        m_pending_submit_block_handlers.pop();
-    }
-    else
-    {
-        m_logger->error("Invalid header received.");
-    }
+    while (remaining_size != 0);
 }
 
 void Wallet_connection_impl::submit_block(network::Shared_payload&& block_data, std::uint32_t block_map_id, Submit_block_handler&& handler)
 {
     m_logger->info("Submitting Block...");
 
-    Packet packet;
-    packet.m_header = Packet::SUBMIT_BLOCK;
-    packet.m_data = std::move(block_data);
-    packet.m_length = 72;
-
+    Packet packet{ Packet::SUBMIT_BLOCK, std::move(block_data) };
     m_connection->transmit(packet.get_bytes());
 
     // store block request handler in pending list (handler comes from miner_connection)
@@ -255,8 +249,7 @@ void Wallet_connection_impl::get_block(Get_block_handler&& handler)
         return;
     }
 
-    Packet packet_get_block;
-    packet_get_block.m_header = Packet::GET_BLOCK;
+    Packet packet_get_block{ Packet::GET_BLOCK, nullptr };
     m_connection->transmit(packet_get_block.get_bytes());
 
     // store block request handler in pending list (handler comes from miner_connection)

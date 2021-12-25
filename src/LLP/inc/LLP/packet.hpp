@@ -59,6 +59,27 @@ namespace nexuspool
 			, m_is_valid{false}
 		{
 		}
+
+		Packet(std::uint8_t header, network::Payload const& data)
+			: m_header{ header }
+			, m_is_valid{ true }
+		{
+			m_data = std::make_shared<network::Payload>(data);
+			m_length = m_data->size();
+		}
+
+		Packet(std::uint8_t header, network::Shared_payload data)
+			: m_header{ header }
+			, m_length{ 0 }
+			, m_is_valid{ true }
+		{
+			if (data)
+			{
+				m_data = std::move(data);
+				m_length = m_data->size();
+			}
+		}
+
 		// creates a packet from received buffer
 		explicit Packet(network::Shared_payload buffer)
 		{
@@ -129,9 +150,7 @@ namespace nexuspool
 
 		inline Packet get_packet(std::uint8_t header) const
 		{
-			Packet packet;
-			packet.m_header = header;
-
+			Packet packet{ header, nullptr };
 			return packet;
 		}
     };
