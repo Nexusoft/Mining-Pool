@@ -14,6 +14,7 @@ public:
     MOCK_METHOD(void, stop, (), (override));
     MOCK_METHOD(network::Connection::Handler, connection_handler, (), (override));
     MOCK_METHOD(void, set_current_height, (std::uint32_t height), (override));
+    MOCK_METHOD(void, get_hashrate, (), (override));
 };
 
 }

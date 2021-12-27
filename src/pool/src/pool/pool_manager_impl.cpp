@@ -276,7 +276,7 @@ chrono::Timer::Handler Pool_manager_impl::update_block_hashes_handler(std::uint1
 {
 	return[this, update_block_hashes_interval]()
 	{
-		m_reward_component->update_block_hashes_from_current_round();
+		m_session_registry->get_hashrate();
 
 		// restart timer
 		m_update_block_hashes_timer->start(chrono::Seconds(update_block_hashes_interval),

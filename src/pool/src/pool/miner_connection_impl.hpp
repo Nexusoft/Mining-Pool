@@ -27,6 +27,7 @@ public:
 
     network::Connection::Handler connection_handler() override;
     void set_current_height(std::uint32_t height) override;
+    void get_hashrate() override;
 
 private:
 

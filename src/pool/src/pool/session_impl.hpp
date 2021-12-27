@@ -73,6 +73,9 @@ public:
 	// update height on active sessions
 	void update_height(std::uint32_t height) override;
 
+	// sends get_hashrate message to active sessions
+	void get_hashrate() override;
+
 	bool valid_nxs_address(std::string const& nxs_address) override;
 	bool does_account_exists(std::string account) override;
 	void login(Session_key key) override;	// fetch user data from storage for the specific session

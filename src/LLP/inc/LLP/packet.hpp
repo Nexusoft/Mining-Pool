@@ -36,6 +36,7 @@ namespace nexuspool
 			GET_HEIGHT = 130,
 			GET_REWARD = 131,
 			GET_PAYOUT = 132,
+			GET_HASHRATE = 133,
 
 			//POOL RELATED
 			LOGIN_SUCCESS = 134,

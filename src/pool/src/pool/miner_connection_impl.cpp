@@ -311,4 +311,15 @@ void Miner_connection_impl::process_accepted()
 	session->set_update_time(std::chrono::steady_clock::now());
 }
 
+void Miner_connection_impl::get_hashrate()
+{
+	if (!m_connection)
+	{
+		return;
+	}
+
+	Packet packet{ Packet::GET_HASHRATE, nullptr };
+	m_connection->transmit(packet.get_bytes());
+}
+
 }
