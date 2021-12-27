@@ -27,6 +27,8 @@ namespace config
 		, m_print_statistics_interval{5}
 		, m_get_height_interval{2}
 		, m_session_expiry_time{5}
+		, m_update_block_hashes_interval{600}
+		, m_hashrate_interval{300}
 	{
 	}
 
@@ -125,6 +127,14 @@ namespace config
 			if (j.count("session_expiry_time") != 0)
 			{
 				j.at("session_expiry_time").get_to(m_session_expiry_time);
+			}
+			if (j.count("update_block_hashes_interval") != 0)
+			{
+				j.at("update_block_hashes_interval").get_to(m_update_block_hashes_interval);
+			}
+			if (j.count("get_hashrate_interval") != 0)
+			{
+				j.at("get_hashrate_interval").get_to(m_hashrate_interval);
 			}
 
 			if (j.count("logfile") != 0)

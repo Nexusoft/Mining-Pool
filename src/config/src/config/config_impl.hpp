@@ -35,7 +35,9 @@ public:
 	std::vector<Stats_printer_config>& get_stats_printer_config() override  { return m_stats_printer_config; }
 	Pool_config const& get_pool_config() const override  { return m_pool_config; }
 	Persistance_config const& get_persistance_config() const override  { return m_persistance_config; }
-	virtual Api_config const& get_api_config() const override { return m_api_config;  }
+	Api_config const& get_api_config() const override { return m_api_config;  }
+	std::uint16_t get_update_block_hashes_interval() const override { return m_update_block_hashes_interval; }
+	std::uint16_t get_hashrate_interval() const override { return m_hashrate_interval; }
 
 private:
 
@@ -62,6 +64,8 @@ private:
 	std::uint16_t m_print_statistics_interval;
 	std::uint16_t m_get_height_interval;
 	std::uint16_t m_session_expiry_time;
+	std::uint16_t m_update_block_hashes_interval;
+	std::uint16_t m_hashrate_interval;
 
 };
 

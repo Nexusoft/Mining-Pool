@@ -69,6 +69,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
 	m_update_block_hashes_timer = m_timer_factory->create_timer();
+	m_get_hashrate_timer = m_timer_factory->create_timer();
 }
 
 void Pool_manager_impl::start()
@@ -145,8 +146,8 @@ void Pool_manager_impl::start()
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 
-	m_update_block_hashes_timer->start(chrono::Seconds(5*60), update_block_hashes_handler(5*60));
-	
+	m_update_block_hashes_timer->start(chrono::Seconds(m_config->get_update_block_hashes_interval()), update_block_hashes_handler(m_config->get_update_block_hashes_interval()));
+	m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
 }
 
 void Pool_manager_impl::stop()
@@ -154,6 +155,7 @@ void Pool_manager_impl::stop()
 	m_session_registry_maintenance->stop();
 	m_end_round_timer->stop();
 	m_update_block_hashes_timer->stop();
+	m_get_hashrate_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_wallet_connection->stop();
 	m_listen_socket->stop_listen();
@@ -281,6 +283,18 @@ chrono::Timer::Handler Pool_manager_impl::update_block_hashes_handler(std::uint1
 			update_block_hashes_handler(update_block_hashes_interval));
 	};
 }
+
+chrono::Timer::Handler Pool_manager_impl::get_hashrate_handler(std::uint16_t get_hashrate_interval)
+{
+	return[this, get_hashrate_interval]()
+	{
+		m_reward_component->update_block_hashes_from_current_round();
+
+		// restart timer
+		m_get_hashrate_timer->start(chrono::Seconds(get_hashrate_interval), get_hashrate_handler(get_hashrate_interval));
+	};
+}
+
 
 chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval)
 {

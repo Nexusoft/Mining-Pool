@@ -163,7 +163,7 @@ bool Validator::check(std::string const& config_file)
 		}
 		if (j.count("get_height_interval") != 0)
 		{
-                        if(!j.at("get_height_interval").is_number())
+            if(!j.at("get_height_interval").is_number())
             {
                 m_optional_fields.push_back(Validator_error{"get_height_interval", "Not a number"});
             }
@@ -175,6 +175,20 @@ bool Validator::check(std::string const& config_file)
                 m_optional_fields.push_back(Validator_error{ "session_expiry_time", "Not a number" });
             }
         } 
+        if (j.count("update_block_hashes_interval") != 0)
+        {
+            if (!j.at("update_block_hashes_interval").is_number())
+            {
+                m_optional_fields.push_back(Validator_error{ "update_block_hashes_interval", "Not a number" });
+            }
+        }
+        if (j.count("get_hashrate_interval") != 0)
+        {
+            if (!j.at("get_hashrate_interval").is_number())
+            {
+                m_optional_fields.push_back(Validator_error{ "get_hashrate_interval", "Not a number" });
+            }
+        }
 
         if (j.count("log_level") != 0)
         {

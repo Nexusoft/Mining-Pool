@@ -29,6 +29,8 @@ public:
     MOCK_METHOD(Pool_config const&, get_pool_config, (), (const override));
     MOCK_METHOD(Persistance_config const&, get_persistance_config, (), (const override));
     MOCK_METHOD(Api_config const&, get_api_config, (), (const override));
+    MOCK_METHOD(std::uint16_t, get_update_block_hashes_interval, (), (const override));
+    MOCK_METHOD(std::uint16_t, get_hashrate_interval, (), (const override));
 };
 
 
