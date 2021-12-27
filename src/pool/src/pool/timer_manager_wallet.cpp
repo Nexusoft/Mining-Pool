@@ -51,8 +51,7 @@ chrono::Timer::Handler Timer_manager_wallet::get_height_handler(std::uint16_t ge
         auto connection_shared = connection.lock();
         if(connection_shared)
         {
-            Packet packet_get_height;
-            packet_get_height.m_header = Packet::GET_HEIGHT;
+            Packet packet_get_height{ Packet::GET_HEIGHT, nullptr };
             connection_shared->transmit(packet_get_height.get_bytes());
 
             // restart timer
