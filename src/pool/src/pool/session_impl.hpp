@@ -33,7 +33,7 @@ public:
 	void set_update_time(std::chrono::steady_clock::time_point update_time) override { m_update_time = update_time; }
 	bool add_share() override;
 	void reset_shares() override;
-	void update_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio) override;
+	void update_hashrate(double hashrate) override;
 	void set_block(LLP::CBlock const& block) override { m_block = std::make_unique<LLP::CBlock>(block); }
 	std::unique_ptr<LLP::CBlock> get_block() override;
 

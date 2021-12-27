@@ -39,10 +39,10 @@ void Session_impl::reset_shares()
 	m_data_writer->update_account(m_user_data.m_account);
 }
 
-void Session_impl::update_hashrate(std::uint32_t pool_nbits, std::uint32_t network_nbits, double prime_shares_to_blocks_ratio)
+void Session_impl::update_hashrate(double hashrate)
 {
 	m_user_data.m_account = m_data_reader->get_account(m_user_data.m_account.m_address);
-	m_user_data.m_account.m_hashrate = m_hashrate_helper.get_hashrate(pool_nbits, network_nbits, prime_shares_to_blocks_ratio);
+	m_user_data.m_account.m_hashrate = hashrate;
 	m_data_writer->update_account(m_user_data.m_account);
 }
 

@@ -30,6 +30,7 @@ namespace nexuspool
 
 			//POOL RELATED
 			LOGIN = 8,
+			HASHRATE = 9,
 
 			/** REQUEST PACKETS **/
 			GET_BLOCK = 129,

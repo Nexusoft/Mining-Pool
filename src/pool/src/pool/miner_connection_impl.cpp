@@ -245,6 +245,12 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 					});
 			}
 		}
+		else if (packet.m_header == Packet::HASHRATE)
+		{
+			auto const hashrate = bytes2double(*packet.m_data);
+			session->update_hashrate(hashrate);
+
+		}
 		else if (packet.m_header == Packet::SET_CHANNEL)
 		{
 			m_logger->error("Invalid header received. Possibly from miner in SOLO mode");

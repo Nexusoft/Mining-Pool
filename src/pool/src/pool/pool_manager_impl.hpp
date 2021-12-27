@@ -70,9 +70,6 @@ private:
     chrono::Timer::Uptr m_update_block_hashes_timer;
     chrono::Timer::Uptr m_get_hashrate_timer;
 
-    std::atomic<std::uint32_t> m_total_blocks;
-    std::atomic<std::uint32_t> m_total_shares;
-
     // connection variables
     std::atomic<std::uint32_t> m_current_height;
     std::mutex m_block_mutex;
