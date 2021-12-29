@@ -44,6 +44,8 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "log_level"             // optional, default=2 (info), sets the verbosity of log messages ranges from 0 (trace) - 5 (critical)
     "api"                // Option group regarding API for frontend of the POOL. If not present then no API server will be started
         "listen_port" : 0   // port of the POOL for listening to incoming API calls (from the web frontend for example).
+        "auth_user"         // Optional. If this config value is given then the API calls requires BasicAuth REST.
+        "auth_pw"           // Optional. If the auth_user config option is given then this field is mandatory.
 
     "persistance"       // Option group regarding used storage for the POOL
         "type"          // which storage type the POOL uses. Currently only 'sqlite' is supported.

@@ -1,6 +1,7 @@
 import logging
 import requests
 from django.conf import settings
+from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger('NexusWebUI')
 
@@ -21,22 +22,27 @@ def normalize_endpoint_url(method):
 def rest_request(method, parameters=None):
 
     try:
-        print("Sending request")
-        if parameters:
-            response = requests.get(normalize_endpoint_url(method), params=parameters)
+        user = getattr(settings, "POOL_USER", None)
+        password = getattr(settings, "POOL_PWD", None)
+
+        if user and password:
+            print("Sending authenticated request")
+
+            if parameters:
+                response = requests.get(normalize_endpoint_url(method), params=parameters,
+                                        auth=HTTPBasicAuth(user, password))
+            else:
+                response = requests.get(normalize_endpoint_url(method), auth=HTTPBasicAuth(user, password))
+
         else:
-            response = requests.get(normalize_endpoint_url(method))
+            print("Sending non-authenticated request")
+
+            if parameters:
+                response = requests.get(normalize_endpoint_url(method), params=parameters)
+            else:
+                response = requests.get(normalize_endpoint_url(method))
 
         print(f"Response: {response}")
-
-        # if response.status_code != 200:
-        #     print(f"Status Code: {response.status_code}")
-        #     logger.error("Did not receive a proper Response from Backend!")
-        #     logger.error(f"Response Code: {response.status_code}")
-        #     return None
-        # else:
-        #     print("Returning Valid Response")
-        #     return response
 
         return response
 

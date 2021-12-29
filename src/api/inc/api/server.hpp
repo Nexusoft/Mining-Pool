@@ -25,6 +25,8 @@ public:
         persistance::Data_reader::Uptr data_reader,
         std::string public_ip, 
         std::uint16_t api_listen_port,
+        std::string auth_user,
+        std::string auth_pw,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange);
 
     void start();
@@ -37,6 +39,8 @@ private:
     std::shared_ptr<Shared_data_reader> m_shared_data_reader;
     std::string m_public_ip;
     std::uint16_t m_api_listen_port;
+    std::string m_auth_user;
+    std::string m_auth_pw;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
 
 };

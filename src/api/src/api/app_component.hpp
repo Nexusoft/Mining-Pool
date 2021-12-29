@@ -36,9 +36,6 @@ public:
         return objectMapper;
         }());
 
-
-
-
     /**
         *  Create Router component
         */

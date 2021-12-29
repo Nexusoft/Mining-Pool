@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 
-add_library(api STATIC  src/api/server.cpp
-                        src/api/controller.cpp)
+add_library(api STATIC  src/api/server.cpp)
                     
 target_include_directories(api
     PUBLIC 
@@ -10,4 +9,4 @@ target_include_directories(api
     PRIVATE src
 )
 
-target_link_libraries(api network persistance TAO common oatpp)
+target_link_libraries(api persistance TAO common oatpp)

@@ -101,8 +101,14 @@ namespace config
 			// api config
 			if (j.count("api") != 0)
 			{
+				json api_json = j.at("api");
 				m_api_config.m_use_api = true;
-				m_api_config.m_listen_port = j.at("api")["listen_port"];
+				m_api_config.m_listen_port = api_json["listen_port"];
+				if (api_json.contains("auth_user"))
+				{
+					m_api_config.m_auth_user = api_json["auth_user"];
+					m_api_config.m_auth_pw = api_json["auth_pw"];
+				}
 			}
 
 			// read stats printer config

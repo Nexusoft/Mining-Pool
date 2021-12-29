@@ -133,7 +133,7 @@ namespace nexuspool
 		if (api_config.m_use_api)
 		{
 			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
-				m_config->get_public_ip(), api_config.m_listen_port, m_pool_api_data_exchange);
+				m_config->get_public_ip(), api_config.m_listen_port, api_config.m_auth_user, api_config.m_auth_pw, m_pool_api_data_exchange);
 		}
 
 		return true;

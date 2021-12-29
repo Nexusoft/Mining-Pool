@@ -1,12 +1,8 @@
-import collections
 import json
 import logging
 import math
 
-import requests
-from collections import OrderedDict
 from django.shortcuts import render, redirect
-from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from .tables import OverviewTable, AccountPayoutsTable
