@@ -26,7 +26,8 @@ LOG_DIR = os.path.join(BASE_DIR, 'logs')
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# DEBUG = False
+DEBUG = True
 
 # Todo move to .env file!
 # >>> os.environ['ALLOWED_HOSTS'] = '.localhost, .herokuapp.com'
@@ -184,6 +185,7 @@ LOGGING = {
 }
 
 # POOL SETTINGS
-POOL_IP = config('POOL_IP')
 POOL_PORT = config('POOL_PORT', cast=int, default=1)
 POOL_HOST = config('POOL_HOST')
+POOL_USER = config('POOL_USER')
+POOL_PWD = config('POOL_PWD')
