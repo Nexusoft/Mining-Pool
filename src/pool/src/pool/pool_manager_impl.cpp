@@ -68,6 +68,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	m_end_round_timer = m_timer_factory->create_timer();
 	m_update_block_hashes_timer = m_timer_factory->create_timer();
 	m_get_hashrate_timer = m_timer_factory->create_timer();
+	m_mining_info_timer = m_timer_factory->create_timer();
 }
 
 void Pool_manager_impl::start()
@@ -146,6 +147,13 @@ void Pool_manager_impl::start()
 
 	m_update_block_hashes_timer->start(chrono::Seconds(m_config->get_update_block_hashes_interval()), update_block_hashes_handler(m_config->get_update_block_hashes_interval()));
 	m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
+
+	auto const api_config = m_config->get_api_config();
+	if (api_config.m_use_api)
+	{
+		m_mining_info_timer->start(chrono::Seconds(api_config.m_reward_calc_update_interval), mining_info_handler(api_config.m_reward_calc_update_interval));
+	}
+
 }
 
 void Pool_manager_impl::stop()
@@ -154,6 +162,7 @@ void Pool_manager_impl::stop()
 	m_end_round_timer->stop();
 	m_update_block_hashes_timer->stop();
 	m_get_hashrate_timer->stop();
+	m_mining_info_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_wallet_connection->stop();
 	m_listen_socket->stop_listen();
@@ -281,6 +290,21 @@ chrono::Timer::Handler Pool_manager_impl::get_hashrate_handler(std::uint16_t get
 
 		// restart timer
 		m_get_hashrate_timer->start(chrono::Seconds(get_hashrate_interval), get_hashrate_handler(get_hashrate_interval));
+	};
+}
+
+chrono::Timer::Handler Pool_manager_impl::mining_info_handler(std::uint16_t mining_info_interval)
+{
+	return[this, mining_info_interval]()
+	{
+		common::Mining_info mining_info;
+		if (m_http_component->get_mining_info(mining_info))
+		{
+			m_pool_api_data_exchange->set_mining_info(mining_info);
+		}
+
+		// restart timer
+		m_mining_info_timer->start(chrono::Seconds(mining_info_interval), mining_info_handler(mining_info_interval));
 	};
 }
 

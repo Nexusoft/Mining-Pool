@@ -21,6 +21,15 @@ struct Block_reward_data
 	std::uint32_t m_tx_confirmations;
 };
 
+struct Mining_info
+{
+	std::uint32_t m_height{ 0 };
+	double m_prime_difficulty{ 0.0 };
+	double m_hash_difficulty{ 0.0 };
+	double m_prime_reward{ 0.0 };
+	double m_hash_rewards{ 0.0 };
+};
+
 }
 }
 #endif

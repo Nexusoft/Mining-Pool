@@ -45,6 +45,8 @@ private:
     chrono::Timer::Handler end_round_handler();
     chrono::Timer::Handler update_block_hashes_handler(std::uint16_t update_block_hashes_interval);
     chrono::Timer::Handler get_hashrate_handler(std::uint16_t get_hashrate_interval);
+    chrono::Timer::Handler mining_info_handler(std::uint16_t mining_info_interval);
+
     void end_round();
     persistance::Config_data storage_config_check();
 
@@ -69,6 +71,7 @@ private:
     chrono::Timer::Uptr m_end_round_timer;
     chrono::Timer::Uptr m_update_block_hashes_timer;
     chrono::Timer::Uptr m_get_hashrate_timer;
+    chrono::Timer::Uptr m_mining_info_timer;
 
     // connection variables
     std::atomic<std::uint32_t> m_current_height;

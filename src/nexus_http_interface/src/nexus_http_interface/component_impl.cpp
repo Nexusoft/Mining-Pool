@@ -85,7 +85,7 @@ bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
 	return true;
 }
 
-bool Component_impl::get_mining_info(Mining_info& mining_info)
+bool Component_impl::get_mining_info(common::Mining_info& mining_info)
 {
 	auto response = m_client->get_mininginfo();
 	auto const status_code = response->getStatusCode();

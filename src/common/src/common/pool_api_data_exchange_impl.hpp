@@ -16,12 +16,16 @@ public:
 	void set_active_miners(std::uint32_t active_miners) override;
 	bool is_config_updated() const override;
 	void set_config_updated(bool update) override;
+	Mining_info get_mining_info() const override;
+	void set_mining_info(Mining_info const& mining_info) override;
 
 private:
 
 	std::uint32_t m_active_miners{ 0 };
+	Mining_info m_mining_info;
 	std::atomic<bool> m_config_updated{ true };
 	mutable std::mutex m_miners_mutex;
+	mutable std::mutex m_mining_info_mutex;
 };
 
 Pool_api_data_exchange::Sptr create_pool_api_data_exchange()

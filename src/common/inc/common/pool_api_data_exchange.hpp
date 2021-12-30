@@ -3,9 +3,12 @@
 
 #include <cstdint>
 #include <memory>
+#include "common/types.hpp"
 
-namespace nexuspool {
-namespace common {
+namespace nexuspool
+{
+namespace common 
+{
 
 class Pool_api_data_exchange
 {
@@ -18,6 +21,9 @@ public:
 	virtual void set_active_miners(std::uint32_t active_miners) = 0;
 	virtual bool is_config_updated() const = 0;
 	virtual void set_config_updated(bool update) = 0;
+
+	virtual Mining_info get_mining_info() const = 0;
+	virtual void set_mining_info(Mining_info const& mining_info) = 0;
 };
 
 Pool_api_data_exchange::Sptr create_pool_api_data_exchange();

@@ -22,7 +22,7 @@ TEST_F(Nexus_http_interface_fixture, get_block_hash_test)
 
 TEST_F(Nexus_http_interface_fixture, get_mining_info_test)
 {
-	nexus_http_interface::Mining_info mining_info;
+	common::Mining_info mining_info;
 	auto result = m_component->get_mining_info(mining_info);
 
 	EXPECT_TRUE(result);
