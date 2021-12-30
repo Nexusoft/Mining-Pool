@@ -41,7 +41,9 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "connection_retry_interval" // retry time in seconds trying to connect to NXS wallet if a connection attempt failed.
     "get_height_interval"       // time in seconds polling for current BLOCK height of NXS wallet.
     "session_expiry_time"       // time in seconds after which a miner session expires.
-    "log_level"             // optional, default=2 (info), sets the verbosity of log messages ranges from 0 (trace) - 5 (critical)
+    "log_level"             // Optional, default=2 (info), sets the verbosity of log messages ranges from 0 (trace) - 5 (critical)
+    "update_block_hashes_interval"  // Optional, time in seconds when the found blocks should update their hashes in storage. Automatically happens during round end.
+    "get_hashrate_interval"         // Optional, time in seconds requesting the current hashrate from the connected miners
     "api"                // Option group regarding API for frontend of the POOL. If not present then no API server will be started
         "listen_port" : 0   // port of the POOL for listening to incoming API calls (from the web frontend for example).
         "auth_user"         // Optional. If this config value is given then the API calls requires BasicAuth REST.
@@ -58,6 +60,12 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
         "difficulty_divider"        // reduced the NXS mainnet difficulty for miners.
         "round_duration_hours"      // time in hours for the duration of a mining round. Payouts to miners can only happen when a round is finished. Config changes to POOL difficulty, fee, mining mode can only happen after round end.
 ```
+
+ ## API
+
+ The pool supports a REST API to accessinformation about the pool. 
+ The API server will automatically be started when the "api" option group is available in the pool.conf
+ The API server supports REST BasicAuth which will be enabled if the "auth_user" option is set in the "api" option group in pool.conf.  
 
 
 ## BUILDING
