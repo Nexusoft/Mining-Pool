@@ -33,6 +33,8 @@ public:
 
 private:
 
+	void stop();
+
 	std::unique_ptr<network::Component> m_network_component;
 	std::unique_ptr<persistance::Component> m_persistance_component;
 	chrono::Component::Uptr m_timer_component;

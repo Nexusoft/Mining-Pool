@@ -42,20 +42,22 @@ namespace nexuspool
 		m_signals->async_wait([this](auto, auto)
 		{
 			m_logger->info("Shutting down NexusPool");
-			if (m_api_server)
-			{
-				m_api_server->stop();
-			}
-
-			m_pool_manager->stop();
-			m_io_context->stop();
+			stop();
 			exit(1);
 		});
 	}
 
 	Pool::~Pool()
 	{
-		m_api_server->stop();
+		stop();
+	}
+
+	void Pool::stop()
+	{
+		if (m_api_server)
+		{
+			m_api_server->stop();
+		}
 		m_pool_manager->stop();
 		m_io_context->stop();
 	}
@@ -98,7 +100,7 @@ namespace nexuspool
 			auto const& full_logname = m_config->get_logfile();
 			std::size_t lastindex = full_logname.find_last_of(".");
 			std::string raw_logname = full_logname.substr(0, lastindex);
-			raw_logname += oss.str() + ".log";
+			raw_logname += "_" + oss.str() + ".log";
 
 			// initialise a new logger
 			spdlog::drop("logger");

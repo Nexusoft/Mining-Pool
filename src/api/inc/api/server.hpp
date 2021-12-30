@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <atomic>
 
 namespace spdlog { class logger; }
 namespace nexuspool
@@ -42,6 +43,7 @@ private:
     std::string m_auth_user;
     std::string m_auth_pw;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
+    std::atomic_bool m_server_stopped;
 
 };
 

@@ -26,51 +26,71 @@ Server::Server(std::shared_ptr<spdlog::logger> logger,
 	, m_auth_user{ std::move(auth_user) }
 	, m_auth_pw{ std::move(auth_pw) }
 	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
+	, m_server_stopped{false}
 {
 }
 
 void Server::start()
 {
 	oatpp::base::Environment::init();
-	m_server_thread = std::thread([this]() {
-		App_component components{ m_public_ip, m_api_listen_port }; // Create scope Environment components
+	App_component components{ m_public_ip, m_api_listen_port }; // Create scope Environment components
 
-		OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
-		OATPP_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper);
+	OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
+	OATPP_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper);
 
-		/* create ApiControllers and add endpoints to router */
-		if (m_auth_user.empty())
+	/* create ApiControllers and add endpoints to router */
+	if (m_auth_user.empty())
+	{
+		auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange, objectMapper);
+		router->addController(rest_controller);
+	}
+	else
+	{
+		auto rest_auth_controller = std::make_shared<Rest_auth_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_auth_user, m_auth_pw, objectMapper);
+		router->addController(rest_auth_controller);
+	}
+
+
+	/* Get connection handler component */
+	OATPP_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, connectionHandler);
+
+	/* Get connection provider component */
+	auto connectionProvider = components.get_serverConnectionProvider();
+
+	oatpp::network::Server server(connectionProvider, connectionHandler);
+	m_logger->info("API server started");
+
+	m_server_thread = std::thread([this, &server]()
+	{
+		server.run([this]()
 		{
-			auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange, objectMapper);
-			router->addController(rest_controller);
-		}
-		else
-		{
-			auto rest_auth_controller = std::make_shared<Rest_auth_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_auth_user, m_auth_pw, objectMapper);
-			router->addController(rest_auth_controller);
-		}
-
-
-		/* Get connection handler component */
-		OATPP_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, connectionHandler);
-
-		/* Get connection provider component */
-		auto connectionProvider = components.get_serverConnectionProvider();
-
-		oatpp::network::Server server(connectionProvider, connectionHandler);
-		m_logger->info("API server started");
-		server.run();
+			return m_server_stopped.load();
+		});
 	});
 }
 
 void Server::stop()
 {
-	m_server_thread.join();
+	/* First, stop the ServerConnectionProvider so we don't accept any new connections */
+	OATPP_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, connectionProvider);
+	connectionProvider->stop();
+
+	/* Signal the stop condition */
+	m_server_stopped.store(false);
+
+	/* Finally, stop the ConnectionHandler and wait until all running connections are closed */
+	OATPP_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, connectionHandler);
+	connectionHandler->stop();
+
+	/* Check if the thread has already stopped or if we need to wait for the server to stop */
+	if (m_server_thread.joinable()) 
+	{
+		m_server_thread.join();
+	}
+
 	oatpp::base::Environment::destroy();
 	m_logger->info("API server stopped");
 }
-
-
 
 }
 }
