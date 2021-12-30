@@ -85,6 +85,26 @@ bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
 	return true;
 }
 
+bool Component_impl::get_mining_info(Mining_info& mining_info)
+{
+	auto response = m_client->get_mininginfo();
+	auto const status_code = response->getStatusCode();
+	if (status_code != 200)
+	{
+		m_logger->error("API error. Code: {} Message: {}", status_code, response->readBodyToString()->c_str());
+		return false;
+	}
+
+	auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
+	mining_info.m_height = data_json["result"]["blocks"];
+	mining_info.m_hash_rewards = data_json["result"]["hashValue"];
+	mining_info.m_hash_difficulty = data_json["result"]["hashDifficulty"];
+	mining_info.m_prime_reward = data_json["result"]["primeValue"];
+	mining_info.m_prime_difficulty = data_json["result"]["primeDifficulty"];
+
+	return true;
+}
+
 bool Component_impl::does_account_exists(std::string const& account)
 {
 	std::string parameter{ "?address=" };

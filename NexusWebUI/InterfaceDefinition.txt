@@ -71,3 +71,16 @@ Wallet Detail API's:
             - time
             - amount
             - txhash
+############################
+Reward calculation API's:
+
+    ########################
+    GET /reward_data
+
+    # Result
+    Fields:
+        - block_reward
+        - network diff
+        - hardware (array)
+            - model
+            - power_consumption

@@ -20,6 +20,19 @@ TEST_F(Nexus_http_interface_fixture, get_block_hash_test)
 
 }
 
+TEST_F(Nexus_http_interface_fixture, get_mining_info_test)
+{
+	nexus_http_interface::Mining_info mining_info;
+	auto result = m_component->get_mining_info(mining_info);
+
+	EXPECT_TRUE(result);
+	EXPECT_GT(mining_info.m_height, 0);
+	EXPECT_GT(mining_info.m_hash_rewards, 0);
+	EXPECT_GT(mining_info.m_hash_difficulty, 0);
+	EXPECT_GT(mining_info.m_prime_difficulty, 0);
+	EXPECT_GT(mining_info.m_prime_reward, 0);
+}
+
 TEST_F(Nexus_http_interface_fixture, get_block_reward_data_test)
 {
 	common::Block_reward_data reward_data{};

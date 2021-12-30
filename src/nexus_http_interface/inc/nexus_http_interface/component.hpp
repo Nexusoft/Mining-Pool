@@ -6,8 +6,10 @@
 #include <string>
 #include <vector>
 
-namespace nexuspool {
-namespace nexus_http_interface {
+namespace nexuspool 
+{
+namespace nexus_http_interface 
+{
 
 struct Payout_recipient_data
 {
@@ -17,6 +19,14 @@ struct Payout_recipient_data
 
 using Payout_recipients = std::vector<Payout_recipient_data>;
 
+struct Mining_info
+{
+    std::uint32_t m_height{ 0 };
+    double m_prime_difficulty{ 0.0 };
+    double m_hash_difficulty{ 0.0 };
+    double m_prime_reward{ 0.0 };
+    double m_hash_rewards{ 0.0 };
+};
 
 class Component 
 {
@@ -30,6 +40,9 @@ public:
 
     // Get the block hash by height
     virtual bool get_block_hash(std::uint32_t height, std::string& hash) = 0;
+
+    // Get the mining info from wallet
+    virtual bool get_mining_info(Mining_info& mining_info) = 0;
 
     // Checks if the given account address exists on the blockchain
     virtual bool does_account_exists(std::string const& account) = 0;
