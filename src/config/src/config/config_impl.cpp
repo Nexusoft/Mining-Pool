@@ -109,6 +109,10 @@ namespace config
 					m_api_config.m_auth_user = api_json["auth_user"];
 					m_api_config.m_auth_pw = api_json["auth_pw"];
 				}
+				if (api_json.contains("reward_calc_update_interval"))
+				{
+					m_api_config.m_reward_calc_update_interval = api_json["reward_calc_update_interval"];
+				}				
 			}
 
 			// read stats printer config
