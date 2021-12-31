@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "config/stats_printer_config.hpp"
 #include "config/types.hpp"
 #include "common/types.hpp"
 
@@ -31,10 +30,8 @@ public:
 	virtual std::string const& get_logfile() const = 0;
 	virtual std::uint8_t get_log_level() const = 0;
 	virtual std::uint16_t get_connection_retry_interval() const = 0;
-	virtual std::uint16_t get_print_statistics_interval() const = 0;
 	virtual std::uint16_t get_height_interval() const = 0;
 	virtual std::uint16_t get_session_expiry_time() const = 0;
-	virtual std::vector<Stats_printer_config>& get_stats_printer_config() = 0;
 	virtual Pool_config const& get_pool_config() const = 0;
 	virtual Persistance_config const& get_persistance_config() const = 0;
 	virtual Api_config const& get_api_config() const = 0;

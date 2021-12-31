@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include "json/json.hpp"
-#include "config/stats_printer_config.hpp"
 #include "config/config.hpp"
 
 namespace nexuspool
@@ -29,10 +28,8 @@ public:
 	std::string const& get_logfile() const override  { return m_logfile; }
 	std::uint8_t get_log_level() const override { return m_log_level; }
 	std::uint16_t get_connection_retry_interval() const override  { return m_connection_retry_interval; }
-	std::uint16_t get_print_statistics_interval() const override  { return m_print_statistics_interval; }
 	std::uint16_t get_height_interval() const override  { return m_get_height_interval; }
 	std::uint16_t get_session_expiry_time() const override  { return m_session_expiry_time; }
-	std::vector<Stats_printer_config>& get_stats_printer_config() override  { return m_stats_printer_config; }
 	Pool_config const& get_pool_config() const override  { return m_pool_config; }
 	Persistance_config const& get_persistance_config() const override  { return m_persistance_config; }
 	Api_config const& get_api_config() const override { return m_api_config;  }
@@ -40,8 +37,6 @@ public:
 	std::uint16_t get_hashrate_interval() const override { return m_hashrate_interval; }
 
 private:
-
-	bool read_stats_printer_config(nlohmann::json& j);
 
 	std::string  m_wallet_ip;
 	std::uint16_t m_wallet_port;
@@ -56,12 +51,8 @@ private:
 	std::string  m_logfile;
 	std::uint8_t m_log_level;
 
-	// stats printers
-	std::vector<Stats_printer_config> m_stats_printer_config;
-
 	// advanced configs
 	std::uint16_t m_connection_retry_interval;
-	std::uint16_t m_print_statistics_interval;
 	std::uint16_t m_get_height_interval;
 	std::uint16_t m_session_expiry_time;
 	std::uint16_t m_update_block_hashes_interval;

@@ -24,7 +24,6 @@ namespace config
 		, m_logfile{""}		// no logfile usage, default
 		, m_log_level{ 2 }	// info level
 		, m_connection_retry_interval{5}
-		, m_print_statistics_interval{5}
 		, m_get_height_interval{2}
 		, m_session_expiry_time{5}
 		, m_update_block_hashes_interval{600}
@@ -115,20 +114,10 @@ namespace config
 				}				
 			}
 
-			// read stats printer config
-			if (!read_stats_printer_config(j))
-			{
-				return false;
-			}
-
 			// advanced configs
 			if (j.count("connection_retry_interval") != 0)
 			{
 				j.at("connection_retry_interval").get_to(m_connection_retry_interval);
-			}
-			if (j.count("print_statistics_interval") != 0)
-			{
-				j.at("print_statistics_interval").get_to(m_print_statistics_interval);
 			}
 			if (j.count("get_height_interval") != 0)
 			{
@@ -164,37 +153,6 @@ namespace config
 			std::cerr << "Failed to parse config file. Exception: " << e.what() << std::endl;
 			return false;
 		}
-	}
-
-	bool Config_impl::read_stats_printer_config(nlohmann::json& j)
-	{
-		for (auto& stats_printers_json : j["stats_printers"])
-		{
-			for(auto& stats_printer_config_json : stats_printers_json)
-			{
-				Stats_printer_config stats_printer_config;
-				auto stats_printer_mode = stats_printer_config_json["mode"];
-
-				if(stats_printer_mode == "console")
-				{
-					stats_printer_config.m_mode = Stats_printer_mode::CONSOLE;
-					stats_printer_config.m_printer_mode = Stats_printer_config_console{};
-				}
-				else if(stats_printer_mode == "file")
-				{
-					stats_printer_config.m_mode = Stats_printer_mode::FILE;
-					stats_printer_config.m_printer_mode = Stats_printer_config_file{stats_printer_config_json["filename"]};
-				}
-				else
-				{
-					// invalid config
-					return false;
-				}
-
-				m_stats_printer_config.push_back(stats_printer_config);		
-			}
-		}
-		return true;	
 	}
 }
 }

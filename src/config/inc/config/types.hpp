@@ -8,11 +8,6 @@ namespace nexuspool
 {
 namespace config
 {
-enum class Stats_printer_mode : std::uint8_t
-{
-	CONSOLE = 0,
-	FILE
-};
 
 enum class Persistance_type : std::uint8_t 
 {

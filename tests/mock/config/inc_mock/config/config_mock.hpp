@@ -22,10 +22,8 @@ public:
     MOCK_METHOD(std::string const&, get_logfile, (), (const override));
     MOCK_METHOD(std::uint8_t, get_log_level, (), (const override));
     MOCK_METHOD(std::uint16_t, get_connection_retry_interval, (), (const override));
-    MOCK_METHOD(std::uint16_t, get_print_statistics_interval, (), (const override));
     MOCK_METHOD(std::uint16_t, get_height_interval, (), (const override));
     MOCK_METHOD(std::uint16_t, get_session_expiry_time, (), (const override));
-    MOCK_METHOD(std::vector<Stats_printer_config>&, get_stats_printer_config, (), (const override));
     MOCK_METHOD(Pool_config const&, get_pool_config, (), (const override));
     MOCK_METHOD(Persistance_config const&, get_persistance_config, (), (const override));
     MOCK_METHOD(Api_config const&, get_api_config, (), (const override));
