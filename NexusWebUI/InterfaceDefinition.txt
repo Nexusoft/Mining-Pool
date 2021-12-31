@@ -75,12 +75,24 @@ Wallet Detail API's:
 Reward calculation API's:
 
     ########################
-    GET /reward_data
+    GET /reward_data (sends back the data for the selected mining channel PRIME or HASH)
 
     # Result
     Fields:
         - block_reward
         - network diff
-        - hardware (array)
-            - model
-            - power_consumption
+
+   ########################
+    GET /hardware_data (should be cached on website end - will only change after a pool restart)
+
+    # Result
+    Fields:
+        - devices (array of hardware)
+            - hardware
+                - model
+                - hashrate
+                - power_consumption
+            - hardware
+                - model
+                - hashrate
+                - power_consumption

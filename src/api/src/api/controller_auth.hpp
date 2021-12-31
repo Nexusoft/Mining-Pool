@@ -62,6 +62,18 @@ public:
         return get_account_payout(account);
     }
 
+    ENDPOINT("GET", "/reward_data", rewarddata, AUTHORIZATION(std::shared_ptr<DefaultBasicAuthorizationObject>, authObject))
+    {
+        OATPP_ASSERT_HTTP(authObject->userId == m_auth_user && authObject->password == m_auth_pw, Status::CODE_401, "Unauthorized");
+        return get_reward_data();
+    }
+
+    ENDPOINT("GET", "/hardware_data", hardwaredata, AUTHORIZATION(std::shared_ptr<DefaultBasicAuthorizationObject>, authObject))
+    {
+        OATPP_ASSERT_HTTP(authObject->userId == m_auth_user && authObject->password == m_auth_pw, Status::CODE_401, "Unauthorized");
+        return get_hardware_data();
+    }
+
 private:
 
     std::string m_auth_user;

@@ -46,6 +46,16 @@ public:
     {
         return get_account_payout(account);
     }
+
+    ENDPOINT("GET", "/reward_data", rewarddata)
+    {
+        return get_reward_data();
+    }
+
+    ENDPOINT("GET", "/hardware_data", hardwaredata)
+    {
+        return get_hardware_data();
+    }
 };
 
 #include OATPP_CODEGEN_BEGIN(ApiController) //<-- End codegen

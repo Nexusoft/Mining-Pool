@@ -145,6 +145,32 @@ protected:
         }
     }
 
+    std::shared_ptr<ApiController::OutgoingResponse> get_reward_data()
+    {
+        auto const config = get_config_data();
+        auto const mining_info = m_pool_api_data_exchange->get_mining_info();
+
+        auto dto = Reward_data_dto::createShared();
+        if (config.m_mining_mode == "HASH")
+        {
+            dto->block_reward = mining_info.m_hash_rewards;
+            dto->network_diff = mining_info.m_hash_difficulty;
+        }
+        else
+        {
+            dto->block_reward = mining_info.m_prime_reward;
+            dto->network_diff = mining_info.m_prime_difficulty;
+        }
+
+        return createDtoResponse(Status::CODE_200, dto);
+    }
+
+    std::shared_ptr<ApiController::OutgoingResponse> get_hardware_data()
+    {
+        auto dto = Hardware_data_dto::createShared();
+
+        return createDtoResponse(Status::CODE_200, dto);
+    }
 
     Shared_data_reader::Sptr m_data_reader;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;

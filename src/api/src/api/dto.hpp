@@ -92,6 +92,39 @@ class Latest_blocks_dto : public oatpp::DTO
 	DTO_FIELD(Vector<Object<Block_dto>>, blocks) = {};
 };
 
+class Hardware_dto : public oatpp::DTO
+{
+	DTO_INIT(Hardware_dto, DTO)
+
+	DTO_FIELD(String, model);
+	DTO_FIELD(Float64, hashrate);
+	DTO_FIELD(Float64, power_consumption);
+
+public:
+
+	Hardware_dto() = default;
+	Hardware_dto(const char* pmodel, double phashrate, double ppower_consumption)
+		: model(pmodel)
+		, hashrate(phashrate)
+		, power_consumption(ppower_consumption)
+	{}
+};
+
+class Hardware_data_dto : public oatpp::DTO
+{
+	DTO_INIT(Hardware_data_dto, DTO)
+
+	DTO_FIELD(Vector<Object<Hardware_dto>>, devices) = {};
+};
+
+class Reward_data_dto : public oatpp::DTO
+{
+	DTO_INIT(Reward_data_dto, DTO)
+
+	DTO_FIELD(Float64, block_reward);
+	DTO_FIELD(Float64, network_diff);
+};
+
 #include OATPP_CODEGEN_END(DTO)
 
 }
