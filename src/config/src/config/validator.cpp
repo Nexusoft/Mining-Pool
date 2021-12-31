@@ -125,40 +125,12 @@ bool Validator::check(std::string const& config_file)
             m_mandatory_fields.push_back(Validator_error{ "persistance/file", "" });
         }
 
-
-        //stats printers
-        for (auto& stats_printers_json : j["stats_printers"])
-        {
-            for(auto& stats_printer_config_json : stats_printers_json)
-            {
-                auto stats_printer_mode = stats_printer_config_json["mode"];
-                if(!stats_printer_mode.is_string())
-                {
-                    m_optional_fields.push_back(Validator_error{"stats_printers/stats_printer/mode", "Not a string"});
-                    break;
-                }
-
-                if(stats_printer_mode != "console" && stats_printer_mode != "file")
-                {
-                    m_optional_fields.push_back(Validator_error{"stats_printers/stats_printer/mode", "Not 'console' or 'file"});
-                    break;
-                }
-            }
-        }
-
         //advanced config
 		if (j.count("connection_retry_interval") != 0)
 		{
             if(!j.at("connection_retry_interval").is_number())
             {
                 m_optional_fields.push_back(Validator_error{"connection_retry_interval", "Not a number"});
-            }
-		}
-		if (j.count("print_statistics_interval") != 0)
-		{
-            if(!j.at("print_statistics_interval").is_number())
-            {
-                m_optional_fields.push_back(Validator_error{"print_statistics_interval", "Not a number"});
             }
 		}
 		if (j.count("get_height_interval") != 0)
