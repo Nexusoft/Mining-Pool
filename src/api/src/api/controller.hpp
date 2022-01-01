@@ -18,8 +18,9 @@ public:
 
     Rest_controller(Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
+        config::Config_api::Sptr config_api,
         std::shared_ptr<oatpp::data::mapping::ObjectMapper> objectMapper)
-    : Base_controller(std::move(data_reader), std::move(pool_api_data_exchange), std::move(objectMapper))
+    : Base_controller(std::move(data_reader), std::move(pool_api_data_exchange), std::move(config_api), std::move(objectMapper))
     {}
 
     ENDPOINT("GET", "/metainfo", metainfo)

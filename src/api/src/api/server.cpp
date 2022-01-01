@@ -35,12 +35,12 @@ void Server::start()
 	/* create ApiControllers and add endpoints to router */
 	if (m_config_api->get_auth_user().empty())
 	{
-		auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange, objectMapper);
+		auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
 		router->addController(rest_controller);
 	}
 	else
 	{
-		auto rest_auth_controller = std::make_shared<Rest_auth_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_config_api->get_auth_user(), m_config_api->get_auth_pw(), objectMapper);
+		auto rest_auth_controller = std::make_shared<Rest_auth_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
 		router->addController(rest_auth_controller);
 	}
 

@@ -21,11 +21,12 @@ public:
 	virtual bool read_config(std::string const& api_config_file) = 0;
 
 	virtual	std::uint16_t get_listen_port() const = 0;
-	virtual std::string const& get_public_ip() const = 0;
-	virtual std::string const& get_auth_user() const = 0;
-	virtual std::string const& get_auth_pw() const = 0;
+	virtual std::string get_public_ip() const = 0;
+	virtual std::string get_auth_user() const = 0;
+	virtual std::string get_auth_pw() const = 0;
 	virtual common::Mining_mode get_mining_mode() const = 0;
 	virtual std::uint16_t get_reward_calc_update_interval() const = 0;
+	virtual std::vector<Hardware_config>& get_devices() = 0;
 };
 
 Config_api::Sptr create_api_config();

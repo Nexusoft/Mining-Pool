@@ -19,11 +19,12 @@ public:
 	bool read_config(std::string const& api_config_file) override;
 
 	std::uint16_t get_listen_port() const override { return m_listen_port; }
-	std::string const& get_public_ip() const override { return m_public_ip; }
-	std::string const& get_auth_user() const override { return m_auth_user; }
-	std::string const& get_auth_pw() const override { return m_auth_pw; }
+	std::string get_public_ip() const override { return m_public_ip; }
+	std::string get_auth_user() const override { return m_auth_user; }
+	std::string get_auth_pw() const override { return m_auth_pw; }
 	common::Mining_mode get_mining_mode() const override { return m_mining_mode; }
 	std::uint16_t get_reward_calc_update_interval() const override { return m_reward_calc_update_interval; }
+	std::vector<Hardware_config>& get_devices() override { return m_devices; }
 
 private:
 
@@ -33,7 +34,7 @@ private:
 	std::string m_auth_user;
 	std::string m_auth_pw;
 	common::Mining_mode	m_mining_mode;
-
+	std::vector<Hardware_config> m_devices;
 };
 
 Config_api::Sptr create_api_config()

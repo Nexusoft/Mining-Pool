@@ -69,7 +69,7 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
  The API server will automatically be started when there is an api config file given    
  The API server supports REST BasicAuth which will be enabled if the "auth_user" option is set in the api.conf    
    
-    Some important config options in api.conf
+ Some important config options in api.conf
     
   ```
     "mining_mode" : "PRIME",  // mining mode the POOL is started with. Options are 'HASH' or 'PRIME'. This has to be the same as for the POOL otherwise unexpected behaviour

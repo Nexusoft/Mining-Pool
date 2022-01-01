@@ -24,9 +24,11 @@ public:
 
     Base_controller(Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
+        config::Config_api::Sptr config_api,
         std::shared_ptr<oatpp::data::mapping::ObjectMapper> objectMapper)
     : m_data_reader{ std::move(data_reader) }
     , m_pool_api_data_exchange{ std::move(pool_api_data_exchange) }
+    , m_config_api{std::move(config_api)}
     , ApiController(objectMapper)
     {
     }
@@ -147,11 +149,10 @@ protected:
 
     std::shared_ptr<ApiController::OutgoingResponse> get_reward_data()
     {
-        auto const config = get_config_data();
         auto const mining_info = m_pool_api_data_exchange->get_mining_info();
 
         auto dto = Reward_data_dto::createShared();
-        if (config.m_mining_mode == "HASH")
+        if (m_config_api->get_mining_mode() == common::Mining_mode::HASH)
         {
             dto->block_reward = mining_info.m_hash_rewards;
             dto->network_diff = mining_info.m_hash_difficulty;
@@ -169,11 +170,18 @@ protected:
     {
         auto dto = Hardware_data_dto::createShared();
 
+        auto const devices = m_config_api->get_devices();
+        for (auto const& device : devices)
+        {
+            dto->devices->push_back(Hardware_dto::createShared(device.m_model.c_str(), device.m_hashrate, device.m_power_consumption));
+        }
+
         return createDtoResponse(Status::CODE_200, dto);
     }
 
     Shared_data_reader::Sptr m_data_reader;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
+    config::Config_api::Sptr m_config_api;
     persistance::Config_data m_cached_config;
 
 };

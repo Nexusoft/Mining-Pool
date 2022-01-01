@@ -29,6 +29,14 @@ struct Pool_config
 	std::uint16_t m_difficulty_divider{};
 	std::uint16_t m_round_duration_hours{};
 };
+
+struct Hardware_config
+{
+	std::string m_model{};
+	double m_hashrate{ 0.0 };
+	double m_power_consumption{ 0.0 };
+};
+
 }
 }
 #endif

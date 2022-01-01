@@ -16,6 +16,7 @@ Config_api_impl::Config_api_impl()
 	, m_auth_user{}
 	, m_auth_pw{}
 	, m_mining_mode{ common::Mining_mode::HASH }
+	, m_devices{}
 {
 }
 
@@ -59,6 +60,19 @@ bool Config_api_impl::read_config(std::string const& api_config_file)
 		if (j.contains("reward_calc_update_interval"))
 		{
 			m_reward_calc_update_interval = j["reward_calc_update_interval"];
+		}
+
+		for (auto& devices_json : j["devices"])
+		{
+			for (auto& hardware_json : devices_json)
+			{
+				Hardware_config hardware_config;
+				hardware_config.m_model = hardware_json["model"];
+				hardware_config.m_hashrate = hardware_json["hashrate"];
+				hardware_config.m_power_consumption = hardware_json["power_consumption"];
+
+				m_devices.push_back(hardware_config);
+			}
 		}
 
 		return true;
