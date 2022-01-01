@@ -32,7 +32,6 @@ public:
 	std::uint16_t get_session_expiry_time() const override  { return m_session_expiry_time; }
 	Pool_config const& get_pool_config() const override  { return m_pool_config; }
 	Persistance_config const& get_persistance_config() const override  { return m_persistance_config; }
-	Api_config const& get_api_config() const override { return m_api_config;  }
 	std::uint16_t get_update_block_hashes_interval() const override { return m_update_block_hashes_interval; }
 	std::uint16_t get_hashrate_interval() const override { return m_hashrate_interval; }
 
@@ -47,7 +46,6 @@ private:
 	common::Mining_mode	 m_mining_mode;
 	Pool_config  m_pool_config;
 	Persistance_config m_persistance_config;
-	Api_config m_api_config;
 	std::string  m_logfile;
 	std::uint8_t m_log_level;
 

@@ -28,6 +28,7 @@ namespace nexuspool
 		, m_signals{ std::make_shared<::asio::signal_set>(*m_io_context) }
 	{
 		m_config = config::create_config();
+		m_api_config = config::create_api_config();
 		m_logger = spdlog::stdout_color_mt("logger");
 		m_logger->set_pattern("[%D %H:%M:%S.%e][%^%l%$] %v");
 		// Register to handle the signals that indicate when the server should exit.
@@ -78,7 +79,7 @@ namespace nexuspool
 		return result;
 	}
 
-	bool Pool::init(std::string const& pool_config_file)
+	bool Pool::init(std::string pool_config_file, std::string api_config_file)
 	{
 		if (!m_config->read_config(pool_config_file))
 		{
@@ -131,11 +132,13 @@ namespace nexuspool
 			m_persistance_component->get_data_reader_factory(),
 			m_pool_api_data_exchange);
 
-		auto const& api_config = m_config->get_api_config();
-		if (api_config.m_use_api)
+		if (m_api_config->read_config(api_config_file))
 		{
-			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(),
-				m_config->get_public_ip(), api_config.m_listen_port, api_config.m_auth_user, api_config.m_auth_pw, m_pool_api_data_exchange);
+			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(), m_api_config, m_pool_api_data_exchange);
+		}
+		else
+		{
+			m_logger->info("No API support");
 		}
 
 		return true;

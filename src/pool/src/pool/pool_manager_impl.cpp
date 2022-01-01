@@ -148,11 +148,11 @@ void Pool_manager_impl::start()
 	m_update_block_hashes_timer->start(chrono::Seconds(m_config->get_update_block_hashes_interval()), update_block_hashes_handler(m_config->get_update_block_hashes_interval()));
 	m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
 
-	auto const api_config = m_config->get_api_config();
-	if (api_config.m_use_api)
-	{
-		m_mining_info_timer->start(chrono::Seconds(api_config.m_reward_calc_update_interval), mining_info_handler(api_config.m_reward_calc_update_interval));
-	}
+	//auto const api_config = m_config->get_api_config();
+	//if (api_config.m_use_api)
+	//{
+	//	m_mining_info_timer->start(chrono::Seconds(api_config.m_reward_calc_update_interval), mining_info_handler(api_config.m_reward_calc_update_interval));
+	//}
 
 }
 

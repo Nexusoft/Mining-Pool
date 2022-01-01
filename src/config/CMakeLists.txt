@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 
-add_library(config STATIC "src/config/config_impl.cpp"
-                          "src/config/validator.cpp")
+add_library(config STATIC src/config/config_impl.cpp
+                          src/config/validator.cpp
+                          src/config/config_api_impl.cpp)
                     
 target_include_directories(config
     PUBLIC 

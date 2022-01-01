@@ -1,4 +1,3 @@
-
 #include "config/config_impl.hpp"
 
 #include <fstream>
@@ -20,7 +19,6 @@ namespace config
 		, m_mining_mode{ common::Mining_mode::HASH}
 		, m_pool_config{}
 		, m_persistance_config{}
-		, m_api_config{}
 		, m_logfile{""}		// no logfile usage, default
 		, m_log_level{ 2 }	// info level
 		, m_connection_retry_interval{5}
@@ -95,23 +93,6 @@ namespace config
 			else
 			{
 				m_persistance_config.m_type = Persistance_type::sqlite;
-			}
-
-			// api config
-			if (j.count("api") != 0)
-			{
-				json api_json = j.at("api");
-				m_api_config.m_use_api = true;
-				m_api_config.m_listen_port = api_json["listen_port"];
-				if (api_json.contains("auth_user"))
-				{
-					m_api_config.m_auth_user = api_json["auth_user"];
-					m_api_config.m_auth_pw = api_json["auth_pw"];
-				}
-				if (api_json.contains("reward_calc_update_interval"))
-				{
-					m_api_config.m_reward_calc_update_interval = api_json["reward_calc_update_interval"];
-				}				
 			}
 
 			// advanced configs

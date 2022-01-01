@@ -2,6 +2,7 @@
 #define NEXUSPOOL_POOL_HPP
 
 #include "config/config.hpp"
+#include "config/config_api.hpp"
 #include "persistance/types.hpp"
 #include "chrono/component.hpp"
 #include <spdlog/spdlog.h>
@@ -27,7 +28,7 @@ public:
 	Pool();
 	~Pool();
 
-	bool init(std::string const& pool_config_file);
+	bool init(std::string pool_config_file, std::string api_config_file);
 	bool check_config(std::string const& pool_config_file);
 	void run();
 
@@ -45,6 +46,7 @@ private:
 	std::shared_ptr<Pool_manager> m_pool_manager;
 
 	std::shared_ptr<config::Config> m_config;
+	std::shared_ptr<config::Config_api> m_api_config;
 	std::unique_ptr<api::Server> m_api_server;
 
 	std::shared_ptr<::asio::signal_set> m_signals;
