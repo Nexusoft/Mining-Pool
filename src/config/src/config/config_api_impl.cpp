@@ -12,6 +12,7 @@ namespace config
 Config_api_impl::Config_api_impl()
 	: m_listen_port{ 0 }
 	, m_public_ip{ "127.0.0.1" }
+	, m_wallet_ip{ "127.0.0.1" }
 	, m_reward_calc_update_interval{ 300 }
 	, m_auth_user{}
 	, m_auth_pw{}
@@ -36,6 +37,7 @@ bool Config_api_impl::read_config(std::string const& api_config_file)
 		json j = json::parse(config_file);
 		j.at("public_ip").get_to(m_public_ip);
 		j.at("listen_port").get_to(m_listen_port);
+		j.at("wallet_ip").get_to(m_wallet_ip);
 
 		std::string mining_mode = j["mining_mode"];
 		std::for_each(mining_mode.begin(), mining_mode.end(), [](char& c)

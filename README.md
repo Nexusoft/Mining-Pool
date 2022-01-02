@@ -72,9 +72,10 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
  Some important config options in api.conf
     
   ```
-    "mining_mode" : "PRIME",  // mining mode the POOL is started with. Options are 'HASH' or 'PRIME'. This has to be the same as for the POOL otherwise unexpected behaviour
-    "public_ip" :            // public ip of the API which a frontend connect to.
-    "listen_port" : 0   // port of the API for listening to incoming API calls (from the web frontend for example).
+    "mining_mode"           // mining mode the POOL is started with. Options are 'HASH' or 'PRIME'. This has to be the same as for the POOL otherwise unexpected behaviour
+    "public_ip"             // public ip of the API which a frontend connect to.
+    "listen_port"           // port of the API for listening to incoming API calls (from the web frontend for example).
+    "wallet_ip"             // the ip the NXS wallet listens to. Needed for API calls
     "auth_user"         // Optional. If this config value is given then the API calls requires BasicAuth REST.
     "auth_pw"           // Optional. If the auth_user config option is given then this field is mandatory.
     "reward_calc_update_interval"   // Optional, default=300, time in seconds updating the mining_info for the API

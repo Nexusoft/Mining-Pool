@@ -3,12 +3,17 @@
 
 #include "api/dto.hpp"
 #include "api/shared_data_reader.hpp"
+#include "api/client.hpp"
 #include "common/pool_api_data_exchange.hpp"
 #include "TAO/Register/types/address.h"
 
 #include "oatpp/web/server/api/ApiController.hpp"
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/macro/component.hpp"
+#include "oatpp/web/client/HttpRequestExecutor.hpp"
+#include "oatpp/network/tcp/client/ConnectionProvider.hpp"
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include <json/json.hpp>
 
 namespace nexuspool
 {
@@ -31,6 +36,12 @@ public:
     , m_config_api{std::move(config_api)}
     , ApiController(objectMapper)
     {
+        /* Create RequestExecutor which will execute ApiClient's requests */
+        auto connectionProvider = oatpp::network::tcp::client::ConnectionProvider::createShared({ m_config_api->get_wallet_ip().c_str(), 8080 });
+        auto requestExecutor = oatpp::web::client::HttpRequestExecutor::createShared(connectionProvider);
+
+        /* ObjectMapper passed here is used for serialization of outgoing DTOs */
+        m_client = Client::createShared(requestExecutor, objectMapper);
     }
 
 protected:
@@ -149,18 +160,24 @@ protected:
 
     std::shared_ptr<ApiController::OutgoingResponse> get_reward_data()
     {
-        auto const mining_info = m_pool_api_data_exchange->get_mining_info();
+        auto response = m_client->get_mininginfo();
+        auto const status_code = response->getStatusCode();
+        if (status_code != 200)
+        {
+            return createResponse(Status::CODE_404, "get_mininginfo error");
+        }
 
+        auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
         auto dto = Reward_data_dto::createShared();
         if (m_config_api->get_mining_mode() == common::Mining_mode::HASH)
         {
-            dto->block_reward = mining_info.m_hash_rewards;
-            dto->network_diff = mining_info.m_hash_difficulty;
+            dto->block_reward = static_cast<double>(data_json["result"]["hashValue"]);
+            dto->network_diff = static_cast<double>(data_json["result"]["hashDifficulty"]);
         }
         else
         {
-            dto->block_reward = mining_info.m_prime_reward;
-            dto->network_diff = mining_info.m_prime_difficulty;
+            dto->block_reward = static_cast<double>(data_json["result"]["primeValue"]);
+            dto->network_diff = static_cast<double>(data_json["result"]["primeDifficulty"]);
         }
 
         return createDtoResponse(Status::CODE_200, dto);
@@ -182,6 +199,7 @@ protected:
     Shared_data_reader::Sptr m_data_reader;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
     config::Config_api::Sptr m_config_api;
+    std::shared_ptr<Client> m_client;
     persistance::Config_data m_cached_config;
 
 };

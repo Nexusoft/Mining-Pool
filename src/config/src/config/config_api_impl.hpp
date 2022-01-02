@@ -20,6 +20,7 @@ public:
 
 	std::uint16_t get_listen_port() const override { return m_listen_port; }
 	std::string get_public_ip() const override { return m_public_ip; }
+	std::string get_wallet_ip() const override { return m_wallet_ip; }
 	std::string get_auth_user() const override { return m_auth_user; }
 	std::string get_auth_pw() const override { return m_auth_pw; }
 	common::Mining_mode get_mining_mode() const override { return m_mining_mode; }
@@ -30,6 +31,7 @@ private:
 
 	std::uint16_t m_listen_port;
 	std::string m_public_ip;
+	std::string m_wallet_ip;
 	std::uint16_t m_reward_calc_update_interval;
 	std::string m_auth_user;
 	std::string m_auth_pw;

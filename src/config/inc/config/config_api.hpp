@@ -22,6 +22,7 @@ public:
 
 	virtual	std::uint16_t get_listen_port() const = 0;
 	virtual std::string get_public_ip() const = 0;
+	virtual std::string get_wallet_ip() const = 0;
 	virtual std::string get_auth_user() const = 0;
 	virtual std::string get_auth_pw() const = 0;
 	virtual common::Mining_mode get_mining_mode() const = 0;
