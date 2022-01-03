@@ -9,4 +9,4 @@ target_include_directories(api
     PRIVATE src
 )
 
-target_link_libraries(api config persistance TAO common oatpp)
+target_link_libraries(api config persistance TAO common oatpp chrono)

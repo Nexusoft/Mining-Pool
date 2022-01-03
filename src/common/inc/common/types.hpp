@@ -28,6 +28,8 @@ struct Mining_info
 	double m_hash_difficulty{ 0.0 };
 	double m_prime_reward{ 0.0 };
 	double m_hash_rewards{ 0.0 };
+
+	bool is_valid() const { return m_height != 0; }
 };
 
 }

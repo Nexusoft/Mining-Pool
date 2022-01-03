@@ -16,11 +16,12 @@ class Rest_controller : public Base_controller
 {
 public:
 
-    Rest_controller(Shared_data_reader::Sptr data_reader,
+    Rest_controller(std::shared_ptr<::asio::io_context> io_context,
+        Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
         config::Config_api::Sptr config_api,
         std::shared_ptr<oatpp::data::mapping::ObjectMapper> objectMapper)
-    : Base_controller(std::move(data_reader), std::move(pool_api_data_exchange), std::move(config_api), std::move(objectMapper))
+    : Base_controller(std::move(io_context), std::move(data_reader), std::move(pool_api_data_exchange), std::move(config_api), std::move(objectMapper))
     {}
 
     ENDPOINT("GET", "/metainfo", metainfo)

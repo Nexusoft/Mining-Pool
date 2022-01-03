@@ -11,6 +11,7 @@
 #include <string>
 #include <atomic>
 
+namespace asio { class io_context; }
 namespace spdlog { class logger; }
 namespace nexuspool
 {
@@ -33,6 +34,7 @@ public:
 
 private:
 
+    std::shared_ptr<::asio::io_context> m_io_context;
     std::thread m_server_thread;
     std::shared_ptr<spdlog::logger> m_logger;
     std::shared_ptr<Shared_data_reader> m_shared_data_reader;

@@ -5,7 +5,7 @@
 #include "api/controller_auth.hpp"
 #include "oatpp/network/Server.hpp"
 #include <spdlog/spdlog.h>
-
+#include <asio/io_context.hpp>
 
 namespace nexuspool
 {
@@ -16,7 +16,8 @@ Server::Server(std::shared_ptr<spdlog::logger> logger,
 	persistance::Data_reader::Uptr data_reader,
 	config::Config_api::Sptr config_api,
 	common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
-	: m_logger{std::move(logger)}
+	: m_io_context{ std::make_shared<::asio::io_context>() }
+	, m_logger{std::move(logger)}
 	, m_shared_data_reader{std::make_shared<Shared_data_reader>(std::move(data_reader))}
 	, m_config_api{std::move(config_api)}
 	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
@@ -38,12 +39,12 @@ void Server::start()
 		/* create ApiControllers and add endpoints to router */
 		if (m_config_api->get_auth_user().empty())
 		{
-			auto rest_controller = std::make_shared<Rest_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
+			auto rest_controller = std::make_shared<Rest_controller>(m_io_context, m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
 			router->addController(rest_controller);
 		}
 		else
 		{
-			auto rest_auth_controller = std::make_shared<Rest_auth_controller>(m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
+			auto rest_auth_controller = std::make_shared<Rest_auth_controller>(m_io_context, m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
 			router->addController(rest_auth_controller);
 		}
 
@@ -70,10 +71,12 @@ void Server::start()
 		connectionHandler->stop();
 
 	});
+	m_io_context->run();
 }
 
 void Server::stop()
 {
+	m_io_context->stop();
 	/* Signal the stop condition */
 	m_server_stopped.store(true);
 
