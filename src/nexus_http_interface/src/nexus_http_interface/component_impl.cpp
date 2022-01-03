@@ -105,6 +105,22 @@ bool Component_impl::get_mining_info(common::Mining_info& mining_info)
 	return true;
 }
 
+bool Component_impl::get_system_info(common::System_info& system_info)
+{
+	auto response = m_client->get_systeminfo();
+	auto const status_code = response->getStatusCode();
+	if (status_code != 200)
+	{
+		m_logger->error("API error. Code: {} Message: {}", status_code, response->readBodyToString()->c_str());
+		return false;
+	}
+
+	auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
+	system_info.m_wallet_version = data_json["result"]["version"];
+
+	return true;
+}
+
 bool Component_impl::does_account_exists(std::string const& account)
 {
 	std::string parameter{ "?address=" };

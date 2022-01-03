@@ -16,8 +16,8 @@ Pool API's:
             - pool_hashrate
 			- mining_mode  (string HASH or PRIME)
             - active_miners
-        JSON:
-        {'id': 1, 'jsonrpc': '2.0', 'result': {'fee': 5, 'mining_mode': 'prime', 'round_duration': 0.1, 'pool_hashrate': 95.3}}
+            - wallet_version
+            - pool_version
 
     #######################
     get_latest_blocks

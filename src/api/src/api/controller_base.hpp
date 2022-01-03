@@ -53,6 +53,10 @@ protected:
         dto->fee = config.m_fee;
         dto->mining_mode = config.m_mining_mode.c_str();
         dto->active_miners = m_controller_helper.get_active_miners();
+        auto const system_info = m_controller_helper.get_system_info();
+        dto->wallet_version = system_info.m_wallet_version;
+        dto->pool_version = system_info.m_pool_version;
+
         return createDtoResponse(Status::CODE_200, dto);
     }
 

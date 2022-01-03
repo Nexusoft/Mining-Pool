@@ -47,6 +47,7 @@ class Api_client : public oatpp::web::client::ApiClient
 	API_CALL("GET", "ledger/get/mininginfo", get_mininginfo)
 	API_CALL("GET", "finance/get/account{parameter}", get_account, PATH(String, parameter))
 	API_CALL("POST", "finance/debit/account", payout, BODY_DTO(Object<Payout_dto>, body))
+	API_CALL("GET", "system/get/info", get_systeminfo)
 };
 #include OATPP_CODEGEN_END(ApiClient)
 

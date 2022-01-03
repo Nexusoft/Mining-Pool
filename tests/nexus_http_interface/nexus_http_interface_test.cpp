@@ -33,6 +33,15 @@ TEST_F(Nexus_http_interface_fixture, get_mining_info_test)
 	EXPECT_GT(mining_info.m_prime_reward, 0);
 }
 
+TEST_F(Nexus_http_interface_fixture, get_system_info_test)
+{
+	common::System_info system_info;
+	auto result = m_component->get_system_info(system_info);
+
+	EXPECT_TRUE(result);
+	EXPECT_TRUE(system_info.is_valid());
+}
+
 TEST_F(Nexus_http_interface_fixture, get_block_reward_data_test)
 {
 	common::Block_reward_data reward_data{};

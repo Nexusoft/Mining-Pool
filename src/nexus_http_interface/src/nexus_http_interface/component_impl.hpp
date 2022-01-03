@@ -17,6 +17,7 @@ public:
     bool get_block_reward_data(std::string hash, common::Block_reward_data& reward_data) override;
     bool get_block_hash(std::uint32_t height, std::string& hash) override;
     bool get_mining_info(common::Mining_info& mining_info) override;
+    bool get_system_info(common::System_info& system_info) override;
     bool does_account_exists(std::string const& account) override;
     bool payout(std::string account_from, std::string pin, Payout_recipients const& recipients, std::string& tx_id) override;
 

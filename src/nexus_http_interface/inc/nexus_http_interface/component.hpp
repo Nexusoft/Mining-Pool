@@ -35,6 +35,9 @@ public:
     // Get the mining info from wallet
     virtual bool get_mining_info(common::Mining_info& mining_info) = 0;
 
+    // Get the system info from wallet
+    virtual bool get_system_info(common::System_info& system_info) = 0;
+
     // Checks if the given account address exists on the blockchain
     virtual bool does_account_exists(std::string const& account) = 0;
 

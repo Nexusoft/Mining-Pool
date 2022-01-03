@@ -69,6 +69,23 @@ public:
         return m_cached_mining_info;
     }
 
+    common::System_info get_system_info() const
+    {
+        auto response = m_client->get_systeminfo();
+        auto const status_code = response->getStatusCode();
+        if (status_code != 200)
+        {
+            return common::System_info{};
+        }
+
+        auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
+        common::System_info system_info;
+        system_info.m_wallet_version = data_json["result"]["version"];
+        system_info.m_pool_version = "0.9";
+
+        return system_info;
+    }
+
 
 private:
 

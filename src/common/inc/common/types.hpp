@@ -32,6 +32,14 @@ struct Mining_info
 	bool is_valid() const { return m_height != 0; }
 };
 
+struct System_info
+{
+	std::string m_wallet_version{};
+	std::string m_pool_version{};
+
+	bool is_valid() const { return !m_wallet_version.empty(); }
+};
+
 }
 }
 #endif
