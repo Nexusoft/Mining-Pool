@@ -25,7 +25,6 @@ public:
 
     void start_connection_retry_timer(std::uint16_t timer_interval, std::weak_ptr<Wallet_connection> wallet_connection,
         network::Endpoint const& wallet_endpoint);
-    // collect also data from the workers
     void start_get_height_timer(std::uint16_t timer_interval, std::weak_ptr<network::Connection> connection);
 
     void stop();

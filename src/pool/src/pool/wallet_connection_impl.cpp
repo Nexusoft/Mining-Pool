@@ -1,7 +1,5 @@
 #include "pool/wallet_connection_impl.hpp"
 #include "pool/pool_manager.hpp"
-#include "LLP/packet.hpp"
-#include "LLP/block.hpp"
 #include <spdlog/spdlog.h>
 #include <algorithm>
 
@@ -27,10 +25,12 @@ Wallet_connection_impl::Wallet_connection_impl(std::shared_ptr<asio::io_context>
     , m_current_height{0}
     , m_get_block_pool_manager{false}
 {
+    m_block_resubmit_timer = m_timer_factory->create_timer();
 }
 
 void Wallet_connection_impl::stop()
 {
+    m_block_resubmit_timer->stop();
     m_timer_manager.stop();
     m_connection->close();
 }
@@ -123,6 +123,7 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
             auto const height = bytes2uint(*packet.m_data);
             if (height > m_current_height)
             {
+                m_block_resubmit_timer->stop();
                 m_current_height = height;
                 m_logger->info("Nexus Network: New Block with height {}", m_current_height);
 
@@ -192,6 +193,7 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
         }
         else if (packet.m_header == Packet::ACCEPT)
         {
+            m_block_resubmit_timer->stop();
             m_logger->info("Block Accepted By Nexus Network.");
             auto pool_manager_shared = m_pool_manager.lock();
             if (!pool_manager_shared)
@@ -210,12 +212,11 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
         }
         else if (packet.m_header == Packet::REJECT)
         {
+            m_block_resubmit_timer->stop();
             m_logger->warn("Block Rejected by Nexus Network.");
-
 
             Packet packet_get_block{ Packet::GET_BLOCK, nullptr };
             m_connection->transmit(packet_get_block.get_bytes());
-            //  m_stats_collector->block_rejected();
 
             std::scoped_lock lock(m_submit_block_mutex);
             auto handler = m_pending_submit_block_handlers.front();
@@ -234,8 +235,10 @@ void Wallet_connection_impl::submit_block(network::Shared_payload&& block_data, 
 {
     m_logger->info("Submitting Block...");
 
-    Packet packet{ Packet::SUBMIT_BLOCK, std::move(block_data) };
-    m_connection->transmit(packet.get_bytes());
+    m_submit_block_packet = Packet{ Packet::SUBMIT_BLOCK, std::move(block_data) };
+    m_connection->transmit(m_submit_block_packet.get_bytes());
+
+    m_block_resubmit_timer->start(chrono::Seconds(2), block_resubmit_handler(2U));
 
     // store block request handler in pending list (handler comes from miner_connection)
     std::scoped_lock lock(m_submit_block_mutex);
@@ -255,6 +258,19 @@ void Wallet_connection_impl::get_block(Get_block_handler&& handler)
     // store block request handler in pending list (handler comes from miner_connection)
     std::scoped_lock lock(m_get_block_mutex);
     m_pending_get_blocks.emplace(std::move(handler));
+}
+
+chrono::Timer::Handler Wallet_connection_impl::block_resubmit_handler(std::uint16_t timer_interval)
+{
+    return[self = shared_from_this(), timer_interval]()
+    {
+        self->m_logger->warn("Re-Submitting Block...");
+        self->m_connection->transmit(self->m_submit_block_packet.get_bytes());
+
+        // start timer again
+        self->m_block_resubmit_timer->start(chrono::Seconds(2), self->block_resubmit_handler(2U));
+    };
+
 }
 
 }

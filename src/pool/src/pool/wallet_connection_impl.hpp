@@ -8,6 +8,7 @@
 #include "pool/timer_manager_wallet.hpp"
 #include "pool/wallet_connection.hpp"
 #include "LLP/block.hpp"
+#include "LLP/packet.hpp"
 #include "pool/types.hpp"
 #include "common/types.hpp"
 
@@ -50,6 +51,7 @@ private:
     void process_data(network::Shared_payload&& receive_buffer);
 
     void retry_connect(network::Endpoint const& wallet_endpoint);
+    chrono::Timer::Handler block_resubmit_handler(std::uint16_t timer_interval);
 
     std::shared_ptr<::asio::io_context> m_io_context;
     std::shared_ptr<spdlog::logger> m_logger;
@@ -63,6 +65,8 @@ private:
     Timer_manager_wallet m_timer_manager;
     std::atomic<std::uint32_t> m_current_height;
 
+    chrono::Timer::Uptr m_block_resubmit_timer;
+
     // get_block variables
     std::mutex m_get_block_mutex;
     std::atomic<bool> m_get_block_pool_manager;
@@ -71,6 +75,7 @@ private:
     // submit_block variables
     std::mutex m_submit_block_mutex;
     std::queue<std::pair<std::uint32_t, Submit_block_handler>> m_pending_submit_block_handlers;
+    Packet m_submit_block_packet;
 };
 }
 
