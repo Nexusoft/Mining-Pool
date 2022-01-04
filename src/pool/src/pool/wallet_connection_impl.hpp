@@ -64,6 +64,7 @@ private:
     chrono::Timer_factory::Sptr m_timer_factory;
     Timer_manager_wallet m_timer_manager;
     std::atomic<std::uint32_t> m_current_height;
+    std::atomic<bool> m_stopped;
 
     chrono::Timer::Uptr m_block_resubmit_timer;
 

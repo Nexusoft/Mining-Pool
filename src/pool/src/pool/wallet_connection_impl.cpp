@@ -24,12 +24,14 @@ Wallet_connection_impl::Wallet_connection_impl(std::shared_ptr<asio::io_context>
     , m_timer_manager{ m_timer_factory }
     , m_current_height{0}
     , m_get_block_pool_manager{false}
+    , m_stopped{false}
 {
     m_block_resubmit_timer = m_timer_factory->create_timer();
 }
 
 void Wallet_connection_impl::stop()
 {
+    m_stopped = true;
     m_block_resubmit_timer->stop();
     m_timer_manager.stop();
     m_connection->close();
@@ -37,6 +39,11 @@ void Wallet_connection_impl::stop()
 
 void Wallet_connection_impl::retry_connect(network::Endpoint const& wallet_endpoint)
 {
+    if (m_stopped)
+    {
+        return;
+    }
+
     m_connection->close();
 
     // retry connect
