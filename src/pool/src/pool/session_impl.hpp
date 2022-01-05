@@ -28,7 +28,8 @@ public:
 
 	void update_connection(std::shared_ptr<Miner_connection> miner_connection) override;
 	std::weak_ptr<Miner_connection> get_connection() override { return m_miner_connection; }
-	Session_user& get_user_data() override { return m_user_data; }
+	Session_user get_user_data() const  override { return m_user_data; }
+	void update_user_data(Session_user const& user_data) override { m_user_data = user_data; }
 	std::chrono::steady_clock::time_point get_update_time() const override { return m_update_time; }
 	void set_update_time(std::chrono::steady_clock::time_point update_time) override { m_update_time = update_time; }
 	bool add_share() override;
@@ -38,6 +39,7 @@ public:
 	std::unique_ptr<LLP::CBlock> get_block() override;
 
 	bool create_account() override;
+	void login() override;
 
 private:
 
@@ -78,7 +80,6 @@ public:
 
 	bool valid_nxs_address(std::string const& nxs_address) override;
 	bool does_account_exists(std::string account) override;
-	void login(Session_key key) override;	// fetch user data from storage for the specific session
 
 private:
 

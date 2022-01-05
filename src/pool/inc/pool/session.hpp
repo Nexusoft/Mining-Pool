@@ -29,7 +29,8 @@ public:
 
 	virtual void update_connection(std::shared_ptr<Miner_connection> miner_connection) = 0;
 	virtual std::weak_ptr<Miner_connection> get_connection() = 0;
-	virtual Session_user& get_user_data() = 0;
+	virtual Session_user get_user_data() const = 0;
+	virtual void update_user_data(Session_user const& user_data) = 0;
 	virtual std::chrono::steady_clock::time_point get_update_time() const = 0;
 	virtual void set_update_time(std::chrono::steady_clock::time_point update_time) = 0;
 	virtual bool add_share() = 0;
@@ -39,6 +40,7 @@ public:
 	virtual std::unique_ptr<LLP::CBlock> get_block() = 0;
 
 	virtual bool create_account() = 0;
+	virtual void login() = 0;
 };
 
 // Manages all sessions
@@ -66,7 +68,7 @@ public:
 
 	virtual bool valid_nxs_address(std::string const& nxs_address) = 0;
 	virtual bool does_account_exists(std::string account) = 0;
-	virtual void login(Session_key key) = 0;	// fetch user data from storage for the specific session
+
 };
 
 }

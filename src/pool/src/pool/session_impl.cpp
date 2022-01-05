@@ -51,7 +51,7 @@ bool Session_impl::create_account()
 	assert(m_user_data.m_new_account);
 	assert(!m_user_data.m_account.m_address.empty());
 
-	return m_data_writer->create_account(m_user_data.m_account.m_address, "");
+	return m_data_writer->create_account(m_user_data.m_account.m_address, m_user_data.m_account.m_display_name);
 }
 
 std::unique_ptr<LLP::CBlock> Session_impl::get_block()
@@ -62,6 +62,29 @@ std::unique_ptr<LLP::CBlock> Session_impl::get_block()
 	}
 	return nullptr;
 }
+
+void Session_impl::login()
+{
+	auto const account_data = m_data_reader->get_account(m_user_data.m_account.m_address);
+
+	if (!account_data.is_empty())
+	{
+		auto const display_name_received = m_user_data.m_account.m_display_name;
+		// only move account_data from storage if the account has been found
+		m_user_data.m_account = std::move(account_data);
+		// check if there is a new display_name received
+		if (!display_name_received.empty() && display_name_received != m_user_data.m_account.m_display_name)
+		{
+			m_user_data.m_account.m_display_name = display_name_received;
+			// new display name! update account
+			m_data_writer->update_account(m_user_data.m_account);
+		}
+	}
+
+	m_user_data.m_login_time = std::chrono::steady_clock::now();
+	m_user_data.m_logged_in = true;
+}
+
 
 // ------------------------------------------------------------------------------------------------------------
 
@@ -186,24 +209,6 @@ bool Session_registry_impl::valid_nxs_address(std::string const& nxs_address)
 bool Session_registry_impl::does_account_exists(std::string account)
 {
 	return m_data_reader->does_account_exists(std::move(account));
-}
-
-void Session_registry_impl::login(Session_key key)
-{
-	auto session = get_session(key);
-	auto& user_data = session->get_user_data();
-	persistance::Account_data account_data{};
-	{
-		account_data = m_data_reader->get_account(user_data.m_account.m_address);
-	}
-
-	if (!account_data.is_empty())
-	{
-		// only move account_data from storage if the account has been found
-		user_data.m_account = std::move(account_data);
-	}
-
-	user_data.m_login_time = std::chrono::steady_clock::now();
 }
 
 }

@@ -59,7 +59,12 @@ namespace nexuspool
 		{
 			m_api_server->stop();
 		}
-		m_pool_manager->stop();
+
+		if (m_pool_manager)
+		{
+			m_pool_manager->stop();
+		}
+
 		m_io_context->stop();
 	}
 

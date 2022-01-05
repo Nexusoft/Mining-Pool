@@ -2,12 +2,9 @@
 #define NEXUSPOOL_MINER_CONNECTION_IMPL_HPP
 
 #include "pool/miner_connection.hpp"
-
-
+#include "LLP/packet.hpp"
 #include <memory>
 #include <atomic>
-
-
 
 namespace nexuspool
 {
@@ -35,6 +32,8 @@ private:
 
     // checks if a new account should be created, add share for session
     void process_accepted();
+
+    bool process_login(Packet login_packet, std::shared_ptr<Session> session);
 
     std::shared_ptr<spdlog::logger> m_logger;
     network::Connection::Sptr m_connection;

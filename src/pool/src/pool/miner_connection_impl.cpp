@@ -1,9 +1,9 @@
 #include "pool/miner_connection_impl.hpp"
 #include "pool/pool_manager_impl.hpp"
-#include "LLP/packet.hpp"
 #include "LLP/block.hpp"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
+#include <json/json.hpp>
 #include <string>
 
 namespace nexuspool
@@ -109,42 +109,8 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		}
 		else if (packet.m_header == Packet::LOGIN)
 		{
-			auto& user_data = session->get_user_data();
-			// check if already logged in
-			if (user_data.m_logged_in)
-			{
-				m_logger->warn("Multiple login attempts of user {} with endpoint {} ", user_data.m_account.m_address, m_connection->remote_endpoint().to_string());
-				// increase ddos score
-				continue;
-			}
+			auto result = process_login(std::move(packet), session);
 
-			Packet response;
-			Packet login_fail_response;
-			login_fail_response = login_fail_response.get_packet(Packet::LOGIN_FAIL);
-
-			auto const nxs_address = std::string(packet.m_data->begin(), packet.m_data->end());
-			auto const nxs_address_valid = m_session_registry->valid_nxs_address(nxs_address);
-			if (!nxs_address_valid)
-			{
-				m_logger->warn("Bad Account {}", nxs_address);
-				//if (m_isDDOS)
-				//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
-
-				m_connection->transmit(login_fail_response.get_bytes());
-				continue;
-			}
-
-			// check if banned ip/user
-
-			// check if user already exists in db
-			user_data.m_new_account = !m_session_registry->does_account_exists(nxs_address);
-			// login the user (fetch data from storage)
-			user_data.m_account.m_address = nxs_address;
-			m_session_registry->login(m_session_key);
-			user_data.m_logged_in = true;
-
-			response = response.get_packet(Packet::LOGIN_SUCCESS);
-			m_connection->transmit(response.get_bytes());
 		}
 		else if (packet.m_header == Packet::GET_BLOCK)
 		{
@@ -247,9 +213,13 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		}
 		else if (packet.m_header == Packet::HASHRATE)
 		{
-			auto const hashrate = bytes2double(*packet.m_data);
-			session->update_hashrate(hashrate);
-
+			auto user_data = session->get_user_data();
+			// only update hashrate if user is logged in and the account has already been created
+			if (user_data.m_logged_in && !user_data.m_new_account)
+			{
+				auto const hashrate = bytes2double(*packet.m_data);
+				session->update_hashrate(hashrate);
+			}
 		}
 		else if (packet.m_header == Packet::SET_CHANNEL)
 		{
@@ -295,7 +265,7 @@ void Miner_connection_impl::process_accepted()
 		m_logger->trace("process_accepted, session invalid");
 		return;
 	}
-	auto& user_data = session->get_user_data();
+	auto user_data = session->get_user_data();
 
 	// create new account
 	if(user_data.m_new_account)
@@ -305,7 +275,12 @@ void Miner_connection_impl::process_accepted()
 		{
 			m_logger->error("Failed creating new account for miner {}", user_data.m_account.m_address);
 		}
-		user_data.m_new_account = false;
+		else
+		{
+			user_data.m_new_account = false;
+			session->update_user_data(user_data);
+		}
+
 	}
 
 	// add share
@@ -326,6 +301,61 @@ void Miner_connection_impl::get_hashrate()
 
 	Packet packet{ Packet::GET_HASHRATE, nullptr };
 	m_connection->transmit(packet.get_bytes());
+}
+
+bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<Session> session)
+{
+	auto user_data = session->get_user_data();
+	// check if already logged in
+	if (user_data.m_logged_in)
+	{
+		m_logger->warn("Multiple login attempts of user {} with endpoint {} ", user_data.m_account.m_address, m_connection->remote_endpoint().to_string());
+		// increase ddos score
+		return false;
+	}
+
+	Packet response;
+	Packet login_fail_response;
+	login_fail_response = login_fail_response.get_packet(Packet::LOGIN_FAIL);
+
+	std::string nxs_address, display_name;
+	try
+	{
+		nlohmann::json j = nlohmann::json::parse(login_packet.m_data->begin(), login_packet.m_data->end());
+		nxs_address = j.at("username");
+		display_name = j.at("display_name");
+		auto const protocol_version = j.at("protocol_version");	// TODO: protocol version check in future
+	}
+	catch (std::exception& e)
+	{
+		m_logger->debug("Invalid login json. Exception: {}", e.what());
+		return false;
+	}
+
+	auto const nxs_address_valid = m_session_registry->valid_nxs_address(nxs_address);
+	if (!nxs_address_valid)
+	{
+		m_logger->warn("Bad Account {}", nxs_address);
+		//if (m_isDDOS)
+		//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
+
+		m_connection->transmit(login_fail_response.get_bytes());
+		return false;
+	}
+
+	// check if banned ip/user
+
+	// check if user already exists in db
+	user_data.m_new_account = !m_session_registry->does_account_exists(nxs_address);
+	// login the user (fetch data from storage)
+	user_data.m_account.m_address = nxs_address;
+	user_data.m_account.m_display_name = display_name;
+	session->update_user_data(user_data);
+	session->login();
+
+	response = response.get_packet(Packet::LOGIN_SUCCESS);
+	m_connection->transmit(response.get_bytes());
+	return true;
 }
 
 }
