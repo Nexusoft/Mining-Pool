@@ -59,6 +59,7 @@ Wallet Detail API's:
 			- last_active
             - shares
             - hashrate
+            - display_name
 
 
     ########################

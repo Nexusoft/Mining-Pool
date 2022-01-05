@@ -128,7 +128,7 @@ void Command_account_exists_impl::set_params(std::any params)
 Command_get_account_impl::Command_get_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT name, created_at, last_active, connection_count, shares, hashrate FROM account WHERE name = :name;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT name, created_at, last_active, connection_count, shares, hashrate, display_name FROM account WHERE name = :name;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_account_impl::get_command() const
@@ -139,7 +139,8 @@ std::any Command_get_account_impl::get_command() const
 		{Column_sqlite::string},
 		{Column_sqlite::int32},
 		{Column_sqlite::double_t},
-		{Column_sqlite::double_t}} };
+		{Column_sqlite::double_t},
+		{Column_sqlite::string}} };
 	return command;
 }
 
@@ -393,8 +394,8 @@ Command_create_account_impl::Command_create_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string create_account{R"(INSERT INTO account 
-		(name, created_at, last_active, connection_count, shares, hashrate) 
-		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0))"};
+		(name, created_at, last_active, connection_count, shares, hashrate, display_name) 
+		VALUES(:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, 0, 0, :display_name))"};
 
 	if (sqlite3_prepare_v2(m_handle, create_account.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
 	{
@@ -405,8 +406,9 @@ Command_create_account_impl::Command_create_account_impl(sqlite3* handle)
 void Command_create_account_impl::set_params(std::any params)
 {
 	m_params = std::move(params);
-	auto casted_params = std::any_cast<std::string>(m_params);
-	bind_param(m_stmt, ":name", casted_params);
+	auto casted_params = std::any_cast<Command_create_account_params>(m_params);
+	bind_param(m_stmt, ":name", casted_params.m_name);
+	bind_param(m_stmt, ":display_name", casted_params.m_display_name);
 }
 
 // -----------------------------------------------------------------------------------------------

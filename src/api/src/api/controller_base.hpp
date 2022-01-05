@@ -110,6 +110,7 @@ protected:
             dto->last_active = account_data.m_last_active;
             dto->shares = account_data.m_shares;
             dto->hashrate = account_data.m_hashrate;
+            dto->display_name = account_data.m_display_name;
 
             return createDtoResponse(Status::CODE_200, dto);
         }

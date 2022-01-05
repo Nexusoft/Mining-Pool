@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS account (
   last_active TEXT,
   connection_count INTEGER,
   shares REAL,
-  hashrate REAL
+  hashrate REAL,
+  display_name TEXT
 );
 
 CREATE TABLE IF NOT EXISTS payment (

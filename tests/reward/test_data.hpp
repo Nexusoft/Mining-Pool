@@ -20,7 +20,7 @@ using namespace ::testing;
 
 std::uint32_t const test_current_round{ 3 };
 std::uint32_t const test_unpaid_round{ 4 };
-persistance::Round_data const test_round_data{ test_current_round, 0, 0, 0, 0, "2021-09-19 10:20:04.0000000", "2021-09-20 10:20:04.0000000", true, false };
+persistance::Round_data const test_round_data{ test_current_round, 0, 0, 0, "2021-09-19 10:20:04.0000000", "2021-09-20 10:20:04.0000000", true, false };
 std::vector<persistance::Block_data> const test_blocks_from_round{
 	{ "testblockhash1", 50001, "hash", 351.64, false, "", test_current_round, "2021-09-19 13:36:14.0000000", 2.546},
 	{ "testblockhash2", 50002, "hash", 352.64, false, "", test_current_round, "2021-09-19 18:50:45.0000000", 2.546},
@@ -36,8 +36,8 @@ std::vector<persistance::Account_data_for_payment> const test_active_accounts_fr
 };
 
 
-persistance::Round_data const test_round_not_active_not_paid_data{ test_unpaid_round, 0, 0, 0, 0, "2021-09-19 10:20:04.0000000", "2021-09-20 10:20:04.0000000", false, false };
-persistance::Round_data const test_round_not_active_paid_data{ test_current_round, 20, 5, 2, 0, "2021-09-20 12:00:44.0000000", "2021-09-21 12:00:44.0000000", false, true };
+persistance::Round_data const test_round_not_active_not_paid_data{ test_unpaid_round, 0, 0, 0, "2021-09-19 10:20:04.0000000", "2021-09-20 10:20:04.0000000", false, false };
+persistance::Round_data const test_round_not_active_paid_data{ test_current_round, 20, 5, 2, "2021-09-20 12:00:44.0000000", "2021-09-21 12:00:44.0000000", false, true };
 std::vector<persistance::Block_data> const test_blocks_from_unpaid_round{
 	{ "testblockhash1", 60001, "hash", 351.64, false, "", test_unpaid_round, "2021-09-19 13:36:14.0000000", 0},
 	{ "testblockhash2", 60002, "hash", 352.64, false, "", test_unpaid_round, "2021-09-19 18:50:45.0000000", 0},

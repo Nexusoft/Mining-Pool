@@ -183,7 +183,8 @@ def create_account_test_data(connection):
         'last_active',
         'connection_count',
         'shares',
-        'hashrate'
+        'hashrate',
+        'display_name'
     ]
     )
 
@@ -196,6 +197,8 @@ def create_account_test_data(connection):
         connection_count = random.randint(1, 100)
         shares = round(random.uniform(1, 100), 2)
         hashrate = round(random.uniform(1, 10), 2)
+        letters = string.ascii_lowercase
+        display_name = ''.join(random.choice(letters) for i in range(10))        
 
         data_dict = {
             'name': name,
@@ -204,6 +207,7 @@ def create_account_test_data(connection):
             'connection_count': connection_count,
             'shares': shares,
             'hashrate': hashrate,
+            'display_name' : display_name,
         }
 
         dataframe_account = dataframe_account.append(data_dict, ignore_index=True)

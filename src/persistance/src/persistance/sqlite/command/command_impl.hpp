@@ -198,6 +198,11 @@ public:
 
 // ------------------------------------------------------------------------------------
 // Write commands
+struct Command_create_account_params
+{
+	std::string m_name;
+	std::string m_display_name;
+};
 
 class Command_create_account_impl : public Command_base_database_sqlite
 {

@@ -58,7 +58,8 @@ void Storage_manager_sqlite::start()
 		  last_active TEXT,
 		  connection_count INTEGER,
 		  shares REAL,
-		  hashrate REAL
+		  hashrate REAL,
+		  display_name TEXT
 		);)", NULL, NULL, NULL);
 
 	sqlite3_exec(m_handle, R"(CREATE TABLE IF NOT EXISTS payment (

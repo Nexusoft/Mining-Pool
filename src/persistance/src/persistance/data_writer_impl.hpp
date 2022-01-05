@@ -26,7 +26,7 @@ public:
         persistance::Data_storage::Sptr data_storage,
         std::shared_ptr<persistance::command::Command_factory> command_factory);
 
-    bool create_account(std::string account) override;
+    bool create_account(std::string account, std::string display_name) override;
     bool add_payment(Payment_data data) override;
     bool create_round(std::string round_end_date_time) override;
     bool update_account(Account_data data) override;
@@ -70,7 +70,7 @@ public:
 
     Shared_data_writer_impl(Data_writer::Uptr data_writer);
 
-    bool create_account(std::string account) override;
+    bool create_account(std::string account, std::string display_name) override;
     bool add_payment(Payment_data data) override;
     bool create_round(std::string round_end_date_time) override;
     bool update_account(Account_data data) override;

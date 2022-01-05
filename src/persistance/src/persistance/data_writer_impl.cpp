@@ -36,9 +36,9 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_delete_empty_payments_cmd = m_command_factory->create_command(Type::delete_empty_payments);
 }
 
-bool Data_writer_impl::create_account(std::string account)
+bool Data_writer_impl::create_account(std::string account, std::string display_name)
 {
-	m_create_account_cmd->set_params(std::move(account));
+	m_create_account_cmd->set_params(command::Command_create_account_params{ std::move(account), std::move(display_name) });
 	return m_data_storage->execute_command(m_create_account_cmd);
 }
 
@@ -145,10 +145,10 @@ Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
 	: m_data_writer{ std::move(data_writer) }
 {}
 
-bool Shared_data_writer_impl::create_account(std::string account)
+bool Shared_data_writer_impl::create_account(std::string account, std::string display_name)
 {
 	std::scoped_lock lock(m_writer_mutex);
-	return m_data_writer->create_account(std::move(account));
+	return m_data_writer->create_account(std::move(account), std::move(display_name));
 }
 
 bool Shared_data_writer_impl::add_payment(Payment_data data)

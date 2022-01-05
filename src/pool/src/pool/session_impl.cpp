@@ -51,7 +51,7 @@ bool Session_impl::create_account()
 	assert(m_user_data.m_new_account);
 	assert(!m_user_data.m_account.m_address.empty());
 
-	return m_data_writer->create_account(m_user_data.m_account.m_address);
+	return m_data_writer->create_account(m_user_data.m_account.m_address, "");
 }
 
 std::unique_ptr<LLP::CBlock> Session_impl::get_block()
