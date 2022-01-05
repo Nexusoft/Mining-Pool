@@ -49,7 +49,6 @@ struct Round_data
 	double m_total_shares{ 0 };
 	double m_total_rewards{ 0 };
 	std::uint32_t m_blocks{ 0 };
-	std::uint32_t m_connection_count{ 0 };
 	std::string m_start_date_time{};
 	std::string m_end_date_time{};
 	bool m_is_active{ false };

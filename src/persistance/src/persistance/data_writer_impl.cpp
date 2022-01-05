@@ -111,7 +111,6 @@ bool Data_writer_impl::update_round(Round_data round)
 		round.m_total_shares,
 		round.m_total_rewards,
 		static_cast<int>(round.m_blocks),
-		static_cast<int>(round.m_connection_count),
 		round.m_is_active,
 		round.m_is_paid});
 	return m_data_storage->execute_command(m_update_round_cmd);

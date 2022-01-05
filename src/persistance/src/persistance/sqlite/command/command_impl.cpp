@@ -180,7 +180,7 @@ std::any Command_get_blocks_impl::get_command() const
 Command_get_latest_round_impl::Command_get_latest_round_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT round_number, total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid FROM round ORDER BY round_number DESC LIMIT 1;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT round_number, total_shares, total_reward, blocks, start_date_time, end_date_time, is_active, is_paid FROM round ORDER BY round_number DESC LIMIT 1;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_latest_round_impl::get_command() const
@@ -189,7 +189,6 @@ std::any Command_get_latest_round_impl::get_command() const
 		{{Column_sqlite::int64},
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
-		{Column_sqlite::int32},
 		{Column_sqlite::int32},
 		{Column_sqlite::string},
 		{Column_sqlite::string},
@@ -203,7 +202,7 @@ std::any Command_get_latest_round_impl::get_command() const
 Command_get_round_impl::Command_get_round_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT round_number, total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid FROM round WHERE round_number = :round_number;", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT round_number, total_shares, total_reward, blocks, start_date_time, end_date_time, is_active, is_paid FROM round WHERE round_number = :round_number;", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_round_impl::get_command() const
@@ -212,7 +211,6 @@ std::any Command_get_round_impl::get_command() const
 		{{Column_sqlite::int64},
 		{Column_sqlite::double_t},
 		{Column_sqlite::double_t},
-		{Column_sqlite::int32},
 		{Column_sqlite::int32},
 		{Column_sqlite::string},
 		{Column_sqlite::string},
@@ -439,7 +437,7 @@ Command_create_round_impl::Command_create_round_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string create_round{ R"(INSERT INTO round 
-		(total_shares, total_reward, blocks, connection_count, start_date_time, end_date_time, is_active, is_paid) 
+		(total_shares, total_reward, blocks, start_date_time, end_date_time, is_active, is_paid) 
 		VALUES(0, 0, 0, 0, CURRENT_TIMESTAMP, :end_date_time, 1, 0))" };
 
 	sqlite3_prepare_v2(m_handle, create_round.c_str(), -1, &m_stmt, NULL);
@@ -574,8 +572,7 @@ Command_update_round_impl::Command_update_round_impl(sqlite3* handle)
 	std::string update_round{ R"(UPDATE round SET 
 			total_shares = :total_shares, 
 			total_reward = :total_reward, 
-			blocks = :blocks, 
-			connection_count = :connection_count,  
+			blocks = :blocks,
 			is_active = :is_active, 
 			is_paid = :is_paid 
 			WHERE round_number = :round_number)" };
@@ -590,7 +587,6 @@ void Command_update_round_impl::set_params(std::any params)
 	bind_param(m_stmt, ":total_shares", casted_params.m_total_shares);
 	bind_param(m_stmt, ":total_reward", casted_params.m_total_reward);
 	bind_param(m_stmt, ":blocks", casted_params.m_blocks);
-	bind_param(m_stmt, ":connection_count", casted_params.m_connection_count);
 	bind_param(m_stmt, ":is_active", casted_params.m_is_active);
 	bind_param(m_stmt, ":is_paid", casted_params.m_is_paid);
 	bind_param(m_stmt, ":round_number", casted_params.m_round_number);

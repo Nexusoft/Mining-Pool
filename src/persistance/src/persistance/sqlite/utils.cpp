@@ -42,18 +42,17 @@ Block_data convert_to_block_data(Row_sqlite row)
 
 Round_data convert_to_round_data(Row_sqlite row)
 {
-	assert(row.size() == 9U);
+	assert(row.size() == 8U);
 	Round_data result{};
 
 	result.m_round = std::get<std::int64_t>(row[0].m_data);
 	result.m_total_shares = std::get<double>(row[1].m_data);
 	result.m_total_rewards = std::get<double>(row[2].m_data);
 	result.m_blocks = std::get<std::int32_t>(row[3].m_data);
-	result.m_connection_count = std::get<std::int32_t>(row[4].m_data);
-	result.m_start_date_time = std::get<std::string>(row[5].m_data);
-	result.m_end_date_time = std::get<std::string>(row[6].m_data);
-	result.m_is_active = std::get<std::int32_t>(row[7].m_data) ? true : false;
-	result.m_is_paid = std::get<std::int32_t>(row[8].m_data) ? true : false;
+	result.m_start_date_time = std::get<std::string>(row[4].m_data);
+	result.m_end_date_time = std::get<std::string>(row[5].m_data);
+	result.m_is_active = std::get<std::int32_t>(row[6].m_data) ? true : false;
+	result.m_is_paid = std::get<std::int32_t>(row[7].m_data) ? true : false;
 
 	return result;
 }

@@ -349,7 +349,6 @@ struct Command_update_round_params
 	double m_total_shares;
 	double m_total_reward;
 	int m_blocks;
-	int m_connection_count;
 	int m_is_active;
 	int m_is_paid;
 };

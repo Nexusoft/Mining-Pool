@@ -31,7 +31,6 @@ void Storage_manager_sqlite::start()
 		  total_shares REAL,
 		  total_reward REAL,
 		  blocks INTEGER,
-		  connection_count INTEGER,
 		  start_date_time TEXT NOT NULL,
 		  end_date_time TEXT NOT NULL,
 		  is_active INTEGER NOT NULL,

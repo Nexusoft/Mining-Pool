@@ -140,7 +140,6 @@ def create_round_test_data(connection):
                                             'total_shares',
                                             'total_reward',
                                             'blocks',
-                                            'connection_count',
                                             'start_date_time',
                                             'end_date_time',
                                             'is_active',
@@ -152,7 +151,6 @@ def create_round_test_data(connection):
         total_share = round(random.uniform(1, 10), 2)
         total_reward = round(random.uniform(1, 10), 2)
         blocks = random.randint(1, 10)
-        connection_count = random.randint(1, 100)
         start_date_time = fake.past_datetime()
         end_date_time = fake.past_datetime()
         is_active = random.randint(0, 1)
@@ -162,7 +160,6 @@ def create_round_test_data(connection):
             'total_shares': total_share,
             'total_reward': total_reward,
             'blocks': blocks,
-            'connection_count': connection_count,
             'start_date_time': start_date_time,
             'end_date_time': end_date_time,
             'is_active': is_active,
