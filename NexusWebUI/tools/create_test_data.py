@@ -1,5 +1,6 @@
 import os
 import random
+import string
 import sqlalchemy
 import pandas as pd
 from faker import Faker

@@ -253,6 +253,7 @@ struct Command_update_account_params
 	int m_connection_count;
 	double m_shares;
 	double m_hashrate;
+	std::string m_display_name;
 	std::string m_name;
 };
 

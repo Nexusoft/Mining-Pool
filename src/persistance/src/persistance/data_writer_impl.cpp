@@ -61,6 +61,7 @@ bool Data_writer_impl::update_account(Account_data data)
 		data.m_connections, 
 		data.m_shares,
 		data.m_hashrate, 
+		std::move(data.m_display_name),
 		std::move(data.m_address) });
 	return m_data_storage->execute_command(m_update_account_cmd);
 }

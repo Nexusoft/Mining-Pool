@@ -440,7 +440,7 @@ Command_create_round_impl::Command_create_round_impl(sqlite3* handle)
 {
 	std::string create_round{ R"(INSERT INTO round 
 		(total_shares, total_reward, blocks, start_date_time, end_date_time, is_active, is_paid) 
-		VALUES(0, 0, 0, 0, CURRENT_TIMESTAMP, :end_date_time, 1, 0))" };
+		VALUES(0, 0, 0, CURRENT_TIMESTAMP, :end_date_time, 1, 0))" };
 
 	sqlite3_prepare_v2(m_handle, create_round.c_str(), -1, &m_stmt, NULL);
 }
@@ -457,7 +457,7 @@ Command_update_account_impl::Command_update_account_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string update_account{ R"(UPDATE account SET 
-			last_active = :last_active, connection_count = :connection_count, shares = :shares, hashrate = :hashrate
+			last_active = :last_active, connection_count = :connection_count, shares = :shares, hashrate = :hashrate, display_name = :display_name
 			WHERE name = :name)" };
 
 	sqlite3_prepare_v2(m_handle, update_account.c_str(), -1, &m_stmt, NULL);
@@ -471,6 +471,7 @@ void Command_update_account_impl::set_params(std::any params)
 	bind_param(m_stmt, ":connection_count", casted_params.m_connection_count);
 	bind_param(m_stmt, ":shares", casted_params.m_shares);
 	bind_param(m_stmt, ":hashrate", casted_params.m_hashrate);
+	bind_param(m_stmt, ":display_name", casted_params.m_display_name);
 	bind_param(m_stmt, ":name", casted_params.m_name);
 }
 
