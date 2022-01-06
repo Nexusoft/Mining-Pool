@@ -69,6 +69,7 @@ public:
 	Session_key create_session() override;
 	std::shared_ptr<Session> get_session(Session_key key) override;
 	std::shared_ptr<Session> get_session_with_no_work() override;
+	void reset_work_status_of_sessions() override;
 	void clear_unused_sessions() override;
 	void end_round() override;
 	std::size_t get_sessions_size() override;

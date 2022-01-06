@@ -144,6 +144,18 @@ std::shared_ptr<Session> Session_registry_impl::get_session_with_no_work()
 	return nullptr;
 }
 
+void Session_registry_impl::reset_work_status_of_sessions()
+{
+	std::scoped_lock lock(m_sessions_mutex);
+
+	for (auto& session : m_sessions)
+	{
+		auto user_data = session.second->get_user_data();
+		user_data.m_work_needed = true;
+		session.second->update_user_data(user_data);
+	}
+}
+
 void Session_registry_impl::clear_unused_sessions()
 {
 	std::scoped_lock lock(m_sessions_mutex);

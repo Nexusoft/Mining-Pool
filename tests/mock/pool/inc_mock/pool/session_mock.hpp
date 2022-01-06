@@ -33,6 +33,7 @@ public:
 	MOCK_METHOD(Session_key, create_session, (), (override));
 	MOCK_METHOD(std::shared_ptr<Session>, get_session, (Session_key key), (override));
 	MOCK_METHOD(std::shared_ptr<Session>, get_session_with_no_work, (), (override));
+	MOCK_METHOD(void, reset_work_status_of_sessions, (), (override));
 	MOCK_METHOD(void, clear_unused_sessions, (), (override));
 	MOCK_METHOD(void, end_round, (), (override));
 	MOCK_METHOD(std::size_t, get_sessions_size, (), (override));

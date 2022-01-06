@@ -167,6 +167,7 @@ void Pool_manager_impl::set_current_height(std::uint32_t height)
 		// new block -> clear pending blocks from previous height
 		m_block_map.clear();
 		m_block_map_id = 0;
+		m_session_registry->reset_work_status_of_sessions();
 	}
 
 	// send miners new work
