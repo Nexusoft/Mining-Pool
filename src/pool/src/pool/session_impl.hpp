@@ -28,7 +28,7 @@ public:
 
 	void update_connection(std::shared_ptr<Miner_connection> miner_connection) override;
 	std::weak_ptr<Miner_connection> get_connection() override { return m_miner_connection; }
-	Session_user get_user_data() const  override { return m_user_data; }
+	Session_user get_user_data() const override { return m_user_data; }
 	void update_user_data(Session_user const& user_data) override { m_user_data = user_data; }
 	std::chrono::steady_clock::time_point get_update_time() const override { return m_update_time; }
 	void set_update_time(std::chrono::steady_clock::time_point update_time) override { m_update_time = update_time; }
@@ -68,12 +68,10 @@ public:
 	// Managment methods
 	Session_key create_session() override;
 	std::shared_ptr<Session> get_session(Session_key key) override;
+	std::shared_ptr<Session> get_session_with_no_work() override;
 	void clear_unused_sessions() override;
 	void end_round() override;
 	std::size_t get_sessions_size() override;
-
-	// update height on active sessions
-	void update_height(std::uint32_t height) override;
 
 	// sends get_hashrate message to active sessions
 	void get_hashrate() override;

@@ -169,8 +169,24 @@ void Pool_manager_impl::set_current_height(std::uint32_t height)
 		m_block_map_id = 0;
 	}
 
-	// give the miners the height
-	m_session_registry->update_height(m_current_height);
+	// send miners new work
+	for (auto i = 0; i < m_session_registry->get_sessions_size(); ++i)
+	{
+		auto session = m_session_registry->get_session_with_no_work();
+		if (session)
+		{
+			m_logger->trace("Get block for miner {}", session->get_user_data().m_account.m_display_name);
+			m_wallet_connection->get_block([session](auto block)
+				{
+					auto miner_connection = session->get_connection();
+					auto miner_connection_shared = miner_connection.lock();
+					if (miner_connection_shared)
+					{
+						miner_connection_shared->send_work(block);
+					}
+				});
+		}
+	}
 }
 
 void Pool_manager_impl::set_block(LLP::CBlock const& block)

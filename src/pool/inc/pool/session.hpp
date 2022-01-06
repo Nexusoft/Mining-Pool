@@ -11,6 +11,7 @@
 namespace nexuspool
 {
 class Miner_connection;
+namespace LLP { class CBlock; }
 
 struct Session_user
 {
@@ -18,6 +19,7 @@ struct Session_user
 	bool m_new_account{ true };
 	persistance::Account_data m_account;
 	std::chrono::steady_clock::time_point m_login_time;
+	bool m_work_needed{ true };
 };
 
 // Holds relevant user data and miner_connection
@@ -56,12 +58,10 @@ public:
 	// Managment methods
 	virtual Session_key create_session() = 0;
 	virtual std::shared_ptr<Session> get_session(Session_key key) = 0;
+	virtual std::shared_ptr<Session> get_session_with_no_work() = 0;	// returns a session which needs work
 	virtual void clear_unused_sessions() = 0;
 	virtual void end_round() = 0;
 	virtual std::size_t get_sessions_size() = 0;
-
-	// update height on active sessions
-	virtual void update_height(std::uint32_t height) = 0;
 
 	// sends get_hashrate message to active sessions
 	virtual void get_hashrate() = 0;

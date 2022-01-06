@@ -134,10 +134,6 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
                 m_current_height = height;
                 m_logger->info("Nexus Network: New Block with height {}", m_current_height);
 
-                // update height at pool_manager
-                pool_manager_shared->set_current_height(m_current_height);
-                m_get_block_pool_manager = true;
-
                 // clear pending get_block handlers
                 {
                     std::scoped_lock lock(m_get_block_mutex);
@@ -148,6 +144,10 @@ void Wallet_connection_impl::process_data(network::Shared_payload&& receive_buff
                 // get new block from wallet for pool_manager
                 Packet packet_get_block{ Packet::GET_BLOCK, nullptr };
                 m_connection->transmit(packet_get_block.get_bytes());
+
+                // update height at pool_manager
+                pool_manager_shared->set_current_height(m_current_height);
+                m_get_block_pool_manager = true;
             }
             else
             {

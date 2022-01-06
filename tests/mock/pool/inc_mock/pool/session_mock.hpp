@@ -32,10 +32,10 @@ public:
 	MOCK_METHOD(void, stop, (), (override));
 	MOCK_METHOD(Session_key, create_session, (), (override));
 	MOCK_METHOD(std::shared_ptr<Session>, get_session, (Session_key key), (override));
+	MOCK_METHOD(std::shared_ptr<Session>, get_session_with_no_work, (), (override));
 	MOCK_METHOD(void, clear_unused_sessions, (), (override));
 	MOCK_METHOD(void, end_round, (), (override));
 	MOCK_METHOD(std::size_t, get_sessions_size, (), (override));
-	MOCK_METHOD(void, update_height, (std::uint32_t height), (override));
 	MOCK_METHOD(bool, valid_nxs_address, (std::string const& nxs_address), (override));
 	MOCK_METHOD(bool, does_account_exists, (std::string account), (override));
 	MOCK_METHOD(void, get_hashrate, (), (override));
