@@ -331,7 +331,7 @@ bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 		//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
 
 		login_response_json["result_code"] = Pool_protocol_result::Login_fail_invallid_nxs_account;
-		login_response_json["result_message"] = "";
+		login_response_json["result_message"] = "Invalid nxs account";
 		auto login_response_json_string = login_response_json.dump();
 
 		network::Payload login_data{ login_response_json_string.begin(), login_response_json_string.end() };
