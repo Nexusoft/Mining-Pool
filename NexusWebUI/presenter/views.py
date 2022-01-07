@@ -56,14 +56,19 @@ def block_overview_list(request):
             logger.info("Serving from Cache")
             print("Serving from Cache")
 
-        print(f"{block_overview_meta_json}")
+        print(f"Meta: {block_overview_meta_json}")
 
         # Meta Table
-        pool_hashrate = round((float(block_overview_meta_json['pool_hashrate']) / 1000000000), 2)
+        # pool_hashrate = round((float(block_overview_meta_json['pool_hashrate']) / 1000000000), 2)
+        pool_hashrate = round((float(block_overview_meta_json['pool_hashrate'])), 2)
         mining_mode = block_overview_meta_json['mining_mode']
         round_duration = block_overview_meta_json['round_duration']
         fee = block_overview_meta_json['fee']
         active_miners = block_overview_meta_json['active_miners']
+
+        # Todo Currently not implemented, when available change accordingly!
+        wallet_version = 1
+        pool_version = 1
 
         return render(request, template_name, {'table': table_data,
                                                'pool_hashrate': pool_hashrate,
@@ -71,6 +76,8 @@ def block_overview_list(request):
                                                'round_duration': round_duration,
                                                'active_miners': active_miners,
                                                'fee': fee,
+                                               'wallet_version': wallet_version,
+                                               'pool_version': pool_version,
                                                })
 
     except Exception as ex:
