@@ -32,7 +32,8 @@ private:
     // checks if a new account should be created, add share for session
     void process_accepted();
 
-    bool process_login(Packet login_packet, std::shared_ptr<Session> session);
+    void process_login(Packet login_packet, std::shared_ptr<Session> session);
+    void send_login_fail(std::string json_string);
 
     std::shared_ptr<spdlog::logger> m_logger;
     network::Connection::Sptr m_connection;

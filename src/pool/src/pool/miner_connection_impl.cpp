@@ -109,8 +109,7 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		}
 		else if (packet.m_header == Packet::LOGIN)
 		{
-			auto result = process_login(std::move(packet), session);
-
+			process_login(std::move(packet), session);
 		}
 		//miner has submitted a block to the pool
 		else if (packet.m_header == Packet::SUBMIT_BLOCK)
@@ -294,7 +293,7 @@ void Miner_connection_impl::get_hashrate()
 	m_connection->transmit(packet.get_bytes());
 }
 
-bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<Session> session)
+void Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<Session> session)
 {
 	auto user_data = session->get_user_data();
 	// check if already logged in
@@ -302,7 +301,7 @@ bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	{
 		m_logger->warn("Multiple login attempts of user {} with endpoint {} ", user_data.m_account.m_address, m_connection->remote_endpoint().to_string());
 		// increase ddos score
-		return false;
+		return;
 	}
 
 	nlohmann::json login_response_json;
@@ -310,17 +309,27 @@ bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	login_response_json["result_message"] = "";
 
 	std::string nxs_address, display_name;
+	std::uint8_t protocol_version{ 0U };
 	try
 	{
 		nlohmann::json j = nlohmann::json::parse(login_packet.m_data->begin(), login_packet.m_data->end());
 		nxs_address = j.at("username");
 		display_name = j.at("display_name");
-		auto const protocol_version = j.at("protocol_version");	// TODO: protocol version check in future
+		protocol_version = j.at("protocol_version");	// TODO: protocol version check in future
 	}
 	catch (std::exception& e)
 	{
 		m_logger->debug("Invalid login json. Exception: {}", e.what());
-		return false;
+		return;
+	}
+
+	// protocol version check
+	if (protocol_version < POOL_PROTOCOL_VERSION)
+	{
+		login_response_json["result_code"] = Pool_protocol_result::Protocol_version_fail;
+		login_response_json["result_message"] = "Please update miner. Mandatory protocol_version " + std::to_string(POOL_PROTOCOL_VERSION);
+		send_login_fail(login_response_json.dump());
+		return;
 	}
 
 	auto const nxs_address_valid = m_session_registry->valid_nxs_address(nxs_address);
@@ -332,12 +341,8 @@ bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 
 		login_response_json["result_code"] = Pool_protocol_result::Login_fail_invallid_nxs_account;
 		login_response_json["result_message"] = "Invalid nxs account";
-		auto login_response_json_string = login_response_json.dump();
-
-		network::Payload login_data{ login_response_json_string.begin(), login_response_json_string.end() };
-		Packet login_fail_response{ Packet::LOGIN_FAIL, std::make_shared<network::Payload>(login_data) };
-		m_connection->transmit(login_fail_response.get_bytes());
-		return false;
+		send_login_fail(login_response_json.dump());
+		return;
 	}
 
 	// check if banned ip/user
@@ -355,7 +360,13 @@ bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	network::Payload login_data{ login_response_json_string.begin(), login_response_json_string.end() };
 	Packet response{ Packet::LOGIN_SUCCESS, std::make_shared<network::Payload>(login_data) };
 	m_connection->transmit(response.get_bytes());
-	return true;
+}
+
+void Miner_connection_impl::send_login_fail(std::string json_string)
+{
+	network::Payload login_data{ json_string.begin(), json_string.end() };
+	Packet login_fail_response{ Packet::LOGIN_FAIL, std::make_shared<network::Payload>(login_data) };
+	m_connection->transmit(login_fail_response.get_bytes());
 }
 
 }
