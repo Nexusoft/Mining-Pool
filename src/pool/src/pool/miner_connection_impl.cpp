@@ -1,6 +1,7 @@
 #include "pool/miner_connection_impl.hpp"
 #include "pool/pool_manager_impl.hpp"
 #include "LLP/block.hpp"
+#include "LLP/pool_protocol.hpp"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
 #include <json/json.hpp>
@@ -304,9 +305,9 @@ bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 		return false;
 	}
 
-	Packet response;
-	Packet login_fail_response;
-	login_fail_response = login_fail_response.get_packet(Packet::LOGIN_FAIL);
+	nlohmann::json login_response_json;
+	login_response_json["result_code"] = Pool_protocol_result::Success;
+	login_response_json["result_message"] = "";
 
 	std::string nxs_address, display_name;
 	try
@@ -329,6 +330,12 @@ bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 		//if (m_isDDOS)
 		//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
 
+		login_response_json["result_code"] = Pool_protocol_result::Login_fail_invallid_nxs_account;
+		login_response_json["result_message"] = "";
+		auto login_response_json_string = login_response_json.dump();
+
+		network::Payload login_data{ login_response_json_string.begin(), login_response_json_string.end() };
+		Packet login_fail_response{ Packet::LOGIN_FAIL, std::make_shared<network::Payload>(login_data) };
 		m_connection->transmit(login_fail_response.get_bytes());
 		return false;
 	}
@@ -343,7 +350,10 @@ bool Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	session->update_user_data(user_data);
 	session->login();
 
-	response = response.get_packet(Packet::LOGIN_SUCCESS);
+	auto login_response_json_string = login_response_json.dump();
+
+	network::Payload login_data{ login_response_json_string.begin(), login_response_json_string.end() };
+	Packet response{ Packet::LOGIN_SUCCESS, std::make_shared<network::Payload>(login_data) };
 	m_connection->transmit(response.get_bytes());
 	return true;
 }
