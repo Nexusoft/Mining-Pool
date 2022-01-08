@@ -356,6 +356,7 @@ void Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	user_data.m_new_account = !m_session_registry->does_account_exists(nxs_address);
 	// login the user (fetch data from storage)
 	user_data.m_account.m_address = nxs_address;
+	check_and_update_display_name(display_name, login_response_json);
 	user_data.m_account.m_display_name = display_name;
 	session->update_user_data(user_data);
 	session->login();
@@ -372,6 +373,16 @@ void Miner_connection_impl::send_login_fail(std::string json_string)
 	network::Payload login_data{ json_string.begin(), json_string.end() };
 	Packet login_fail_response{ Packet::LOGIN_FAIL, std::make_shared<network::Payload>(login_data) };
 	m_connection->transmit(login_fail_response.get_bytes());
+}
+
+void Miner_connection_impl::check_and_update_display_name(std::string display_name, nlohmann::json& login_response)
+{
+	if (display_name.empty())
+	{
+		login_response["result_code"] = Pool_protocol_result::Login_warn_no_display_name;
+		login_response["result_message"] = "No display_name set";
+		return;
+	}
 }
 
 }

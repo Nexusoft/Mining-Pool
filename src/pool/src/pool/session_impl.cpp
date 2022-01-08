@@ -72,7 +72,7 @@ void Session_impl::login()
 	{
 		auto const display_name_received = m_user_data.m_account.m_display_name;
 		// only move account_data from storage if the account has been found
-		m_user_data.m_account = std::move(account_data);
+		m_user_data.m_account = account_data;
 		// check if there is a new display_name received
 		if (!display_name_received.empty() && display_name_received != m_user_data.m_account.m_display_name)
 		{

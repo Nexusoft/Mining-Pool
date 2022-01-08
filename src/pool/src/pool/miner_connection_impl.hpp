@@ -3,6 +3,7 @@
 
 #include "pool/miner_connection.hpp"
 #include "LLP/packet.hpp"
+#include <json/json.hpp>
 #include <memory>
 #include <atomic>
 
@@ -34,6 +35,7 @@ private:
 
     void process_login(Packet login_packet, std::shared_ptr<Session> session);
     void send_login_fail(std::string json_string);
+    void check_and_update_display_name(std::string display_name, nlohmann::json& login_response);
 
     std::shared_ptr<spdlog::logger> m_logger;
     network::Connection::Sptr m_connection;
