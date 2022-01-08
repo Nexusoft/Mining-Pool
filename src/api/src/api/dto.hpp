@@ -45,14 +45,16 @@ class Payout_dto : public oatpp::DTO
 
 	DTO_FIELD(String, time);
 	DTO_FIELD(Float64, amount);
+	DTO_FIELD(Float64, shares);
 	DTO_FIELD(String, txhash);
 
 public:
 
 	Payout_dto() = default;
-	Payout_dto(const char* ptime, double pamount, const char* ptxhash)
+	Payout_dto(const char* ptime, double pamount, double pshares, const char* ptxhash)
 		: time(ptime)
 		, amount(pamount)
+		, shares(pshares)
 		, txhash(ptxhash)
 	{}
 };

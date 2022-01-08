@@ -137,7 +137,7 @@ protected:
             auto const payments = m_data_reader->get_payments(account);
             for (auto const& payment : payments)
             {
-                dto->payouts->push_back(Payout_dto::createShared(payment.m_payment_date_time.c_str(), payment.m_amount, payment.m_tx_id.c_str()));
+                dto->payouts->push_back(Payout_dto::createShared(payment.m_payment_date_time.c_str(), payment.m_amount, payment.m_shares, payment.m_tx_id.c_str()));
             }
 
             return createDtoResponse(Status::CODE_200, dto);
