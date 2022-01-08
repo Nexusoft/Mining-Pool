@@ -59,7 +59,6 @@ def block_overview_list(request):
         print(f"Meta: {block_overview_meta_json}")
 
         # Meta Table
-        # pool_hashrate = round((float(block_overview_meta_json['pool_hashrate']) / 1000000000), 2)
         pool_hashrate = round((float(block_overview_meta_json['pool_hashrate'])), 2)
         mining_mode = block_overview_meta_json['mining_mode']
         round_duration = block_overview_meta_json['round_duration']
@@ -145,7 +144,7 @@ def wallet_detail(request):
             created_at = account_info_json['created_at']
             last_active = account_info_json['last_active']
             shares = account_info_json['shares']
-            hashrate = round((float(account_info_json['hashrate']) / 1000000000), 2)
+            hashrate = round((float(account_info_json['hashrate'])), 2)
 
             last_active = last_active[:19]
 
