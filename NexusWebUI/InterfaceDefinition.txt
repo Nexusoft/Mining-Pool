@@ -97,3 +97,22 @@ Reward calculation API's:
                 - model
                 - hashrate
                 - power_consumption
+
+############################
+Statistics API's:
+
+    ########################
+    GET /statistics/blockfinders?num=5      (returns the top 5 blockfinders)
+
+    # Result
+    Fields:
+        - display_name
+        - num_blocks
+
+    ########################
+    GET /statistics/longestchain      (only available in PRIME mining)
+
+    # Result
+    Fields:
+        - display_name
+        - chain
