@@ -64,10 +64,8 @@ def block_overview_list(request):
         round_duration = block_overview_meta_json['round_duration']
         fee = block_overview_meta_json['fee']
         active_miners = block_overview_meta_json['active_miners']
-
-        # Todo Currently not implemented, when available change accordingly!
-        wallet_version = 1
-        pool_version = 1
+        wallet_version = block_overview_meta_json['wallet_version']
+        pool_version = block_overview_meta_json['pool_version']
 
         return render(request, template_name, {'table': table_data,
                                                'pool_hashrate': pool_hashrate,
