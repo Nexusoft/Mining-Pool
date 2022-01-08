@@ -62,6 +62,11 @@ network::Connection::Handler Miner_connection_impl::connection_handler()
 		}
 		else if (result == network::Result::connection_closed)
 		{
+			auto session = self->m_session_registry->get_session(self->m_session_key);
+			if (session)
+			{
+				session->set_inactive();
+			}
 			self->m_connection.reset();
 		}
 		else if (result == network::Result::connection_ok)

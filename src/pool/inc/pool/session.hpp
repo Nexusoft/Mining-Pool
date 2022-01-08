@@ -40,6 +40,8 @@ public:
 	virtual void update_hashrate(double hashrate) = 0;
 	virtual void set_block(LLP::CBlock const& block) = 0;
 	virtual std::unique_ptr<LLP::CBlock> get_block() = 0;
+	virtual bool is_inactive() const = 0;
+	virtual void set_inactive() = 0;
 
 	virtual bool create_account() = 0;
 	virtual void login() = 0;

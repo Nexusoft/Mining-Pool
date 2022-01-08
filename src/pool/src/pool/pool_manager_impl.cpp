@@ -171,7 +171,8 @@ void Pool_manager_impl::set_current_height(std::uint32_t height)
 	}
 
 	// send miners new work
-	for (auto i = 0; i < m_session_registry->get_sessions_size(); ++i)
+	auto const sessions_size = m_session_registry->get_sessions_size();
+	for (auto i = 0; i < sessions_size; ++i)
 	{
 		auto session = m_session_registry->get_session_with_no_work();
 		if (session)

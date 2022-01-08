@@ -23,6 +23,8 @@ public:
 	MOCK_METHOD(std::unique_ptr<LLP::CBlock>, get_block, (), (override));
 	MOCK_METHOD(bool, create_account, (), (override));
 	MOCK_METHOD(void, login, (), (override));
+	MOCK_METHOD(bool, is_inactive, (), (const override));
+	MOCK_METHOD(void, set_inactive, (), (override));
 };
 
 class Session_registry_mock : public Session_registry

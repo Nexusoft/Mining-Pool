@@ -6,6 +6,7 @@
 #include <string>
 #include <mutex>
 #include <chrono>
+#include <atomic>
 #include "LLC/types/uint1024.h"
 #include "persistance/data_writer.hpp"
 #include "persistance/data_reader.hpp"
@@ -37,6 +38,8 @@ public:
 	void update_hashrate(double hashrate) override;
 	void set_block(LLP::CBlock const& block) override { m_block = std::make_unique<LLP::CBlock>(block); }
 	std::unique_ptr<LLP::CBlock> get_block() override;
+	bool is_inactive() const override { return m_inactive; }
+	void set_inactive() { m_inactive = true; }
 
 	bool create_account() override;
 	void login() override;
@@ -50,6 +53,7 @@ private:
 	std::chrono::steady_clock::time_point m_update_time;
 	Hashrate_helper m_hashrate_helper;
 	std::unique_ptr<LLP::CBlock> m_block;
+	std::atomic_bool m_inactive;
 };
 
 // Manages all sessions

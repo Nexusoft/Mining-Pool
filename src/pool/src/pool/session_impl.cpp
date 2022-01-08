@@ -16,6 +16,7 @@ Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Sh
 	, m_update_time{ std::chrono::steady_clock::now() }
 	, m_hashrate_helper{ mining_mode }
 	, m_block{}
+	, m_inactive{false}
 {
 }
 
@@ -133,6 +134,11 @@ std::shared_ptr<Session> Session_registry_impl::get_session_with_no_work()
 
 	for (auto& session : m_sessions)
 	{
+		if (session.second->is_inactive())
+		{
+			continue;
+		}
+
 		auto user_data = session.second->get_user_data();
 		if (user_data.m_work_needed)
 		{
@@ -163,7 +169,14 @@ void Session_registry_impl::clear_unused_sessions()
 	auto iter = m_sessions.begin();
 	while (iter != m_sessions.end())
 	{
-		// delete sessions were the session is expired
+		// delete already inactive sessions. Can happen if the miner disconnects
+		if (iter->second->is_inactive())
+		{
+			iter = m_sessions.erase(iter);
+			continue;
+		}
+
+		// delete sessions were the session is expired (when the pool cuts the connection to miner)
 		if (std::chrono::duration_cast<std::chrono::seconds>(time_now - iter->second->get_update_time()).count() > m_session_expiry_time)
 		{
 			iter = m_sessions.erase(iter);
