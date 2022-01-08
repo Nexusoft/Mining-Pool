@@ -387,6 +387,37 @@ void Command_get_blocks_without_hash_from_round_impl::set_params(std::any params
 }
 
 // -----------------------------------------------------------------------------------------------
+Command_get_pool_hashrate_impl::Command_get_pool_hashrate_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT SUM(hashrate) FROM account", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_pool_hashrate_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt}, {{Column_sqlite::double_t}} };
+	return command;
+}
+
+// -----------------------------------------------------------------------------------------------
+Command_get_longest_chain_finder_impl::Command_get_longest_chain_finder_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT height, difficulty, block_finder, round, account.display_name FROM block INNER JOIN account ON block.block_finder=account.name ORDER BY difficulty DESC LIMIT 1", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_longest_chain_finder_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt},
+		{{Column_sqlite::int32},
+		 {Column_sqlite::double_t},
+		 {Column_sqlite::string},
+		 {Column_sqlite::int64},
+		 {Column_sqlite::string}} };
+	return command;
+}
+
+// -----------------------------------------------------------------------------------------------
 // Write commands
 // -----------------------------------------------------------------------------------------------
 
@@ -656,18 +687,7 @@ Command_delete_empty_payments_impl::Command_delete_empty_payments_impl(sqlite3* 
 	sqlite3_prepare_v2(m_handle, delete_empty_payments.c_str(), -1, &m_stmt, NULL);
 }
 
-// -----------------------------------------------------------------------------------------------
-Command_get_pool_hashrate_impl::Command_get_pool_hashrate_impl(sqlite3* handle)
-	: Command_base_database_sqlite{ handle }
-{
-	sqlite3_prepare_v2(m_handle, "SELECT SUM(hashrate) FROM account", -1, &m_stmt, NULL);
-}
 
-std::any Command_get_pool_hashrate_impl::get_command() const
-{
-	Command_type_sqlite command{ {m_stmt}, {{Column_sqlite::double_t}} };
-	return command;
-}
 
 }
 }

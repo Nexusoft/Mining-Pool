@@ -79,6 +79,17 @@ struct Config_data
 	int m_round_duration_hours;
 };
 
+struct Statistics_block_finder
+{
+	std::uint32_t m_height{ 0 };
+	double m_difficulty{ 0 };
+	std::string m_account{};
+	std::int64_t m_round{ 0 };
+	std::string m_display_name{};
+
+	bool is_empty() const { return (m_account.empty()); }
+};
+
 } // namespace database
 } // namespace nexuspool
 

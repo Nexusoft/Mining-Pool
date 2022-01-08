@@ -87,5 +87,19 @@ Config_data convert_to_config_data(Row_sqlite row)
 	return result;
 }
 
+Statistics_block_finder convert_to_statistics_block_finder(Row_sqlite row)
+{
+	assert(row.size() == 5U);
+	Statistics_block_finder result{};
+
+	result.m_height = std::get<std::int32_t>(row[0].m_data);
+	result.m_difficulty = std::get<double>(row[1].m_data);
+	result.m_account = std::get<std::string>(row[2].m_data);
+	result.m_round = std::get<std::int64_t>(row[3].m_data);
+	result.m_display_name = std::get<std::string>(row[4].m_data);
+
+	return result;
+}
+
 }
 }
