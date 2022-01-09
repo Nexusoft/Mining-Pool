@@ -13,9 +13,15 @@
 
 {% block body_block %}
 
-    <form method="post">
+    <form method="post" id="hardwareForm" data-hardware="{% url 'presenter:ajax_load_hardware_detail' %}" novalidate>
         {% csrf_token %}
 
+        {% if form.errors %}
+        <br>
+        <h2>Error:</h2>
+        {{ form.errors }}
+        <br>
+        {% endif %}
 
         <div class="form-outline mb-4">
             {{ form.hardware.label_tag }}
@@ -106,6 +112,20 @@
                 </div>
             </div>
 
+            <div class="col">
+                {{ form.search_rate.label_tag }}
+                <div class="form-outline">
+                    {{ form.search_rate }}
+                    <div class="form-notch">
+                        <div
+                                class="form-notch-leading"
+                                style="width: 9px"
+                        ></div>
+                        <div class="form-notch-trailing"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
 
@@ -146,5 +166,24 @@
         </div>
 
     {% endif %}
+
+    <script>
+        $("#id_hardware").change(function () {
+            {#alert("test!");#}
+            var url = $("#hardwareForm").attr("data-hardware");  // get the url of the `load_hardware_detail` view
+            var HardwareModelID = $(this).val();  // get the selected value from the HTML input
+
+            $.ajax({                       // initialize an AJAX request
+                url: url,                    // set the url of the request
+                data: {
+                    'HardwareModelID': HardwareModelID       // add the current selection to the GET parameters
+                },
+                success: function (data) {   // `data` is the return of the `load_hardware_detail` view function
+                    $("#id_power_consumption").val(data.power_consumption);  // replace the contents of the input with the data that came from the server
+                    $("#id_search_rate").val(data.search_rate);  // replace the contents of the input with the data that came from the server
+                }
+            });
+        });
+    </script>
 
 {% endblock %}

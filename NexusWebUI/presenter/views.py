@@ -2,6 +2,7 @@ import json
 import logging
 import math
 
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
@@ -11,6 +12,7 @@ from django.conf import settings
 from django.core.cache import cache
 from .helpers import get_exchange_rate_nxs2usd
 from .rest_request import rest_request
+from .models import MiningCalcHardware
 
 logger = logging.getLogger('NexusWebUI')
 
@@ -138,6 +140,8 @@ def wallet_detail(request):
         else:
             account_info_json = account_info.json()
 
+            print(account_info_json)
+
             account = account_info_json['account']
             created_at = account_info_json['created_at']
             last_active = account_info_json['last_active']
@@ -190,16 +194,15 @@ def mining_calc(request):
     template_name = 'presenter/mining_calc.html'
 
     try:
-
         if request.GET & CalcForm.base_fields.keys():
             form = CalcForm(request.GET)
 
         elif request.POST:
-
             form = CalcForm(request.POST)
 
             if form.is_valid():
-                search_rate = int(form.cleaned_data['hardware'])
+
+                search_rate = form.cleaned_data['search_rate']
                 network_difficulty = form.cleaned_data['network_difficulty']
                 block_reward = form.cleaned_data['block_reward']
                 power_consumption = form.cleaned_data['power_consumption']
@@ -219,11 +222,70 @@ def mining_calc(request):
                                                        'profit_per_day': profit_per_day,
                                                        }
                               )
+            else:
+                print("Form not valid!")
+                return render(request, template_name, {'form': form})
 
         else:
+            # Try to retrieve from cache
+            reward_data_json = cache.get('reward_data_json')
+            hardware_data_json = cache.get('hardware_data_json')
 
-            form = CalcForm(initial={'network_difficulty': 8,
-                                     'exchange_rate': get_exchange_rate_nxs2usd()})
+            if not reward_data_json or not hardware_data_json:
+                logger.info("Rebuilding Cache for Calulator")
+                print("Rebuilding Cache for Calulator")
+
+                # Get Initial Values from Pool
+                # Reward Data => NetworkDifficulty / BlockReward
+                reward_data = rest_request(method='/reward_data')
+                reward_data_json = reward_data.json()
+
+                print(f"reward_data_json: {reward_data_json}")
+
+                # Hardware Data =>
+                hardware_data = rest_request(method='/hardware_data')
+                hardware_data_json = hardware_data.json()
+
+                print(f"hardware_data_json: {hardware_data_json}")
+
+                if not reward_data_json or not hardware_data_json:
+                    raise Exception("No Data for Calulcator received from Pool")
+
+                # Check if any Devices have not been added to the DB and create if necessary
+                devices = hardware_data_json['devices']
+                for device in devices:
+                    if not MiningCalcHardware.objects.filter(model_name=device['model']).exists():
+                        MiningCalcHardware.objects.create(
+                            model_name=device['model'],
+                            hashrate=device['hashrate'],
+                            power_consumption=device['power_consumption']
+                        )
+
+                # Save data in the cache
+                if settings.DEBUG is False and hardware_data_json and reward_data_json:
+                    cache.set('reward_data_json', reward_data_json, 720)
+                    cache.set('hardware_data_json', hardware_data_json, 720)
+
+            else:
+                logger.info("Serving from Cache")
+                print("Serving from Cache")
+
+                # Check if any Devices have not been added to the DB and create if necessary
+                devices = hardware_data_json['devices']
+                for device in devices:
+                    if not MiningCalcHardware.objects.filter(model_name=device['model']).exists():
+                        MiningCalcHardware.objects.create(
+                            model_name=device['model'],
+                            hashrate=device['hashrate'],
+                            power_consumption=device['power_consumption']
+                        )
+
+            form = CalcForm(initial={'network_difficulty': reward_data_json['network_diff'],
+                                     'exchange_rate': get_exchange_rate_nxs2usd(),
+                                     'block_reward': reward_data_json['block_reward'],
+                                     'electricity_cost': 1
+                                     }
+                            )
 
         return render(request, template_name, {'form': form})
 
@@ -231,3 +293,21 @@ def mining_calc(request):
         print("Exception when trying to calculate: ", ex)
         logger.error(ex)
         return redirect('presenter:error_pool')
+
+
+def load_hardware_detail(request):
+    # Get the info from the request object
+    hardware_model = request.GET.get('HardwareModelID')
+
+    # Get the electricity_cost for the given hardware model from the DB
+    power_consumption = MiningCalcHardware.objects.filter(model_name=hardware_model).values_list('power_consumption',
+                                                                                                 flat=True)
+    search_rate = MiningCalcHardware.objects.filter(model_name=hardware_model).values_list('hashrate',
+                                                                                           flat=True)
+
+    # Convert the Queryset to the desire result
+    power_consumption = round((power_consumption[0]), 2)
+    search_rate = round((search_rate[0]), 2)
+
+    return JsonResponse({'power_consumption': power_consumption,
+                         'search_rate': search_rate})

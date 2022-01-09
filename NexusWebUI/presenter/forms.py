@@ -3,6 +3,7 @@ from django import forms
 from django.conf import settings
 from django.shortcuts import redirect
 from .rest_request import rest_request
+from .models import MiningCalcHardware
 
 # from .models import ValidAccounts
 # from .rpc_requests import get_account_header, socket_connect, get_account
@@ -64,12 +65,13 @@ class WalletSearchForm(forms.Form):
 
 
 class CalcForm(forms.Form):
-    hardware = forms.ChoiceField(choices=HARDWARE, label='Hardware')
-    network_difficulty = forms.IntegerField(label='Network Difficulty', help_text="Usually around 8")
+    hardware = forms.ModelChoiceField(queryset=MiningCalcHardware.objects.all())
+    network_difficulty = forms.FloatField(label='Network Difficulty', help_text="Usually around 8")
     block_reward = forms.FloatField(label="Block Reward (NXS)")
     exchange_rate = forms.FloatField(label="Exchange Rate (USD/NXS)")
     power_consumption = forms.FloatField(label="Power Consumption (W)")
     electricity_cost = forms.FloatField(label="Electricity Cost ($/KWH)")
+    search_rate = forms.FloatField(label="Search Rate")
 
     def __init__(self, *args, **kwargs):
         super(CalcForm, self).__init__(*args, **kwargs)
