@@ -10,6 +10,7 @@ namespace spdlog { class logger; }
 
 namespace nexuspool
 {
+namespace LLP { class CBlock; }
 class Pool_manager;
 
 class Miner_connection
@@ -20,8 +21,8 @@ public:
     virtual ~Miner_connection() = default;
 
     virtual void stop() = 0;
+    virtual void send_work(LLP::CBlock const& block) = 0;
     virtual network::Connection::Handler connection_handler() = 0;
-    virtual void set_current_height(std::uint32_t height) = 0;
     virtual void get_hashrate() = 0;
 };
 

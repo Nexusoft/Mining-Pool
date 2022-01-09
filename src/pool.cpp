@@ -59,7 +59,12 @@ namespace nexuspool
 		{
 			m_api_server->stop();
 		}
-		m_pool_manager->stop();
+
+		if (m_pool_manager)
+		{
+			m_pool_manager->stop();
+		}
+
 		m_io_context->stop();
 	}
 
@@ -134,7 +139,11 @@ namespace nexuspool
 
 		if (m_api_config->read_config(api_config_file))
 		{
-			m_api_server = std::make_unique<api::Server>(m_logger, m_persistance_component->get_data_reader_factory()->create_data_reader(), m_api_config, m_pool_api_data_exchange);
+			m_api_server = std::make_unique<api::Server>(m_logger, 
+				m_persistance_component->get_data_reader_factory()->create_data_reader(), 
+				m_api_config, 
+				m_pool_api_data_exchange, 
+				m_timer_component->get_timer_factory());
 		}
 		else
 		{

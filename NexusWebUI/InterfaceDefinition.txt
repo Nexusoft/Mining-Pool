@@ -4,9 +4,6 @@ Interface Definiton
 Pool API's:
 
     ########################
-    get_meta_info
-
-        # Request
         GET /metainfo
 
         # Result
@@ -20,8 +17,6 @@ Pool API's:
             - pool_version
 
     #######################
-    get_latest_blocks
-
         GET /latestblocks
 
         # Result
@@ -31,25 +26,17 @@ Pool API's:
             - height
             - network diff
             - time
-        JSON:
-        {'id': 1, 'jsonrpc': '2.0', 'result': [{'block_reward': 0.06, 'hash': '012f77d1fe0f58f0b814c80d98979085', 'height': 56, 'network_diff': 62.45, 'time': '2021-09-22 22:42:24.000000'}]}
 
 ############################
 Wallet Detail API's:
 
     ########################
-    get_account_header
-
         GET /account/header?account=test
 
         # Result
 			empty or error
-        JSON:
-        {'id': 1, 'jsonrpc': '2.0', 'result': [{'total_reward': 0.06}]}
 
     ########################
-    get_account
-
         GET /account/detail?account=test
 
         # Result
@@ -59,17 +46,17 @@ Wallet Detail API's:
 			- last_active
             - shares
             - hashrate
+            - display_name
 
 
     ########################
-    get_account_payouts
-
         GET /account/payout?account=test
 
         # Result
         Fields:
             - time
             - amount
+            - shares
             - txhash
 ############################
 Reward calculation API's:
@@ -96,3 +83,22 @@ Reward calculation API's:
                 - model
                 - hashrate
                 - power_consumption
+
+############################
+Statistics API's:
+
+    ########################
+    GET /statistics/blockfinders?num=5      (returns the top 5 blockfinders)
+
+    # Result
+    Fields:
+        - display_name
+        - num_blocks
+
+    ########################
+    GET /statistics/longestchain      (only available in PRIME mining)
+
+    # Result
+    Fields:
+        - display_name
+        - chain

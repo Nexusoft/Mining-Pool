@@ -167,10 +167,28 @@ void Pool_manager_impl::set_current_height(std::uint32_t height)
 		// new block -> clear pending blocks from previous height
 		m_block_map.clear();
 		m_block_map_id = 0;
+		m_session_registry->reset_work_status_of_sessions();
 	}
 
-	// give the miners the height
-	m_session_registry->update_height(m_current_height);
+	// send miners new work
+	auto const sessions_size = m_session_registry->get_sessions_size();
+	for (auto i = 0; i < sessions_size; ++i)
+	{
+		auto session = m_session_registry->get_session_with_no_work();
+		if (session)
+		{
+			m_logger->trace("Get block for miner {}", session->get_user_data().m_account.m_display_name);
+			m_wallet_connection->get_block([session](auto block)
+				{
+					auto miner_connection = session->get_connection();
+					auto miner_connection_shared = miner_connection.lock();
+					if (miner_connection_shared)
+					{
+						miner_connection_shared->send_work(block);
+					}
+				});
+		}
+	}
 }
 
 void Pool_manager_impl::set_block(LLP::CBlock const& block)

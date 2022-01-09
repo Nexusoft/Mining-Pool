@@ -16,6 +16,7 @@ Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Sh
 	, m_update_time{ std::chrono::steady_clock::now() }
 	, m_hashrate_helper{ mining_mode }
 	, m_block{}
+	, m_inactive{false}
 {
 }
 
@@ -51,7 +52,7 @@ bool Session_impl::create_account()
 	assert(m_user_data.m_new_account);
 	assert(!m_user_data.m_account.m_address.empty());
 
-	return m_data_writer->create_account(m_user_data.m_account.m_address);
+	return m_data_writer->create_account(m_user_data.m_account.m_address, m_user_data.m_account.m_display_name);
 }
 
 std::unique_ptr<LLP::CBlock> Session_impl::get_block()
@@ -62,6 +63,29 @@ std::unique_ptr<LLP::CBlock> Session_impl::get_block()
 	}
 	return nullptr;
 }
+
+void Session_impl::login()
+{
+	auto const account_data = m_data_reader->get_account(m_user_data.m_account.m_address);
+
+	if (!account_data.is_empty())
+	{
+		auto const display_name_received = m_user_data.m_account.m_display_name;
+		// only move account_data from storage if the account has been found
+		m_user_data.m_account = account_data;
+		// check if there is a new display_name received
+		if (!display_name_received.empty() && display_name_received != m_user_data.m_account.m_display_name)
+		{
+			m_user_data.m_account.m_display_name = display_name_received;
+			// new display name! update account
+			m_data_writer->update_account(m_user_data.m_account);
+		}
+	}
+
+	m_user_data.m_login_time = std::chrono::steady_clock::now();
+	m_user_data.m_logged_in = true;
+}
+
 
 // ------------------------------------------------------------------------------------------------------------
 
@@ -102,7 +126,40 @@ std::shared_ptr<Session> Session_registry_impl::get_session(Session_key key)
 		return nullptr;
 	}
 	return m_sessions[key];
+}
 
+std::shared_ptr<Session> Session_registry_impl::get_session_with_no_work()
+{
+	std::scoped_lock lock(m_sessions_mutex);
+
+	for (auto& session : m_sessions)
+	{
+		if (session.second->is_inactive())
+		{
+			continue;
+		}
+
+		auto user_data = session.second->get_user_data();
+		if (user_data.m_work_needed)
+		{
+			user_data.m_work_needed = false;
+			session.second->update_user_data(user_data);
+			return session.second;
+		}
+	}
+	return nullptr;
+}
+
+void Session_registry_impl::reset_work_status_of_sessions()
+{
+	std::scoped_lock lock(m_sessions_mutex);
+
+	for (auto& session : m_sessions)
+	{
+		auto user_data = session.second->get_user_data();
+		user_data.m_work_needed = true;
+		session.second->update_user_data(user_data);
+	}
 }
 
 void Session_registry_impl::clear_unused_sessions()
@@ -112,7 +169,14 @@ void Session_registry_impl::clear_unused_sessions()
 	auto iter = m_sessions.begin();
 	while (iter != m_sessions.end())
 	{
-		// delete sessions were the session is expired
+		// delete already inactive sessions. Can happen if the miner disconnects
+		if (iter->second->is_inactive())
+		{
+			iter = m_sessions.erase(iter);
+			continue;
+		}
+
+		// delete sessions were the session is expired (when the pool cuts the connection to miner)
 		if (std::chrono::duration_cast<std::chrono::seconds>(time_now - iter->second->get_update_time()).count() > m_session_expiry_time)
 		{
 			iter = m_sessions.erase(iter);
@@ -138,21 +202,6 @@ std::size_t Session_registry_impl::get_sessions_size()
 {
 	std::scoped_lock lock(m_sessions_mutex);
 	return m_sessions.size();
-}
-
-void Session_registry_impl::update_height(std::uint32_t height)
-{
-	std::scoped_lock lock(m_sessions_mutex);
-
-	for (auto& session : m_sessions)
-	{
-		auto miner_connection = session.second->get_connection();
-		auto miner_connection_shared = miner_connection.lock();
-		if (miner_connection_shared)
-		{
-			miner_connection_shared->set_current_height(height);
-		}
-	}
 }
 
 void Session_registry_impl::get_hashrate()
@@ -186,24 +235,6 @@ bool Session_registry_impl::valid_nxs_address(std::string const& nxs_address)
 bool Session_registry_impl::does_account_exists(std::string account)
 {
 	return m_data_reader->does_account_exists(std::move(account));
-}
-
-void Session_registry_impl::login(Session_key key)
-{
-	auto session = get_session(key);
-	auto& user_data = session->get_user_data();
-	persistance::Account_data account_data{};
-	{
-		account_data = m_data_reader->get_account(user_data.m_account.m_address);
-	}
-
-	if (!account_data.is_empty())
-	{
-		// only move account_data from storage if the account has been found
-		user_data.m_account = std::move(account_data);
-	}
-
-	user_data.m_login_time = std::chrono::steady_clock::now();
 }
 
 }

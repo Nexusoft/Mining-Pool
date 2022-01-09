@@ -48,7 +48,8 @@ enum class Type : std::uint8_t
 	get_blocks_without_hash_from_round,
 	update_reward_of_payment,
 	delete_empty_payments,
-	get_pool_hashrate
+	get_pool_hashrate,
+	get_longest_chain_finder
 };
 
 

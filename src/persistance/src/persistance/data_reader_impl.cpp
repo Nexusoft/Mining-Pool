@@ -35,6 +35,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_unpaid_rounds_cmd = m_command_factory->create_command(Type::get_unpaid_rounds);
 	m_get_blocks_without_hash_from_round_cmd = m_command_factory->create_command(Type::get_blocks_without_hash_from_round);
 	m_get_pool_hashrate_cmd = m_command_factory->create_command(Type::get_pool_hashrate);
+	m_get_longest_chain_finder_cmd = m_command_factory->create_command(Type::get_longest_chain_finder);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -290,6 +291,23 @@ double Data_reader_impl::get_pool_hashrate()
 	auto return_value = m_data_storage->execute_command(m_get_pool_hashrate_cmd);
 	auto result = std::any_cast<Result_sqlite>(m_get_pool_hashrate_cmd->get_result());
 	return std::get<std::double_t>(result.m_rows.front()[0].m_data);
+}
+
+Statistics_block_finder Data_reader_impl::get_longest_chain_finder()
+{
+	Statistics_block_finder data{};
+	if (!m_data_storage->execute_command(m_get_longest_chain_finder_cmd))
+	{
+		return data;	// return empty result
+	}
+	auto result = std::any_cast<Result_sqlite>(m_get_longest_chain_finder_cmd->get_result());
+	if (result.m_rows.empty())
+	{
+		return data;	// return empty result
+	}
+	data = convert_to_statistics_block_finder(result.m_rows.front());
+
+	return data;
 }
 
 

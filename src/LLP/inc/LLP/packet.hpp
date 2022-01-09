@@ -31,6 +31,9 @@ namespace nexuspool
 			//POOL RELATED
 			LOGIN = 8,
 			HASHRATE = 9,
+			WORK = 10,
+			LOGIN_SUCCESS = 11,
+			LOGIN_FAIL = 12,
 
 			/** REQUEST PACKETS **/
 			GET_BLOCK = 129,
@@ -38,10 +41,6 @@ namespace nexuspool
 			GET_REWARD = 131,
 			GET_PAYOUT = 132,
 			GET_HASHRATE = 133,
-
-			//POOL RELATED
-			LOGIN_SUCCESS = 134,
-			LOGIN_FAIL = 135,
 
 
 			/** RESPONSE PACKETS **/

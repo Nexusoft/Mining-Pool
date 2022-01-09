@@ -69,9 +69,7 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 
 bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
 {
-	std::string parameter{ "?height=" };
-	parameter += std::to_string(height);
-	auto response = m_client->get_blockhash(parameter.c_str());
+	auto response = m_client->get_blockhash(height);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
@@ -123,9 +121,7 @@ bool Component_impl::get_system_info(common::System_info& system_info)
 
 bool Component_impl::does_account_exists(std::string const& account)
 {
-	std::string parameter{ "?address=" };
-	parameter += account;
-	auto response = m_client->get_account(parameter.c_str());
+	auto response = m_client->get_account(account);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{

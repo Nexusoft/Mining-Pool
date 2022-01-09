@@ -15,12 +15,13 @@ namespace api
 Server::Server(std::shared_ptr<spdlog::logger> logger, 
 	persistance::Data_reader::Uptr data_reader,
 	config::Config_api::Sptr config_api,
-	common::Pool_api_data_exchange::Sptr pool_api_data_exchange)
-	: m_io_context{ std::make_shared<::asio::io_context>() }
-	, m_logger{std::move(logger)}
+	common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
+	chrono::Timer_factory::Sptr timer_factory)
+	: m_logger{std::move(logger)}
 	, m_shared_data_reader{std::make_shared<Shared_data_reader>(std::move(data_reader))}
 	, m_config_api{std::move(config_api)}
 	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
+	, m_timer_factory{std::move(timer_factory)}
 	, m_server_stopped{false}
 {
 }
@@ -39,12 +40,12 @@ void Server::start()
 		/* create ApiControllers and add endpoints to router */
 		if (m_config_api->get_auth_user().empty())
 		{
-			auto rest_controller = std::make_shared<Rest_controller>(m_io_context, m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
+			auto rest_controller = std::make_shared<Rest_controller>(m_timer_factory, m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
 			router->addController(rest_controller);
 		}
 		else
 		{
-			auto rest_auth_controller = std::make_shared<Rest_auth_controller>(m_io_context, m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
+			auto rest_auth_controller = std::make_shared<Rest_auth_controller>(m_timer_factory, m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper);
 			router->addController(rest_auth_controller);
 		}
 
@@ -71,12 +72,10 @@ void Server::start()
 		connectionHandler->stop();
 
 	});
-	m_io_context->run();
 }
 
 void Server::stop()
 {
-	m_io_context->stop();
 	/* Signal the stop condition */
 	m_server_stopped.store(true);
 

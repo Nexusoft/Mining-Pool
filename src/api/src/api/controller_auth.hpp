@@ -20,12 +20,12 @@ class Rest_auth_controller : public Base_controller
 {
 public:
 
-    Rest_auth_controller(std::shared_ptr<::asio::io_context> io_context,
+    Rest_auth_controller(chrono::Timer_factory::Sptr timer_factory,
         Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
         config::Config_api::Sptr config_api,
         std::shared_ptr<oatpp::data::mapping::ObjectMapper> objectMapper)
-    : Base_controller(std::move(io_context), std::move(data_reader), std::move(pool_api_data_exchange), config_api, std::move(objectMapper))
+    : Base_controller(std::move(timer_factory), std::move(data_reader), std::move(pool_api_data_exchange), config_api, std::move(objectMapper))
     , m_auth_user{ config_api->get_auth_user() }
     , m_auth_pw{ config_api->get_auth_pw() }
     {

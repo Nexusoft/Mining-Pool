@@ -46,9 +46,3 @@ TEST_F(Miner_connection_fixture, stop_test)
 	EXPECT_CALL(*m_connection, close()).Times(1);
 	m_miner_connection->stop();
 }
-
-TEST_F(Miner_connection_fixture, set_current_height_test)
-{
-	EXPECT_CALL(*m_connection, transmit(_)).Times(1);
-	m_miner_connection->set_current_height(99);
-}

@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS round (
   total_shares REAL,
   total_reward REAL,
   blocks INTEGER,
-  connection_count INTEGER,
   start_date_time TEXT NOT NULL,
   end_date_time TEXT,
   is_active INTEGER NOT NULL,
@@ -31,7 +30,8 @@ CREATE TABLE IF NOT EXISTS account (
   last_active TEXT,
   connection_count INTEGER,
   shares REAL,
-  hashrate REAL
+  hashrate REAL,
+  display_name TEXT
 );
 
 CREATE TABLE IF NOT EXISTS payment (

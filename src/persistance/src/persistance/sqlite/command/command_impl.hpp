@@ -196,8 +196,35 @@ public:
 	void set_params(std::any params) override;
 };
 
+class Command_get_pool_hashrate_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_pool_hashrate_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::get_pool_hashrate; }
+	std::any get_command() const override;
+
+};
+
+class Command_get_longest_chain_finder_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_longest_chain_finder_impl(sqlite3* handle);
+
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_longest_chain_finder; }
+};
+
+
 // ------------------------------------------------------------------------------------
 // Write commands
+struct Command_create_account_params
+{
+	std::string m_name;
+	std::string m_display_name;
+};
 
 class Command_create_account_impl : public Command_base_database_sqlite
 {
@@ -248,6 +275,7 @@ struct Command_update_account_params
 	int m_connection_count;
 	double m_shares;
 	double m_hashrate;
+	std::string m_display_name;
 	std::string m_name;
 };
 
@@ -349,7 +377,6 @@ struct Command_update_round_params
 	double m_total_shares;
 	double m_total_reward;
 	int m_blocks;
-	int m_connection_count;
 	int m_is_active;
 	int m_is_paid;
 };
@@ -428,18 +455,6 @@ public:
 	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 
 };
-
-class Command_get_pool_hashrate_impl : public Command_base_database_sqlite
-{
-public:
-
-	explicit Command_get_pool_hashrate_impl(sqlite3* handle);
-
-	Type get_type() const override { return Type::get_pool_hashrate; }
-	std::any get_command() const override;
-
-};
-
 
 }
 }

@@ -21,13 +21,13 @@ class Controller_helper
 {
 public:
 
-    Controller_helper(std::shared_ptr<::asio::io_context> io_context,
+    Controller_helper(chrono::Timer_factory::Sptr timer_factory,
         Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
         std::string const& wallet_ip,
         std::uint16_t reward_calc_update_interval,
         std::shared_ptr<oatpp::data::mapping::ObjectMapper> objectMapper)
-        : m_io_context{std::move(io_context)}
+        : m_timer_factory{std::move(timer_factory)}
         , m_data_reader{std::move(data_reader)}
         , m_pool_api_data_exchange{ std::move(pool_api_data_exchange) }
     {
@@ -37,8 +37,7 @@ public:
 
         /* ObjectMapper passed here is used for serialization of outgoing DTOs */
         m_client = Client::createShared(requestExecutor, objectMapper);
-        m_chrono_component = chrono::create_component(m_io_context);
-        m_mining_info_timer = m_chrono_component->get_timer_factory()->create_timer();
+        m_mining_info_timer = m_timer_factory->create_timer();
         m_mining_info_timer->start(chrono::Seconds(reward_calc_update_interval), mining_info_handler(reward_calc_update_interval));
     }
 
@@ -114,7 +113,7 @@ private:
         };
     }
 
-    std::shared_ptr<::asio::io_context> m_io_context;
+    chrono::Timer_factory::Sptr m_timer_factory;
     Shared_data_reader::Sptr m_data_reader;
     common::Pool_api_data_exchange::Sptr m_pool_api_data_exchange;
     persistance::Config_data m_cached_config;

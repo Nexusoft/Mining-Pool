@@ -1,5 +1,6 @@
 import os
 import random
+import string
 import sqlalchemy
 import pandas as pd
 from faker import Faker
@@ -140,7 +141,6 @@ def create_round_test_data(connection):
                                             'total_shares',
                                             'total_reward',
                                             'blocks',
-                                            'connection_count',
                                             'start_date_time',
                                             'end_date_time',
                                             'is_active',
@@ -152,7 +152,6 @@ def create_round_test_data(connection):
         total_share = round(random.uniform(1, 10), 2)
         total_reward = round(random.uniform(1, 10), 2)
         blocks = random.randint(1, 10)
-        connection_count = random.randint(1, 100)
         start_date_time = fake.past_datetime()
         end_date_time = fake.past_datetime()
         is_active = random.randint(0, 1)
@@ -162,7 +161,6 @@ def create_round_test_data(connection):
             'total_shares': total_share,
             'total_reward': total_reward,
             'blocks': blocks,
-            'connection_count': connection_count,
             'start_date_time': start_date_time,
             'end_date_time': end_date_time,
             'is_active': is_active,
@@ -186,7 +184,8 @@ def create_account_test_data(connection):
         'last_active',
         'connection_count',
         'shares',
-        'hashrate'
+        'hashrate',
+        'display_name'
     ]
     )
 
@@ -199,6 +198,8 @@ def create_account_test_data(connection):
         connection_count = random.randint(1, 100)
         shares = round(random.uniform(1, 100), 2)
         hashrate = round(random.uniform(1, 10), 2)
+        letters = string.ascii_lowercase
+        display_name = ''.join(random.choice(letters) for i in range(10))        
 
         data_dict = {
             'name': name,
@@ -207,6 +208,7 @@ def create_account_test_data(connection):
             'connection_count': connection_count,
             'shares': shares,
             'hashrate': hashrate,
+            'display_name' : display_name,
         }
 
         dataframe_account = dataframe_account.append(data_dict, ignore_index=True)

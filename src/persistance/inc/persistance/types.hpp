@@ -16,6 +16,7 @@ struct Account_data
 	std::string m_last_active{};
 	double m_shares{ 0 };
 	double m_hashrate{0};
+	std::string m_display_name{};
 
 	bool is_empty() const { return (m_address.empty()); }
 };
@@ -49,7 +50,6 @@ struct Round_data
 	double m_total_shares{ 0 };
 	double m_total_rewards{ 0 };
 	std::uint32_t m_blocks{ 0 };
-	std::uint32_t m_connection_count{ 0 };
 	std::string m_start_date_time{};
 	std::string m_end_date_time{};
 	bool m_is_active{ false };
@@ -77,6 +77,17 @@ struct Config_data
 	int m_difficulty_divider;
 	std::string m_mining_mode;
 	int m_round_duration_hours;
+};
+
+struct Statistics_block_finder
+{
+	std::uint32_t m_height{ 0 };
+	double m_difficulty{ 0 };
+	std::string m_account{};
+	std::int64_t m_round{ 0 };
+	std::string m_display_name{};
+
+	bool is_empty() const { return (m_account.empty()); }
 };
 
 } // namespace database

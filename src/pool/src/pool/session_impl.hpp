@@ -6,6 +6,7 @@
 #include <string>
 #include <mutex>
 #include <chrono>
+#include <atomic>
 #include "LLC/types/uint1024.h"
 #include "persistance/data_writer.hpp"
 #include "persistance/data_reader.hpp"
@@ -28,7 +29,8 @@ public:
 
 	void update_connection(std::shared_ptr<Miner_connection> miner_connection) override;
 	std::weak_ptr<Miner_connection> get_connection() override { return m_miner_connection; }
-	Session_user& get_user_data() override { return m_user_data; }
+	Session_user get_user_data() const override { return m_user_data; }
+	void update_user_data(Session_user const& user_data) override { m_user_data = user_data; }
 	std::chrono::steady_clock::time_point get_update_time() const override { return m_update_time; }
 	void set_update_time(std::chrono::steady_clock::time_point update_time) override { m_update_time = update_time; }
 	bool add_share() override;
@@ -36,8 +38,11 @@ public:
 	void update_hashrate(double hashrate) override;
 	void set_block(LLP::CBlock const& block) override { m_block = std::make_unique<LLP::CBlock>(block); }
 	std::unique_ptr<LLP::CBlock> get_block() override;
+	bool is_inactive() const override { return m_inactive; }
+	void set_inactive() { m_inactive = true; }
 
 	bool create_account() override;
+	void login() override;
 
 private:
 
@@ -48,6 +53,7 @@ private:
 	std::chrono::steady_clock::time_point m_update_time;
 	Hashrate_helper m_hashrate_helper;
 	std::unique_ptr<LLP::CBlock> m_block;
+	std::atomic_bool m_inactive;
 };
 
 // Manages all sessions
@@ -66,19 +72,17 @@ public:
 	// Managment methods
 	Session_key create_session() override;
 	std::shared_ptr<Session> get_session(Session_key key) override;
+	std::shared_ptr<Session> get_session_with_no_work() override;
+	void reset_work_status_of_sessions() override;
 	void clear_unused_sessions() override;
 	void end_round() override;
 	std::size_t get_sessions_size() override;
-
-	// update height on active sessions
-	void update_height(std::uint32_t height) override;
 
 	// sends get_hashrate message to active sessions
 	void get_hashrate() override;
 
 	bool valid_nxs_address(std::string const& nxs_address) override;
 	bool does_account_exists(std::string account) override;
-	void login(Session_key key) override;	// fetch user data from storage for the specific session
 
 private:
 

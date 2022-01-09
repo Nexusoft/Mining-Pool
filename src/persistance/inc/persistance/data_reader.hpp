@@ -35,6 +35,7 @@ public:
     virtual std::vector<std::uint32_t> get_unpaid_rounds() = 0;
     virtual std::vector<std::uint32_t> get_blocks_without_hash_from_round(std::uint32_t round) = 0;
     virtual double get_pool_hashrate() = 0;
+    virtual Statistics_block_finder get_longest_chain_finder() = 0;
 };
 }
 }

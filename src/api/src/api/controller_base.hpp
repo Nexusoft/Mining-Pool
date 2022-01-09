@@ -25,14 +25,14 @@ class Base_controller : public ApiController
 {
 public:
 
-    Base_controller(std::shared_ptr<::asio::io_context> io_context,
+    Base_controller(chrono::Timer_factory::Sptr timer_factory,
         Shared_data_reader::Sptr data_reader,
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
         config::Config_api::Sptr config_api,
         std::shared_ptr<oatpp::data::mapping::ObjectMapper> objectMapper)
     : m_data_reader{ std::move(data_reader) }
     , m_config_api{std::move(config_api)}
-    , m_controller_helper{ std::move(io_context), 
+    , m_controller_helper{ std::move(timer_factory), 
         m_data_reader, std::move(pool_api_data_exchange),
         m_config_api->get_wallet_ip(), 
         m_config_api->get_reward_calc_update_interval(), 
@@ -110,6 +110,7 @@ protected:
             dto->last_active = account_data.m_last_active;
             dto->shares = account_data.m_shares;
             dto->hashrate = account_data.m_hashrate;
+            dto->display_name = account_data.m_display_name;
 
             return createDtoResponse(Status::CODE_200, dto);
         }
@@ -136,7 +137,7 @@ protected:
             auto const payments = m_data_reader->get_payments(account);
             for (auto const& payment : payments)
             {
-                dto->payouts->push_back(Payout_dto::createShared(payment.m_payment_date_time.c_str(), payment.m_amount, payment.m_tx_id.c_str()));
+                dto->payouts->push_back(Payout_dto::createShared(payment.m_payment_date_time.c_str(), payment.m_amount, payment.m_shares, payment.m_tx_id.c_str()));
             }
 
             return createDtoResponse(Status::CODE_200, dto);

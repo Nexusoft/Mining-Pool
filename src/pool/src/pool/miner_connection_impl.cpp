@@ -1,9 +1,10 @@
 #include "pool/miner_connection_impl.hpp"
 #include "pool/pool_manager_impl.hpp"
-#include "LLP/packet.hpp"
 #include "LLP/block.hpp"
+#include "LLP/pool_protocol.hpp"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
+#include <json/json.hpp>
 #include <string>
 
 namespace nexuspool
@@ -30,7 +31,6 @@ Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> log
     : m_logger{ std::move(logger) }
 	, m_connection{ std::move(connection) }
 	, m_pool_manager{std::move(pool_manager)}
-    , m_current_height{ 0 }
 	, m_session_key{session_key}
 	, m_session_registry{std::move(session_registry)}
 	, m_pool_nbits{ 0 }
@@ -62,6 +62,11 @@ network::Connection::Handler Miner_connection_impl::connection_handler()
 		}
 		else if (result == network::Result::connection_closed)
 		{
+			auto session = self->m_session_registry->get_session(self->m_session_key);
+			if (session)
+			{
+				session->set_inactive();
+			}
 			self->m_connection.reset();
 		}
 		else if (result == network::Result::connection_ok)
@@ -109,86 +114,16 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		}
 		else if (packet.m_header == Packet::LOGIN)
 		{
-			auto& user_data = session->get_user_data();
-			// check if already logged in
-			if (user_data.m_logged_in)
-			{
-				m_logger->warn("Multiple login attempts of user {} with endpoint {} ", user_data.m_account.m_address, m_connection->remote_endpoint().to_string());
-				// increase ddos score
-				continue;
-			}
-
-			Packet response;
-			Packet login_fail_response;
-			login_fail_response = login_fail_response.get_packet(Packet::LOGIN_FAIL);
-
-			auto const nxs_address = std::string(packet.m_data->begin(), packet.m_data->end());
-			auto const nxs_address_valid = m_session_registry->valid_nxs_address(nxs_address);
-			if (!nxs_address_valid)
-			{
-				m_logger->warn("Bad Account {}", nxs_address);
-				//if (m_isDDOS)
-				//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
-
-				m_connection->transmit(login_fail_response.get_bytes());
-				continue;
-			}
-
-			// check if banned ip/user
-
-			// check if user already exists in db
-			user_data.m_new_account = !m_session_registry->does_account_exists(nxs_address);
-			// login the user (fetch data from storage)
-			user_data.m_account.m_address = nxs_address;
-			m_session_registry->login(m_session_key);
-			user_data.m_logged_in = true;
-
-			response = response.get_packet(Packet::LOGIN_SUCCESS);
-			m_connection->transmit(response.get_bytes());
-		}
-		else if (packet.m_header == Packet::GET_BLOCK)
-		{
-			auto pool_manager_shared = m_pool_manager.lock();
-			if (pool_manager_shared)
-			{
-				m_pool_nbits = pool_manager_shared->get_pool_nbits();
-				std::weak_ptr<Miner_connection_impl> weak_self = shared_from_this();
-				pool_manager_shared->get_block([weak_self](auto block)
-					{
-						auto self = weak_self.lock();
-						if (!self)
-						{
-							self->m_logger->debug("GET_BLOCK handler, miner_connection invalid.");
-							return;
-						}
-						if (!self->m_connection)
-						{
-							self->m_logger->debug("GET_BLOCK handler, miner_connection connection invalid.");
-							return;
-						}
-
-						auto session = self->m_session_registry->get_session(self->m_session_key);
-						if (!session)
-						{
-							self->m_logger->debug("GET_BLOCK, session invalid.");
-							return;
-						}
-						session->set_block(block);
-
-						//prepend pool nbits to the packet
-						auto pool_nbits_bytes = nexuspool::uint2bytes(self->m_pool_nbits);
-					
-						auto block_data = block.serialize();
-						block_data.insert(block_data.begin(), pool_nbits_bytes.begin(), pool_nbits_bytes.end());
-						Packet response{ Packet::BLOCK_DATA, std::make_shared<network::Payload>(block_data) };
-
-						self->m_connection->transmit(response.get_bytes());
-					});
-			}
+			process_login(std::move(packet), session);
 		}
 		//miner has submitted a block to the pool
 		else if (packet.m_header == Packet::SUBMIT_BLOCK)
 		{
+			// miner needs new work
+			auto user_data = session->get_user_data();
+			user_data.m_work_needed = true;
+			session->update_user_data(user_data);
+
 			if (packet.m_length != 72)
 			{
 				m_logger->error("Invalid paket length for submit_block received! Received {} bytes", packet.m_length);
@@ -247,9 +182,13 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		}
 		else if (packet.m_header == Packet::HASHRATE)
 		{
-			auto const hashrate = bytes2double(*packet.m_data);
-			session->update_hashrate(hashrate);
-
+			auto user_data = session->get_user_data();
+			// only update hashrate if user is logged in and the account has already been created
+			if (user_data.m_logged_in && !user_data.m_new_account)
+			{
+				auto const hashrate = bytes2double(*packet.m_data);
+				session->update_hashrate(hashrate);
+			}
 		}
 		else if (packet.m_header == Packet::SET_CHANNEL)
 		{
@@ -275,18 +214,6 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 	session->set_update_time(std::chrono::steady_clock::now());
 }
 
-void Miner_connection_impl::set_current_height(std::uint32_t height)
-{
-	m_current_height = height;
-	if (!m_connection)
-	{
-		return;
-	}
-
-	Packet response{ Packet::BLOCK_HEIGHT, uint2bytes(m_current_height) };
-	m_connection->transmit(response.get_bytes());
-}
-
 void Miner_connection_impl::process_accepted()
 {
 	auto session = m_session_registry->get_session(m_session_key);
@@ -295,7 +222,7 @@ void Miner_connection_impl::process_accepted()
 		m_logger->trace("process_accepted, session invalid");
 		return;
 	}
-	auto& user_data = session->get_user_data();
+	auto user_data = session->get_user_data();
 
 	// create new account
 	if(user_data.m_new_account)
@@ -305,7 +232,12 @@ void Miner_connection_impl::process_accepted()
 		{
 			m_logger->error("Failed creating new account for miner {}", user_data.m_account.m_address);
 		}
-		user_data.m_new_account = false;
+		else
+		{
+			user_data.m_new_account = false;
+			session->update_user_data(user_data);
+		}
+
 	}
 
 	// add share
@@ -317,6 +249,44 @@ void Miner_connection_impl::process_accepted()
 	session->set_update_time(std::chrono::steady_clock::now());
 }
 
+void Miner_connection_impl::send_work(LLP::CBlock const& block)
+{
+	if (!m_connection)
+	{
+		return;
+	}
+
+	auto session = m_session_registry->get_session(m_session_key);
+	if (!session)
+	{
+		m_logger->debug("SEND_WORK, session invalid.");
+		return;
+	}
+	auto pool_manager_shared = m_pool_manager.lock();
+	if (!pool_manager_shared)
+	{
+		return;
+	}
+
+	session->set_block(block);
+
+	//prepend pool nbits to the packet
+	m_pool_nbits = pool_manager_shared->get_pool_nbits();
+	auto pool_nbits_bytes = nexuspool::uint2bytes(m_pool_nbits);
+	auto block_data = block.serialize();
+	block_data.insert(block_data.begin(), pool_nbits_bytes.begin(), pool_nbits_bytes.end());
+
+	nlohmann::json j;
+	j["work_id"] = 1;
+	j["block"] = nlohmann::json::binary( block_data );
+	auto j_string = j.dump();
+
+	network::Payload work_data{ j_string.begin(), j_string.end() };
+	Packet response{ Packet::WORK, std::make_shared<network::Payload>(work_data) };
+
+	m_connection->transmit(response.get_bytes());
+}
+
 void Miner_connection_impl::get_hashrate()
 {
 	if (!m_connection)
@@ -326,6 +296,93 @@ void Miner_connection_impl::get_hashrate()
 
 	Packet packet{ Packet::GET_HASHRATE, nullptr };
 	m_connection->transmit(packet.get_bytes());
+}
+
+void Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<Session> session)
+{
+	auto user_data = session->get_user_data();
+	// check if already logged in
+	if (user_data.m_logged_in)
+	{
+		m_logger->warn("Multiple login attempts of user {} with endpoint {} ", user_data.m_account.m_address, m_connection->remote_endpoint().to_string());
+		// increase ddos score
+		return;
+	}
+
+	nlohmann::json login_response_json;
+	login_response_json["result_code"] = Pool_protocol_result::Success;
+	login_response_json["result_message"] = "";
+
+	std::string nxs_address, display_name;
+	std::uint8_t protocol_version{ 0U };
+	try
+	{
+		nlohmann::json j = nlohmann::json::parse(login_packet.m_data->begin(), login_packet.m_data->end());
+		nxs_address = j.at("username");
+		display_name = j.at("display_name");
+		protocol_version = j.at("protocol_version");	// TODO: protocol version check in future
+	}
+	catch (std::exception& e)
+	{
+		m_logger->debug("Invalid login json. Exception: {}", e.what());
+		return;
+	}
+
+	// protocol version check
+	if (protocol_version < POOL_PROTOCOL_VERSION)
+	{
+		login_response_json["result_code"] = Pool_protocol_result::Protocol_version_fail;
+		login_response_json["result_message"] = "Please update miner. Mandatory protocol_version " + std::to_string(POOL_PROTOCOL_VERSION);
+		send_login_fail(login_response_json.dump());
+		return;
+	}
+
+	auto const nxs_address_valid = m_session_registry->valid_nxs_address(nxs_address);
+	if (!nxs_address_valid)
+	{
+		m_logger->warn("Bad Account {}", nxs_address);
+		//if (m_isDDOS)
+		//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
+
+		login_response_json["result_code"] = Pool_protocol_result::Login_fail_invallid_nxs_account;
+		login_response_json["result_message"] = "Invalid nxs account";
+		send_login_fail(login_response_json.dump());
+		return;
+	}
+
+	// check if banned ip/user
+
+	// check if user already exists in db
+	user_data.m_new_account = !m_session_registry->does_account_exists(nxs_address);
+	// login the user (fetch data from storage)
+	user_data.m_account.m_address = nxs_address;
+	check_and_update_display_name(display_name, login_response_json);
+	user_data.m_account.m_display_name = display_name;
+	session->update_user_data(user_data);
+	session->login();
+
+	auto login_response_json_string = login_response_json.dump();
+
+	network::Payload login_data{ login_response_json_string.begin(), login_response_json_string.end() };
+	Packet response{ Packet::LOGIN_SUCCESS, std::make_shared<network::Payload>(login_data) };
+	m_connection->transmit(response.get_bytes());
+}
+
+void Miner_connection_impl::send_login_fail(std::string json_string)
+{
+	network::Payload login_data{ json_string.begin(), json_string.end() };
+	Packet login_fail_response{ Packet::LOGIN_FAIL, std::make_shared<network::Payload>(login_data) };
+	m_connection->transmit(login_fail_response.get_bytes());
+}
+
+void Miner_connection_impl::check_and_update_display_name(std::string display_name, nlohmann::json& login_response)
+{
+	if (display_name.empty())
+	{
+		login_response["result_code"] = Pool_protocol_result::Login_warn_no_display_name;
+		login_response["result_message"] = "No display_name set";
+		return;
+	}
 }
 
 }
