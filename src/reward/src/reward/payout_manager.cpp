@@ -122,7 +122,7 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 			if (payment.m_amount == 0.0)
 			{
 				// nothing to pay -> no blocks in this round
-				m_logger->trace("payout: Nthing to pay for account {} in round {}", payment.m_account, current_round);
+				m_logger->trace("payout: Npthing to pay for account {} in round {}", payment.m_account, current_round);
 				m_shared_data_writer.account_paid(current_round, payment.m_account, "");
 				continue;
 			}
