@@ -35,7 +35,7 @@ class Account_dto : public oatpp::DTO
 	DTO_FIELD(String, last_active);
 	DTO_FIELD(UInt16, round_duration);
 	DTO_FIELD(UInt32, shares);
-	DTO_FIELD(UInt32, hashrate);
+	DTO_FIELD(Float64, hashrate);
 	DTO_FIELD(String, display_name);
 };
 
