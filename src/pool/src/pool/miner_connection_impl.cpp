@@ -385,4 +385,14 @@ void Miner_connection_impl::check_and_update_display_name(std::string display_na
 	}
 }
 
+void Miner_connection_impl::send_pool_notification(std::string message)
+{
+	nlohmann::json j;
+	j["message"] = message;
+	auto j_string = j.dump();
+
+	Packet response{ Packet::POOL_NOTIFICATION, std::make_shared<network::Payload>(network::Payload{ j_string.begin(), j_string.end() }) };
+	m_connection->transmit(response.get_bytes());
+}
+
 }

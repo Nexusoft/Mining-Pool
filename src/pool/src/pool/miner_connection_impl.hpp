@@ -25,6 +25,7 @@ public:
     void send_work(LLP::CBlock const& block) override;
     network::Connection::Handler connection_handler() override;
     void get_hashrate() override;
+    void send_pool_notification(std::string message) override;
 
 private:
 
