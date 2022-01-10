@@ -9,9 +9,113 @@
 
 {% block body_block %}
 
-    {#    {% include 'presenter/messages.html' %}#}
     <br>
-    <strong>Mining Mode:</strong> {{ mining_mode }}
+    {#    <strong>Mining Mode:</strong> {{ mining_mode }}#}
+
+    <!-- Carousel wrapper -->
+    <div
+            id="carouselMeta"
+            class="carousel slide carousel-fade shadow-3-strong"
+            data-mdb-ride="carousel"
+    >
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+            <li
+                    data-mdb-target="#carouselMeta"
+                    data-mdb-slide-to="0"
+                    class=""
+            ></li>
+            <li
+                    data-mdb-target="#carouselMeta"
+                    data-mdb-slide-to="1"
+                    class=""
+            ></li>
+            <li
+                    data-mdb-target="#carouselMeta"
+                    data-mdb-slide-to="2"
+                    class="active"
+                    aria-current="true"
+            ></li>
+        </ol>
+
+        <!-- Inner -->
+        <div class="carousel-inner">
+            <!-- Single item -->
+            <div class="carousel-item">
+                <div class="text-center">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">Mining Mode</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title">{{ mining_mode }}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single item -->
+            <div class="carousel-item">
+                <div class="text-center">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">Wallet Version</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title">{{ wallet_version }}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single item -->
+            <div class="carousel-item active">
+                <div class="text-center">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">Pool Version</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title">{{ pool_version }}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Inner -->
+
+        <!-- Controls -->
+        <a
+                class="carousel-control-prev"
+                href="#carouselMeta"
+                role="button"
+                data-mdb-slide="prev"
+        >
+            <span
+                    class="carousel-control-prev-icon"
+                    aria-hidden="true"
+            ></span>
+            <span class="visually-hidden">Previous</span>
+        </a>
+        <a
+                class="carousel-control-next"
+                href="#carouselMeta"
+                role="button"
+                data-mdb-slide="next"
+        >
+            <span
+                    class="carousel-control-next-icon"
+                    aria-hidden="true"
+            ></span>
+            <span class="visually-hidden">Next</span>
+        </a>
+    </div>
+    <!-- Carousel wrapper -->
+    </section>
+    <!--Section: Carousel-->
+
+
+
     <hr>
 
     {% if mining_mode %}
