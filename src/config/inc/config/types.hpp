@@ -28,6 +28,8 @@ struct Pool_config
 	std::uint16_t m_fee{};
 	std::uint16_t m_difficulty_divider{};
 	std::uint16_t m_round_duration_hours{};
+	std::string m_nxs_api_user{};
+	std::string m_nxs_api_pw{};
 };
 
 struct Hardware_config

@@ -139,6 +139,9 @@ namespace nexuspool
 
 		if (m_api_config->read_config(api_config_file))
 		{
+			m_api_config->set_nxs_api_user(m_config->get_pool_config().m_nxs_api_user);
+			m_api_config->set_nxs_api_pw(m_config->get_pool_config().m_nxs_api_pw);
+
 			m_api_server = std::make_unique<api::Server>(m_logger, 
 				m_persistance_component->get_data_reader_factory()->create_data_reader(), 
 				m_api_config, 

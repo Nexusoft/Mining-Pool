@@ -26,10 +26,13 @@ public:
         common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
         std::string const& wallet_ip,
         std::uint16_t reward_calc_update_interval,
+        std::string auth_user,
+        std::string auth_pw,
         std::shared_ptr<oatpp::data::mapping::ObjectMapper> objectMapper)
         : m_timer_factory{std::move(timer_factory)}
         , m_data_reader{std::move(data_reader)}
         , m_pool_api_data_exchange{ std::move(pool_api_data_exchange) }
+        , m_auth_string{ auth_user + ":" + auth_pw }
     {
         /* Create RequestExecutor which will execute ApiClient's requests */
         auto connectionProvider = oatpp::network::tcp::client::ConnectionProvider::createShared({ wallet_ip.c_str(), 8080 });
@@ -70,7 +73,7 @@ public:
 
     common::System_info get_system_info() const
     {
-        auto response = m_client->get_systeminfo();
+        auto response = m_client->get_systeminfo(m_auth_string);
         auto const status_code = response->getStatusCode();
         if (status_code != 200)
         {
@@ -92,7 +95,7 @@ private:
     {
         return[this, mining_info_interval]()
         {
-            auto response = m_client->get_mininginfo();
+            auto response = m_client->get_mininginfo(m_auth_string);
             auto const status_code = response->getStatusCode();
             if (status_code != 200)
             {
@@ -121,6 +124,7 @@ private:
     std::shared_ptr<Client> m_client;
     chrono::Component::Uptr m_chrono_component;
     chrono::Timer::Uptr m_mining_info_timer;
+    std::string m_auth_string;
 };
 
 

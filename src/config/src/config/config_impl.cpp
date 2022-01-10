@@ -82,6 +82,8 @@ namespace config
 			m_pool_config.m_fee = j.at("pool")["fee"];
 			m_pool_config.m_difficulty_divider = j.at("pool")["difficulty_divider"];
 			m_pool_config.m_round_duration_hours = j.at("pool")["round_duration_hours"];
+			m_pool_config.m_nxs_api_user = j.at("pool")["nxs_api_user"];
+			m_pool_config.m_nxs_api_pw = j.at("pool")["nxs_api_pw"];
 
 			auto persistance_type = j.at("persistance")["type"];
 			m_persistance_config.m_file = j.at("persistance")["file"];

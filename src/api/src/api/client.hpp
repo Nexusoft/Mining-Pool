@@ -15,8 +15,8 @@ namespace api
 class Client : public oatpp::web::client::ApiClient
 {
 	API_CLIENT_INIT(Client)
-	API_CALL("GET", "ledger/get/mininginfo", get_mininginfo)
-	API_CALL("GET", "system/get/info", get_systeminfo)
+	API_CALL("GET", "ledger/get/mininginfo", get_mininginfo, AUTHORIZATION_BASIC(String, authString))
+	API_CALL("GET", "system/get/info", get_systeminfo, AUTHORIZATION_BASIC(String, authString))
 };
 #include OATPP_CODEGEN_END(ApiClient)
 

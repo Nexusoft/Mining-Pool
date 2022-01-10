@@ -12,7 +12,6 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
                             note: this is not needed if you mine to localhost (127.0.0.1). This is primarily used for a local-area-network setup
 
     -mining               Ensure mining LLP servers are initialized.
-    -apiauth=0            API calls to the wallet need no authorization (will be changed in future releases)
     -indexheight          needed to query the wallet for blocks with height param
 ```
 
@@ -61,6 +60,8 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
         "fee"                   // POOL fee in %
         "difficulty_divider"        // reduced the NXS mainnet difficulty for miners.
         "round_duration_hours"      // time in hours for the duration of a mining round. Payouts to miners can only happen when a round is finished. Config changes to POOL difficulty, fee, mining mode can only happen after round end.
+        "nxs_api_user"  // NXS API user name. Must be the same user as in nexus.conf or nxs wallet startup arguments
+        "nxs_api_pw"  // NXS API password. Must be the same password as in nexus.conf or nxs wallet startup arguments
 ```
 
  ## API

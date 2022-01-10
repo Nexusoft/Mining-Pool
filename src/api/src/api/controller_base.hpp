@@ -35,7 +35,9 @@ public:
     , m_controller_helper{ std::move(timer_factory), 
         m_data_reader, std::move(pool_api_data_exchange),
         m_config_api->get_wallet_ip(), 
-        m_config_api->get_reward_calc_update_interval(), 
+        m_config_api->get_reward_calc_update_interval(),
+        m_config_api->get_nxs_api_user(),
+        m_config_api->get_nxs_api_pw(),
         objectMapper }
     , ApiController(objectMapper)
     {

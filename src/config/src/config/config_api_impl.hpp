@@ -26,6 +26,10 @@ public:
 	common::Mining_mode get_mining_mode() const override { return m_mining_mode; }
 	std::uint16_t get_reward_calc_update_interval() const override { return m_reward_calc_update_interval; }
 	std::vector<Hardware_config>& get_devices() override { return m_devices; }
+	std::string get_nxs_api_user() const override { return m_nxs_api_user; }
+	std::string get_nxs_api_pw() const override { return m_nxs_api_pw; }
+	void set_nxs_api_user(std::string nxs_api_user) override { m_nxs_api_user = std::move(nxs_api_user); }
+	void set_nxs_api_pw(std::string nxs_api_pw) override { m_nxs_api_pw = std::move(nxs_api_pw); }
 
 private:
 
@@ -37,6 +41,8 @@ private:
 	std::string m_auth_pw;
 	common::Mining_mode	m_mining_mode;
 	std::vector<Hardware_config> m_devices;
+	std::string m_nxs_api_user;
+	std::string m_nxs_api_pw;
 };
 
 Config_api::Sptr create_api_config()

@@ -106,6 +106,14 @@ bool Validator::check(std::string const& config_file)
                 m_mandatory_fields.push_back(Validator_error{ "pool/round_duration_hours", "Not a number" });
             }
         }
+        if (j.count("pool")["nxs_api_user"] == 0)
+        {
+            m_mandatory_fields.push_back(Validator_error{ "pool/nxs_api_user", "" });
+        }
+        if (j.count("pool")["nxs_api_pw"] == 0)
+        {
+            m_mandatory_fields.push_back(Validator_error{ "pool/nxs_api_pw", "" });
+        }
 
         // persistance config
         if (j.count("persistance")["type"] == 0)

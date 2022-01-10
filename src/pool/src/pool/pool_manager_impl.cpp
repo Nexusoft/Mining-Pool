@@ -46,7 +46,11 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
 	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
-	, m_http_component{ nexus_http_interface::create_component(m_logger, m_config->get_wallet_ip())}
+	, m_http_component{ nexus_http_interface::create_component(
+		m_logger, 
+		m_config->get_wallet_ip(), 
+		m_config->get_pool_config().m_nxs_api_user, 
+		m_config->get_pool_config().m_nxs_api_pw)}
 	, m_reward_component{reward::create_component(m_logger, 
 		m_http_component,
 		m_data_writer_factory->create_shared_data_writer(), 

@@ -7,7 +7,7 @@ using namespace ::nexuspool;
 TEST(Nexus_http_interface, initialisation)
 {
 	auto logger = spdlog::stdout_color_mt("test_logger");
-	auto nexus_http_interface_component = nexus_http_interface::create_component(logger, "");
+	auto nexus_http_interface_component = nexus_http_interface::create_component(logger, "", "", "");
 	EXPECT_TRUE(nexus_http_interface_component);
 }
 

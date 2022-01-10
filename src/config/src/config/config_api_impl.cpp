@@ -18,6 +18,8 @@ Config_api_impl::Config_api_impl()
 	, m_auth_pw{}
 	, m_mining_mode{ common::Mining_mode::HASH }
 	, m_devices{}
+	, m_nxs_api_user{}
+	, m_nxs_api_pw{}
 {
 }
 
