@@ -33,6 +33,7 @@ public:
     MOCK_METHOD(std::vector<std::uint32_t>, get_blocks_without_hash_from_round, (std::uint32_t round), (override));
     MOCK_METHOD(double, get_pool_hashrate, (), (override));
     MOCK_METHOD(Statistics_block_finder, get_longest_chain_finder, (), (override));
+    MOCK_METHOD(std::vector<Statistics_top_block_finder>, get_top_block_finders, (std::uint16_t num_finders), (override));
 };
 
 }

@@ -49,7 +49,8 @@ enum class Type : std::uint8_t
 	update_reward_of_payment,
 	delete_empty_payments,
 	get_pool_hashrate,
-	get_longest_chain_finder
+	get_longest_chain_finder,
+	get_top_block_finders
 };
 
 

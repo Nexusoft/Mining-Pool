@@ -57,6 +57,8 @@ public:
             std::make_shared<Command_get_pool_hashrate_impl>(m_storage_manager->get_handle<sqlite3*>())));
         m_commands.emplace(std::make_pair(Type::get_longest_chain_finder,
             std::make_shared<Command_get_longest_chain_finder_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::get_top_block_finders,
+            std::make_shared<Command_get_top_block_finders_impl>(m_storage_manager->get_handle<sqlite3*>())));
         
         // Write commands
         m_commands.emplace(std::make_pair(Type::create_account,
@@ -155,6 +157,10 @@ private:
         case Type::get_longest_chain_finder:
             result = std::any_cast<std::shared_ptr<Command_get_longest_chain_finder_impl>>(m_commands[command_type]);
             break;
+        case Type::get_top_block_finders:
+            result = std::any_cast<std::shared_ptr<Command_get_top_block_finders_impl>>(m_commands[command_type]);
+            break;
+            
             // Write commands
         case Type::create_account:
             result = std::any_cast<std::shared_ptr<Command_create_account_impl>>(m_commands[command_type]);

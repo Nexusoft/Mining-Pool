@@ -90,6 +90,14 @@ struct Statistics_block_finder
 	bool is_empty() const { return (m_account.empty()); }
 };
 
+struct Statistics_top_block_finder
+{
+	std::uint32_t m_num_blocks{ 0U };
+	std::string m_display_name{};
+
+	bool is_empty() const { return (m_display_name.empty()); }
+};
+
 } // namespace database
 } // namespace nexuspool
 

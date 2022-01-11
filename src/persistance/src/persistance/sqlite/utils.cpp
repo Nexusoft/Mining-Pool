@@ -101,5 +101,16 @@ Statistics_block_finder convert_to_statistics_block_finder(Row_sqlite row)
 	return result;
 }
 
+Statistics_top_block_finder convert_to_statistics_top_block_finder(Row_sqlite row)
+{
+	assert(row.size() == 2U);
+	Statistics_top_block_finder result{};
+
+	result.m_num_blocks = std::get<std::int32_t>(row[0].m_data);
+	result.m_display_name = std::get<std::string>(row[1].m_data);
+
+	return result;
+}
+
 }
 }

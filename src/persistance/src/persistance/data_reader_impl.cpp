@@ -36,6 +36,7 @@ Data_reader_impl::Data_reader_impl(std::shared_ptr<spdlog::logger> logger,
 	m_get_blocks_without_hash_from_round_cmd = m_command_factory->create_command(Type::get_blocks_without_hash_from_round);
 	m_get_pool_hashrate_cmd = m_command_factory->create_command(Type::get_pool_hashrate);
 	m_get_longest_chain_finder_cmd = m_command_factory->create_command(Type::get_longest_chain_finder);
+	m_get_top_block_finders_cmd = m_command_factory->create_command(Type::get_top_block_finders);
 }
 
 bool Data_reader_impl::is_connection_banned(std::string address)
@@ -308,6 +309,24 @@ Statistics_block_finder Data_reader_impl::get_longest_chain_finder()
 	data = convert_to_statistics_block_finder(result.m_rows.front());
 
 	return data;
+}
+
+std::vector<Statistics_top_block_finder> Data_reader_impl::get_top_block_finders(std::uint16_t num_finders)
+{
+	std::vector<Statistics_top_block_finder> block_finders{};
+	m_get_top_block_finders_cmd->set_params(static_cast<std::int32_t>(num_finders));
+	if (!m_data_storage->execute_command(m_get_top_block_finders_cmd))
+	{
+		return block_finders;	// return empty result
+	}
+
+	auto result = std::any_cast<Result_sqlite>(m_get_top_block_finders_cmd->get_result());
+	for (auto& row : result.m_rows)
+	{
+		block_finders.push_back(convert_to_statistics_top_block_finder(std::move(row)));
+	}
+
+	return block_finders;
 }
 
 

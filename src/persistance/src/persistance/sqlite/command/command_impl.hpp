@@ -217,6 +217,17 @@ public:
 	Type get_type() const override { return Type::get_longest_chain_finder; }
 };
 
+class Command_get_top_block_finders_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_get_top_block_finders_impl(sqlite3* handle);
+
+	std::any get_command() const override;
+	Type get_type() const override { return Type::get_top_block_finders; }
+	void set_params(std::any params) override;
+};
+
 
 // ------------------------------------------------------------------------------------
 // Write commands
