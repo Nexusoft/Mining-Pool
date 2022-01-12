@@ -1,7 +1,7 @@
 #ifndef NEXUSPOOL_API_CONTROLLER_AUTH_HPP
 #define NEXUSPOOL_API_CONTROLLER_AUTH_HPP
 
-#include "api/controller_base.hpp"
+#include "api/controller/controller_base.hpp"
 
 #include "oatpp/web/server/handler/AuthorizationHandler.hpp"
 #include "oatpp/core/macro/codegen.hpp"

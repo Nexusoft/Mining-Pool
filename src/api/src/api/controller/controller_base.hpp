@@ -1,10 +1,10 @@
 #ifndef NEXUSPOOL_API_CONTROLLER_BASE_HPP
 #define NEXUSPOOL_API_CONTROLLER_BASE_HPP
 
-#include "api/dto.hpp"
+#include "api/controller/dto.hpp"
 #include "api/shared_data_reader.hpp"
 #include "api/client.hpp"
-#include "api/controller_helper.hpp"
+#include "api/controller/controller_helper.hpp"
 #include "config/config_api.hpp"
 #include "TAO/Register/types/address.h"
 

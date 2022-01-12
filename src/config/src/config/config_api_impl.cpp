@@ -56,11 +56,9 @@ bool Config_api_impl::read_config(std::string const& api_config_file)
 			m_mining_mode = common::Mining_mode::HASH;
 		}
 
-		if (j.contains("auth_user"))
-		{
-			m_auth_user = j["auth_user"];
-			m_auth_pw = j["auth_pw"];
-		}
+		j.at("auth_user").get_to(m_auth_user);
+		j.at("auth_pw").get_to(m_auth_pw);
+
 		if (j.contains("reward_calc_update_interval"))
 		{
 			m_reward_calc_update_interval = j["reward_calc_update_interval"];
