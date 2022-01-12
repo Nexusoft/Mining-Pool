@@ -43,7 +43,6 @@ private:
 
     chrono::Timer::Handler session_registry_maintenance_handler(std::uint16_t session_registry_maintenance_interval);
     chrono::Timer::Handler end_round_handler();
-    chrono::Timer::Handler update_block_hashes_handler(std::uint16_t update_block_hashes_interval);
     chrono::Timer::Handler get_hashrate_handler(std::uint16_t get_hashrate_interval);
 
     void end_round();
@@ -68,7 +67,6 @@ private:
     // periodic timer
     chrono::Timer::Uptr m_session_registry_maintenance;
     chrono::Timer::Uptr m_end_round_timer;
-    chrono::Timer::Uptr m_update_block_hashes_timer;
     chrono::Timer::Uptr m_get_hashrate_timer;
 
     // connection variables

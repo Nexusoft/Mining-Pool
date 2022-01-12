@@ -22,6 +22,7 @@ public:
 
     double calculate_reward_of_blocks(std::uint32_t round, bool& calculation_finished);
     bool payout(std::string const& account_from, std::string const& pin, std::uint32_t current_round);
+    bool is_all_paid(std::uint32_t current_round) const;
 
 private:
 
@@ -29,6 +30,7 @@ private:
     nexus_http_interface::Component& m_http_interface;
     persistance::Shared_data_writer& m_shared_data_writer;
     persistance::Data_reader& m_data_reader;
+    std::uint32_t m_not_fully_paid_round;
 };
 
 }

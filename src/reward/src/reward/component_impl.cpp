@@ -10,13 +10,16 @@ namespace reward {
 
 Component_impl::Component_impl(
 	std::shared_ptr<spdlog::logger> logger, 
+	chrono::Timer_factory::Sptr timer_factory,
 	nexus_http_interface::Component::Sptr http_interface,
 	persistance::Shared_data_writer::Sptr shared_data_writer, 
 	persistance::Data_reader::Uptr data_reader,
 	std::string account_from,
 	std::string pin,
-	std::uint16_t pool_fee)
+	std::uint16_t pool_fee,
+	std::uint16_t update_block_hashes_interval)
     : m_logger{std::move(logger)}
+	, m_timer_factory{std::move(timer_factory)}
 	, m_http_interface{std::move(http_interface)}
     , m_shared_data_writer{ std::move(shared_data_writer) }
     , m_data_reader{ std::move(data_reader) }
@@ -26,6 +29,16 @@ Component_impl::Component_impl(
 	, m_pin{std::move(pin)}
 	, m_pool_fee{pool_fee}
 {
+	m_update_block_hashes_timer = m_timer_factory->create_timer();
+	m_not_paid_miners_timer = m_timer_factory->create_timer();
+	m_update_block_hashes_timer->start(chrono::Seconds(update_block_hashes_interval),
+		update_block_hashes_handler(update_block_hashes_interval));
+}
+
+Component_impl::~Component_impl()
+{
+	m_update_block_hashes_timer->stop();
+	m_not_paid_miners_timer->stop();
 }
 
 Difficulty_result Component_impl::check_difficulty(const LLP::CBlock& block, uint32_t pool_nbits) const
@@ -245,6 +258,14 @@ bool Component_impl::pay_round(std::uint32_t round)
 	{
 		round_data.m_is_paid = true;
 		m_shared_data_writer->update_round(round_data);
+
+		if (!m_payout_manager.is_all_paid(round))
+		{
+			m_logger->warn("Not all miners of round {} could be paid. Starting timer for later payout.");
+			m_not_paid_miners_rounds.emplace(round);
+
+			m_not_paid_miners_timer->start(chrono::Seconds(600), not_paid_miners_handler());
+		}
 	}
 
 	// cleanup empty payment records of this round
@@ -255,7 +276,10 @@ bool Component_impl::pay_round(std::uint32_t round)
 
 void Component_impl::update_block_hashes_from_current_round()
 {
-	assert(m_current_round != 0);
+	if (m_current_round == 0)
+	{
+		return; 
+	}
 	update_block_hashes(m_current_round);
 }
 
@@ -314,6 +338,27 @@ void Component_impl::block_found()
 	auto round_data = m_data_reader->get_latest_round();
 	round_data.m_blocks++;
 	m_shared_data_writer->update_round(round_data);
+}
+
+chrono::Timer::Handler Component_impl::update_block_hashes_handler(std::uint16_t update_block_hashes_interval)
+{
+	return[this, update_block_hashes_interval]()
+	{
+		update_block_hashes_from_current_round();
+
+		// restart timer
+		m_update_block_hashes_timer->start(chrono::Seconds(update_block_hashes_interval),
+			update_block_hashes_handler(update_block_hashes_interval));
+	};
+}
+
+chrono::Timer::Handler Component_impl::not_paid_miners_handler()
+{
+	return[this]()
+	{
+		m_payout_manager.payout(m_account_from, m_pin, m_not_paid_miners_rounds.front());
+		m_not_paid_miners_rounds.pop();
+	};
 }
 
 }

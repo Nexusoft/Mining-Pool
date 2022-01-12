@@ -41,7 +41,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	: m_io_context{std::move(io_context) }
 	, m_logger{ std::move(logger)}
 	, m_config{std::move(config)}
-	, m_timer_factory{ std::move(timer_factory) }
+	, m_timer_factory{ timer_factory }
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
@@ -52,12 +52,14 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_config->get_pool_config().m_nxs_api_user, 
 		m_config->get_pool_config().m_nxs_api_pw)}
 	, m_reward_component{reward::create_component(m_logger, 
+		std::move(timer_factory),
 		m_http_component,
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_data_reader_factory->create_data_reader(),
 		m_config->get_pool_config().m_account,
 		m_config->get_pool_config().m_pin,
-		m_config->get_pool_config().m_fee)}
+		m_config->get_pool_config().m_fee,
+		m_config->get_update_block_hashes_interval())}
 	, m_listen_socket{}
 	, m_session_registry{std::make_shared<Session_registry_impl>(
 		m_data_reader_factory->create_data_reader(), 
@@ -70,7 +72,6 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
-	m_update_block_hashes_timer = m_timer_factory->create_timer();
 	m_get_hashrate_timer = m_timer_factory->create_timer();
 }
 
@@ -148,7 +149,6 @@ void Pool_manager_impl::start()
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 
-	m_update_block_hashes_timer->start(chrono::Seconds(m_config->get_update_block_hashes_interval()), update_block_hashes_handler(m_config->get_update_block_hashes_interval()));
 	m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
 }
 
@@ -156,7 +156,6 @@ void Pool_manager_impl::stop()
 {
 	m_session_registry_maintenance->stop();
 	m_end_round_timer->stop();
-	m_update_block_hashes_timer->stop();
 	m_get_hashrate_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_wallet_connection->stop();
@@ -281,18 +280,6 @@ std::uint32_t Pool_manager_impl::get_pool_nbits() const
 {
 	std::scoped_lock(m_block_mutex);
 	return m_pool_nBits;
-}
-
-chrono::Timer::Handler Pool_manager_impl::update_block_hashes_handler(std::uint16_t update_block_hashes_interval)
-{
-	return[this, update_block_hashes_interval]()
-	{
-		m_reward_component->update_block_hashes_from_current_round();
-
-		// restart timer
-		m_update_block_hashes_timer->start(chrono::Seconds(update_block_hashes_interval),
-			update_block_hashes_handler(update_block_hashes_interval));
-	};
 }
 
 chrono::Timer::Handler Pool_manager_impl::get_hashrate_handler(std::uint16_t get_hashrate_interval)

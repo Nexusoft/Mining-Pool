@@ -12,6 +12,7 @@
 #include "persistance/data_reader_mock.hpp"
 #include "persistance/data_writer_mock.hpp"
 #include "nexus_http_interface/component_mock.hpp"
+#include "chrono/timer_factory_mock.hpp"
 
 namespace
 {
@@ -61,6 +62,7 @@ public:
 
 		m_http_interface_mock = std::make_unique<nexus_http_interface::Component_mock>();
 		m_http_interface_mock_raw = m_http_interface_mock.get();
+		m_timer_factory_mock = std::make_shared<NiceMock<chrono::Timer_factory_mock>>();
 	}
 
 	~Test_data()
@@ -140,6 +142,7 @@ public:
 	std::shared_ptr<persistance::Shared_data_writer_mock> m_shared_data_writer_mock;
 	std::unique_ptr<nexus_http_interface::Component_mock> m_http_interface_mock;
 	nexus_http_interface::Component_mock* m_http_interface_mock_raw{ nullptr };
+	std::shared_ptr<chrono::Timer_factory_mock> m_timer_factory_mock;
 
 protected:
 
