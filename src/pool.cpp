@@ -5,7 +5,7 @@
 #include "persistance/create_component.hpp"
 #include "config/validator.hpp"
 #include "common/types.hpp"
-#include "api/server.hpp"
+#include "api/create_component.hpp"
 #include "pool/pool_manager.hpp"
 #include "common/pool_api_data_exchange.hpp"
 #include "version.h"
@@ -55,9 +55,9 @@ namespace nexuspool
 
 	void Pool::stop()
 	{
-		if (m_api_server)
+		if (m_api_component)
 		{
-			m_api_server->stop();
+			m_api_component->stop();
 		}
 
 		if (m_pool_manager)
@@ -142,7 +142,7 @@ namespace nexuspool
 			m_api_config->set_nxs_api_user(m_config->get_pool_config().m_nxs_api_user);
 			m_api_config->set_nxs_api_pw(m_config->get_pool_config().m_nxs_api_pw);
 
-			m_api_server = std::make_unique<api::Server>(m_logger, 
+			m_api_component = api::create_component(m_logger,
 				m_persistance_component->get_data_reader_factory()->create_data_reader(), 
 				m_api_config, 
 				m_pool_api_data_exchange, 
@@ -158,9 +158,9 @@ namespace nexuspool
 
 	void Pool::run()
 	{
-		if (m_api_server)
+		if (m_api_component)
 		{
-			m_api_server->start();
+			m_api_component->start();
 		}
 
 		m_pool_manager->start();
