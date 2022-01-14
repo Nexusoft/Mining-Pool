@@ -19,7 +19,6 @@ struct Session_user
 	bool m_new_account{ true };
 	persistance::Account_data m_account;
 	std::chrono::steady_clock::time_point m_login_time;
-	bool m_work_needed{ true };
 };
 
 // Holds relevant user data and miner_connection
@@ -42,6 +41,8 @@ public:
 	virtual std::unique_ptr<LLP::CBlock> get_block() = 0;
 	virtual bool is_inactive() const = 0;
 	virtual void set_inactive() = 0;
+	virtual bool is_need_work() const = 0;
+	virtual void needs_work(bool need_work) = 0;
 
 	virtual bool create_account() = 0;
 	virtual void login() = 0;

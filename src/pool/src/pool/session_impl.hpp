@@ -40,6 +40,8 @@ public:
 	std::unique_ptr<LLP::CBlock> get_block() override;
 	bool is_inactive() const override { return m_inactive; }
 	void set_inactive() { m_inactive = true; }
+	bool is_need_work() const override { return m_work_needed;  }
+	void needs_work(bool need_work) override { m_work_needed = need_work; }
 
 	bool create_account() override;
 	void login() override;
@@ -54,6 +56,7 @@ private:
 	Hashrate_helper m_hashrate_helper;
 	std::unique_ptr<LLP::CBlock> m_block;
 	std::atomic_bool m_inactive;
+	std::atomic_bool m_work_needed;
 };
 
 // Manages all sessions

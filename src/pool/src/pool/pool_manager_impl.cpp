@@ -222,7 +222,6 @@ void Pool_manager_impl::set_block(LLP::CBlock const& block)
 	{
 		m_pool_nBits = block.nBits;
 	}
-
 }
 
 void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)

@@ -120,9 +120,7 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		else if (packet.m_header == Packet::SUBMIT_BLOCK)
 		{
 			// miner needs new work
-			auto user_data = session->get_user_data();
-			user_data.m_work_needed = true;
-			session->update_user_data(user_data);
+			session->needs_work(true);
 
 			if (packet.m_length != 72)
 			{
@@ -237,7 +235,6 @@ void Miner_connection_impl::process_accepted()
 			user_data.m_new_account = false;
 			session->update_user_data(user_data);
 		}
-
 	}
 
 	// add share
@@ -392,7 +389,7 @@ void Miner_connection_impl::send_pool_notification(std::string message)
 	auto j_string = j.dump();
 
 	Packet response{ Packet::POOL_NOTIFICATION, std::make_shared<network::Payload>(network::Payload{ j_string.begin(), j_string.end() }) };
-	m_connection->transmit(response.get_bytes());
+//	m_connection->transmit(response.get_bytes());		TODO: enable when miner 1.5 released
 }
 
 }

@@ -25,6 +25,8 @@ public:
 	MOCK_METHOD(void, login, (), (override));
 	MOCK_METHOD(bool, is_inactive, (), (const override));
 	MOCK_METHOD(void, set_inactive, (), (override));
+	MOCK_METHOD(bool, is_need_work, (), (const override));
+	MOCK_METHOD(void, needs_work, (bool need_work), (override));
 };
 
 class Session_registry_mock : public Session_registry

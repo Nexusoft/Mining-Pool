@@ -138,12 +138,10 @@ std::shared_ptr<Session> Session_registry_impl::get_session_with_no_work()
 		{
 			continue;
 		}
-
-		auto user_data = session.second->get_user_data();
-		if (user_data.m_work_needed)
+ 
+		if (session.second->is_need_work())
 		{
-			user_data.m_work_needed = false;
-			session.second->update_user_data(user_data);
+			session.second->needs_work(false);
 			return session.second;
 		}
 	}
@@ -156,9 +154,7 @@ void Session_registry_impl::reset_work_status_of_sessions()
 
 	for (auto& session : m_sessions)
 	{
-		auto user_data = session.second->get_user_data();
-		user_data.m_work_needed = true;
-		session.second->update_user_data(user_data);
+		session.second->needs_work(true);
 	}
 }
 
