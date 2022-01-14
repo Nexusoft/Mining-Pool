@@ -103,12 +103,10 @@ private:
 
     persistance::Config_data get_config_data()
     {
-        auto config_updated = m_pool_api_data_exchange->is_config_updated();
-        if (config_updated)
+        if (m_pool_api_data_exchange->is_config_updated())
         {
             m_cached_config = m_data_reader->get_config();
-            config_updated = false;
-            m_pool_api_data_exchange->set_config_updated(config_updated);
+            m_pool_api_data_exchange->set_config_updated(false);
         }
         return m_cached_config;
     }

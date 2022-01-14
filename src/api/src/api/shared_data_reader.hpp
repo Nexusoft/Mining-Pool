@@ -58,6 +58,18 @@ public:
         return m_data_reader->get_pool_hashrate();
     }
 
+    persistance::Statistics_block_finder get_longest_chain_finder()
+    {
+        std::scoped_lock lock(m_db_mutex);
+        return m_data_reader->get_longest_chain_finder();
+    }
+
+    std::vector<persistance::Statistics_top_block_finder> get_top_block_finders(std::uint16_t num_finders)
+    {
+        std::scoped_lock lock(m_db_mutex);
+        return m_data_reader->get_top_block_finders(num_finders);
+    }
+
 private:
 
     persistance::Data_reader::Uptr m_data_reader;

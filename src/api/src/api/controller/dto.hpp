@@ -130,6 +130,37 @@ class Reward_data_dto : public oatpp::DTO
 	DTO_FIELD(Float64, network_diff);
 };
 
+class Statistics_longest_chain_dto : public oatpp::DTO
+{
+	DTO_INIT(Statistics_longest_chain_dto, DTO)
+
+	DTO_FIELD(String, display_name);
+	DTO_FIELD(Float64, chain);
+};
+
+class Statistics_block_finder_dto : public oatpp::DTO
+{
+	DTO_INIT(Statistics_block_finder_dto, DTO)
+
+	DTO_FIELD(String, display_name);
+	DTO_FIELD(UInt32, num_blocks);
+
+public:
+
+	Statistics_block_finder_dto() = default;
+	Statistics_block_finder_dto(const char* pdisplay_name, std::uint32_t pnum_blocks)
+		: display_name(pdisplay_name)
+		, num_blocks(pnum_blocks)
+	{}
+};
+
+class Statistics_top_block_finders_dto : public oatpp::DTO
+{
+	DTO_INIT(Statistics_top_block_finders_dto, DTO)
+
+	DTO_FIELD(Vector<Object<Statistics_block_finder_dto>>, block_finders) = {};
+};
+
 #include OATPP_CODEGEN_END(DTO)
 
 }

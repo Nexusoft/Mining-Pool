@@ -5,6 +5,8 @@
 #include "api/controller/controller_overview.hpp"
 #include "api/controller/controller_mining_calc.hpp"
 #include "api/controller/controller_account.hpp"
+#include "api/controller/controller_statistics.hpp"
+
 #include "oatpp/network/Server.hpp"
 #include "oatpp/web/client/HttpRequestExecutor.hpp"
 #include "oatpp/network/tcp/client/ConnectionProvider.hpp"
@@ -52,8 +54,9 @@ void Component_impl::start()
 
 			/* create ApiControllers and add endpoints to router */
 			router->addController(std::make_shared<Controller_overview>(m_nxs_client, m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper));
-			router->addController(std::make_shared<Controller_mining_calc>(m_nxs_client, m_timer_factory, m_shared_data_reader, m_pool_api_data_exchange, m_config_api, objectMapper));
+			router->addController(std::make_shared<Controller_mining_calc>(m_nxs_client, m_timer_factory, m_shared_data_reader, m_config_api, objectMapper));
 			router->addController(std::make_shared<Controller_account>(m_shared_data_reader, m_config_api, objectMapper));
+			router->addController(std::make_shared<Controller_statistics>(m_shared_data_reader, m_config_api, objectMapper));
 
 			/* Get connection handler component */
 			OATPP_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, connectionHandler);

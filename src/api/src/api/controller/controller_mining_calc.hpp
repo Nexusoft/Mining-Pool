@@ -3,6 +3,8 @@
 
 #include "common/types.hpp"
 #include "config/config_api.hpp"
+#include "chrono/timer_factory.hpp"
+#include "chrono/timer.hpp"
 #include "api/controller/dto.hpp"
 #include "api/client.hpp"
 
@@ -12,6 +14,7 @@
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include <json/json.hpp>
 #include <string>
+#include <mutex>
 
 namespace nexuspool
 {
@@ -30,7 +33,6 @@ public:
     Controller_mining_calc(std::shared_ptr<NXS_client> nxs_client,
         chrono::Timer_factory::Sptr timer_factory,
         Shared_data_reader::Sptr data_reader,
-        common::Pool_api_data_exchange::Sptr pool_api_data_exchange,
         config::Config_api::Sptr config_api,
         std::shared_ptr<oatpp::data::mapping::ObjectMapper> objectMapper)
         : ApiController(objectMapper)
@@ -98,18 +100,22 @@ private:
         {
             auto response = m_nxs_client->get_mininginfo(m_auth_nxs_string);
             auto const status_code = response->getStatusCode();
-            if (status_code != 200)
             {
-                m_cached_mining_info = common::Mining_info{};
-            }
-            else
-            {
-                auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
-                m_cached_mining_info.m_height = data_json["result"]["blocks"];
-                m_cached_mining_info.m_hash_rewards = data_json["result"]["hashValue"];
-                m_cached_mining_info.m_hash_difficulty = data_json["result"]["hashDifficulty"];
-                m_cached_mining_info.m_prime_reward = data_json["result"]["primeValue"];
-                m_cached_mining_info.m_prime_difficulty = data_json["result"]["primeDifficulty"];
+                std::scoped_lock lock(m_mining_info_mutex);
+
+                if (status_code != 200)
+                {
+                    m_cached_mining_info = common::Mining_info{};
+                }
+                else
+                {
+                    auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
+                    m_cached_mining_info.m_height = data_json["result"]["blocks"];
+                    m_cached_mining_info.m_hash_rewards = data_json["result"]["hashValue"];
+                    m_cached_mining_info.m_hash_difficulty = data_json["result"]["hashDifficulty"];
+                    m_cached_mining_info.m_prime_reward = data_json["result"]["primeValue"];
+                    m_cached_mining_info.m_prime_difficulty = data_json["result"]["primeDifficulty"];
+                }
             }
 
             // restart timer
@@ -125,6 +131,7 @@ private:
     std::shared_ptr<NXS_client> m_nxs_client;
     common::Mining_info m_cached_mining_info;
     chrono::Timer::Uptr m_mining_info_timer;
+    std::mutex m_mining_info_mutex;
 };
 
 #include OATPP_CODEGEN_BEGIN(ApiController) //<-- End codegen

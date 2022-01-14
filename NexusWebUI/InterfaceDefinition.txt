@@ -92,8 +92,9 @@ Statistics API's:
 
     # Result
     Fields:
-        - display_name
-        - num_blocks
+        - block_finders (array of block_finder)
+            - display_name
+            - num_blocks
 
     ########################
     GET /statistics/longestchain      (only available in PRIME mining)
