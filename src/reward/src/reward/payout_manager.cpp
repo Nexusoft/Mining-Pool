@@ -153,7 +153,7 @@ bool Payout_manager::is_all_paid(std::uint32_t current_round) const
 	{
 		return false;
 	}
-	return false;
+	return true;
 }
 
 }
