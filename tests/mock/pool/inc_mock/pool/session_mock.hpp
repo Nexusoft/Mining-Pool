@@ -44,6 +44,7 @@ public:
 	MOCK_METHOD(bool, valid_nxs_address, (std::string const& nxs_address), (override));
 	MOCK_METHOD(bool, does_account_exists, (std::string account), (override));
 	MOCK_METHOD(void, get_hashrate, (), (override));
+	MOCK_METHOD(void, send_notification, (std::string message), (override));
 };
 
 

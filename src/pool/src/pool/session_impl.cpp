@@ -215,6 +215,21 @@ void Session_registry_impl::get_hashrate()
 	}
 }
 
+void Session_registry_impl::send_notification(std::string message)
+{
+	std::scoped_lock lock(m_sessions_mutex);
+
+	for (auto& session : m_sessions)
+	{
+		auto miner_connection = session.second->get_connection();
+		auto miner_connection_shared = miner_connection.lock();
+		if (miner_connection_shared)
+		{
+			miner_connection_shared->send_pool_notification(std::move(message));
+		}
+	}
+}
+
 bool Session_registry_impl::valid_nxs_address(std::string const& nxs_address)
 {
 	// check if nxs_address has a valid format

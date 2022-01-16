@@ -83,6 +83,8 @@ public:
 
 	// sends get_hashrate message to active sessions
 	void get_hashrate() override;
+	// sends pool notification message to active sessions
+	void send_notification(std::string message) override;
 
 	bool valid_nxs_address(std::string const& nxs_address) override;
 	bool does_account_exists(std::string account) override;

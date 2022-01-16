@@ -12,6 +12,7 @@
 namespace nexuspool
 {
 class Wallet_connection;
+class Notifications;
 
 class Pool_manager_impl : public Pool_manager, public std::enable_shared_from_this<Pool_manager_impl>
 {
@@ -64,6 +65,7 @@ private:
     network::Socket::Sptr m_listen_socket;
 
     std::shared_ptr<Session_registry> m_session_registry;    // holds all sessions -> each session contains a miner_connection
+    std::unique_ptr<Notifications> m_miner_notifications;
     // periodic timer
     chrono::Timer::Uptr m_session_registry_maintenance;
     chrono::Timer::Uptr m_end_round_timer;

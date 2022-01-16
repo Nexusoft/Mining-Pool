@@ -69,6 +69,8 @@ public:
 
 	// sends get_hashrate message to active sessions
 	virtual void get_hashrate() = 0;
+	// sends pool notification message to active sessions
+	virtual void send_notification(std::string message) = 0;
 
 	virtual bool valid_nxs_address(std::string const& nxs_address) = 0;
 	virtual bool does_account_exists(std::string account) = 0;

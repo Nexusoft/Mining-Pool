@@ -2,6 +2,7 @@
 #include "pool/session_impl.hpp"
 #include "pool/wallet_connection_impl.hpp"
 #include "pool/miner_connection_impl.hpp"
+#include "pool/notifications.hpp"
 #include "config/config.hpp"
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
@@ -67,6 +68,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_http_component, 
 		m_config->get_session_expiry_time(),
 		m_config->get_mining_mode())}
+	, m_miner_notifications{std::make_unique<Notifications>(m_session_registry, m_config->get_miner_notifications())}
 	, m_current_height{0}
 	, m_block_map_id{0}
 {
@@ -154,6 +156,7 @@ void Pool_manager_impl::start()
 
 void Pool_manager_impl::stop()
 {
+	m_miner_notifications->send_pool_shutdown();
 	m_session_registry_maintenance->stop();
 	m_end_round_timer->stop();
 	m_get_hashrate_timer->stop();
@@ -239,6 +242,7 @@ void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 	data_writer->add_block(std::move(block_data));
 
 	m_reward_component->block_found();
+	m_miner_notifications->send_block_found();
 }
 
 void Pool_manager_impl::get_block(Get_block_handler&& handler)
