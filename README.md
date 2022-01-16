@@ -44,6 +44,7 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "log_level"             // Optional, default=2 (info), sets the verbosity of log messages ranges from 0 (trace) - 5 (critical)
     "update_block_hashes_interval"  // Optional, default=600, time in seconds when the found blocks should update their hashes in storage. Automatically happens during round end.
     "get_hashrate_interval"         // Optional, default=300, time in seconds requesting the current hashrate from the connected miners
+    "miner_notifications"           // Optional, default=true send notification messages to miners (like pool restart, block found etc)
     "api"                // Option group regarding API for frontend of the POOL. If not present then no API server will be started
         "listen_port" : 0   // port of the POOL for listening to incoming API calls (from the web frontend for example).
         "auth_user"         // Optional. If this config value is given then the API calls requires BasicAuth REST.

@@ -26,17 +26,18 @@ namespace config
 		, m_session_expiry_time{5}
 		, m_update_block_hashes_interval{600}
 		, m_hashrate_interval{300}
+		, m_miner_notifications{true}
 	{
 	}
 
 	bool Config_impl::read_config(std::string const& pool_config_file)
 	{
-		std::cout << "Reading config file " << pool_config_file << std::endl;
+		std::cout << "Reading POOL config file " << pool_config_file << std::endl;
 
 		std::ifstream config_file(pool_config_file);
 		if (!config_file.is_open())
 		{
-			std::cerr << "Unable to read " << pool_config_file << std::endl;
+			std::cerr << "Unable to read POOL config file " << pool_config_file << std::endl;
 			return false;
 		}
 
@@ -118,6 +119,10 @@ namespace config
 			{
 				j.at("get_hashrate_interval").get_to(m_hashrate_interval);
 			}
+			if (j.count("miner_notifications") != 0)
+			{
+				j.at("miner_notifications").get_to(m_miner_notifications);
+			}
 
 			if (j.count("logfile") != 0)
 			{
@@ -133,7 +138,7 @@ namespace config
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << "Failed to parse config file. Exception: " << e.what() << std::endl;
+			std::cerr << "Failed to parse POOL config file. Exception: " << e.what() << std::endl;
 			return false;
 		}
 	}

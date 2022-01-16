@@ -25,12 +25,12 @@ Config_api_impl::Config_api_impl()
 
 bool Config_api_impl::read_config(std::string const& api_config_file)
 {
-	std::cout << "Reading config file " << api_config_file << std::endl;
+	std::cout << "Reading API config file " << api_config_file << std::endl;
 
 	std::ifstream config_file(api_config_file);
 	if (!config_file.is_open())
 	{
-		std::cerr << "Unable to read " << api_config_file << std::endl;
+		std::cerr << "Unable to read API config file " << api_config_file << std::endl;
 		return false;
 	}
 
@@ -81,7 +81,7 @@ bool Config_api_impl::read_config(std::string const& api_config_file)
 	}
 	catch (std::exception& e)
 	{
-		std::cerr << "Failed to parse config file. Exception: " << e.what() << std::endl;
+		std::cerr << "Failed to parse API config file. Exception: " << e.what() << std::endl;
 		return false;
 	}
 }

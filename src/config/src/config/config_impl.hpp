@@ -34,6 +34,7 @@ public:
 	Persistance_config const& get_persistance_config() const override  { return m_persistance_config; }
 	std::uint16_t get_update_block_hashes_interval() const override { return m_update_block_hashes_interval; }
 	std::uint16_t get_hashrate_interval() const override { return m_hashrate_interval; }
+	bool get_miner_notifications() const override { return m_miner_notifications; }
 
 private:
 
@@ -55,6 +56,7 @@ private:
 	std::uint16_t m_session_expiry_time;
 	std::uint16_t m_update_block_hashes_interval;
 	std::uint16_t m_hashrate_interval;
+	bool m_miner_notifications;
 
 };
 
