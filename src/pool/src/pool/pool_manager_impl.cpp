@@ -4,6 +4,7 @@
 #include "pool/miner_connection_impl.hpp"
 #include "pool/notifications.hpp"
 #include "config/config.hpp"
+#include "common/utils.hpp"
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
 #include "LLP/utils.hpp"
@@ -74,6 +75,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
+	m_payout_timer = m_timer_factory->create_timer();
 	m_get_hashrate_timer = m_timer_factory->create_timer();
 }
 
@@ -160,6 +162,7 @@ void Pool_manager_impl::stop()
 	m_session_registry_maintenance->stop();
 	m_end_round_timer->stop();
 	m_get_hashrate_timer->stop();
+	m_payout_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_wallet_connection->stop();
 	m_listen_socket->stop_listen();
@@ -311,9 +314,17 @@ chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(s
 
 chrono::Timer::Handler Pool_manager_impl::end_round_handler()
 {
-	return[this]()
-	{
-		end_round();
+	return[this]() { end_round(); };
+}
+
+chrono::Timer::Handler Pool_manager_impl::payout_handler(std::uint32_t round)
+{
+	return[this, round]()
+	{ 
+		m_reward_component->pay_round(round);
+		// If there are still unpaid rounds pay them also now. (This can happen if not all blocks from previous rounds 
+		// are matured till round end and there are insufficient funds to pay all miners) -> very unlikely now due to delayed payout
+		m_reward_component->process_unpaid_rounds();
 	};
 }
 
@@ -321,15 +332,18 @@ void Pool_manager_impl::end_round()
 {
 	auto const current_round = m_reward_component->get_current_round();
 	m_reward_component->end_round(current_round);
-	m_reward_component->pay_round(current_round);
+	// end round in registry
 	m_session_registry->end_round();
+
+	// start timer for payout -> payout is delayed (4 hours) to make sure that every block is already confirmed
+	m_payout_timer->start(chrono::Seconds(60 * 60 * 4), payout_handler(current_round));
+	// set payout_time for api
+	auto payout_time = std::chrono::system_clock::now();
+	payout_time += std::chrono::hours(4);
+	m_pool_api_data_exchange->set_payout_time(common::get_datetime_string(payout_time));
 
 	// update config in storage
 	m_storage_config_data = storage_config_check();
-
-	// If there are still unpaid rounds pay them also now. (This can happen if not all blocks from previous rounds 
-	// are matured till round end and there are insufficient funds to pay all miners)
-	m_reward_component->process_unpaid_rounds();
 
 	// start next round
 	if (!m_reward_component->start_round(m_storage_config_data.m_round_duration_hours))

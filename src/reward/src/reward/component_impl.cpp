@@ -323,6 +323,7 @@ bool Component_impl::process_unpaid_rounds()
 
 	for (auto& round_number : round_numbers)
 	{
+		m_logger->info("process_unpaid_rounds: round {} is still unpaid -> processing now.", round_number);
 		update_block_hashes(round_number);
 		auto result = pay_round(round_number);
 		if (!result)
