@@ -22,6 +22,7 @@ class Meta_infos_dto : public oatpp::DTO
 	DTO_FIELD(UInt16, active_miners);
 	DTO_FIELD(String, wallet_version);
 	DTO_FIELD(String, pool_version);
+	DTO_FIELD(String, payout_time);
 };
 
 class Account_dto : public oatpp::DTO

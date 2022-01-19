@@ -57,6 +57,7 @@ public:
         dto->fee = config.m_fee;
         dto->mining_mode = config.m_mining_mode.c_str();
         dto->active_miners = m_pool_api_data_exchange->get_active_miners();
+        dto->payout_time = m_pool_api_data_exchange->get_payout_time();
         auto const system_info = get_system_info();
         dto->wallet_version = system_info.m_wallet_version;
         dto->pool_version = system_info.m_pool_version;
