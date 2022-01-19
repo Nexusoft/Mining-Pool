@@ -96,23 +96,29 @@ Optional cmake build options are
 * SQLite:   build sqlite as static lib (VS Studio x64 command prompt, cl /c /EHsc sqlite3.c && lib sqlite3.obj)  
             copy sqlite3.lib to /libs folder  
 * OpenSSL: 
-* OatPP: 
-$ git clone https://github.com/oatpp/oatpp.git
-$ cd oatpp\
-$ MD build
-$ cd build\
-$ cmake ..
-$ cmake --build . --target INSTALL
+* OatPP:   
+$ git clone https://github.com/oatpp/oatpp.git  
+$ cd oatpp\  
+$ MD build  
+$ cd build\  
+$ cmake ..  
+$ cmake --build . --target INSTALL    
 
-Build the Pool server with -D CMAKE_INSTALL_PREFIX:STRING="<YOUR_PATH_TO_OATPP_INSTALL_LOCATION>"
+Build the Pool server with -D CMAKE_INSTALL_PREFIX:STRING="<YOUR_PATH_TO_OATPP_INSTALL_LOCATION>"  
 
 ### Ubuntu/Debian
 
 * SQLite:                           sudo apt-get install sqlite3 libsqlite3-dev  
 * OpenSSL:                          sudo apt-get install libssl-dev  
-* OatPP:
-$ git clone https://github.com/oatpp/oatpp.git
-$ cd oatpp/
-$ mkdir build && cd build
-$ cmake ..
-$ make install
+* OatPP:  
+$ git clone https://github.com/oatpp/oatpp.git  
+$ cd oatpp/  
+$ mkdir build && cd build  
+$ cmake ..  
+$ make install    
+* OatPP-OpenSSL:    
+$ git clone https://github.com/oatpp/oatpp-openssl.git  
+$ cd oatpp-openssl/  
+$ mkdir build && cd build    
+$ cmake ..    
+$ make install      

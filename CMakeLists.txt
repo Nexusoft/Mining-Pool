@@ -36,9 +36,7 @@ if(WIN32)
 endif()
 
 find_package(oatpp 1.3.0 REQUIRED)
-
-include_directories(${oatpp_INCLUDE_DIRS})
-link_directories(${oatpp_LIBRARIES_DIRS})
+find_package(oatpp-openssl 1.3.0 REQUIRED)
 
 # add submodules
 add_subdirectory(src/chrono)

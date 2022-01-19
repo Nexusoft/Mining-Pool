@@ -6,6 +6,8 @@
 #include "oatpp/network/tcp/server/ConnectionProvider.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/core/macro/component.hpp"
+#include "oatpp-openssl/server/ConnectionProvider.hpp"
+#include "oatpp-openssl/Config.hpp"
 #include <string>
 
 namespace nexuspool
@@ -23,6 +25,12 @@ public:
     {
         // create ConnectionProvider component which listens on the port
         m_serverConnectionProvider = oatpp::network::tcp::server::ConnectionProvider::createShared({ m_public_ip.c_str(), m_api_listen_port, oatpp::network::Address::IP_4 });
+
+const char* pemFile = "path/to/file.pem";
+const char* crtFile = "path/to/file.crt";
+
+        auto config = oatpp::openssl::Config::createDefaultServerConfigShared(pemFile, crtFile);
+auto connectionProvider = oatpp::openssl::server::ConnectionProvider::createShared(config, {"localhost", 8443});
     }
 
     std::shared_ptr<oatpp::network::ServerConnectionProvider> get_serverConnectionProvider()

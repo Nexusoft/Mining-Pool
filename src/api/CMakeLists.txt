@@ -10,7 +10,7 @@ target_include_directories(api
     PRIVATE src
 )
 
-target_link_libraries(api config persistance TAO common oatpp chrono)
+target_link_libraries(api config persistance TAO common oatpp::oatpp oatpp::oatpp-openssl chrono)
 
 if(WIN32)
 target_link_libraries(api Ws2_32.lib)
