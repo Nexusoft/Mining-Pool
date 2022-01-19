@@ -30,6 +30,8 @@ public:
 	std::string get_nxs_api_pw() const override { return m_nxs_api_pw; }
 	void set_nxs_api_user(std::string nxs_api_user) override { m_nxs_api_user = std::move(nxs_api_user); }
 	void set_nxs_api_pw(std::string nxs_api_pw) override { m_nxs_api_pw = std::move(nxs_api_pw); }
+	std::string get_ssl_crt_file() const override { return m_ssl_crt_file; }
+	std::string get_ssl_pem_file() const override { return m_ssl_pem_file; }
 
 private:
 
@@ -43,6 +45,8 @@ private:
 	std::vector<Hardware_config> m_devices;
 	std::string m_nxs_api_user;
 	std::string m_nxs_api_pw;
+	std::string m_ssl_crt_file;
+	std::string m_ssl_pem_file;
 };
 
 Config_api::Sptr create_api_config()

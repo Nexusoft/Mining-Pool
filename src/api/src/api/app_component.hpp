@@ -3,7 +3,6 @@
 
 #include "oatpp/web/server/HttpConnectionHandler.hpp"
 #include "oatpp/web/server/HttpRouter.hpp"
-#include "oatpp/network/tcp/server/ConnectionProvider.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/core/macro/component.hpp"
 #include "oatpp-openssl/server/ConnectionProvider.hpp"
@@ -19,21 +18,18 @@ class App_component
 {
 public:
 
-    App_component(std::string public_ip, std::uint16_t api_listen_port)
+    App_component(std::string public_ip, 
+        std::uint16_t api_listen_port,
+        std::string ssl_crt_file,
+        std::string ssl_pem_file)
         : m_public_ip{ std::move(public_ip) }
         , m_api_listen_port{ api_listen_port }
     {
-        // create ConnectionProvider component which listens on the port
-        m_serverConnectionProvider = oatpp::network::tcp::server::ConnectionProvider::createShared({ m_public_ip.c_str(), m_api_listen_port, oatpp::network::Address::IP_4 });
-
-const char* pemFile = "path/to/file.pem";
-const char* crtFile = "path/to/file.crt";
-
-        auto config = oatpp::openssl::Config::createDefaultServerConfigShared(pemFile, crtFile);
-auto connectionProvider = oatpp::openssl::server::ConnectionProvider::createShared(config, {"localhost", 8443});
+        auto config = oatpp::openssl::Config::createDefaultServerConfigShared(ssl_pem_file, ssl_crt_file);
+        m_serverConnectionProvider = oatpp::openssl::server::ConnectionProvider::createShared(config, { m_public_ip, m_api_listen_port });
     }
 
-    std::shared_ptr<oatpp::network::ServerConnectionProvider> get_serverConnectionProvider()
+    std::shared_ptr<oatpp::openssl::server::ConnectionProvider> get_serverConnectionProvider()
     {
         return m_serverConnectionProvider;
     }
@@ -63,7 +59,7 @@ private:
 
     std::string m_public_ip;
     std::uint16_t m_api_listen_port;
-    std::shared_ptr<oatpp::network::ServerConnectionProvider> m_serverConnectionProvider;
+    std::shared_ptr<oatpp::openssl::server::ConnectionProvider> m_serverConnectionProvider;
 
 };
 

@@ -32,6 +32,8 @@ public:
 	virtual std::string get_nxs_api_pw() const = 0;
 	virtual void set_nxs_api_user(std::string nxs_api_user) = 0;
 	virtual void set_nxs_api_pw(std::string nxs_api_pw) = 0;
+	virtual std::string get_ssl_crt_file() const = 0;
+	virtual std::string get_ssl_pem_file() const = 0;
 };
 
 Config_api::Sptr create_api_config();

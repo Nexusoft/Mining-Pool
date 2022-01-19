@@ -40,7 +40,11 @@ void Component_impl::start()
 
 	m_server_thread = std::thread([this]()
 		{
-			App_component components{ m_config_api->get_public_ip(), m_config_api->get_listen_port() }; // Create scope Environment components
+			App_component components{ 
+				m_config_api->get_public_ip(), 
+				m_config_api->get_listen_port(),
+				m_config_api->get_ssl_crt_file(),
+				m_config_api->get_ssl_pem_file()};
 
 			OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router);
 			OATPP_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, objectMapper);

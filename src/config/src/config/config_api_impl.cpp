@@ -20,6 +20,8 @@ Config_api_impl::Config_api_impl()
 	, m_devices{}
 	, m_nxs_api_user{}
 	, m_nxs_api_pw{}
+	, m_ssl_crt_file{}
+	, m_ssl_pem_file{}
 {
 }
 
@@ -58,6 +60,8 @@ bool Config_api_impl::read_config(std::string const& api_config_file)
 
 		j.at("auth_user").get_to(m_auth_user);
 		j.at("auth_pw").get_to(m_auth_pw);
+		j.at("ssl_crt_file").get_to(m_ssl_crt_file);
+		j.at("ssl_pem_file").get_to(m_ssl_pem_file);
 
 		if (j.contains("reward_calc_update_interval"))
 		{

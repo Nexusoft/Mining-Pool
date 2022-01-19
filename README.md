@@ -80,6 +80,8 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "wallet_ip"             // the ip the NXS wallet listens to. Needed for API calls
     "auth_user"             // Username used for BasicAuth REST.
     "auth_pw"               // Password used for BasicAuth REST.
+    "ssl_crt_file"          // path and filename to ssl crt file. Used for REST api
+    "ssl_pem_file"          // path and filename to ssl pem file. Used for REST api
     "reward_calc_update_interval"   // Optional, default=300, time in seconds updating the mining_info for the API
 
     "devices"              // Array where GPU models can be added with hashrate and power_consumption. This is the data for the reward_calculation site if the frontend.
