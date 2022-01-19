@@ -35,7 +35,10 @@ if(WIN32)
     add_definitions(-D_WIN32_WINT=0x0601 -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-add_subdirectory(oatpp-1.3.0)
+find_package(oatpp 1.3.0 REQUIRED)
+
+include_directories(${oatpp_INCLUDE_DIRS})
+link_directories(${oatpp_LIBRARIES_DIRS})
 
 # add submodules
 add_subdirectory(src/chrono)

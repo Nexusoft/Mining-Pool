@@ -13,3 +13,7 @@ target_include_directories(nexus_http_interface
 )
 
 target_link_libraries(nexus_http_interface common oatpp)
+
+if(WIN32)
+target_link_libraries(nexus_http_interface Ws2_32.lib)
+endif()

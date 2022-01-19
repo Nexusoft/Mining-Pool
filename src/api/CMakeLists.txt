@@ -11,3 +11,7 @@ target_include_directories(api
 )
 
 target_link_libraries(api config persistance TAO common oatpp chrono)
+
+if(WIN32)
+target_link_libraries(api Ws2_32.lib)
+endif()
