@@ -321,10 +321,18 @@ chrono::Timer::Handler Pool_manager_impl::payout_handler(std::uint32_t round)
 {
 	return[this, round]()
 	{ 
-		m_reward_component->pay_round(round);
-		// If there are still unpaid rounds pay them also now. (This can happen if not all blocks from previous rounds 
-		// are matured till round end and there are insufficient funds to pay all miners) -> very unlikely now due to delayed payout
-		m_reward_component->process_unpaid_rounds();
+		if (m_reward_component->pay_round(round))
+		{
+			// If there are still unpaid rounds pay them also now. (This can happen if not all blocks from previous rounds 
+			// are matured till round end and there are insufficient funds to pay all miners) -> very unlikely now due to delayed payout
+			m_reward_component->process_unpaid_rounds();
+		}
+		else
+		{
+			constexpr std::uint16_t payout_interval{ 10U };
+			m_logger->info("Next payout attempt in {} minutes", payout_interval);
+			m_payout_timer->start(chrono::Seconds(payout_interval * 60), payout_handler(round));
+		}
 	};
 }
 
