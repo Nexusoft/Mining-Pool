@@ -147,6 +147,7 @@ def wallet_detail(request):
             last_active = account_info_json['last_active']
             shares = account_info_json['shares']
             hashrate = round((float(account_info_json['hashrate'])), 2)
+            display_name = account_info_json['display_name']
 
             last_active = last_active[:19]
 
@@ -158,6 +159,8 @@ def wallet_detail(request):
 
                 # Extract the necessary data as list of dicts
                 get_account_payouts_list = get_account_payouts_json['payouts']
+
+                print(get_account_payouts_list)
 
                 # Rename the txhash column to re-use the hash logic from the overview page
                 for item in get_account_payouts_list:
@@ -177,6 +180,7 @@ def wallet_detail(request):
                                                    'last_active': last_active,
                                                    'shares': shares,
                                                    'hashrate': hashrate,
+                                                   'display_name': display_name,
                                                    'table_account_payouts': get_account_payouts_table
                                                    })
 
@@ -190,6 +194,7 @@ def block_detail(request, hash):
     return redirect(f'https://explorer.nexus.io/search/{hash}')
 
 
+@csrf_exempt
 def mining_calc(request):
     template_name = 'presenter/mining_calc.html'
 
@@ -261,10 +266,11 @@ def mining_calc(request):
                             power_consumption=device['power_consumption']
                         )
 
+                # Todo TEST --> Deactivated to see if updates
                 # Save data in the cache
-                if settings.DEBUG is False and hardware_data_json and reward_data_json:
-                    cache.set('reward_data_json', reward_data_json, 720)
-                    cache.set('hardware_data_json', hardware_data_json, 720)
+                # if settings.DEBUG is False and hardware_data_json and reward_data_json:
+                #     cache.set('reward_data_json', reward_data_json, 720)
+                #     cache.set('hardware_data_json', hardware_data_json, 720)
 
             else:
                 logger.info("Serving from Cache")
