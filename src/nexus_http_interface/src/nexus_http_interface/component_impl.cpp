@@ -9,9 +9,13 @@
 namespace nexuspool {
 namespace nexus_http_interface {
 
-Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, std::string wallet_ip)
+Component_impl::Component_impl(std::shared_ptr<spdlog::logger> logger, 
+	std::string wallet_ip,
+	std::string auth_user,
+	std::string auth_pw)
 	: m_logger{std::move(logger)}
-	, m_wallet_ip{std::move(wallet_ip)}
+	, m_wallet_ip{ std::move(wallet_ip) }
+	, m_auth_string{auth_user + ":" + auth_pw}
 {
 	oatpp::base::Environment::init();
 
@@ -30,7 +34,7 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 {
 	std::string parameter{ "?verbose=summary&hash=" };
 	parameter += hash;
-	auto response = m_client->get_block(parameter.c_str());
+	auto response = m_client->get_block(parameter, m_auth_string);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
@@ -69,7 +73,7 @@ bool Component_impl::get_block_reward_data(std::string hash, common::Block_rewar
 
 bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
 {
-	auto response = m_client->get_blockhash(height);
+	auto response = m_client->get_blockhash(height, m_auth_string);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
@@ -85,7 +89,7 @@ bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
 
 bool Component_impl::get_mining_info(common::Mining_info& mining_info)
 {
-	auto response = m_client->get_mininginfo();
+	auto response = m_client->get_mininginfo(m_auth_string);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
@@ -105,7 +109,7 @@ bool Component_impl::get_mining_info(common::Mining_info& mining_info)
 
 bool Component_impl::get_system_info(common::System_info& system_info)
 {
-	auto response = m_client->get_systeminfo();
+	auto response = m_client->get_systeminfo(m_auth_string);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
@@ -121,7 +125,7 @@ bool Component_impl::get_system_info(common::System_info& system_info)
 
 bool Component_impl::does_account_exists(std::string const& account)
 {
-	auto response = m_client->get_account(account);
+	auto response = m_client->get_account(account, m_auth_string);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{
@@ -135,14 +139,14 @@ bool Component_impl::does_account_exists(std::string const& account)
 bool Component_impl::payout(std::string account_from, std::string pin, Payout_recipients const& recipients, std::string& tx_id)
 {
 	auto dto = Payout_dto::createShared();
-	dto->pin = oatpp::String(pin.c_str());
-	dto->name = oatpp::String(account_from.c_str());
+	dto->pin = pin;
+	dto->name = account_from;
 	for (auto& recipient : recipients)
 	{
 		dto->recipients->push_back(Payout_recipient_dto::createShared(recipient.m_address.c_str(), recipient.m_reward));
 	}
 
-	auto response = m_client->payout(dto);
+	auto response = m_client->payout(dto, m_auth_string);
 	auto const status_code = response->getStatusCode();
 	if (status_code != 200)
 	{

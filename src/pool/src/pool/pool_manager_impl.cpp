@@ -2,7 +2,9 @@
 #include "pool/session_impl.hpp"
 #include "pool/wallet_connection_impl.hpp"
 #include "pool/miner_connection_impl.hpp"
+#include "pool/notifications.hpp"
 #include "config/config.hpp"
+#include "common/utils.hpp"
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
 #include "LLP/utils.hpp"
@@ -41,19 +43,25 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	: m_io_context{std::move(io_context) }
 	, m_logger{ std::move(logger)}
 	, m_config{std::move(config)}
-	, m_timer_factory{ std::move(timer_factory) }
+	, m_timer_factory{ timer_factory }
 	, m_socket_factory{std::move(socket_factory)}
 	, m_data_writer_factory{std::move(data_writer_factory)}
 	, m_data_reader_factory{std::move(data_reader_factory)}
 	, m_pool_api_data_exchange{std::move(pool_api_data_exchange)}
-	, m_http_component{ nexus_http_interface::create_component(m_logger, m_config->get_wallet_ip())}
+	, m_http_component{ nexus_http_interface::create_component(
+		m_logger, 
+		m_config->get_wallet_ip(), 
+		m_config->get_pool_config().m_nxs_api_user, 
+		m_config->get_pool_config().m_nxs_api_pw)}
 	, m_reward_component{reward::create_component(m_logger, 
+		std::move(timer_factory),
 		m_http_component,
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_data_reader_factory->create_data_reader(),
 		m_config->get_pool_config().m_account,
 		m_config->get_pool_config().m_pin,
-		m_config->get_pool_config().m_fee)}
+		m_config->get_pool_config().m_fee,
+		m_config->get_update_block_hashes_interval())}
 	, m_listen_socket{}
 	, m_session_registry{std::make_shared<Session_registry_impl>(
 		m_data_reader_factory->create_data_reader(), 
@@ -61,12 +69,13 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_http_component, 
 		m_config->get_session_expiry_time(),
 		m_config->get_mining_mode())}
+	, m_miner_notifications{std::make_unique<Notifications>(m_session_registry, m_config->get_miner_notifications())}
 	, m_current_height{0}
 	, m_block_map_id{0}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
-	m_update_block_hashes_timer = m_timer_factory->create_timer();
+	m_payout_timer = m_timer_factory->create_timer();
 	m_get_hashrate_timer = m_timer_factory->create_timer();
 }
 
@@ -144,16 +153,16 @@ void Pool_manager_impl::start()
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 
-	m_update_block_hashes_timer->start(chrono::Seconds(m_config->get_update_block_hashes_interval()), update_block_hashes_handler(m_config->get_update_block_hashes_interval()));
 	m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
 }
 
 void Pool_manager_impl::stop()
 {
+	m_miner_notifications->send_pool_shutdown();
 	m_session_registry_maintenance->stop();
 	m_end_round_timer->stop();
-	m_update_block_hashes_timer->stop();
 	m_get_hashrate_timer->stop();
+	m_payout_timer->stop();
 	m_session_registry->stop();	// clear sessions and deletes miner_connection objects
 	m_wallet_connection->stop();
 	m_listen_socket->stop_listen();
@@ -219,7 +228,6 @@ void Pool_manager_impl::set_block(LLP::CBlock const& block)
 	{
 		m_pool_nBits = block.nBits;
 	}
-
 }
 
 void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
@@ -237,6 +245,7 @@ void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 	data_writer->add_block(std::move(block_data));
 
 	m_reward_component->block_found();
+	m_miner_notifications->send_block_found();
 }
 
 void Pool_manager_impl::get_block(Get_block_handler&& handler)
@@ -279,18 +288,6 @@ std::uint32_t Pool_manager_impl::get_pool_nbits() const
 	return m_pool_nBits;
 }
 
-chrono::Timer::Handler Pool_manager_impl::update_block_hashes_handler(std::uint16_t update_block_hashes_interval)
-{
-	return[this, update_block_hashes_interval]()
-	{
-		m_reward_component->update_block_hashes_from_current_round();
-
-		// restart timer
-		m_update_block_hashes_timer->start(chrono::Seconds(update_block_hashes_interval),
-			update_block_hashes_handler(update_block_hashes_interval));
-	};
-}
-
 chrono::Timer::Handler Pool_manager_impl::get_hashrate_handler(std::uint16_t get_hashrate_interval)
 {
 	return[this, get_hashrate_interval]()
@@ -317,9 +314,25 @@ chrono::Timer::Handler Pool_manager_impl::session_registry_maintenance_handler(s
 
 chrono::Timer::Handler Pool_manager_impl::end_round_handler()
 {
-	return[this]()
-	{
-		end_round();
+	return[this]() { end_round(); };
+}
+
+chrono::Timer::Handler Pool_manager_impl::payout_handler(std::uint32_t round)
+{
+	return[this, round]()
+	{ 
+		if (m_reward_component->pay_round(round))
+		{
+			// If there are still unpaid rounds pay them also now. (This can happen if not all blocks from previous rounds 
+			// are matured till round end and there are insufficient funds to pay all miners) -> very unlikely now due to delayed payout
+			m_reward_component->process_unpaid_rounds();
+		}
+		else
+		{
+			constexpr std::uint16_t payout_interval{ 10U };
+			m_logger->info("Next payout attempt in {} minutes", payout_interval);
+			m_payout_timer->start(chrono::Seconds(payout_interval * 60), payout_handler(round));
+		}
 	};
 }
 
@@ -327,15 +340,18 @@ void Pool_manager_impl::end_round()
 {
 	auto const current_round = m_reward_component->get_current_round();
 	m_reward_component->end_round(current_round);
-	m_reward_component->pay_round(current_round);
+	// end round in registry
 	m_session_registry->end_round();
+
+	// start timer for payout -> payout is delayed (4 hours) to make sure that every block is already confirmed
+	m_payout_timer->start(chrono::Seconds(60 * 60 * 4), payout_handler(current_round));
+	// set payout_time for api
+	auto payout_time = std::chrono::system_clock::now();
+	payout_time += std::chrono::hours(4);
+	m_pool_api_data_exchange->set_payout_time(common::get_datetime_string(payout_time));
 
 	// update config in storage
 	m_storage_config_data = storage_config_check();
-
-	// If there are still unpaid rounds pay them also now. (This can happen if not all blocks from previous rounds 
-	// are matured till round end and there are insufficient funds to pay all miners)
-	m_reward_component->process_unpaid_rounds();
 
 	// start next round
 	if (!m_reward_component->start_round(m_storage_config_data.m_round_duration_hours))

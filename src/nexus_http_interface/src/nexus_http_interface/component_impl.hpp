@@ -12,7 +12,10 @@ namespace nexus_http_interface {
 class Component_impl : public Component
 {
 public:
-    Component_impl(std::shared_ptr<spdlog::logger> logger, std::string wallet_ip);
+    Component_impl(std::shared_ptr<spdlog::logger> logger, 
+        std::string wallet_ip,
+        std::string auth_user,
+        std::string auth_pw);
 
     bool get_block_reward_data(std::string hash, common::Block_reward_data& reward_data) override;
     bool get_block_hash(std::uint32_t height, std::string& hash) override;
@@ -25,6 +28,7 @@ private:
 
     std::shared_ptr<spdlog::logger> m_logger;
     std::string m_wallet_ip;
+    std::string m_auth_string;
     std::shared_ptr<Api_client> m_client;
     
 

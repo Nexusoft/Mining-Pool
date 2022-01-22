@@ -16,7 +16,6 @@ Payout_manager::Payout_manager(
 	, m_shared_data_writer{ shared_data_writer }
 	, m_data_reader{ data_reader }
 {
-
 }
 
 double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& calculation_finished)
@@ -114,6 +113,7 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 			payout_recipients.push_back(nexus_http_interface::Payout_recipient_data{ payment.m_account, payment.m_amount });
 		}
 		m_logger->info("Could only pay 99 miners! {} are unpaid", payments.size());
+		m_not_fully_paid_round = current_round;		// store the not fully paid round
 	}
 	else
 	{
@@ -122,12 +122,13 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 			if (payment.m_amount == 0.0)
 			{
 				// nothing to pay -> no blocks in this round
-				m_logger->trace("payout: Nthing to pay for account {} in round {}", payment.m_account, current_round);
+				m_logger->trace("payout: Nothing to pay for account {} in round {}", payment.m_account, current_round);
 				m_shared_data_writer.account_paid(current_round, payment.m_account, "");
 				continue;
 			}
 			payout_recipients.push_back(nexus_http_interface::Payout_recipient_data{ payment.m_account, payment.m_amount });
 		}
+		m_not_fully_paid_round = 0U;
 	}
 
 	std::string tx_id{};
@@ -143,6 +144,15 @@ bool Payout_manager::payout(std::string const& account_from, std::string const& 
 		m_shared_data_writer.account_paid(current_round, recipient.m_address, tx_id);
 	}
 
+	return true;
+}
+
+bool Payout_manager::is_all_paid(std::uint32_t current_round) const
+{
+	if (m_not_fully_paid_round == current_round)
+	{
+		return false;
+	}
 	return true;
 }
 

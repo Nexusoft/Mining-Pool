@@ -18,17 +18,19 @@ Config_api_impl::Config_api_impl()
 	, m_auth_pw{}
 	, m_mining_mode{ common::Mining_mode::HASH }
 	, m_devices{}
+	, m_nxs_api_user{}
+	, m_nxs_api_pw{}
 {
 }
 
 bool Config_api_impl::read_config(std::string const& api_config_file)
 {
-	std::cout << "Reading config file " << api_config_file << std::endl;
+	std::cout << "Reading API config file " << api_config_file << std::endl;
 
 	std::ifstream config_file(api_config_file);
 	if (!config_file.is_open())
 	{
-		std::cerr << "Unable to read " << api_config_file << std::endl;
+		std::cerr << "Unable to read API config file " << api_config_file << std::endl;
 		return false;
 	}
 
@@ -54,11 +56,9 @@ bool Config_api_impl::read_config(std::string const& api_config_file)
 			m_mining_mode = common::Mining_mode::HASH;
 		}
 
-		if (j.contains("auth_user"))
-		{
-			m_auth_user = j["auth_user"];
-			m_auth_pw = j["auth_pw"];
-		}
+		j.at("auth_user").get_to(m_auth_user);
+		j.at("auth_pw").get_to(m_auth_pw);
+
 		if (j.contains("reward_calc_update_interval"))
 		{
 			m_reward_calc_update_interval = j["reward_calc_update_interval"];
@@ -81,7 +81,7 @@ bool Config_api_impl::read_config(std::string const& api_config_file)
 	}
 	catch (std::exception& e)
 	{
-		std::cerr << "Failed to parse config file. Exception: " << e.what() << std::endl;
+		std::cerr << "Failed to parse API config file. Exception: " << e.what() << std::endl;
 		return false;
 	}
 }

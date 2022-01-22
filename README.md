@@ -12,7 +12,6 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
                             note: this is not needed if you mine to localhost (127.0.0.1). This is primarily used for a local-area-network setup
 
     -mining               Ensure mining LLP servers are initialized.
-    -apiauth=0            API calls to the wallet need no authorization (will be changed in future releases)
     -indexheight          needed to query the wallet for blocks with height param
 ```
 
@@ -45,6 +44,7 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "log_level"             // Optional, default=2 (info), sets the verbosity of log messages ranges from 0 (trace) - 5 (critical)
     "update_block_hashes_interval"  // Optional, default=600, time in seconds when the found blocks should update their hashes in storage. Automatically happens during round end.
     "get_hashrate_interval"         // Optional, default=300, time in seconds requesting the current hashrate from the connected miners
+    "miner_notifications"           // Optional, default=true send notification messages to miners (like pool restart, block found etc)
     "api"                // Option group regarding API for frontend of the POOL. If not present then no API server will be started
         "listen_port" : 0   // port of the POOL for listening to incoming API calls (from the web frontend for example).
         "auth_user"         // Optional. If this config value is given then the API calls requires BasicAuth REST.
@@ -61,6 +61,8 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
         "fee"                   // POOL fee in %
         "difficulty_divider"        // reduced the NXS mainnet difficulty for miners.
         "round_duration_hours"      // time in hours for the duration of a mining round. Payouts to miners can only happen when a round is finished. Config changes to POOL difficulty, fee, mining mode can only happen after round end.
+        "nxs_api_user"  // NXS API user name. Must be the same user as in nexus.conf or nxs wallet startup arguments
+        "nxs_api_pw"  // NXS API password. Must be the same password as in nexus.conf or nxs wallet startup arguments
 ```
 
  ## API
@@ -76,8 +78,8 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "public_ip"             // public ip of the API which a frontend connect to.
     "listen_port"           // port of the API for listening to incoming API calls (from the web frontend for example).
     "wallet_ip"             // the ip the NXS wallet listens to. Needed for API calls
-    "auth_user"         // Optional. If this config value is given then the API calls requires BasicAuth REST.
-    "auth_pw"           // Optional. If the auth_user config option is given then this field is mandatory.
+    "auth_user"             // Username used for BasicAuth REST.
+    "auth_pw"               // Password used for BasicAuth REST.
     "reward_calc_update_interval"   // Optional, default=300, time in seconds updating the mining_info for the API
 
     "devices"              // Array where GPU models can be added with hashrate and power_consumption. This is the data for the reward_calculation site if the frontend.

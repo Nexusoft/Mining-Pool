@@ -18,6 +18,7 @@ Round_data convert_to_round_data(Row_sqlite row);
 Payment_data convert_to_payment_data(Row_sqlite row);
 Config_data convert_to_config_data(Row_sqlite row);
 Statistics_block_finder convert_to_statistics_block_finder(Row_sqlite row);
+Statistics_top_block_finder convert_to_statistics_top_block_finder(Row_sqlite row);
 
 }
 }

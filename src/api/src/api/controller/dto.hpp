@@ -13,7 +13,6 @@ namespace api
 
 class Meta_infos_dto : public oatpp::DTO
 {
-
 	DTO_INIT(Meta_infos_dto, DTO)
 
 	DTO_FIELD(Float64, pool_hashrate);
@@ -23,19 +22,18 @@ class Meta_infos_dto : public oatpp::DTO
 	DTO_FIELD(UInt16, active_miners);
 	DTO_FIELD(String, wallet_version);
 	DTO_FIELD(String, pool_version);
+	DTO_FIELD(String, payout_time);
 };
 
 class Account_dto : public oatpp::DTO
 {
-
 	DTO_INIT(Account_dto, DTO)
 
 	DTO_FIELD(String, account);
 	DTO_FIELD(String, created_at);
 	DTO_FIELD(String, last_active);
-	DTO_FIELD(UInt16, round_duration);
 	DTO_FIELD(UInt32, shares);
-	DTO_FIELD(UInt32, hashrate);
+	DTO_FIELD(Float64, hashrate);
 	DTO_FIELD(String, display_name);
 };
 
@@ -128,6 +126,37 @@ class Reward_data_dto : public oatpp::DTO
 
 	DTO_FIELD(Float64, block_reward);
 	DTO_FIELD(Float64, network_diff);
+};
+
+class Statistics_longest_chain_dto : public oatpp::DTO
+{
+	DTO_INIT(Statistics_longest_chain_dto, DTO)
+
+	DTO_FIELD(String, display_name);
+	DTO_FIELD(Float64, chain);
+};
+
+class Statistics_block_finder_dto : public oatpp::DTO
+{
+	DTO_INIT(Statistics_block_finder_dto, DTO)
+
+	DTO_FIELD(String, display_name);
+	DTO_FIELD(UInt32, num_blocks);
+
+public:
+
+	Statistics_block_finder_dto() = default;
+	Statistics_block_finder_dto(const char* pdisplay_name, std::uint32_t pnum_blocks)
+		: display_name(pdisplay_name)
+		, num_blocks(pnum_blocks)
+	{}
+};
+
+class Statistics_top_block_finders_dto : public oatpp::DTO
+{
+	DTO_INIT(Statistics_top_block_finders_dto, DTO)
+
+	DTO_FIELD(Vector<Object<Statistics_block_finder_dto>>, block_finders) = {};
 };
 
 #include OATPP_CODEGEN_END(DTO)

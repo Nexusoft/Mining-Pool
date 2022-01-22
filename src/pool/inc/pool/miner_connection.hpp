@@ -24,6 +24,7 @@ public:
     virtual void send_work(LLP::CBlock const& block) = 0;
     virtual network::Connection::Handler connection_handler() = 0;
     virtual void get_hashrate() = 0;
+    virtual void send_pool_notification(std::string message) = 0;
 };
 
 Miner_connection::Sptr create_miner_connection(std::shared_ptr<spdlog::logger> logger,

@@ -29,6 +29,7 @@ public:
     MOCK_METHOD(Api_config const&, get_api_config, (), (const override));
     MOCK_METHOD(std::uint16_t, get_update_block_hashes_interval, (), (const override));
     MOCK_METHOD(std::uint16_t, get_hashrate_interval, (), (const override));
+    MOCK_METHOD(bool, get_miner_notifications, (), (const override));
 };
 
 

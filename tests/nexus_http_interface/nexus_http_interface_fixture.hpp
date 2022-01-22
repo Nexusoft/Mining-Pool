@@ -23,7 +23,7 @@ public:
 		m_logger = spdlog::stdout_color_mt("logger");
 		m_logger->set_level(spdlog::level::debug);
 
-		m_component = nexus_http_interface::create_component(m_logger, "127.0.0.1");
+		m_component = nexus_http_interface::create_component(m_logger, "127.0.0.1", "admin", "1234");
 	}
 
 protected:

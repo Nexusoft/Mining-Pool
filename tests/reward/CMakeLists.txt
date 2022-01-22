@@ -7,6 +7,7 @@ target_link_libraries(reward_test
   LLP
   nexus_http_interface_mock
   persistance_mock
+  chrono_mock
 )
 
 include(GoogleTest)

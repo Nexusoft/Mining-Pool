@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 
-add_library(api STATIC  src/api/server.cpp)
+add_library(api STATIC  src/api/component_impl.cpp 
+                        src/api/create_component.cpp)
                     
 target_include_directories(api
     PUBLIC 

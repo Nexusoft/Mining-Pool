@@ -18,7 +18,7 @@ namespace network { class Socket; class Component; }
 namespace common { class Pool_api_data_exchange; }
 namespace persistance { class Component; }
 namespace chrono { class Timer; }
-namespace api { class Server; }
+namespace api { class Component; }
 class Pool_manager;
 
 class Pool
@@ -47,7 +47,7 @@ private:
 
 	std::shared_ptr<config::Config> m_config;
 	std::shared_ptr<config::Config_api> m_api_config;
-	std::unique_ptr<api::Server> m_api_server;
+	std::unique_ptr<api::Component> m_api_component;
 
 	std::shared_ptr<::asio::signal_set> m_signals;
 };

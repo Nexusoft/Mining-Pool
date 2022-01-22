@@ -6,12 +6,14 @@
 #include <string>
 
 namespace spdlog { class logger; }
-namespace nexuspool {
-namespace nexus_http_interface {
-
-// Component factory
-
-Component::Sptr create_component(std::shared_ptr<spdlog::logger> logger, std::string wallet_ip);
+namespace nexuspool 
+{
+namespace nexus_http_interface 
+{
+Component::Sptr create_component(std::shared_ptr<spdlog::logger> logger, 
+	std::string wallet_ip, 
+	std::string auth_user,
+	std::string auth_pw);
 
 }
 }

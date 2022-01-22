@@ -169,6 +169,19 @@ TEST_F(Persistance_fixture, command_get_longest_chain_finder)
 	EXPECT_FALSE(result.is_empty());
 }
 
+TEST_F(Persistance_fixture, command_get_top_block_finders)
+{
+	auto data_reader = m_persistance_component->get_data_reader_factory()->create_data_reader();
+	auto result = data_reader->get_top_block_finders(5);
+	EXPECT_FALSE(result.empty());
+	EXPECT_EQ(result.size(), 5);
+
+	for (auto& block_finder : result)
+	{
+		EXPECT_FALSE(block_finder.is_empty());
+	}
+}
+
 // -----------------------------------------------------------------------------------------------
 // Write commands
 // -----------------------------------------------------------------------------------------------

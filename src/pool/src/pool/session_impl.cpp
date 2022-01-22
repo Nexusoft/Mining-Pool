@@ -138,12 +138,10 @@ std::shared_ptr<Session> Session_registry_impl::get_session_with_no_work()
 		{
 			continue;
 		}
-
-		auto user_data = session.second->get_user_data();
-		if (user_data.m_work_needed)
+ 
+		if (session.second->is_need_work())
 		{
-			user_data.m_work_needed = false;
-			session.second->update_user_data(user_data);
+			session.second->needs_work(false);
 			return session.second;
 		}
 	}
@@ -156,9 +154,7 @@ void Session_registry_impl::reset_work_status_of_sessions()
 
 	for (auto& session : m_sessions)
 	{
-		auto user_data = session.second->get_user_data();
-		user_data.m_work_needed = true;
-		session.second->update_user_data(user_data);
+		session.second->needs_work(true);
 	}
 }
 
@@ -215,6 +211,21 @@ void Session_registry_impl::get_hashrate()
 		if (miner_connection_shared)
 		{
 			miner_connection_shared->get_hashrate();
+		}
+	}
+}
+
+void Session_registry_impl::send_notification(std::string message)
+{
+	std::scoped_lock lock(m_sessions_mutex);
+
+	for (auto& session : m_sessions)
+	{
+		auto miner_connection = session.second->get_connection();
+		auto miner_connection_shared = miner_connection.lock();
+		if (miner_connection_shared)
+		{
+			miner_connection_shared->send_pool_notification(std::move(message));
 		}
 	}
 }

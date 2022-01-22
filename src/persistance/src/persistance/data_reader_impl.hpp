@@ -42,6 +42,7 @@ public:
     std::vector<std::uint32_t> get_blocks_without_hash_from_round(std::uint32_t round) override;
     double get_pool_hashrate() override;
     Statistics_block_finder get_longest_chain_finder() override;
+    std::vector<Statistics_top_block_finder> get_top_block_finders(std::uint16_t num_finders) override;
 
 private:
 
@@ -67,6 +68,7 @@ private:
     std::shared_ptr<Command> m_get_blocks_without_hash_from_round_cmd;
     std::shared_ptr<Command> m_get_pool_hashrate_cmd;
     std::shared_ptr<Command> m_get_longest_chain_finder_cmd;
+    std::shared_ptr<Command> m_get_top_block_finders_cmd;
 };
 
 }

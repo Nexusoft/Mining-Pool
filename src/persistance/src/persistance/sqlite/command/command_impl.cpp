@@ -418,6 +418,28 @@ std::any Command_get_longest_chain_finder_impl::get_command() const
 }
 
 // -----------------------------------------------------------------------------------------------
+Command_get_top_block_finders_impl::Command_get_top_block_finders_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	sqlite3_prepare_v2(m_handle, "SELECT COUNT(*) as num_blocks, account.display_name FROM block INNER JOIN account ON block.block_finder=account.name GROUP BY block_finder ORDER BY num_blocks DESC LIMIT :limit", -1, &m_stmt, NULL);
+}
+
+std::any Command_get_top_block_finders_impl::get_command() const
+{
+	Command_type_sqlite command{ {m_stmt},
+		{{Column_sqlite::int32},
+		 {Column_sqlite::string}} };
+	return command;
+}
+
+void Command_get_top_block_finders_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<std::int32_t>(m_params);
+	bind_param(m_stmt, ":limit", casted_params);
+}
+
+// -----------------------------------------------------------------------------------------------
 // Write commands
 // -----------------------------------------------------------------------------------------------
 
