@@ -53,6 +53,11 @@
                        href="{% url 'presenter:mining_calc' %}">Mining Calculator
                     </a>
                 </li>
+                <li class="nav-item px-2">
+                    <a class="nav-link"
+                       href="https://github.com/Nexusoft/NexusMiner/releases">Mining Software
+                    </a>
+                </li>
             </ul>
             <form class="d-flex" method="POST" action="{% url 'presenter:wallet' %}">
                 {% csrf_token %}

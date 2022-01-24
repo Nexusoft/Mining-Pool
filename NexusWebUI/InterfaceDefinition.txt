@@ -15,6 +15,7 @@ Pool API's:
             - active_miners
             - wallet_version
             - pool_version
+            - payout_time
 
     #######################
         GET /latestblocks

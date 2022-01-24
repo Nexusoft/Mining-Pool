@@ -13,7 +13,6 @@ namespace api
 
 class Meta_infos_dto : public oatpp::DTO
 {
-
 	DTO_INIT(Meta_infos_dto, DTO)
 
 	DTO_FIELD(Float64, pool_hashrate);
@@ -23,17 +22,16 @@ class Meta_infos_dto : public oatpp::DTO
 	DTO_FIELD(UInt16, active_miners);
 	DTO_FIELD(String, wallet_version);
 	DTO_FIELD(String, pool_version);
+	DTO_FIELD(String, payout_time);
 };
 
 class Account_dto : public oatpp::DTO
 {
-
 	DTO_INIT(Account_dto, DTO)
 
 	DTO_FIELD(String, account);
 	DTO_FIELD(String, created_at);
 	DTO_FIELD(String, last_active);
-	DTO_FIELD(UInt16, round_duration);
 	DTO_FIELD(UInt32, shares);
 	DTO_FIELD(Float64, hashrate);
 	DTO_FIELD(String, display_name);
