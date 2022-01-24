@@ -10,7 +10,8 @@
 {% block body_block %}
 
     <br>
-    {#    <strong>Mining Mode:</strong> {{ mining_mode }}#}
+
+    <strong id="timer">Timer: </strong>
 
     <!-- Carousel wrapper -->
     <div
@@ -33,6 +34,12 @@
             <li
                     data-mdb-target="#carouselMeta"
                     data-mdb-slide-to="2"
+                    class=""
+                    aria-current="true"
+            ></li>
+            <li
+                    data-mdb-target="#carouselMeta"
+                    data-mdb-slide-to="3"
                     class="active"
                     aria-current="true"
             ></li>
@@ -69,6 +76,20 @@
             </div>
 
             <!-- Single item -->
+            <div class="carousel-item">
+                <div class="text-center">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">PayOut in:</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title" id="id_payout">_</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single item -->
             <div class="carousel-item active">
                 <div class="text-center">
                     <div class="card mb-4 rounded-3 shadow-sm">
@@ -82,6 +103,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Inner -->
 
         <!-- Controls -->
@@ -169,5 +191,21 @@
     {% if table %}
         {% render_table table %}
     {% endif %}
+
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: '{% url 'presenter:ajax_load_payout_timer' payout_time=payout_time %}',
+                success: function(data){
+                    alert(data);
+                    document.getElementById("id_payout").textContent=data;
+                },
+                failure: function(data) {
+                    alert('Got an error dude');
+                },
+                cache: false
+            });
+        });
+    </script>
 
 {% endblock %}

@@ -1,8 +1,10 @@
+import datetime
 import json
 import logging
 import math
 
 from django.http import JsonResponse
+from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
@@ -68,6 +70,7 @@ def block_overview_list(request):
         active_miners = block_overview_meta_json['active_miners']
         wallet_version = block_overview_meta_json['wallet_version']
         pool_version = block_overview_meta_json['pool_version']
+        payout_time = block_overview_meta_json['payout_time']
 
         return render(request, template_name, {'table': table_data,
                                                'pool_hashrate': pool_hashrate,
@@ -77,6 +80,7 @@ def block_overview_list(request):
                                                'fee': fee,
                                                'wallet_version': wallet_version,
                                                'pool_version': pool_version,
+                                               'payout_time': payout_time
                                                })
 
     except Exception as ex:
@@ -317,3 +321,24 @@ def load_hardware_detail(request):
 
     return JsonResponse({'power_consumption': power_consumption,
                          'search_rate': search_rate})
+
+
+def load_payout_timer(request, payout_time):
+    """
+    Returns the difference to the given payout time in the form of a string hh:mm:ss
+    """
+
+    # Format to an iso datetime
+    payout_time = payout_time[:19]
+    # Convert to a proper DateTime Object
+    payout_time = datetime.datetime.fromisoformat(payout_time)
+
+    # Calculate the time difference
+    current_date_time = datetime.datetime.now()
+    time_difference = payout_time - current_date_time
+
+    diff = str(datetime.timedelta(seconds=time_difference.total_seconds()))
+    diff = diff.split(".", 1)[0]
+
+    return HttpResponse(f'{diff}')
+    # return HttpResponse(f'test')
