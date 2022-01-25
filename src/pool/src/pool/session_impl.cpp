@@ -17,6 +17,7 @@ Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Sh
 	, m_hashrate_helper{ mining_mode }
 	, m_block{}
 	, m_inactive{false}
+	, m_work_needed{true}
 {
 }
 
