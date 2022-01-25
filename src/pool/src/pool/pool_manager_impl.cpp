@@ -2,6 +2,7 @@
 #include "pool/session_impl.hpp"
 #include "pool/wallet_connection_impl.hpp"
 #include "pool/miner_connection_impl.hpp"
+#include "pool/miner_connection_legacy_impl.hpp"
 #include "pool/notifications.hpp"
 #include "config/config.hpp"
 #include "common/utils.hpp"
@@ -74,6 +75,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	, m_miner_notifications{std::make_unique<Notifications>(m_session_registry, m_config->get_miner_notifications())}
 	, m_current_height{0}
 	, m_block_map_id{0}
+	, m_legacy_mode{m_config->get_legacy_mode()}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
@@ -145,7 +147,21 @@ void Pool_manager_impl::start()
 	auto socket_handler = [self](network::Connection::Sptr&& connection)
 	{
 		auto const session_key = self->m_session_registry->create_session();
-		auto miner_connection = create_miner_connection(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
+		std::shared_ptr<Miner_connection> miner_connection{};
+		if (self->m_legacy_mode)
+		{
+			miner_connection = std::make_shared<Miner_connection_legacy_impl>(
+				self->m_logger, 
+				std::move(connection), 
+				self, 
+				session_key, 
+				self->m_session_registry, 
+				self->m_timer_factory->create_timer());
+		}
+		else
+		{
+			miner_connection = create_miner_connection(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
+		}
 
 		auto session = self->m_session_registry->get_session(session_key);
 		session->update_connection(miner_connection);
@@ -159,7 +175,10 @@ void Pool_manager_impl::start()
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 
-	m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
+	if (!m_legacy_mode)
+	{
+		m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
+	}
 }
 
 void Pool_manager_impl::stop()

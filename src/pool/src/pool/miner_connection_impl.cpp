@@ -375,14 +375,14 @@ void Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	auto login_response_json_string = login_response_json.dump();
 
 	network::Payload login_data{ login_response_json_string.begin(), login_response_json_string.end() };
-	Packet response{ Packet::LOGIN_SUCCESS, std::make_shared<network::Payload>(login_data) };
+	Packet response{ Packet::LOGIN_V2_SUCCESS, std::make_shared<network::Payload>(login_data) };
 	m_connection->transmit(response.get_bytes());
 }
 
 void Miner_connection_impl::send_login_fail(std::string json_string)
 {
 	network::Payload login_data{ json_string.begin(), json_string.end() };
-	Packet login_fail_response{ Packet::LOGIN_FAIL, std::make_shared<network::Payload>(login_data) };
+	Packet login_fail_response{ Packet::LOGIN_V2_FAIL, std::make_shared<network::Payload>(login_data)};
 	m_connection->transmit(login_fail_response.get_bytes());
 }
 

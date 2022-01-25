@@ -35,6 +35,7 @@ public:
 	std::uint16_t get_update_block_hashes_interval() const override { return m_update_block_hashes_interval; }
 	std::uint16_t get_hashrate_interval() const override { return m_hashrate_interval; }
 	bool get_miner_notifications() const override { return m_miner_notifications; }
+	bool get_legacy_mode() const override { return m_legacy_mode; }
 
 private:
 
@@ -57,6 +58,7 @@ private:
 	std::uint16_t m_update_block_hashes_interval;
 	std::uint16_t m_hashrate_interval;
 	bool m_miner_notifications;
+	bool m_legacy_mode;
 
 };
 
