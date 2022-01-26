@@ -21,6 +21,11 @@ Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Sh
 {
 }
 
+Session_impl::~Session_impl()
+{
+	update_hashrate(0);		// set hasrate to 0 on disconnect
+}
+
 void Session_impl::update_connection(std::shared_ptr<Miner_connection> miner_connection)
 {
 	m_miner_connection = std::move(miner_connection);
