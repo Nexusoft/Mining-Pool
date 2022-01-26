@@ -11,8 +11,6 @@
 
     <br>
 
-    <strong id="timer">Timer: </strong>
-
     <!-- Carousel wrapper -->
     <div
             id="carouselMeta"
@@ -197,11 +195,10 @@
             $.ajax({
                 url: '{% url 'presenter:ajax_load_payout_timer' payout_time=payout_time %}',
                 success: function(data){
-                    alert(data);
                     document.getElementById("id_payout").textContent=data;
                 },
                 failure: function(data) {
-                    alert('Got an error dude');
+                    document.getElementById("id_payout").textContent="_";
                 },
                 cache: false
             });

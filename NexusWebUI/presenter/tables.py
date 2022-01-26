@@ -34,3 +34,25 @@ class AccountPayoutsTable(tables.Table):
         attrs = {
             'class': ' table table-dark table-hover table-striped',
         }
+
+
+class Top5FindersTable(tables.Table):
+    display_name = tables.Column(orderable=False)
+    num_blocks = tables.Column(orderable=False)
+
+    class Meta:
+        template_name = "django_tables2/bootstrap4.html"
+        attrs = {
+            'class': ' table table-dark table-hover table-striped',
+        }
+
+
+class LongestChainTable(tables.Table):
+    display_name = tables.Column(orderable=False)
+    chain = tables.Column(orderable=False)
+
+    class Meta:
+        template_name = "django_tables2/bootstrap4.html"
+        attrs = {
+            'class': ' table table-dark table-hover table-striped',
+        }
