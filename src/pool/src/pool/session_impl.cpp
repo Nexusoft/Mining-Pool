@@ -17,7 +17,13 @@ Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Sh
 	, m_hashrate_helper{ mining_mode }
 	, m_block{}
 	, m_inactive{false}
+	, m_work_needed{true}
 {
+}
+
+Session_impl::~Session_impl()
+{
+	update_hashrate(0);		// set hasrate to 0 on disconnect
 }
 
 void Session_impl::update_connection(std::shared_ptr<Miner_connection> miner_connection)
