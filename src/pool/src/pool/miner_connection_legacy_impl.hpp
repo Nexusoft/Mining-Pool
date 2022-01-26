@@ -36,6 +36,7 @@ private:
     void process_accepted();
     void process_login(Packet login_packet, std::shared_ptr<Session> session);
 
+    void get_block(std::shared_ptr<Pool_manager> pool_manager);
     chrono::Timer::Handler get_block_handler(std::uint16_t get_block_interval);
 
     std::shared_ptr<spdlog::logger> m_logger;

@@ -158,6 +158,12 @@ void Miner_connection_legacy_impl::process_data(network::Shared_payload&& receiv
 							self->process_accepted();
 							response = response.get_packet(Packet::ACCEPT);
 							self->m_connection->transmit(response.get_bytes());
+							// immediately get a net block for miner
+							auto pool_manager_shared_2 = self->m_pool_manager.lock();
+ 							if (pool_manager_shared_2)
+							{
+								self->get_block(std::move(pool_manager_shared_2));
+							}
 						}
 						else if (result == Submit_block_result::reject)
 						{
@@ -270,6 +276,43 @@ void Miner_connection_legacy_impl::process_login(Packet login_packet, std::share
 	m_connection->transmit(response.get_bytes());
 }
 
+void Miner_connection_legacy_impl::get_block(std::shared_ptr<Pool_manager> pool_manager)
+{
+	m_pool_nbits = pool_manager->get_pool_nbits();
+	std::weak_ptr<Miner_connection_legacy_impl> weak_self = shared_from_this();
+	pool_manager->get_block([weak_self](auto block)
+		{
+			auto self = weak_self.lock();
+			if (!self)
+			{
+				self->m_logger->debug("GET_BLOCK handler, miner_connection_legacy invalid.");
+				return;
+			}
+			if (!self->m_connection)
+			{
+				self->m_logger->debug("GET_BLOCK handler, miner_connection_legacy connection invalid.");
+				return;
+			}
+
+			auto session = self->m_session_registry->get_session(self->m_session_key);
+			if (!session)
+			{
+				self->m_logger->debug("GET_BLOCK handler, session invalid.");
+				return;
+			}
+			session->set_block(block);
+
+			//prepend pool nbits to the packet
+			auto pool_nbits_bytes = nexuspool::uint2bytes(self->m_pool_nbits);
+
+			auto block_data = block.serialize();
+			block_data.insert(block_data.begin(), pool_nbits_bytes.begin(), pool_nbits_bytes.end());
+			Packet response{ Packet::BLOCK_DATA, std::make_shared<network::Payload>(block_data) };
+
+			self->m_connection->transmit(response.get_bytes());
+		});
+}
+
 chrono::Timer::Handler Miner_connection_legacy_impl::get_block_handler(std::uint16_t get_block_interval)
 {
 	return[self = shared_from_this(), get_block_interval]()
@@ -277,39 +320,7 @@ chrono::Timer::Handler Miner_connection_legacy_impl::get_block_handler(std::uint
 		auto pool_manager_shared = self->m_pool_manager.lock();
 		if (pool_manager_shared)
 		{
-			self->m_pool_nbits = pool_manager_shared->get_pool_nbits();
-			std::weak_ptr<Miner_connection_legacy_impl> weak_self = self;
-			pool_manager_shared->get_block([weak_self](auto block)
-				{
-					auto self = weak_self.lock();
-					if (!self)
-					{
-						self->m_logger->debug("GET_BLOCK handler, miner_connection_legacy invalid.");
-						return;
-					}
-					if (!self->m_connection)
-					{
-						self->m_logger->debug("GET_BLOCK handler, miner_connection_legacy connection invalid.");
-						return;
-					}
-
-					auto session = self->m_session_registry->get_session(self->m_session_key);
-					if (!session)
-					{
-						self->m_logger->debug("GET_BLOCK handler, session invalid.");
-						return;
-					}
-					session->set_block(block);
-
-					//prepend pool nbits to the packet
-					auto pool_nbits_bytes = nexuspool::uint2bytes(self->m_pool_nbits);
-
-					auto block_data = block.serialize();
-					block_data.insert(block_data.begin(), pool_nbits_bytes.begin(), pool_nbits_bytes.end());
-					Packet response{ Packet::BLOCK_DATA, std::make_shared<network::Payload>(block_data) };
-
-					self->m_connection->transmit(response.get_bytes());
-				});
+			self->get_block(std::move(pool_manager_shared));
 		}
 
 		// restart timer
