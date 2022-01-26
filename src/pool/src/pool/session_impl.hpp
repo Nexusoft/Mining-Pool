@@ -26,6 +26,7 @@ class Session_impl : public Session
 public:
 
 	Session_impl(persistance::Shared_data_writer::Sptr data_writer, Shared_data_reader::Sptr data_reader, common::Mining_mode mining_mode);
+	~Session_impl();
 
 	void update_connection(std::shared_ptr<Miner_connection> miner_connection) override;
 	std::weak_ptr<Miner_connection> get_connection() override { return m_miner_connection; }

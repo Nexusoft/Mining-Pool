@@ -120,6 +120,13 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		//miner has submitted a block to the pool
 		else if (packet.m_header == Packet::SUBMIT_BLOCK)
 		{
+			auto user_data = session->get_user_data();
+			if (!user_data.m_logged_in)
+			{
+				m_logger->error("Miner {} not logged in! Reject block.", user_data.m_account.m_display_name);
+				Packet response{ Packet::REJECT, nullptr };
+				m_connection->transmit(response.get_bytes());
+			}
 			// miner needs new work
 			session->needs_work(true);
 
