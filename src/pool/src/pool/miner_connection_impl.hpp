@@ -34,6 +34,9 @@ private:
     // checks if a new account should be created, add share for session
     void process_accepted();
 
+    // to support 1.5 (new protocol) -> can be dropped if all miners have updated
+    std::uint64_t process_submit_block_protocol_2(Packet packet);
+
     void process_login(Packet login_packet, std::shared_ptr<Session> session);
     void send_login_fail(std::string json_string);
     void check_and_update_display_name(std::string display_name, nlohmann::json& login_response);
@@ -44,6 +47,7 @@ private:
     Session_key m_session_key;
     Session_registry::Sptr m_session_registry;
     std::uint32_t m_pool_nbits;
+    std::uint8_t m_miner_protocol_version;
 };
 
 }

@@ -34,6 +34,7 @@ Miner_connection_impl::Miner_connection_impl(std::shared_ptr<spdlog::logger> log
 	, m_session_key{session_key}
 	, m_session_registry{std::move(session_registry)}
 	, m_pool_nbits{ 0 }
+	, m_miner_protocol_version{0U}
 {
 }
 
@@ -119,19 +120,40 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 		//miner has submitted a block to the pool
 		else if (packet.m_header == Packet::SUBMIT_BLOCK)
 		{
+			auto user_data = session->get_user_data();
+			if (!user_data.m_logged_in)
+			{
+				m_logger->error("Miner {} not logged in! Reject block.", user_data.m_account.m_display_name);
+				Packet response{ Packet::REJECT, nullptr };
+				m_connection->transmit(response.get_bytes());
+			}
 			// miner needs new work
 			session->needs_work(true);
 
-			if (packet.m_length != 72)
-			{
-				m_logger->error("Invalid paket length for submit_block received! Received {} bytes", packet.m_length);
-				continue;
-			}
 			auto pool_manager_shared = m_pool_manager.lock();
 			if (pool_manager_shared)
 			{
-				std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };
-				std::uint64_t nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
+				std::uint64_t nonce{ 0U };
+				if (m_miner_protocol_version > POOL_PROTOCOL_VERSION)
+				{
+					nonce = process_submit_block_protocol_2(packet);
+					if (nonce == 0U)
+					{
+						m_logger->error("Invalid paket for submit_block received!");
+						continue;
+					}
+				}
+				else
+				{
+					if (packet.m_length != 72)
+					{
+						m_logger->error("Invalid paket length for submit_block received! Received {} bytes", packet.m_length);
+						continue;
+					}
+					std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };
+					nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
+				}
+
 				auto block = session->get_block();
 				if (!block)
 				{
@@ -311,13 +333,12 @@ void Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	login_response_json["result_message"] = "";
 
 	std::string nxs_address, display_name;
-	std::uint8_t protocol_version{ 0U };
 	try
 	{
 		nlohmann::json j = nlohmann::json::parse(login_packet.m_data->begin(), login_packet.m_data->end());
 		nxs_address = j.at("username");
 		display_name = j.at("display_name");
-		protocol_version = j.at("protocol_version");	// TODO: protocol version check in future
+		m_miner_protocol_version = j.at("protocol_version");
 	}
 	catch (std::exception& e)
 	{
@@ -326,7 +347,7 @@ void Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	}
 
 	// protocol version check
-	if (protocol_version < POOL_PROTOCOL_VERSION)
+	if (m_miner_protocol_version < POOL_PROTOCOL_VERSION)
 	{
 		login_response_json["result_code"] = Pool_protocol_result::Protocol_version_fail;
 		login_response_json["result_message"] = "Please update miner. Mandatory protocol_version " + std::to_string(POOL_PROTOCOL_VERSION);
@@ -390,6 +411,22 @@ void Miner_connection_impl::send_pool_notification(std::string message)
 
 	Packet response{ Packet::POOL_NOTIFICATION, std::make_shared<network::Payload>(network::Payload{ j_string.begin(), j_string.end() }) };
 //	m_connection->transmit(response.get_bytes());		TODO: enable when miner 1.5 released
+}
+
+std::uint64_t Miner_connection_impl::process_submit_block_protocol_2(Packet packet)
+{
+	std::uint64_t nonce{0U};
+	try
+	{
+		nlohmann::json j = nlohmann::json::parse(packet.m_data->begin(), packet.m_data->end());
+		std::uint32_t const work_id = j.at("work_id");
+		nonce = j.at("nonce");
+	}
+	catch (std::exception& e)
+	{
+		m_logger->error("Invalid SUBMIT_BLOCK json received. Exception: {}", e.what());
+	}
+	return nonce;
 }
 
 }

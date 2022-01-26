@@ -12,6 +12,8 @@
 namespace nexuspool
 {
 
+constexpr std::uint32_t payout_time_delay{ 4U };
+
 Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_context,
 	std::shared_ptr<spdlog::logger> logger,
 	config::Config::Sptr config,
@@ -125,6 +127,10 @@ void Pool_manager_impl::start()
 	{
 		// start timer for end_round
 		m_end_round_timer->start(chrono::Seconds(std::chrono::duration_cast<std::chrono::seconds>(round_end_time - time_now).count()), end_round_handler());
+		// set payout_time for api
+		auto payout_time = round_end_time;
+		payout_time += std::chrono::hours(payout_time_delay);
+		m_pool_api_data_exchange->set_payout_time(common::get_datetime_string(payout_time));
 	}
 
 	// On startup check if there are still unpaid rounds
@@ -321,6 +327,12 @@ chrono::Timer::Handler Pool_manager_impl::payout_handler(std::uint32_t round)
 {
 	return[this, round]()
 	{ 
+		// set payout_time for api
+		std::chrono::system_clock::time_point round_start_time, payout_time;
+		m_reward_component->get_start_end_round_times(round_start_time, payout_time);
+		payout_time += std::chrono::hours(payout_time_delay);
+		m_pool_api_data_exchange->set_payout_time(common::get_datetime_string(payout_time));
+
 		if (m_reward_component->pay_round(round))
 		{
 			// If there are still unpaid rounds pay them also now. (This can happen if not all blocks from previous rounds 
@@ -344,11 +356,7 @@ void Pool_manager_impl::end_round()
 	m_session_registry->end_round();
 
 	// start timer for payout -> payout is delayed (4 hours) to make sure that every block is already confirmed
-	m_payout_timer->start(chrono::Seconds(60 * 60 * 4), payout_handler(current_round));
-	// set payout_time for api
-	auto payout_time = std::chrono::system_clock::now();
-	payout_time += std::chrono::hours(4);
-	m_pool_api_data_exchange->set_payout_time(common::get_datetime_string(payout_time));
+	m_payout_timer->start(chrono::Seconds(60 * 60 * payout_time_delay), payout_handler(current_round));
 
 	// update config in storage
 	m_storage_config_data = storage_config_check();
