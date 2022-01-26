@@ -239,7 +239,7 @@ void Miner_connection_legacy_impl::process_accepted()
 
 void Miner_connection_legacy_impl::process_login(Packet login_packet, std::shared_ptr<Session> session)
 {
-	auto& user_data = session->get_user_data();
+	auto user_data = session->get_user_data();
 	// check if already logged in
 	if (user_data.m_logged_in)
 	{
