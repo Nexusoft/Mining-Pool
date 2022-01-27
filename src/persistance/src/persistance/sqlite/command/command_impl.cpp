@@ -390,7 +390,7 @@ void Command_get_blocks_without_hash_from_round_impl::set_params(std::any params
 Command_get_pool_hashrate_impl::Command_get_pool_hashrate_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT SUM(hashrate) FROM account", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT SUM(hashrate) FROM account WHERE datetime(last_active) >= datetime('now', '-10 Minute')", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_pool_hashrate_impl::get_command() const
