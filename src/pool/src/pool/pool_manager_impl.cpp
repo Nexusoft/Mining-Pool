@@ -8,6 +8,8 @@
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
 #include "LLP/utils.hpp"
+#include "TAO/Ledger/prime.h"
+#include "TAO/Ledger/difficulty.h"
 
 namespace nexuspool
 {
@@ -239,14 +241,20 @@ void Pool_manager_impl::set_block(LLP::CBlock const& block)
 void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 {
 	auto submit_block_data = m_block_map[block_map_id];
-	auto const block_hash = submit_block_data.m_block->GetHash().ToString();
+	
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
 	persistance::Block_data block_data;
 	block_data.m_height = submit_block_data.m_block->nHeight;
 	block_data.m_type = submit_block_data.m_block->nChannel == 1 ? "prime" : "hash";
 	block_data.m_orphan = 0;
 	block_data.m_block_finder = submit_block_data.m_blockfinder;
-	block_data.m_difficulty = get_difficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
+	//this is the network difficulty at the time the block was found
+	block_data.m_difficulty = TAO::Ledger::GetDifficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
+	//this is the actual difficulty of the block
+	auto const block_hash = submit_block_data.m_block->nChannel == 1 ? submit_block_data.m_block->GetHash() :
+		submit_block_data.m_block->GetPrime();
+	double actual_difficulty = TAO::Ledger::GetDifficulty(block_hash, submit_block_data.m_block->nChannel);
+	//todo save actual difficulty to the database
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
 
