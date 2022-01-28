@@ -267,6 +267,10 @@ bool Component_impl::pay_round(std::uint32_t round)
 			m_not_paid_miners_timer->start(chrono::Seconds(600), not_paid_miners_handler());
 		}
 	}
+	else
+	{
+		return false;
+	}
 
 	// cleanup empty payment records of this round
 	m_shared_data_writer->delete_empty_payments();
