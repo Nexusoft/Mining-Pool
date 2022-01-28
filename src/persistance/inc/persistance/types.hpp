@@ -40,6 +40,7 @@ struct Block_data
 	std::uint32_t m_round{ 0 };
 	std::string m_block_found_time{};
 	double m_mainnet_reward{ 0 };
+	double m_share_difficulty{ 0 };
 
 	bool is_empty() const { return (m_hash.empty()); }
 };

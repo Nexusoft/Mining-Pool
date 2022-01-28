@@ -27,6 +27,8 @@ private:
         return m_handle;
     }
 
+    void update_db_schema();
+
     std::shared_ptr<spdlog::logger> m_logger;
     std::string m_db_name;
     bool m_readonly;
