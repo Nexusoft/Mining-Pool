@@ -251,10 +251,8 @@ void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 	//this is the network difficulty at the time the block was found
 	block_data.m_difficulty = TAO::Ledger::GetDifficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
 	//this is the actual difficulty of the block
-	auto const block_hash = submit_block_data.m_block->nChannel == 1 ? submit_block_data.m_block->GetHash() :
-		submit_block_data.m_block->GetPrime();
-	double actual_difficulty = TAO::Ledger::GetDifficulty(block_hash, submit_block_data.m_block->nChannel);
-	//todo save actual difficulty to the database
+	auto const block_hash = submit_block_data.m_block->nChannel == 1 ? submit_block_data.m_block->GetHash() : submit_block_data.m_block->GetPrime();
+	block_data.m_share_difficulty = TAO::Ledger::GetDifficulty(block_hash, submit_block_data.m_block->nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
 

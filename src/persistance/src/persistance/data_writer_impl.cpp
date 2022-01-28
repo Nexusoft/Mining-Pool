@@ -92,16 +92,17 @@ bool Data_writer_impl::add_block(Block_data data)
 		data.m_orphan,
 		std::move(data.m_block_finder),
 		data.m_round,
-		data.m_mainnet_reward});
+		data.m_mainnet_reward,
+		data.m_share_difficulty});
 	return m_data_storage->execute_command(m_add_block_cmd);
 }
 
 bool Data_writer_impl::update_block_rewards(std::string hash, bool orphan, double reward)
 {
 	m_update_block_rewards_cmd->set_params(command::Command_update_block_reward_params{
-	orphan,
-	reward,
-	std::move(hash)});
+		orphan,
+		reward,
+		std::move(hash)});
 	return m_data_storage->execute_command(m_update_block_rewards_cmd);
 }
 

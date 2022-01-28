@@ -350,6 +350,7 @@ struct Command_add_block_params
 	std::string m_block_finder;
 	std::int64_t m_round;
 	double m_mainnet_reward;
+	double m_share_difficulty;
 };
 
 // the block_hash is not included in this command. It has to be queried from nxs wallet and updated later
