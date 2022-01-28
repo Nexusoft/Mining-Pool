@@ -155,7 +155,7 @@ void Miner_connection_legacy_impl::process_data(network::Shared_payload&& receiv
 						Packet response;
 						if (result == Submit_block_result::accept)
 						{
-							m_logger->trace("Share accepted");
+							self->m_logger->trace("Share accepted");
 							self->process_accepted();
 							response = response.get_packet(Packet::ACCEPT);
 							self->m_connection->transmit(response.get_bytes());
