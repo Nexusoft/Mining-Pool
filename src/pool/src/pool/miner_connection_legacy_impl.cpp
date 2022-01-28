@@ -111,7 +111,7 @@ void Miner_connection_legacy_impl::process_data(network::Shared_payload&& receiv
 		}
 		else if (packet.m_header == Packet::GET_BLOCK)
 		{
-			// ignore get_block messages for now
+			m_logger->trace("GET_BLOCK message received");
 		}
 		//miner has submitted a block to the pool
 		else if (packet.m_header == Packet::SUBMIT_BLOCK)
@@ -155,6 +155,7 @@ void Miner_connection_legacy_impl::process_data(network::Shared_payload&& receiv
 						Packet response;
 						if (result == Submit_block_result::accept)
 						{
+							m_logger->trace("Share accepted");
 							self->process_accepted();
 							response = response.get_packet(Packet::ACCEPT);
 							self->m_connection->transmit(response.get_bytes());
