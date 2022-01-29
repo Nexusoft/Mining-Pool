@@ -6,6 +6,7 @@ target_link_libraries(
   gtest_main
   nexus_http_interface
   config
+  TAO
 )
 
 include(GoogleTest)

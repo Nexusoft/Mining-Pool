@@ -602,7 +602,7 @@ void Command_add_block_impl::set_params(std::any params)
 	bind_param(m_stmt, ":block_finder", casted_params.m_block_finder);
 	bind_param(m_stmt, ":round", casted_params.m_round);
 	bind_param(m_stmt, ":mainnet_reward", casted_params.m_mainnet_reward);
-	bind_param(m_stmt, ":share_difficulty", casted_params.m_mainnet_reward);
+	bind_param(m_stmt, ":share_difficulty", casted_params.m_share_difficulty);
 }
 // -----------------------------------------------------------------------------------------------
 Command_update_block_rewards_impl::Command_update_block_rewards_impl(sqlite3* handle)
@@ -709,7 +709,21 @@ Command_delete_empty_payments_impl::Command_delete_empty_payments_impl(sqlite3* 
 	std::string delete_empty_payments{ R"(DELETE FROM payment WHERE amount = 0 AND tx_id = '')" };
 	sqlite3_prepare_v2(m_handle, delete_empty_payments.c_str(), -1, &m_stmt, NULL);
 }
+// -----------------------------------------------------------------------------------------------
+Command_update_block_share_difficulty_impl::Command_update_block_share_difficulty_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string update_reward_of_payment{ R"(UPDATE block SET share_difficulty = :share_difficulty WHERE height = :height)" };
+	sqlite3_prepare_v2(m_handle, update_reward_of_payment.c_str(), -1, &m_stmt, NULL);
+}
 
+void Command_update_block_share_difficulty_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_update_block_share_difficulty_params>(m_params);
+	bind_param(m_stmt, ":height", casted_params.m_height);
+	bind_param(m_stmt, ":share_difficulty", casted_params.m_share_difficulty);
+}
 
 
 }

@@ -107,6 +107,9 @@ void Pool_manager_impl::start()
 		return;
 	}
 
+	// fill out share_difficulty in blocks table (will be removed afterwards)
+	//m_http_component
+
 	// check if there is an active round -> if not start one
 	if (!m_reward_component->is_round_active())
 	{

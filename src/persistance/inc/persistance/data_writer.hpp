@@ -32,6 +32,7 @@ public:
     virtual bool update_block_hash(std::uint32_t height, std::string block_hash) = 0;
     virtual bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) = 0;
     virtual bool delete_empty_payments() = 0;
+    virtual bool update_block_share_difficulty(std::uint32_t height, double share_difficulty) = 0;
 };
 
 // Wrapper for unique data_writer. Ensures thread safety
@@ -57,6 +58,7 @@ public:
     virtual bool update_block_hash(std::uint32_t height, std::string block_hash) = 0;
     virtual bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) = 0;
     virtual bool delete_empty_payments() = 0;
+    virtual bool update_block_share_difficulty(std::uint32_t height, double share_difficulty) = 0;
 };
 }
 }

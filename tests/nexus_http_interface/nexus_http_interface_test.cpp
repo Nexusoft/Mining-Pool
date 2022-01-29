@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "nexus_http_interface_fixture.hpp"
+#include "TAO/Ledger/difficulty.h"
 
 
 using namespace ::nexuspool;
@@ -56,8 +57,12 @@ TEST_F(Nexus_http_interface_fixture, get_block_reward_data_test)
 TEST_F(Nexus_http_interface_fixture, get_block_test)
 {
 	LLP::CBlock block;
-	auto result = m_component->get_block(15, block);
+	auto result = m_component->get_block(10, block);
 	EXPECT_TRUE(result);
+
+	//this is the actual difficulty of the block
+	auto const block_hash = block.nChannel == 1 ? block.GetHash() : block.GetPrime();
+	auto share_difficulty = TAO::Ledger::GetDifficulty(block_hash, block.nChannel);
 }
 
 TEST_F(Nexus_http_interface_fixture, does_account_exists_test)
