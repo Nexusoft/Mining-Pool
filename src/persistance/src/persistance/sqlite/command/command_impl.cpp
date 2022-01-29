@@ -534,7 +534,7 @@ Command_create_config_impl::Command_create_config_impl(sqlite3* handle)
 {
 	std::string create_config{ R"(INSERT INTO config 
 		(version, difficulty_divider, fee, mining_mode, round_duration_hours) 
-		VALUES('1.0', :difficulty_divider, :fee, :mining_mode, :round_duration_hours))" };
+		VALUES('1.1', :difficulty_divider, :fee, :mining_mode, :round_duration_hours))" };
 
 	if (sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
 	{
