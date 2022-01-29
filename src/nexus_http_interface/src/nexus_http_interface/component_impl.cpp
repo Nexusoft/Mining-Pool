@@ -87,6 +87,31 @@ bool Component_impl::get_block_hash(std::uint32_t height, std::string& hash)
 	return true;
 }
 
+bool Component_impl::get_block(std::uint32_t height, LLP::CBlock& block)
+{
+	std::string parameter{ "?verbose=none&height=" };
+	parameter += std::to_string(height);
+	auto response = m_client->get_block(parameter, m_auth_string);
+	auto const status_code = response->getStatusCode();
+	if (status_code != 200)
+	{
+		m_logger->error("API error. Code: {} Message: {}", status_code, response->readBodyToString()->c_str());
+		return false;
+	}
+
+	auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
+
+	block.nVersion = data_json["result"]["version"];
+	block.nHeight = data_json["result"]["height"];
+	block.nChannel = data_json["result"]["channel"];
+	block.nBits = static_cast<std::uint32_t>(std::stoul(data_json["result"]["bits"].get<std::string>()));
+	block.nNonce = data_json["result"]["nonce"].get<std::uint64_t>();
+	block.hashPrevBlock = uint1024_t{ data_json["result"] ["previousblockhash"].get<std::string>() };
+	block.hashMerkleRoot = uint512_t{ data_json["result"] ["merkleroot"].get<std::string>() };
+
+	return true;
+}
+
 bool Component_impl::get_mining_info(common::Mining_info& mining_info)
 {
 	auto response = m_client->get_mininginfo(m_auth_string);

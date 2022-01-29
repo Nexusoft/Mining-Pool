@@ -53,6 +53,13 @@ TEST_F(Nexus_http_interface_fixture, get_block_reward_data_test)
 	EXPECT_TRUE(result);
 }
 
+TEST_F(Nexus_http_interface_fixture, get_block_test)
+{
+	LLP::CBlock block;
+	auto result = m_component->get_block(15, block);
+	EXPECT_TRUE(result);
+}
+
 TEST_F(Nexus_http_interface_fixture, does_account_exists_test)
 {
 	auto result = m_component->does_account_exists("testaddress");
