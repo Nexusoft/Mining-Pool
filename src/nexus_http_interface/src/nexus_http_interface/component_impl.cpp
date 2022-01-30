@@ -104,7 +104,7 @@ bool Component_impl::get_block(std::uint32_t height, LLP::CBlock& block)
 	block.nVersion = data_json["result"]["version"];
 	block.nHeight = data_json["result"]["height"];
 	block.nChannel = data_json["result"]["channel"];
-	block.nBits = static_cast<std::uint32_t>(std::stoul(data_json["result"]["bits"].get<std::string>()));
+	block.nBits = static_cast<std::uint32_t>(std::stoul(data_json["result"]["bits"].get<std::string>(), nullptr,16));
 	block.nNonce = data_json["result"]["nonce"].get<std::uint64_t>();
 	block.hashPrevBlock = uint1024_t{ data_json["result"] ["previousblockhash"].get<std::string>() };
 	block.hashMerkleRoot = uint512_t{ data_json["result"] ["merkleroot"].get<std::string>() };

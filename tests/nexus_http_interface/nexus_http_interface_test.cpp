@@ -61,7 +61,7 @@ TEST_F(Nexus_http_interface_fixture, get_block_test)
 	EXPECT_TRUE(result);
 
 	//this is the actual difficulty of the block
-	auto const block_hash = block.nChannel == 1 ? block.GetHash() : block.GetPrime();
+	auto const block_hash = block.nChannel == 1 ? block.GetPrime() : block.GetHash();
 	auto share_difficulty = TAO::Ledger::GetDifficulty(block_hash, block.nChannel);
 }
 
