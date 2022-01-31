@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     nexuspool::Pool pool;
 
     std::string pool_config_file{"pool.conf"};
-    std::string api_config_file{"api.conf"};
+    std::string api_config_file{};
     bool run_check = false;
     for (int i = 1; i < argc; ++i) 
     {
