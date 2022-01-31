@@ -107,20 +107,6 @@ void Pool_manager_impl::start()
 		return;
 	}
 
-	// fill out share_difficulty in blocks table (will be removed afterwards)
-	auto data_reader = m_data_reader_factory->create_data_reader();
-	auto data_writer = m_data_writer_factory->create_shared_data_writer();
-	auto const blocks = data_reader->get_latest_blocks();
-	for (auto& block : blocks)
-	{
-		LLP::CBlock nxs_block;
-		m_http_component->get_block(block.m_height, nxs_block);
-		auto const block_hash = nxs_block.nChannel == 1 ? nxs_block.GetPrime() : nxs_block.GetHash();
-		auto const share_difficulty = TAO::Ledger::GetDifficulty(block_hash, nxs_block.nChannel);
-
-		data_writer->update_block_share_difficulty(block.m_height, share_difficulty);
-	}
-
 	// check if there is an active round -> if not start one
 	if (!m_reward_component->is_round_active())
 	{
