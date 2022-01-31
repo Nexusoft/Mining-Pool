@@ -403,7 +403,7 @@ std::any Command_get_pool_hashrate_impl::get_command() const
 Command_get_longest_chain_finder_impl::Command_get_longest_chain_finder_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT height, difficulty, block_finder, round, account.display_name FROM block INNER JOIN account ON block.block_finder=account.name ORDER BY difficulty DESC LIMIT 1", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT height, share_difficulty, block_finder, round, account.display_name FROM block INNER JOIN account ON block.block_finder=account.name ORDER BY share_difficulty DESC LIMIT 1", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_longest_chain_finder_impl::get_command() const
