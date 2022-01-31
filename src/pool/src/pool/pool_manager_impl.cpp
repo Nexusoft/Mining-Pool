@@ -14,7 +14,7 @@
 namespace nexuspool
 {
 
-constexpr std::uint32_t payout_time_delay{ 5U };
+constexpr std::uint32_t payout_time_delay{ 8U };
 
 Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_context,
 	std::shared_ptr<spdlog::logger> logger,
