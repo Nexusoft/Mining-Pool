@@ -65,7 +65,8 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_config->get_pool_config().m_account,
 		m_config->get_pool_config().m_pin,
 		m_config->get_pool_config().m_fee,
-		m_config->get_update_block_hashes_interval())}
+		m_config->get_update_block_hashes_interval(),
+		m_config->get_pool_config().m_fee_address)}
 	, m_listen_socket{}
 	, m_session_registry{std::make_shared<Session_registry_impl>(
 		m_data_reader_factory->create_data_reader(), 

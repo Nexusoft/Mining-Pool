@@ -53,7 +53,7 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& cal
 		}
 
 		bool is_orphan = true;
-		if (reward_data.m_tx_type == "COINBASE" && reward_data.m_tx_confirmations > 3)	// 3 confirmations enough?
+		if (reward_data.m_tx_type == "COINBASE" && reward_data.m_tx_confirmations > 10)	// 10 confirmations enough?
 		{
 			is_orphan = false;
 		}

@@ -23,7 +23,8 @@ Component::Uptr create_component(
 	std::string account_from,
 	std::string pin,
 	std::uint16_t pool_fee,
-	std::uint16_t update_block_hashes_interval);
+	std::uint16_t update_block_hashes_interval,
+	std::string fee_address);
 
 }
 
