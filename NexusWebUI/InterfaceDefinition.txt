@@ -22,11 +22,11 @@ Pool API's:
 
         # Result
         Fields:
-            - block_reward
             - hash
             - height
             - network diff
             - time
+            - is_orphan
 
 ############################
 Wallet Detail API's:

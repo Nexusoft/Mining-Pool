@@ -247,7 +247,7 @@ void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 	persistance::Block_data block_data;
 	block_data.m_height = submit_block_data.m_block->nHeight;
 	block_data.m_type = submit_block_data.m_block->nChannel == 1 ? "prime" : "hash";
-	block_data.m_orphan = 0;
+	block_data.m_orphan = false;
 	block_data.m_block_finder = submit_block_data.m_blockfinder;
 	//this is the network difficulty at the time the block was found
 	block_data.m_difficulty = TAO::Ledger::GetDifficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
@@ -362,7 +362,7 @@ void Pool_manager_impl::end_round()
 	// end round in registry
 	m_session_registry->end_round();
 
-	// start timer for payout -> payout is delayed (4 hours) to make sure that every block is already confirmed
+	// start timer for payout -> payout is delayed (8 hours) to make sure that every block is already confirmed
 	m_payout_timer->start(chrono::Seconds(60 * 60 * payout_time_delay), payout_handler(current_round));
 
 	// update config in storage
