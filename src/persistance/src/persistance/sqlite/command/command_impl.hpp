@@ -350,6 +350,7 @@ struct Command_add_block_params
 	std::string m_block_finder;
 	std::int64_t m_round;
 	double m_mainnet_reward;
+	double m_share_difficulty;
 };
 
 // the block_hash is not included in this command. It has to be queried from nxs wallet and updated later
@@ -465,6 +466,23 @@ public:
 	Type get_type() const override { return Type::delete_empty_payments; }
 	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
 
+};
+
+struct Command_update_block_share_difficulty_params
+{
+	int m_height;
+	double m_share_difficulty;
+};
+
+class Command_update_block_share_difficulty_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_update_block_share_difficulty_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::update_block_share_difficulty; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
+	void set_params(std::any params) override;
 };
 
 }

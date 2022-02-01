@@ -11,6 +11,7 @@ ________________________________________________________________________________
 #define NEXUS_TAO_LEDGER_INCLUDE_DIFFICULTY_H
 
 #include <cstdint>
+#include <LLC/types/uint1024.h>
 
 /* Global TAO namespace. */
 namespace TAO
@@ -32,6 +33,7 @@ namespace TAO
          *
          **/
         double GetDifficulty(std::uint32_t nBits, std::int32_t nChannel);
+        double GetDifficulty(const uint1024_t& block_hash, std::int32_t nChannel);
 
     }
 }

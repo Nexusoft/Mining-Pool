@@ -390,7 +390,7 @@ void Command_get_blocks_without_hash_from_round_impl::set_params(std::any params
 Command_get_pool_hashrate_impl::Command_get_pool_hashrate_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT SUM(hashrate) FROM account", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT SUM(hashrate) FROM account WHERE datetime(last_active) >= datetime('now', '-10 Minute')", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_pool_hashrate_impl::get_command() const
@@ -403,7 +403,7 @@ std::any Command_get_pool_hashrate_impl::get_command() const
 Command_get_longest_chain_finder_impl::Command_get_longest_chain_finder_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT height, difficulty, block_finder, round, account.display_name FROM block INNER JOIN account ON block.block_finder=account.name ORDER BY difficulty DESC LIMIT 1", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT height, share_difficulty, block_finder, round, account.display_name FROM block INNER JOIN account ON block.block_finder=account.name ORDER BY share_difficulty DESC LIMIT 1", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_longest_chain_finder_impl::get_command() const
@@ -534,7 +534,7 @@ Command_create_config_impl::Command_create_config_impl(sqlite3* handle)
 {
 	std::string create_config{ R"(INSERT INTO config 
 		(version, difficulty_divider, fee, mining_mode, round_duration_hours) 
-		VALUES('1.0', :difficulty_divider, :fee, :mining_mode, :round_duration_hours))" };
+		VALUES('1.1', :difficulty_divider, :fee, :mining_mode, :round_duration_hours))" };
 
 	if (sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
 	{
@@ -585,8 +585,8 @@ Command_add_block_impl::Command_add_block_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
 	std::string add_block{ R"(INSERT INTO block 
-		(hash, height, type, difficulty, orphan, block_finder, round, block_found_time, mainnet_reward) 
-		VALUES("", :height, :type, :difficulty, :orphan, :block_finder, :round, CURRENT_TIMESTAMP, :mainnet_reward))" };
+		(hash, height, type, difficulty, orphan, block_finder, round, block_found_time, mainnet_reward, share_difficulty) 
+		VALUES("", :height, :type, :difficulty, :orphan, :block_finder, :round, CURRENT_TIMESTAMP, :mainnet_reward, :share_difficulty))" };
 
 	sqlite3_prepare_v2(m_handle, add_block.c_str(), -1, &m_stmt, NULL);
 }
@@ -602,6 +602,7 @@ void Command_add_block_impl::set_params(std::any params)
 	bind_param(m_stmt, ":block_finder", casted_params.m_block_finder);
 	bind_param(m_stmt, ":round", casted_params.m_round);
 	bind_param(m_stmt, ":mainnet_reward", casted_params.m_mainnet_reward);
+	bind_param(m_stmt, ":share_difficulty", casted_params.m_share_difficulty);
 }
 // -----------------------------------------------------------------------------------------------
 Command_update_block_rewards_impl::Command_update_block_rewards_impl(sqlite3* handle)
@@ -708,7 +709,21 @@ Command_delete_empty_payments_impl::Command_delete_empty_payments_impl(sqlite3* 
 	std::string delete_empty_payments{ R"(DELETE FROM payment WHERE amount = 0 AND tx_id = '')" };
 	sqlite3_prepare_v2(m_handle, delete_empty_payments.c_str(), -1, &m_stmt, NULL);
 }
+// -----------------------------------------------------------------------------------------------
+Command_update_block_share_difficulty_impl::Command_update_block_share_difficulty_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string update_reward_of_payment{ R"(UPDATE block SET share_difficulty = :share_difficulty WHERE height = :height)" };
+	sqlite3_prepare_v2(m_handle, update_reward_of_payment.c_str(), -1, &m_stmt, NULL);
+}
 
+void Command_update_block_share_difficulty_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_update_block_share_difficulty_params>(m_params);
+	bind_param(m_stmt, ":height", casted_params.m_height);
+	bind_param(m_stmt, ":share_difficulty", casted_params.m_share_difficulty);
+}
 
 
 }

@@ -17,7 +17,8 @@ Component_impl::Component_impl(
 	std::string account_from,
 	std::string pin,
 	std::uint16_t pool_fee,
-	std::uint16_t update_block_hashes_interval)
+	std::uint16_t update_block_hashes_interval,
+	std::string fee_address)
     : m_logger{std::move(logger)}
 	, m_timer_factory{std::move(timer_factory)}
 	, m_http_interface{std::move(http_interface)}
@@ -28,6 +29,7 @@ Component_impl::Component_impl(
 	, m_account_from{std::move(account_from)}
 	, m_pin{std::move(pin)}
 	, m_pool_fee{pool_fee}
+	, m_fee_address{std::move(fee_address)}
 {
 	m_update_block_hashes_timer = m_timer_factory->create_timer();
 	m_not_paid_miners_timer = m_timer_factory->create_timer();
@@ -158,6 +160,13 @@ bool Component_impl::end_round(std::uint32_t round_number)
 			// reward is not set yet
 			m_shared_data_writer->add_payment(persistance::Payment_data{ active_account.m_address, 0.0, active_account.m_shares, "", round_data.m_round, ""});
 		}
+
+		// dev fee should go to a different account -> handle this like a miner payment
+		if (!m_fee_address.empty())
+		{
+			m_logger->debug("Added pool fee payment for {}", m_fee_address);
+			m_shared_data_writer->add_payment(persistance::Payment_data{ m_fee_address, 0.0, 0.0, "", round_data.m_round, "" });
+		}
 	}
 
     // reset shares of all accounts (round end)
@@ -212,6 +221,13 @@ Calculate_rewards_result Component_impl::calculate_rewards(std::uint32_t round_n
 			}
 			for (auto& payment : payments)
 			{
+				// dev fee should go to a seperate account
+				if (!m_fee_address.empty() && m_fee_address == payment.m_account)
+				{
+					auto const pool_fee = round_data.m_total_rewards * static_cast<double>(m_pool_fee / 100);
+					m_logger->debug("Pool fee payment {} NXS for {}", pool_fee, m_fee_address);
+					m_shared_data_writer->update_reward_of_payment(pool_fee, m_fee_address, round_number);
+				}
 				// calculate reward for account. First reduce the total_rewards with pool_fee % 
 				auto account_reward = (round_data.m_total_rewards * (1.0 - static_cast<double>(m_pool_fee / 100))) * (payment.m_shares / round_data.m_total_shares);
 				m_shared_data_writer->update_reward_of_payment(account_reward, payment.m_account, round_number);
@@ -266,6 +282,10 @@ bool Component_impl::pay_round(std::uint32_t round)
 
 			m_not_paid_miners_timer->start(chrono::Seconds(600), not_paid_miners_handler());
 		}
+	}
+	else
+	{
+		return false;
 	}
 
 	// cleanup empty payment records of this round

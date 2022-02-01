@@ -7,6 +7,8 @@ file COPYING or http://www.opensource.org/licenses/mit-license.php.
 ____________________________________________________________________________________________*/
 
 #include "TAO/Ledger/difficulty.h"
+#include "TAO/Ledger/prime.h"
+
 
 /* Global TAO namespace. */
 namespace TAO
@@ -15,6 +17,27 @@ namespace TAO
     /* Ledger Layer namespace. */
     namespace Ledger
     {
+        //given the block hash and channel, return the actual difficulty of the block
+        double GetDifficulty(const uint1024_t& block_hash, std::int32_t nChannel)
+        {
+            double actual_difficulty;
+            if (nChannel == 1) //prime
+            {
+                std::vector<uint8_t> offsets;
+                actual_difficulty = TAO::Ledger::GetPrimeDifficulty(block_hash, offsets);
+            }
+            else //hash
+            {
+                
+                uint32_t nbits_actual = block_hash.GetCompact();
+                actual_difficulty = TAO::Ledger::GetDifficulty(nbits_actual, nChannel);
+            }
+            return actual_difficulty;
+            
+        }
+
+        
+
 
         /* Determines the Decimal of nBits per Channel for a decent "Frame of Reference". */
         double GetDifficulty(std::uint32_t nBits, std::int32_t nChannel)

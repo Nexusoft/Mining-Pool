@@ -48,6 +48,7 @@ void Storage_manager_sqlite::start()
 		  round INTEGER NOT NULL,
 		  block_found_time TEXT NOT NULL,
 		  mainnet_reward REAL NOT NULL,
+		  share_difficulty REAL,
 		  FOREIGN KEY(round) REFERENCES round(round_number),
 		  FOREIGN KEY(block_finder) REFERENCES account(name)
 		);)", NULL, NULL, NULL);
@@ -93,12 +94,33 @@ void Storage_manager_sqlite::start()
 		  mining_mode TEXT NOT NULL,
 		  round_duration_hours INTEGER NOT NULL
 		);)", NULL, NULL, NULL);
+
+	update_db_schema();
 }
 
 void Storage_manager_sqlite::stop()
 {
     sqlite3_close(m_handle);
     sqlite3_shutdown();
+}
+
+void Storage_manager_sqlite::update_db_schema()
+{
+	sqlite3_stmt* stmt;
+	sqlite3_prepare_v2(m_handle, "SELECT version FROM config;", -1, &stmt, 0);
+	int ret;
+	std::string version;
+	while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
+	{
+		version = std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+	}
+
+	if (version == "1.0")
+	{
+		m_logger->info("Updating DB schema to version 1.1");
+		sqlite3_exec(m_handle, R"(ALTER TABLE block ADD COLUMN share_difficulty REAL;)", NULL, NULL, NULL);
+		sqlite3_exec(m_handle, R"(UPDATE config SET version = '1.1';)", NULL, NULL, NULL);
+	}
 }
 
 }

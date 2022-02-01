@@ -50,7 +50,8 @@ enum class Type : std::uint8_t
 	delete_empty_payments,
 	get_pool_hashrate,
 	get_longest_chain_finder,
-	get_top_block_finders
+	get_top_block_finders,
+	update_block_share_difficulty
 };
 
 
