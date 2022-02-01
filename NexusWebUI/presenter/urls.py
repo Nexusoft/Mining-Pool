@@ -9,6 +9,7 @@ app_name = 'presenter'
 
 urlpatterns = [
                   path('', views.block_overview_list, name='index'),
+                  path('overview', views.block_overview_list, name='overview'),
                   path('overview/', views.block_overview_list, name='overview'),
                   path('error/', views.ErrorView.as_view(), name='error'),
                   path('error_pool/', views.ErrorPoolView.as_view(), name='error_pool'),
@@ -16,6 +17,7 @@ urlpatterns = [
                   path('error_unknown_wallet/', views.ErrorUnknownWallet.as_view(), name='error_unknown_wallet'),
                   path('wallet/', views.wallet_detail, name='wallet'),
                   path('detail/<str:hash>/', views.block_detail, name='detail'),
+                  path('mining_calc', views.mining_calc, name='mining_calc'),
                   path('mining_calc/', views.mining_calc, name='mining_calc'),
                   path('statistic/', views.statistic_list, name='statistic'),
                   path('ajax/load_hardware_detail', views.load_hardware_detail, name='ajax_load_hardware_detail'),

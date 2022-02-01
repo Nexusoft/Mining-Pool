@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 {% load render_table from django_tables2 %}
 
-<style>
-    table {
-        class: "table table-striped"
-    }
-</style>
 
 {% block body_block %}
+
+    <style>
+        tr[is_orphan="True"] {
+            border: solid thin;
+            {#border-left: solid;#}
+            border-color: red;
+            {#background-color: red;#}
+        }
+    </style>
 
     <br>
 
