@@ -12,14 +12,13 @@ class OverviewTable(tables.Table):
                              verbose_name='Hash', attrs={"a": {"target": "_blank"}})
     time = tables.Column(orderable=False)
     network_diff = tables.Column(orderable=False)
-    is_orphan = tables.Column(orderable=False)
 
     class Meta:
         template_name = "django_tables2/bootstrap4.html"
         attrs = {
             'class': ' table table-dark table-hover table-striped',
         }
-        sequence = ('height', 'time', 'network_diff', 'hash', 'is_orphan')
+        sequence = ('height', 'time', 'network_diff', 'hash')
         row_attrs = {
             'is_orphan': lambda record: record['is_orphan']
         }
