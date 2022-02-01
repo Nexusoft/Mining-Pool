@@ -13,7 +13,8 @@ Component::Uptr create_component(
     std::string account_from,
     std::string pin,
     std::uint16_t pool_fee,
-    std::uint16_t update_block_hashes_interval)
+    std::uint16_t update_block_hashes_interval,
+    std::string fee_address)
 {
     return std::make_unique<Component_impl>(
         std::move(logger), 
@@ -24,7 +25,8 @@ Component::Uptr create_component(
         std::move(account_from),
         std::move(pin),
         pool_fee,
-        update_block_hashes_interval);
+        update_block_hashes_interval,
+        std::move(fee_address));
 }
 
 }

@@ -1,12 +1,14 @@
+import datetime
 import json
 import logging
 import math
 
 from django.http import JsonResponse
+from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from .tables import OverviewTable, AccountPayoutsTable
+from .tables import OverviewTable, AccountPayoutsTable, Top5FindersTable, LongestChainTable
 from .forms import WalletSearchForm, CalcForm
 from django.conf import settings
 from django.core.cache import cache
@@ -68,6 +70,7 @@ def block_overview_list(request):
         active_miners = block_overview_meta_json['active_miners']
         wallet_version = block_overview_meta_json['wallet_version']
         pool_version = block_overview_meta_json['pool_version']
+        payout_time = block_overview_meta_json['payout_time']
 
         return render(request, template_name, {'table': table_data,
                                                'pool_hashrate': pool_hashrate,
@@ -77,6 +80,76 @@ def block_overview_list(request):
                                                'fee': fee,
                                                'wallet_version': wallet_version,
                                                'pool_version': pool_version,
+                                               'payout_time': payout_time
+                                               })
+
+    except Exception as ex:
+        print(ex)
+        logger.error(ex)
+        return redirect('presenter:error_pool')
+
+
+def statistic_list(request):
+    template_name = 'presenter/statistic_list.html'
+
+    try:
+        # Try to retrieve from cache
+        block_overview_meta_json = cache.get('block_overview_meta_json')
+        top_5_finders_json = cache.get('top_5_finders_json')
+        longest_chain_json = cache.get('longest_chain_json')
+
+        if not block_overview_meta_json:
+            block_overview_meta = rest_request(method='metainfo')
+            block_overview_meta_json = block_overview_meta.json()
+            if not block_overview_meta_json:
+                raise Exception("No Meta Data received")
+            else:
+                print(block_overview_meta_json)
+
+            # Save data in the cache
+            if settings.DEBUG is False and block_overview_meta_json:
+                cache.set('block_overview_meta_json', block_overview_meta_json, 1)
+
+        if not top_5_finders_json:
+            top_5_finders = rest_request(method="/statistics/blockfinders", parameters={'num': 5})
+            top_5_finders_json = top_5_finders.json()
+            if not top_5_finders_json:
+                raise Exception("Top 5 Finders Data not received")
+            else:
+                print(top_5_finders_json)
+
+            # Save data in the cache
+            if settings.DEBUG is False and top_5_finders_json:
+                cache.set('top_5_finders_json', top_5_finders_json, 1)
+
+        mining_mode = block_overview_meta_json['mining_mode']
+
+        if mining_mode == 'PRIME':
+            if not longest_chain_json:
+                longest_chain = rest_request(method="/statistics/longestchain")
+                longest_chain_json = longest_chain.json()
+                if not longest_chain_json:
+                    raise Exception("Longest Chain Data not received")
+                else:
+                    print(longest_chain_json)
+
+                # Save data in the cache
+                if settings.DEBUG is False and longest_chain_json:
+                    cache.set('longest_chain_json', longest_chain_json, 1)
+        else:
+            longest_chain_json = None
+            longest_chain_table = None
+
+        top_5_finders_list = top_5_finders_json['block_finders']
+        top_5_table = Top5FindersTable(top_5_finders_list)
+
+        if longest_chain_json:
+            longest_chain_list = [longest_chain_json,]
+            longest_chain_table = LongestChainTable(longest_chain_list)
+
+        return render(request, template_name, {'top_5_table': top_5_table,
+                                               'longest_chain_table': longest_chain_table,
+                                               'mining_mode': mining_mode,
                                                })
 
     except Exception as ex:
@@ -317,3 +390,24 @@ def load_hardware_detail(request):
 
     return JsonResponse({'power_consumption': power_consumption,
                          'search_rate': search_rate})
+
+
+def load_payout_timer(request, payout_time):
+    """
+    Returns the difference to the given payout time in the form of a string hh:mm:ss
+    """
+
+    # Format to an iso datetime
+    payout_time = payout_time[:19]
+    # Convert to a proper DateTime Object
+    payout_time = datetime.datetime.fromisoformat(payout_time)
+
+    # Calculate the time difference
+    current_date_time = datetime.datetime.now()
+    time_difference = payout_time - current_date_time
+
+    diff = str(datetime.timedelta(seconds=time_difference.total_seconds()))
+    diff = diff.split(".", 1)[0]
+
+    return HttpResponse(f'{diff}')
+    # return HttpResponse(f'test')

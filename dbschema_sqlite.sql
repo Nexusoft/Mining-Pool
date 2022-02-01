@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS block (
   round INTEGER NOT NULL,
   block_found_time TEXT NOT NULL,
   mainnet_reward REAL NOT NULL,
+  share_difficulty REAL,
   FOREIGN KEY(round) REFERENCES round(round_number),
   FOREIGN KEY(block_finder) REFERENCES account(name)
 );

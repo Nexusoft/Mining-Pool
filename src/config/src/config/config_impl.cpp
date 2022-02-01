@@ -78,13 +78,21 @@ namespace config
 				m_mining_mode = common::Mining_mode::HASH;
 			}
 
-			m_pool_config.m_account = j.at("pool")["account"];
-			m_pool_config.m_pin = j.at("pool")["pin"];
-			m_pool_config.m_fee = j.at("pool")["fee"];
-			m_pool_config.m_difficulty_divider = j.at("pool")["difficulty_divider"];
-			m_pool_config.m_round_duration_hours = j.at("pool")["round_duration_hours"];
-			m_pool_config.m_nxs_api_user = j.at("pool")["nxs_api_user"];
-			m_pool_config.m_nxs_api_pw = j.at("pool")["nxs_api_pw"];
+			auto pool_json = j.at("pool");
+
+			m_pool_config.m_account = pool_json.at("account");
+			m_pool_config.m_pin = pool_json.at("pin");
+			m_pool_config.m_fee = pool_json.at("fee");
+			m_pool_config.m_difficulty_divider = pool_json.at("difficulty_divider");
+			m_pool_config.m_round_duration_hours = pool_json.at("round_duration_hours");
+			m_pool_config.m_nxs_api_user = pool_json.at("nxs_api_user");
+			m_pool_config.m_nxs_api_pw = pool_json.at("nxs_api_pw");
+
+			//optional
+			if (pool_json.contains("fee_address"))
+			{
+				m_pool_config.m_fee_address = pool_json.at("fee_address");
+			}
 
 			auto persistance_type = j.at("persistance")["type"];
 			m_persistance_config.m_file = j.at("persistance")["file"];

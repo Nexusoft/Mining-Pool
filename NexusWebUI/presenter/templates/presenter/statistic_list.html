@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load render_table from django_tables2 %}
+
+<style>
+    table {
+        class: "table table-striped"
+    }
+</style>
+
+{% block body_block %}
+
+    <br>
+
+    {% if top_5_table %}
+        <h2>Top 5 Block-Finders:</h2>
+        {% render_table top_5_table %}
+    {% endif %}
+
+    {% if top_5_table and  longest_chain_table%}
+        <br>
+        <hr>
+        <br>
+    {% endif %}
+
+    {% if longest_chain_table %}
+        <h2>Longest Chain found:</h2>
+        {% render_table longest_chain_table %}
+    {% endif %}
+
+{% endblock %}

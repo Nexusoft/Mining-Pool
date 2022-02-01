@@ -8,11 +8,13 @@
 #include "reward/create_component.hpp"
 #include "chrono/create_component.hpp"
 #include "LLP/utils.hpp"
+#include "TAO/Ledger/prime.h"
+#include "TAO/Ledger/difficulty.h"
 
 namespace nexuspool
 {
 
-constexpr std::uint32_t payout_time_delay{ 4U };
+constexpr std::uint32_t payout_time_delay{ 8U };
 
 Pool_manager::Sptr create_pool_manager(std::shared_ptr<asio::io_context> io_context,
 	std::shared_ptr<spdlog::logger> logger,
@@ -63,7 +65,8 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_config->get_pool_config().m_account,
 		m_config->get_pool_config().m_pin,
 		m_config->get_pool_config().m_fee,
-		m_config->get_update_block_hashes_interval())}
+		m_config->get_update_block_hashes_interval(),
+		m_config->get_pool_config().m_fee_address)}
 	, m_listen_socket{}
 	, m_session_registry{std::make_shared<Session_registry_impl>(
 		m_data_reader_factory->create_data_reader(), 
@@ -239,14 +242,18 @@ void Pool_manager_impl::set_block(LLP::CBlock const& block)
 void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 {
 	auto submit_block_data = m_block_map[block_map_id];
-	auto const block_hash = submit_block_data.m_block->GetHash().ToString();
+	
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
 	persistance::Block_data block_data;
 	block_data.m_height = submit_block_data.m_block->nHeight;
 	block_data.m_type = submit_block_data.m_block->nChannel == 1 ? "prime" : "hash";
-	block_data.m_orphan = 0;
+	block_data.m_orphan = false;
 	block_data.m_block_finder = submit_block_data.m_blockfinder;
-	block_data.m_difficulty = get_difficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
+	//this is the network difficulty at the time the block was found
+	block_data.m_difficulty = TAO::Ledger::GetDifficulty(submit_block_data.m_block->nBits, submit_block_data.m_block->nChannel);
+	//this is the actual difficulty of the block
+	auto const block_hash = submit_block_data.m_block->nChannel == 1 ? submit_block_data.m_block->GetPrime() : submit_block_data.m_block->GetHash();
+	block_data.m_share_difficulty = TAO::Ledger::GetDifficulty(block_hash, submit_block_data.m_block->nChannel);
 	block_data.m_round = m_reward_component->get_current_round();
 	data_writer->add_block(std::move(block_data));
 
@@ -355,7 +362,7 @@ void Pool_manager_impl::end_round()
 	// end round in registry
 	m_session_registry->end_round();
 
-	// start timer for payout -> payout is delayed (4 hours) to make sure that every block is already confirmed
+	// start timer for payout -> payout is delayed (8 hours) to make sure that every block is already confirmed
 	m_payout_timer->start(chrono::Seconds(60 * 60 * payout_time_delay), payout_handler(current_round));
 
 	// update config in storage

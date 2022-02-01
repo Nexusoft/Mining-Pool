@@ -17,7 +17,9 @@ urlpatterns = [
                   path('wallet/', views.wallet_detail, name='wallet'),
                   path('detail/<str:hash>/', views.block_detail, name='detail'),
                   path('mining_calc/', views.mining_calc, name='mining_calc'),
+                  path('statistic/', views.statistic_list, name='statistic'),
                   path('ajax/load_hardware_detail', views.load_hardware_detail, name='ajax_load_hardware_detail'),
+                  path('ajax/load_payout_timer/<str:payout_time>/', views.load_payout_timer, name='ajax_load_payout_timer'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

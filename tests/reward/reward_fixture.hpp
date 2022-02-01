@@ -51,7 +51,7 @@ public:
 		m_component = reward::create_component(m_logger, m_test_data.m_timer_factory_mock, std::move(m_test_data.m_http_interface_mock),
 			m_persistance_component_mock->get_data_writer_factory()->create_shared_data_writer(),
 			m_persistance_component_mock->get_data_reader_factory()->create_data_reader(),
-			"default", "1234", 1, 5);
+			"default", "1234", 1, 5, "");
 	}
 
 	void calculate_rewards_expectations(persistance::Round_data const& round_data, std::uint32_t round_number, std::vector<persistance::Block_data> const& blocks)

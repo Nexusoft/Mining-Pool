@@ -363,6 +363,21 @@ TEST_F(Persistance_fixture, command_add_block)
 	m_test_data.delete_from_block_table(block_height_input);
 }
 
+TEST_F(Persistance_fixture, command_update_block_share_difficulty)
+{
+	std::int64_t const block_height_input = 5983133;
+	persistance::Block_data const block_input{ "", static_cast<std::uint32_t>(block_height_input), "HASH", 7896, false, "blockfinder", 5, "current_datetime", 2.54 };
+	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();
+	auto result = data_writer->add_block(block_input);
+	EXPECT_TRUE(result);
+
+	auto result_update = data_writer->update_block_share_difficulty(block_height_input, 100);
+	EXPECT_TRUE(result_update);
+
+	// cleanup db
+	m_test_data.delete_from_block_table(block_height_input);
+}
+
 TEST_F(Persistance_fixture, command_update_block_hash)
 {
 	auto data_writer = m_persistance_component->get_data_writer_factory()->create_shared_data_writer();

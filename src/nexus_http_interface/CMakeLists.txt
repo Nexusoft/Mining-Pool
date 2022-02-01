@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 
-add_library(nexus_http_interface STATIC 
-                          
+add_library(nexus_http_interface STATIC                         
                           src/nexus_http_interface/create_component.cpp
                           src/nexus_http_interface/component_impl.cpp)
                     
@@ -12,7 +11,7 @@ target_include_directories(nexus_http_interface
     PRIVATE src
 )
 
-target_link_libraries(nexus_http_interface common oatpp::oatpp)
+target_link_libraries(nexus_http_interface common LLP oatpp::oatpp)
 
 if(WIN32)
 target_link_libraries(nexus_http_interface Ws2_32.lib)

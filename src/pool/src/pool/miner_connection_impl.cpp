@@ -251,6 +251,10 @@ void Miner_connection_impl::process_accepted()
 		if (!session->create_account())
 		{
 			m_logger->error("Failed creating new account for miner {}", user_data.m_account.m_address);
+			// check if the account maybe already exists (this can happen for example if an account has multiple miner connections
+			// and one connection creates a new account. Then the other connections would also endlessly try to create an account
+			user_data.m_new_account = !m_session_registry->does_account_exists(user_data.m_account.m_address);
+			session->update_user_data(user_data);
 		}
 		else
 		{

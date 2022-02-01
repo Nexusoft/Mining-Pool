@@ -45,11 +45,6 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "update_block_hashes_interval"  // Optional, default=600, time in seconds when the found blocks should update their hashes in storage. Automatically happens during round end.
     "get_hashrate_interval"         // Optional, default=300, time in seconds requesting the current hashrate from the connected miners
     "miner_notifications"           // Optional, default=true send notification messages to miners (like pool restart, block found etc)
-    "api"                // Option group regarding API for frontend of the POOL. If not present then no API server will be started
-        "listen_port" : 0   // port of the POOL for listening to incoming API calls (from the web frontend for example).
-        "auth_user"         // Optional. If this config value is given then the API calls requires BasicAuth REST.
-        "auth_pw"           // Optional. If the auth_user config option is given then this field is mandatory.
-        "reward_calc_update_interval"   // Optional, default=300, time in seconds updating the mining_info for the API
 
     "persistance"       // Option group regarding used storage for the POOL
         "type"          // which storage type the POOL uses. Currently only 'sqlite' is supported.
@@ -63,6 +58,7 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
         "round_duration_hours"      // time in hours for the duration of a mining round. Payouts to miners can only happen when a round is finished. Config changes to POOL difficulty, fee, mining mode can only happen after round end.
         "nxs_api_user"  // NXS API user name. Must be the same user as in nexus.conf or nxs wallet startup arguments
         "nxs_api_pw"  // NXS API password. Must be the same password as in nexus.conf or nxs wallet startup arguments
+        "fee_address"   // Optional, Send the pool fee to a seperate NXS address every round
 ```
 
  ## API

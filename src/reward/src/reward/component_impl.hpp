@@ -28,7 +28,8 @@ public:
         std::string account_from,
         std::string pin,
         std::uint16_t pool_fee,
-        std::uint16_t update_block_hashes_interval);
+        std::uint16_t update_block_hashes_interval,
+        std::string fee_address);
 
     ~Component_impl();
 
@@ -61,6 +62,7 @@ private:
     std::string m_account_from;
     std::string m_pin;
     std::uint16_t m_pool_fee;
+    std::string m_fee_address;
     chrono::Timer::Uptr m_update_block_hashes_timer;
     chrono::Timer::Uptr m_not_paid_miners_timer;
 
