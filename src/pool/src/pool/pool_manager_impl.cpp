@@ -183,6 +183,7 @@ void Pool_manager_impl::set_current_height(std::uint32_t height)
 	{
 		m_current_height = height;
 		// new block -> clear pending blocks from previous height
+		m_logger->trace("New height, clear pending blocks from previous height");
 		m_block_map.clear();
 		m_block_map_id = 0;
 		m_session_registry->reset_work_status_of_sessions();
@@ -195,7 +196,6 @@ void Pool_manager_impl::set_current_height(std::uint32_t height)
 		auto session = m_session_registry->get_session_with_no_work();
 		if (session)
 		{
-			m_logger->trace("Get block for miner {}", session->get_user_data().m_account.m_display_name);
 			m_wallet_connection->get_block([session](auto block)
 				{
 					auto miner_connection = session->get_connection();
@@ -241,6 +241,7 @@ void Pool_manager_impl::set_block(LLP::CBlock const& block)
 
 void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 {
+	m_logger->trace("Accessing block_map with id {}. Current block_map size {} and id {}", block_map_id, m_block_map.size(), m_block_map_id);
 	auto submit_block_data = m_block_map[block_map_id];
 	
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
@@ -269,6 +270,11 @@ void Pool_manager_impl::get_block(Get_block_handler&& handler)
 void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, Session_key miner_key, Submit_block_handler handler)
 {
 	auto session = m_session_registry->get_session(miner_key);
+	if (!session)
+	{
+		m_logger->error("Pool_manager_impl::submit_block session invalid");
+	}
+
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
 	switch (difficulty_result)
 	{
