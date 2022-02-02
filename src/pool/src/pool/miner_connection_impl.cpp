@@ -207,7 +207,7 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 			if (user_data.m_logged_in && !user_data.m_new_account)
 			{
 				auto const hashrate = bytes2double(*packet.m_data);
-				session->update_hashrate(hashrate);
+				session->update_hashrate(hashrate, 0, 0);
 			}
 		}
 		else if (packet.m_header == Packet::SET_CHANNEL)

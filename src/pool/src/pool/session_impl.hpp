@@ -25,7 +25,10 @@ class Session_impl : public Session
 {
 public:
 
-	Session_impl(persistance::Shared_data_writer::Sptr data_writer, Shared_data_reader::Sptr data_reader, common::Mining_mode mining_mode);
+	Session_impl(persistance::Shared_data_writer::Sptr data_writer, 
+		Shared_data_reader::Sptr data_reader, 
+		common::Mining_mode mining_mode,
+		bool legacy_mode);
 	~Session_impl();
 
 	void update_connection(std::shared_ptr<Miner_connection> miner_connection) override;
@@ -36,7 +39,7 @@ public:
 	void set_update_time(std::chrono::steady_clock::time_point update_time) override { m_update_time = update_time; }
 	bool add_share() override;
 	void reset_shares() override;
-	void update_hashrate(double hashrate) override;
+	void update_hashrate(double hashrate, std::uint32_t pool_nbits, std::uint32_t network_nbits) override;
 	void set_block(LLP::CBlock const& block) override { m_block = std::make_unique<LLP::CBlock>(block); }
 	std::unique_ptr<LLP::CBlock> get_block() override;
 	bool is_inactive() const override { return m_inactive; }
@@ -55,6 +58,7 @@ private:
 	std::shared_ptr<Miner_connection> m_miner_connection;
 	std::chrono::steady_clock::time_point m_update_time;
 	Hashrate_helper m_hashrate_helper;
+	bool m_legacy_mode;
 	std::unique_ptr<LLP::CBlock> m_block;
 	std::atomic_bool m_inactive;
 	std::atomic_bool m_work_needed;
@@ -69,7 +73,8 @@ public:
 		persistance::Shared_data_writer::Sptr data_writer,
 		nexus_http_interface::Component::Sptr http_interface,
 		std::uint32_t session_expiry_time,
-		common::Mining_mode mining_mode);
+		common::Mining_mode mining_mode,
+		bool legacy_mode);
 
 	void stop() override;
 
@@ -99,6 +104,7 @@ private:
 	std::map<Session_key, std::shared_ptr<Session>> m_sessions;
 	std::uint32_t m_session_expiry_time;
 	common::Mining_mode m_mining_mode;
+	bool m_legacy_mode;
 
 };
 

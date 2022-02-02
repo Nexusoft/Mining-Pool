@@ -46,6 +46,7 @@ private:
     Session_registry::Sptr m_session_registry;
     chrono::Timer::Uptr m_get_block_timer;
     std::uint32_t m_pool_nbits;
+    std::uint32_t m_network_nbits;
     std::atomic<std::uint32_t> m_current_height;
 };
 

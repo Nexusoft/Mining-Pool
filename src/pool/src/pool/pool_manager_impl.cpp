@@ -71,7 +71,8 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_http_component, 
 		m_config->get_session_expiry_time(),
-		m_config->get_mining_mode())}
+		m_config->get_mining_mode(),
+		m_config->get_legacy_mode())}
 	, m_miner_notifications{std::make_unique<Notifications>(m_session_registry, m_config->get_miner_notifications())}
 	, m_current_height{0}
 	, m_block_map_id{0}

@@ -23,6 +23,7 @@ Miner_connection_legacy_impl::Miner_connection_legacy_impl(std::shared_ptr<spdlo
 	, m_session_registry{ std::move(session_registry) }
 	, m_get_block_timer{std::move(get_block_timer)}
 	, m_pool_nbits{ 0 }
+	, m_network_nbits{0}
 	, m_current_height{ 0U }
 {
 }
@@ -234,6 +235,8 @@ void Miner_connection_legacy_impl::process_accepted()
 		m_logger->error("Failed to update account for miner {}", user_data.m_account.m_address);
 	}
 
+	session->update_hashrate(0, m_pool_nbits, m_network_nbits);
+
 	session->set_update_time(std::chrono::steady_clock::now());
 }
 
@@ -301,6 +304,7 @@ void Miner_connection_legacy_impl::get_block(std::shared_ptr<Pool_manager> pool_
 				self->m_logger->debug("GET_BLOCK handler, session invalid.");
 				return;
 			}
+			self->m_network_nbits = block.nBits;
 			session->set_block(block);
 
 			//prepend pool nbits to the packet
