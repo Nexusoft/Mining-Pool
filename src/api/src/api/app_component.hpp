@@ -25,7 +25,7 @@ public:
         : m_public_ip{ std::move(public_ip) }
         , m_api_listen_port{ api_listen_port }
     {
-        auto config = oatpp::openssl::Config::createDefaultServerConfigShared(ssl_pem_file, ssl_crt_file);
+        auto config = oatpp::openssl::Config::createDefaultServerConfigShared(ssl_crt_file, ssl_pem_file);
         m_serverConnectionProvider = oatpp::openssl::server::ConnectionProvider::createShared(config, { m_public_ip, m_api_listen_port });
     }
 
