@@ -19,6 +19,8 @@ public:
 	void set_config_updated(bool update) override;
 	std::string get_payout_time() const override;
 	void set_payout_time(std::string payout_time) override;
+	std::uint32_t get_current_round() const override;
+	void set_current_round(std::uint32_t current_round) override;
 	Mining_info get_mining_info() const override;
 	void set_mining_info(Mining_info const& mining_info) override;
 
@@ -28,6 +30,7 @@ private:
 	Mining_info m_mining_info{};
 	std::atomic_bool m_config_updated{ true };
 	std::string m_payout_time{};
+	std::atomic_uint32_t m_current_round{ 0 };
 	mutable std::mutex m_payout_time_mutex;
 	mutable std::mutex m_mining_info_mutex;
 };
