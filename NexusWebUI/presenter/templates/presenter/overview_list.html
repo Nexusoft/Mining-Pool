@@ -42,6 +42,12 @@
             <li
                     data-mdb-target="#carouselMeta"
                     data-mdb-slide-to="3"
+                    class=""
+                    aria-current="true"
+            ></li>
+            <li
+                    data-mdb-target="#carouselMeta"
+                    data-mdb-slide-to="4"
                     class="active"
                     aria-current="true"
             ></li>
@@ -86,6 +92,20 @@
                         </div>
                         <div class="card-body">
                             <h1 class="card-title pricing-card-title" id="id_payout">_</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single item -->
+            <div class="carousel-item">
+                <div class="text-center">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">Current Round:</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title">{{ current_round }}</h1>
                         </div>
                     </div>
                 </div>
