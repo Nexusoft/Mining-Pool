@@ -74,7 +74,7 @@ public:
         auto blocks = m_data_reader->get_latest_blocks();
         for (auto& block : blocks)
         {
-            dto->blocks->push_back(Block_dto::createShared(block.m_round, block.m_height, block.m_hash.c_str(), block.m_mainnet_reward, block.m_block_found_time.c_str(), block.m_difficulty, block.m_orphan));
+            dto->blocks->push_back(Block_dto::createShared(block.m_round, block.m_height, block.m_hash.c_str(), block.m_block_found_time.c_str(), block.m_difficulty, block.m_orphan));
         }
 
         return createDtoResponse(Status::CODE_200, dto);
