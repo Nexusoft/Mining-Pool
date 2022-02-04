@@ -118,6 +118,8 @@ void Pool_manager_impl::start()
 		}
 	}
 
+	m_pool_api_data_exchange->set_current_round(m_reward_component->get_current_round());
+
 	// calculate round duration and start timer for end_round
 	std::chrono::system_clock::time_point round_start_time, round_end_time;
 	m_reward_component->get_start_end_round_times(round_start_time, round_end_time);
@@ -379,6 +381,8 @@ void Pool_manager_impl::end_round()
 	{
 		return;
 	}
+
+	m_pool_api_data_exchange->set_current_round(m_reward_component->get_current_round());
 
 	// start timer for next end_round
 	// calculate round duration and start timer for end_round
