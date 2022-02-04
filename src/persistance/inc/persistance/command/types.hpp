@@ -51,7 +51,9 @@ enum class Type : std::uint8_t
 	get_pool_hashrate,
 	get_longest_chain_finder,
 	get_top_block_finders,
-	update_block_share_difficulty
+	update_block_share_difficulty,
+	create_miner,
+	update_miner
 };
 
 

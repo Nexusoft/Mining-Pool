@@ -35,6 +35,8 @@ Data_writer_impl::Data_writer_impl(std::shared_ptr<spdlog::logger> logger,
 	m_update_reward_of_payment_cmd = m_command_factory->create_command(Type::update_reward_of_payment);
 	m_delete_empty_payments_cmd = m_command_factory->create_command(Type::delete_empty_payments);
 	m_update_block_share_difficulty_cmd = m_command_factory->create_command(Type::update_block_share_difficulty);
+	m_create_miner_cmd = m_command_factory->create_command(Type::create_miner);
+	m_update_miner_cmd = m_command_factory->create_command(Type::update_miner);
 }
 
 bool Data_writer_impl::create_account(std::string account, std::string display_name)
@@ -148,6 +150,23 @@ bool Data_writer_impl::update_block_share_difficulty(std::uint32_t height, doubl
 	return m_data_storage->execute_command(m_update_block_share_difficulty_cmd);
 }
 
+bool Data_writer_impl::create_miner(std::string account, std::string display_name)
+{
+	m_create_miner_cmd->set_params(command::Command_create_miner_params{ std::move(account), std::move(display_name) });
+	return m_data_storage->execute_command(m_create_miner_cmd);
+}
+
+bool Data_writer_impl::update_miner(Miner_data data)
+{
+	m_update_miner_cmd->set_params(command::Command_update_miner_params{
+		common::get_datetime_string(std::chrono::system_clock::now()),	// take current time as last_active_time
+		data.m_shares,
+		data.m_hashrate,
+		std::move(data.m_display_name),
+		std::move(data.m_name) });
+	return m_data_storage->execute_command(m_update_miner_cmd);
+}
+
 // --------------------------------------------------------------------------------------
 
 Shared_data_writer_impl::Shared_data_writer_impl(Data_writer::Uptr data_writer)
@@ -242,6 +261,18 @@ bool Shared_data_writer_impl::update_block_share_difficulty(std::uint32_t height
 {
 	std::scoped_lock lock(m_writer_mutex);
 	return m_data_writer->update_block_share_difficulty(height, share_difficulty);
+}
+
+bool Shared_data_writer_impl::create_miner(std::string account, std::string display_name)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->create_miner(std::move(account), std::move(display_name));
+}
+
+bool Shared_data_writer_impl::update_miner(Miner_data data)
+{
+	std::scoped_lock lock(m_writer_mutex);
+	return m_data_writer->update_miner(std::move(data));
 }
 
 }

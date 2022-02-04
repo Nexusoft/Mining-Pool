@@ -91,6 +91,10 @@ public:
             std::make_shared<Command_delete_empty_payments_impl>(m_storage_manager->get_handle<sqlite3*>())));   
         m_commands.emplace(std::make_pair(Type::update_block_share_difficulty,
             std::make_shared<Command_update_block_share_difficulty_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::create_miner,
+            std::make_shared<Command_create_miner_impl>(m_storage_manager->get_handle<sqlite3*>())));
+        m_commands.emplace(std::make_pair(Type::update_miner,
+            std::make_shared<Command_update_miner_impl>(m_storage_manager->get_handle<sqlite3*>())));
     }
 
     ~Command_factory_impl()
@@ -208,6 +212,12 @@ private:
             break; 
         case Type::update_block_share_difficulty:
             result = std::any_cast<std::shared_ptr<Command_update_block_share_difficulty_impl>>(m_commands[command_type]);
+            break;
+        case Type::create_miner:
+            result = std::any_cast<std::shared_ptr<Command_create_miner_impl>>(m_commands[command_type]);
+            break;
+        case Type::update_miner:
+            result = std::any_cast<std::shared_ptr<Command_update_miner_impl>>(m_commands[command_type]);
             break;
         }        
 

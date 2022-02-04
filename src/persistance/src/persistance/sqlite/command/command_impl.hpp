@@ -485,6 +485,43 @@ public:
 	void set_params(std::any params) override;
 };
 
+struct Command_create_miner_params
+{
+	std::string m_name;
+	std::string m_display_name;
+};
+
+class Command_create_miner_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_create_miner_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::create_miner; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
+	void set_params(std::any params) override;
+};
+
+struct Command_update_miner_params
+{
+	std::string m_last_active;
+	double m_shares;
+	double m_hashrate;
+	std::string m_display_name;
+	std::string m_name;
+};
+
+class Command_update_miner_impl : public Command_base_database_sqlite
+{
+public:
+
+	explicit Command_update_miner_impl(sqlite3* handle);
+
+	Type get_type() const override { return Type::update_miner; }
+	std::any get_command() const override { return Command_type_sqlite{ {m_stmt}, {}, Command_type_sqlite::Type::no_result }; }
+	void set_params(std::any params) override;
+};
+
 }
 }
 }

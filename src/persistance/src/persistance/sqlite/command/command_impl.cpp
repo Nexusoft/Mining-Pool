@@ -534,7 +534,7 @@ Command_create_config_impl::Command_create_config_impl(sqlite3* handle)
 {
 	std::string create_config{ R"(INSERT INTO config 
 		(version, difficulty_divider, fee, mining_mode, round_duration_hours) 
-		VALUES('1.1', :difficulty_divider, :fee, :mining_mode, :round_duration_hours))" };
+		VALUES('2.0', :difficulty_divider, :fee, :mining_mode, :round_duration_hours))" };
 
 	if (sqlite3_prepare_v2(m_handle, create_config.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
 	{
@@ -723,6 +723,50 @@ void Command_update_block_share_difficulty_impl::set_params(std::any params)
 	auto casted_params = std::any_cast<Command_update_block_share_difficulty_params>(m_params);
 	bind_param(m_stmt, ":height", casted_params.m_height);
 	bind_param(m_stmt, ":share_difficulty", casted_params.m_share_difficulty);
+}
+
+// -----------------------------------------------------------------------------------------------
+Command_create_miner_impl::Command_create_miner_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string create_miner{ R"(INSERT INTO miner 
+		(name, last_active, shares, hashrate, display_name) 
+		VALUES(:name, CURRENT_TIMESTAMP, 0, 0, :display_name))" };
+
+	if (sqlite3_prepare_v2(m_handle, create_miner.c_str(), -1, &m_stmt, NULL) != SQLITE_OK)
+	{
+		std::cout << sqlite3_errmsg(m_handle) << std::endl;
+	}
+}
+
+void Command_create_miner_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_create_miner_params>(m_params);
+	bind_param(m_stmt, ":name", casted_params.m_name);
+	bind_param(m_stmt, ":display_name", casted_params.m_display_name);
+}
+
+// -----------------------------------------------------------------------------------------------
+Command_update_miner_impl::Command_update_miner_impl(sqlite3* handle)
+	: Command_base_database_sqlite{ handle }
+{
+	std::string update_miner{ R"(UPDATE account SET 
+			last_active = :last_active, shares = :shares, hashrate = :hashrate, display_name = :display_name
+			WHERE name = :name)" };
+
+	sqlite3_prepare_v2(m_handle, update_miner.c_str(), -1, &m_stmt, NULL);
+}
+
+void Command_update_miner_impl::set_params(std::any params)
+{
+	m_params = std::move(params);
+	auto casted_params = std::any_cast<Command_update_miner_params>(m_params);
+	bind_param(m_stmt, ":last_active", casted_params.m_last_active);
+	bind_param(m_stmt, ":shares", casted_params.m_shares);
+	bind_param(m_stmt, ":hashrate", casted_params.m_hashrate);
+	bind_param(m_stmt, ":display_name", casted_params.m_display_name);
+	bind_param(m_stmt, ":name", casted_params.m_name);
 }
 
 

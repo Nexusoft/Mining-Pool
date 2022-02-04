@@ -41,6 +41,8 @@ public:
     bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) override;
     bool delete_empty_payments() override;
     bool update_block_share_difficulty(std::uint32_t height, double share_difficulty) override;
+    bool create_miner(std::string account, std::string display_name) override;
+    bool update_miner(Miner_data data) override;
 
 private:
 
@@ -64,6 +66,8 @@ private:
     std::shared_ptr<Command> m_update_reward_of_payment_cmd;
     std::shared_ptr<Command> m_delete_empty_payments_cmd;
     std::shared_ptr<Command> m_update_block_share_difficulty_cmd;
+    std::shared_ptr<Command> m_create_miner_cmd;
+    std::shared_ptr<Command> m_update_miner_cmd;
  };
 
 class Shared_data_writer_impl : public Shared_data_writer
@@ -87,6 +91,8 @@ public:
     bool update_reward_of_payment(double reward, std::string account, std::uint32_t round_number) override;
     bool delete_empty_payments() override;
     bool update_block_share_difficulty(std::uint32_t height, double share_difficulty) override;
+    bool create_miner(std::string account, std::string display_name) override;
+    bool update_miner(Miner_data data) override;
 
 private:
 

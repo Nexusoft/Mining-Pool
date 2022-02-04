@@ -63,6 +63,16 @@ void Storage_manager_sqlite::start()
 		  display_name TEXT
 		);)", NULL, NULL, NULL);
 
+	sqlite3_exec(m_handle, R"(CREATE TABLE IF NOT EXISTS miner(
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		last_active TEXT,
+		shares REAL,
+		hashrate REAL,
+		display_name TEXT,
+		FOREIGN KEY(name) REFERENCES account(name)
+		);)", NULL, NULL, NULL);
+
 	sqlite3_exec(m_handle, R"(CREATE TABLE IF NOT EXISTS payment (
 		  id INTEGER PRIMARY KEY AUTOINCREMENT, 
 		  name TEXT NOT NULL,
@@ -120,6 +130,12 @@ void Storage_manager_sqlite::update_db_schema()
 		m_logger->info("Updating DB schema to version 1.1");
 		sqlite3_exec(m_handle, R"(ALTER TABLE block ADD COLUMN share_difficulty REAL;)", NULL, NULL, NULL);
 		sqlite3_exec(m_handle, R"(UPDATE config SET version = '1.1';)", NULL, NULL, NULL);
+	}
+	else if (version == "1.1")
+	{
+		// Bump version number
+		m_logger->info("Updating DB schema to version 2.0");
+		sqlite3_exec(m_handle, R"(UPDATE config SET version = '2.0';)", NULL, NULL, NULL);
 	}
 }
 

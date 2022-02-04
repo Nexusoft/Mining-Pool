@@ -99,6 +99,17 @@ struct Statistics_top_block_finder
 	bool is_empty() const { return (m_display_name.empty()); }
 };
 
+struct Miner_data
+{
+	std::string m_name{};
+	std::string m_last_active{};
+	double m_shares{ 0 };
+	double m_hashrate{ 0 };
+	std::string m_display_name{};
+
+	bool is_empty() const { return (m_name.empty()); }
+};
+
 } // namespace database
 } // namespace nexuspool
 

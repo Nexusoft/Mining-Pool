@@ -35,6 +35,16 @@ CREATE TABLE IF NOT EXISTS account (
   display_name TEXT
 );
 
+CREATE TABLE IF NOT EXISTS miner (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  last_active TEXT,
+  shares REAL,
+  hashrate REAL,
+  display_name TEXT,
+  FOREIGN KEY(name) REFERENCES account(name)
+);
+
 CREATE TABLE IF NOT EXISTS payment (
   id INTEGER PRIMARY KEY AUTOINCREMENT, 
   name TEXT NOT NULL,
