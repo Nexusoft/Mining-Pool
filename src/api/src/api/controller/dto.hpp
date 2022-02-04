@@ -73,7 +73,6 @@ class Block_dto : public oatpp::DTO
 	DTO_FIELD(UInt32, round);
 	DTO_FIELD(UInt32, height);
 	DTO_FIELD(String, hash);
-	DTO_FIELD(Float64, block_reward);
 	DTO_FIELD(String, time);
 	DTO_FIELD(Float64, network_diff);
 	DTO_FIELD(Boolean, is_orphan);
@@ -81,11 +80,10 @@ class Block_dto : public oatpp::DTO
 public:
 
 	Block_dto() = default;
-	Block_dto(std::uint32_t pround, std::uint32_t pheight, const char* phash, double pblock_reward, const char* ptime, double pnetwork_diff, bool pis_orphan)
+	Block_dto(std::uint32_t pround, std::uint32_t pheight, const char* phash, const char* ptime, double pnetwork_diff, bool pis_orphan)
 		: round(pround)
 		, height(pheight)
 		, hash(phash)
-		, block_reward(pblock_reward)
 		, time(ptime)
 		, network_diff(pnetwork_diff)
 		, is_orphan(pis_orphan)
