@@ -40,7 +40,7 @@ def block_overview_list(request):
             block_overview_latest = rest_request(method='latestblocks')
             block_overview_latest_json = block_overview_latest.json()
 
-            print(block_overview_latest_json)
+            # print(block_overview_latest_json)
 
             # Check if Blocks were returned from the Pool
             if not block_overview_latest_json['blocks']:

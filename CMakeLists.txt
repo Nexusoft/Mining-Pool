@@ -10,6 +10,9 @@ configure_file(src/version.h.in version.h)
 include_directories(${CMAKE_SOURCE_DIR}/include/)
 link_directories(${CMAKE_SOURCE_DIR}/libs)
 
+
+
+
 option(WITH_TESTS "Build with unit tests" OFF)
 
 find_package(Threads REQUIRED)
@@ -64,3 +67,5 @@ target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 target_link_libraries(NexusPool pool)
 
 target_link_libraries(NexusPool Threads::Threads)
+
+set_target_properties(NexusPool PROPERTIES VS_DEBUGGER_COMMAND_ARGUMENTS "-a F:/Work/Nexus Project/LLL-HPP/out/build/x64-Debug/api.conf -p pool.conf")
