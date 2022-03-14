@@ -4,7 +4,8 @@ add_library(pool STATIC   src/pool/timer_manager_wallet.cpp
                           src/pool/miner_connection_impl.cpp 
                           src/pool/wallet_connection_impl.cpp 
                           src/pool/pool_manager_impl.cpp 
-                          src/pool/session_impl.cpp)
+                          src/pool/session_impl.cpp
+                          src/pool/miner_connection_legacy_impl.cpp)
                     
 target_include_directories(pool
     PUBLIC 

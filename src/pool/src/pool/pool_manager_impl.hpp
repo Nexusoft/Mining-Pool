@@ -62,6 +62,8 @@ private:
     nexus_http_interface::Component::Sptr m_http_component;
     reward::Component::Uptr m_reward_component;
 
+    bool m_legacy_mode;
+
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
     network::Socket::Sptr m_listen_socket;
 
