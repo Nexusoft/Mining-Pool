@@ -16,12 +16,14 @@ Pool API's:
             - wallet_version
             - pool_version
             - payout_time
+            - current_round
 
     #######################
         GET /latestblocks
 
         # Result
         Fields:
+            - round
             - hash
             - height
             - network diff

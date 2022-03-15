@@ -156,7 +156,7 @@ void Command_get_account_impl::set_params(std::any params)
 Command_get_blocks_impl::Command_get_blocks_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	if (sqlite3_prepare_v2(m_handle, "SELECT hash, height, type, difficulty, orphan, block_finder, round, block_found_time, mainnet_reward FROM block ORDER BY height LIMIT 100;", -1, &m_stmt, NULL) != SQLITE_OK)
+	if (sqlite3_prepare_v2(m_handle, "SELECT hash, height, type, difficulty, orphan, block_finder, round, block_found_time, mainnet_reward FROM block ORDER BY height DESC LIMIT 100;", -1, &m_stmt, NULL) != SQLITE_OK)
 	{
 		std::cout << sqlite3_errmsg(m_handle) << std::endl;
 	}
@@ -403,7 +403,7 @@ std::any Command_get_pool_hashrate_impl::get_command() const
 Command_get_longest_chain_finder_impl::Command_get_longest_chain_finder_impl(sqlite3* handle)
 	: Command_base_database_sqlite{ handle }
 {
-	sqlite3_prepare_v2(m_handle, "SELECT height, share_difficulty, block_finder, round, account.display_name FROM block INNER JOIN account ON block.block_finder=account.name ORDER BY share_difficulty DESC LIMIT 1", -1, &m_stmt, NULL);
+	sqlite3_prepare_v2(m_handle, "SELECT height, share_difficulty, block_finder, round, account.display_name FROM block INNER JOIN account ON block.block_finder=account.name WHERE block.orphan = 0 ORDER BY share_difficulty DESC LIMIT 1", -1, &m_stmt, NULL);
 }
 
 std::any Command_get_longest_chain_finder_impl::get_command() const

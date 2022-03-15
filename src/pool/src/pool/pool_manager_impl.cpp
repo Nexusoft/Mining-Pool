@@ -2,6 +2,7 @@
 #include "pool/session_impl.hpp"
 #include "pool/wallet_connection_impl.hpp"
 #include "pool/miner_connection_impl.hpp"
+#include "pool/miner_connection_legacy_impl.hpp"
 #include "pool/notifications.hpp"
 #include "config/config.hpp"
 #include "common/utils.hpp"
@@ -73,10 +74,12 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_data_writer_factory->create_shared_data_writer(), 
 		m_http_component, 
 		m_config->get_session_expiry_time(),
-		m_config->get_mining_mode())}
+		m_config->get_mining_mode(),
+		m_config->get_legacy_mode())}
 	, m_miner_notifications{std::make_unique<Notifications>(m_session_registry, m_config->get_miner_notifications())}
 	, m_current_height{0}
 	, m_block_map_id{0}
+	, m_legacy_mode{m_config->get_legacy_mode()}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
@@ -118,6 +121,8 @@ void Pool_manager_impl::start()
 		}
 	}
 
+	m_pool_api_data_exchange->set_current_round(m_reward_component->get_current_round());
+
 	// calculate round duration and start timer for end_round
 	std::chrono::system_clock::time_point round_start_time, round_end_time;
 	m_reward_component->get_start_end_round_times(round_start_time, round_end_time);
@@ -148,7 +153,21 @@ void Pool_manager_impl::start()
 	auto socket_handler = [self](network::Connection::Sptr&& connection)
 	{
 		auto const session_key = self->m_session_registry->create_session();
-		auto miner_connection = create_miner_connection(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
+		std::shared_ptr<Miner_connection> miner_connection{};
+		if (self->m_legacy_mode)
+		{
+			miner_connection = std::make_shared<Miner_connection_legacy_impl>(
+				self->m_logger, 
+				std::move(connection), 
+				self, 
+				session_key, 
+				self->m_session_registry, 
+				self->m_timer_factory->create_timer());
+		}
+		else
+		{
+			miner_connection = create_miner_connection(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
+		}
 
 		auto session = self->m_session_registry->get_session(session_key);
 		session->update_connection(miner_connection);
@@ -162,7 +181,10 @@ void Pool_manager_impl::start()
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 
-	m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
+	if (!m_legacy_mode)
+	{
+		m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
+	}
 }
 
 void Pool_manager_impl::stop()
@@ -183,6 +205,7 @@ void Pool_manager_impl::set_current_height(std::uint32_t height)
 	{
 		m_current_height = height;
 		// new block -> clear pending blocks from previous height
+		m_logger->trace("New height, clear pending blocks from previous height");
 		m_block_map.clear();
 		m_block_map_id = 0;
 		m_session_registry->reset_work_status_of_sessions();
@@ -195,7 +218,6 @@ void Pool_manager_impl::set_current_height(std::uint32_t height)
 		auto session = m_session_registry->get_session_with_no_work();
 		if (session)
 		{
-			m_logger->trace("Get block for miner {}", session->get_user_data().m_account.m_display_name);
 			m_wallet_connection->get_block([session](auto block)
 				{
 					auto miner_connection = session->get_connection();
@@ -241,6 +263,7 @@ void Pool_manager_impl::set_block(LLP::CBlock const& block)
 
 void Pool_manager_impl::add_block_to_storage(std::uint32_t block_map_id)
 {
+	m_logger->trace("Accessing block_map with id {}. Current block_map size {} and id {}", block_map_id, m_block_map.size(), m_block_map_id);
 	auto submit_block_data = m_block_map[block_map_id];
 	
 	auto data_writer = m_data_writer_factory->create_shared_data_writer();
@@ -269,6 +292,11 @@ void Pool_manager_impl::get_block(Get_block_handler&& handler)
 void Pool_manager_impl::submit_block(std::unique_ptr<LLP::CBlock> block, Session_key miner_key, Submit_block_handler handler)
 {
 	auto session = m_session_registry->get_session(miner_key);
+	if (!session)
+	{
+		m_logger->error("Pool_manager_impl::submit_block session invalid");
+	}
+
 	auto difficulty_result = m_reward_component->check_difficulty(*block, m_pool_nBits);
 	switch (difficulty_result)
 	{
@@ -373,6 +401,8 @@ void Pool_manager_impl::end_round()
 	{
 		return;
 	}
+
+	m_pool_api_data_exchange->set_current_round(m_reward_component->get_current_round());
 
 	// start timer for next end_round
 	// calculate round duration and start timer for end_round

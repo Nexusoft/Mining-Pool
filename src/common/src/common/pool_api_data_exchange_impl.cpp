@@ -40,6 +40,16 @@ void Pool_api_data_exchange_impl::set_payout_time(std::string payout_time)
     m_payout_time = std::move(payout_time);
 }
 
+std::uint32_t Pool_api_data_exchange_impl::get_current_round() const
+{
+    return m_current_round;
+}
+
+void Pool_api_data_exchange_impl::set_current_round(std::uint32_t current_round)
+{
+    m_current_round = current_round;
+}
+
 Mining_info Pool_api_data_exchange_impl::get_mining_info() const
 {
     std::scoped_lock lock(m_mining_info_mutex);

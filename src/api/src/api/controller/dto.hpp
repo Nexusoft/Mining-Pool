@@ -23,6 +23,7 @@ class Meta_infos_dto : public oatpp::DTO
 	DTO_FIELD(String, wallet_version);
 	DTO_FIELD(String, pool_version);
 	DTO_FIELD(String, payout_time);
+	DTO_FIELD(UInt32, current_round);
 };
 
 class Account_dto : public oatpp::DTO
@@ -69,6 +70,7 @@ class Block_dto : public oatpp::DTO
 {
 	DTO_INIT(Block_dto, DTO)
 
+	DTO_FIELD(UInt32, round);
 	DTO_FIELD(UInt32, height);
 	DTO_FIELD(String, hash);
 	DTO_FIELD(String, time);
@@ -78,8 +80,9 @@ class Block_dto : public oatpp::DTO
 public:
 
 	Block_dto() = default;
-	Block_dto(std::uint32_t pheight, const char* phash, const char* ptime, double pnetwork_diff, bool pis_orphan)
-		: height(pheight)
+	Block_dto(std::uint32_t pround, std::uint32_t pheight, const char* phash, const char* ptime, double pnetwork_diff, bool pis_orphan)
+		: round(pround)
+		, height(pheight)
 		, hash(phash)
 		, time(ptime)
 		, network_diff(pnetwork_diff)

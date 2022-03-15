@@ -14,8 +14,11 @@ public:
     MOCK_METHOD(void, set_active_miners, (std::uint32_t active_miners), (override));
     MOCK_METHOD(bool, is_config_updated, (), (const override));
     MOCK_METHOD(void, set_config_updated, (bool update), (override));
+    MOCK_METHOD(std::uint32_t, get_current_round, (), (const override));
+    MOCK_METHOD(void, set_current_round, (std::uint32_t current_round), (override));
     MOCK_METHOD(Mining_info, get_mining_info, (), (const override));
     MOCK_METHOD(void, set_mining_info, (Mining_info const& mining_info), (override));
+
 };
 
 }

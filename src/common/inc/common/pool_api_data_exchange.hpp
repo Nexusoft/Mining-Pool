@@ -24,6 +24,8 @@ public:
 	virtual void set_config_updated(bool update) = 0;
 	virtual std::string get_payout_time() const = 0;
 	virtual void set_payout_time(std::string payout_time) = 0;
+	virtual std::uint32_t get_current_round() const = 0;
+	virtual void set_current_round(std::uint32_t current_round) = 0;
 
 	virtual Mining_info get_mining_info() const = 0;
 	virtual void set_mining_info(Mining_info const& mining_info) = 0;

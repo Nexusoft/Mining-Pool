@@ -165,7 +165,10 @@ bool Component_impl::end_round(std::uint32_t round_number)
 		if (!m_fee_address.empty())
 		{
 			m_logger->debug("Added pool fee payment for {}", m_fee_address);
-			m_shared_data_writer->add_payment(persistance::Payment_data{ m_fee_address, 0.0, 0.0, "", round_data.m_round, "" });
+			if(!m_shared_data_writer->add_payment(persistance::Payment_data{ m_fee_address, 0.0, 0.0, "", round_data.m_round, "" }))
+			{
+				m_logger->error("Failed to add_payment for pool fee");
+			}
 		}
 	}
 
@@ -224,12 +227,12 @@ Calculate_rewards_result Component_impl::calculate_rewards(std::uint32_t round_n
 				// dev fee should go to a seperate account
 				if (!m_fee_address.empty() && m_fee_address == payment.m_account)
 				{
-					auto const pool_fee = round_data.m_total_rewards * static_cast<double>(m_pool_fee / 100);
+					double const pool_fee = round_data.m_total_rewards * static_cast<double>(m_pool_fee) / 100.0;
 					m_logger->debug("Pool fee payment {} NXS for {}", pool_fee, m_fee_address);
 					m_shared_data_writer->update_reward_of_payment(pool_fee, m_fee_address, round_number);
 				}
 				// calculate reward for account. First reduce the total_rewards with pool_fee % 
-				auto account_reward = (round_data.m_total_rewards * (1.0 - static_cast<double>(m_pool_fee / 100))) * (payment.m_shares / round_data.m_total_shares);
+				auto account_reward = (round_data.m_total_rewards * (1.0 - (static_cast<double>(m_pool_fee) / 100.0))) * (payment.m_shares / round_data.m_total_shares);
 				m_shared_data_writer->update_reward_of_payment(account_reward, payment.m_account, round_number);
 			}
 			result = Calculate_rewards_result::finished;

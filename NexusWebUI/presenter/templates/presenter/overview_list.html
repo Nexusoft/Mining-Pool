@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 {% load render_table from django_tables2 %}
 
-<style>
-    table {
-        class: "table table-striped"
-    }
-</style>
 
 {% block body_block %}
+
+    <style>
+        tr[is_orphan="True"] {
+            border: solid thin;
+            {#border-left: solid;#}
+            border-color: red;
+            {#background-color: red;#}
+        }
+    </style>
 
     <br>
 
@@ -38,6 +42,12 @@
             <li
                     data-mdb-target="#carouselMeta"
                     data-mdb-slide-to="3"
+                    class=""
+                    aria-current="true"
+            ></li>
+            <li
+                    data-mdb-target="#carouselMeta"
+                    data-mdb-slide-to="4"
                     class="active"
                     aria-current="true"
             ></li>
@@ -82,6 +92,20 @@
                         </div>
                         <div class="card-body">
                             <h1 class="card-title pricing-card-title" id="id_payout">_</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single item -->
+            <div class="carousel-item">
+                <div class="text-center">
+                    <div class="card mb-4 rounded-3 shadow-sm">
+                        <div class="card-header py-3">
+                            <h4 class="my-0 fw-normal">Current Round:</h4>
+                        </div>
+                        <div class="card-body">
+                            <h1 class="card-title pricing-card-title">{{ current_round }}</h1>
                         </div>
                     </div>
                 </div>

@@ -10,16 +10,19 @@ class OverviewTable(tables.Table):
     height = tables.Column(orderable=False)
     hash = tables.LinkColumn('presenter:detail', args=[A('hash')], orderable=False, text=shorten_hash_text,
                              verbose_name='Hash', attrs={"a": {"target": "_blank"}})
-    block_reward = tables.Column(orderable=False)
     time = tables.Column(orderable=False)
     network_diff = tables.Column(orderable=False)
+    round = tables.Column(orderable=False)
 
     class Meta:
         template_name = "django_tables2/bootstrap4.html"
         attrs = {
             'class': ' table table-dark table-hover table-striped',
         }
-        sequence = ('height', 'block_reward', 'time', 'network_diff', 'hash')
+        sequence = ('height', 'time', 'network_diff', 'hash', 'round')
+        row_attrs = {
+            'is_orphan': lambda record: record['is_orphan']
+        }
 
 
 class AccountPayoutsTable(tables.Table):

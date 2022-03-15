@@ -40,6 +40,8 @@ def block_overview_list(request):
             block_overview_latest = rest_request(method='latestblocks')
             block_overview_latest_json = block_overview_latest.json()
 
+            # print(block_overview_latest_json)
+
             # Check if Blocks were returned from the Pool
             if not block_overview_latest_json['blocks']:
                 logger.info("Received no Blocks from Pool!")
@@ -71,6 +73,7 @@ def block_overview_list(request):
         wallet_version = block_overview_meta_json['wallet_version']
         pool_version = block_overview_meta_json['pool_version']
         payout_time = block_overview_meta_json['payout_time']
+        current_round = block_overview_meta_json['current_round']
 
         return render(request, template_name, {'table': table_data,
                                                'pool_hashrate': pool_hashrate,
@@ -80,7 +83,8 @@ def block_overview_list(request):
                                                'fee': fee,
                                                'wallet_version': wallet_version,
                                                'pool_version': pool_version,
-                                               'payout_time': payout_time
+                                               'payout_time': payout_time,
+                                               'current_round': current_round
                                                })
 
     except Exception as ex:

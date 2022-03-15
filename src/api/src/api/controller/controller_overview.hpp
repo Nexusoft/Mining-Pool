@@ -58,6 +58,7 @@ public:
         dto->mining_mode = config.m_mining_mode.c_str();
         dto->active_miners = m_pool_api_data_exchange->get_active_miners();
         dto->payout_time = m_pool_api_data_exchange->get_payout_time();
+        dto->current_round = m_pool_api_data_exchange->get_current_round();
         auto const system_info = get_system_info();
         dto->wallet_version = system_info.m_wallet_version;
         dto->pool_version = system_info.m_pool_version;
@@ -73,7 +74,7 @@ public:
         auto blocks = m_data_reader->get_latest_blocks();
         for (auto& block : blocks)
         {
-            dto->blocks->push_back(Block_dto::createShared(block.m_height, block.m_hash.c_str(), block.m_block_found_time.c_str(), block.m_difficulty, block.m_orphan));
+            dto->blocks->push_back(Block_dto::createShared(block.m_round, block.m_height, block.m_hash.c_str(), block.m_block_found_time.c_str(), block.m_difficulty, block.m_orphan));
         }
 
         return createDtoResponse(Status::CODE_200, dto);
