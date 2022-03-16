@@ -37,6 +37,7 @@ public:
 	virtual std::uint16_t get_update_block_hashes_interval() const = 0;
 	virtual std::uint16_t get_hashrate_interval() const = 0;
 	virtual bool get_miner_notifications() const = 0;
+	virtual bool get_legacy_mode() const = 0;
 };
 
 Config::Sptr create_config();

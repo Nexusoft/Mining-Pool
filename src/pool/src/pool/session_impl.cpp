@@ -8,13 +8,14 @@
 namespace nexuspool
 {
 
-Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Shared_data_reader::Sptr data_reader, common::Mining_mode mining_mode)
+Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Shared_data_reader::Sptr data_reader, common::Mining_mode mining_mode, bool legacy_mode)
 	: m_data_writer{ std::move(data_writer) }
 	, m_data_reader{ std::move(data_reader) }
 	, m_user_data{}
 	, m_miner_connection{}
 	, m_update_time{ std::chrono::steady_clock::now() }
 	, m_hashrate_helper{ mining_mode }
+	, m_legacy_mode{legacy_mode}
 	, m_block{}
 	, m_inactive{false}
 	, m_work_needed{true}
@@ -23,7 +24,7 @@ Session_impl::Session_impl(persistance::Shared_data_writer::Sptr data_writer, Sh
 
 Session_impl::~Session_impl()
 {
-	update_hashrate(0);		// set hasrate to 0 on disconnect
+	update_hashrate(0, 0, 0);		// set hasrate to 0 on disconnect
 }
 
 void Session_impl::update_connection(std::shared_ptr<Miner_connection> miner_connection)
@@ -46,9 +47,14 @@ void Session_impl::reset_shares()
 	m_data_writer->update_account(m_user_data.m_account);
 }
 
-void Session_impl::update_hashrate(double hashrate)
+void Session_impl::update_hashrate(double hashrate, std::uint32_t pool_nbits, std::uint32_t network_nbits)
 {
 	m_user_data.m_account = m_data_reader->get_account(m_user_data.m_account.m_address);
+	if (m_legacy_mode && pool_nbits > 0 && network_nbits > 0)
+	{
+		hashrate = m_hashrate_helper.get_hashrate(pool_nbits, network_nbits, 0.0);
+	}
+
 	m_user_data.m_account.m_hashrate = hashrate;
 	m_data_writer->update_account(m_user_data.m_account);
 }
@@ -99,13 +105,15 @@ Session_registry_impl::Session_registry_impl(persistance::Data_reader::Uptr data
 	persistance::Shared_data_writer::Sptr data_writer,
 	nexus_http_interface::Component::Sptr http_interface,
 	std::uint32_t session_expiry_time,
-	common::Mining_mode mining_mode)
+	common::Mining_mode mining_mode,
+	bool legacy_mode)
 	: m_data_reader{ std::make_shared<Shared_data_reader>(std::move(data_reader)) }
 	, m_data_writer{ std::move(data_writer) }
 	, m_http_interface{std::move(http_interface)}
 	, m_sessions{}
 	, m_session_expiry_time{ session_expiry_time }
 	, m_mining_mode{mining_mode}
+	, m_legacy_mode{legacy_mode}
 {}
 
 void Session_registry_impl::stop()
@@ -120,7 +128,7 @@ Session_key Session_registry_impl::create_session()
 	std::scoped_lock lock(m_sessions_mutex);
 
 	auto const session_key = LLC::GetRand256();
-	m_sessions.emplace(std::make_pair(session_key, std::make_shared<Session_impl>(m_data_writer, m_data_reader, m_mining_mode)));
+	m_sessions.emplace(std::make_pair(session_key, std::make_shared<Session_impl>(m_data_writer, m_data_reader, m_mining_mode, m_legacy_mode)));
 	return session_key;
 }
 

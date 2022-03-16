@@ -2,7 +2,6 @@
 #define NEXUSPOOL_MINER_CONNECTION_HPP
 
 #include "network/connection.hpp"
-#include "network/connection.hpp"
 #include "pool/session.hpp"
 #include <memory>
 

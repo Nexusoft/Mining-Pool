@@ -36,7 +36,7 @@ public:
 	virtual void set_update_time(std::chrono::steady_clock::time_point update_time) = 0;
 	virtual bool add_share() = 0;
 	virtual void reset_shares() = 0;
-	virtual void update_hashrate(double hashrate) = 0;
+	virtual void update_hashrate(double hashrate, std::uint32_t pool_nbits, std::uint32_t network_nbits) = 0;
 	virtual void set_block(LLP::CBlock const& block) = 0;
 	virtual std::unique_ptr<LLP::CBlock> get_block() = 0;
 	virtual bool is_inactive() const = 0;
