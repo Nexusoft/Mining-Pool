@@ -17,27 +17,43 @@ endif()
 
 include(${CPM_DOWNLOAD_LOCATION})
 
+find_package(Threads REQUIRED)
+
 #spdlog
 CPMAddPackage(NAME spdlog GITHUB_REPOSITORY gabime/spdlog VERSION 1.9.2)
 
 #nlohmann json
 CPMAddPackage(NAME nlohmann_json GITHUB_REPOSITORY nlohmann/json  VERSION 3.10.5)
 
+#ASIO
+CPMAddPackage("gh:chriskohlhoff/asio#asio-1-18-1@1.18.1")
+
+# ASIO doesn't use CMake, we have to configure it manually. Extra notes for using on Windows:
+#
+# 1) If _WIN32_WINNT is not set, ASIO assumes _WIN32_WINNT=0x0501, i.e. Windows XP target, which is
+# definitely not the platform which most users target.
+#
+# 2) WIN32_LEAN_AND_MEAN is defined to make Winsock2 work.
+  add_library(asio INTERFACE)
+
+  target_include_directories(asio SYSTEM INTERFACE ${asio_SOURCE_DIR}/asio/include)
+
+  target_compile_definitions(asio INTERFACE ASIO_STANDALONE ASIO_NO_DEPRECATED)
+    target_compile_definitions(asio INTERFACE _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN)
+
+  target_link_libraries(asio INTERFACE Threads::Threads)
+
+
+
 include_directories(${CMAKE_SOURCE_DIR}/include/)
 link_directories(${CMAKE_SOURCE_DIR}/libs)
 
 option(WITH_TESTS "Build with unit tests" OFF)
 
-find_package(Threads REQUIRED)
-
 # OpenSSL
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
-
-#ASIO
-add_definitions(-DASIO_STANDALONE)
-include_directories(${CMAKE_SOURCE_DIR}/include/asio-1.18.1/include)
 
 if(UNIX)
     add_definitions(-DUNIX)
@@ -77,7 +93,7 @@ add_executable(NexusPool
 
 target_include_directories(NexusPool PUBLIC "${PROJECT_BINARY_DIR}")
 
-target_link_libraries(NexusPool pool)
+target_link_libraries(NexusPool pool asio)
 
 target_link_libraries(NexusPool Threads::Threads)
 

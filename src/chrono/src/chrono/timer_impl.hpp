@@ -38,9 +38,7 @@ public:
             // destroy current active timer invocation
             m_active.reset();
 
-            ::asio::error_code error;
-            m_timer.cancel(error);
-
+            m_timer.cancel();
         }
     }
 
@@ -59,8 +57,7 @@ private:
         m_active = std::make_shared<bool>();
 
         // new call to expires_from_now() also cancels the current active expirations
-        ::asio::error_code error;
-        m_timer.expires_from_now(expires_in, error);
+        m_timer.expires_after(expires_in);
         m_timer.async_wait([lambda_handler = std::move(handler), weak_active = std::weak_ptr<bool>(m_active)](::asio::error_code const& error) 
         {
             auto const active = weak_active.lock();
