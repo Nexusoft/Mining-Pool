@@ -14,4 +14,4 @@ target_include_directories(pool
     PRIVATE src
 )
 
-target_link_libraries(pool chrono network config LLP TAO api persistance reward common)
+target_link_libraries(pool spdlog chrono network config LLP TAO api persistance reward common)
