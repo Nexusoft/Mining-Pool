@@ -28,21 +28,17 @@ CPMAddPackage(NAME nlohmann_json GITHUB_REPOSITORY nlohmann/json  VERSION 3.10.5
 #ASIO
 CPMAddPackage("gh:chriskohlhoff/asio#asio-1-18-1@1.18.1")
 
-# ASIO doesn't use CMake, we have to configure it manually. Extra notes for using on Windows:
-#
-# 1) If _WIN32_WINNT is not set, ASIO assumes _WIN32_WINNT=0x0501, i.e. Windows XP target, which is
-# definitely not the platform which most users target.
-#
-# 2) WIN32_LEAN_AND_MEAN is defined to make Winsock2 work.
-  add_library(asio INTERFACE)
+# ASIO doesn't use CMake, we have to configure it manually
+# WIN32_LEAN_AND_MEAN is defined to make Winsock2 work.
+add_library(asio INTERFACE)
+target_include_directories(asio SYSTEM INTERFACE ${asio_SOURCE_DIR}/asio/include)
+target_compile_definitions(asio INTERFACE ASIO_STANDALONE ASIO_NO_DEPRECATED)
+target_compile_definitions(asio INTERFACE _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN)
 
-  target_include_directories(asio SYSTEM INTERFACE ${asio_SOURCE_DIR}/asio/include)
+# Howard Hinnant's date library
+CPMAddPackage(NAME date GITHUB_REPOSITORY HowardHinnant/date VERSION 3.0.1)
 
-  target_compile_definitions(asio INTERFACE ASIO_STANDALONE ASIO_NO_DEPRECATED)
-    target_compile_definitions(asio INTERFACE _WIN32_WINNT=0x0601 WIN32_LEAN_AND_MEAN)
-
-  target_link_libraries(asio INTERFACE Threads::Threads)
-
+target_link_libraries(asio INTERFACE Threads::Threads)
 
 
 include_directories(${CMAKE_SOURCE_DIR}/include/)
