@@ -4,7 +4,7 @@
 #include "oatpp/network/tcp/client/ConnectionProvider.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/core/macro/component.hpp"
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace nexuspool {
 namespace nexus_http_interface {

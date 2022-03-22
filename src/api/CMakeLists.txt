@@ -10,4 +10,4 @@ target_include_directories(api
     PRIVATE src
 )
 
-target_link_libraries(api spdlog config persistance TAO common oatpp chrono)
+target_link_libraries(api spdlog config persistance TAO common oatpp chrono nlohmann_json::nlohmann_json)

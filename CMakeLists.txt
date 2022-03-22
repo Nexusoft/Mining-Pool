@@ -20,6 +20,9 @@ include(${CPM_DOWNLOAD_LOCATION})
 #spdlog
 CPMAddPackage(NAME spdlog GITHUB_REPOSITORY gabime/spdlog VERSION 1.9.2)
 
+#nlohmann json
+CPMAddPackage(NAME nlohmann_json GITHUB_REPOSITORY nlohmann/json  VERSION 3.10.5)
+
 include_directories(${CMAKE_SOURCE_DIR}/include/)
 link_directories(${CMAKE_SOURCE_DIR}/libs)
 
