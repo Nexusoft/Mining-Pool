@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'NexusWebUI.context_processors.dynamic_title',
             ],
         },
     },
@@ -189,3 +190,6 @@ POOL_PORT = config('POOL_PORT', cast=int, default=1)
 POOL_HOST = config('POOL_HOST')
 POOL_USER = config('POOL_USER')
 POOL_PWD = config('POOL_PWD')
+
+# SITE SETTINGS
+SITE_NAME = config('SITE_NAME', default='Nexus Web UI')

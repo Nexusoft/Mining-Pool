@@ -8,3 +8,5 @@ target_include_directories(chrono
         $<INSTALL_INTERFACE:inc>
     PRIVATE src
 )
+
+target_link_libraries(chrono asio)

@@ -4,7 +4,8 @@ add_library(pool STATIC   src/pool/timer_manager_wallet.cpp
                           src/pool/miner_connection_impl.cpp 
                           src/pool/wallet_connection_impl.cpp 
                           src/pool/pool_manager_impl.cpp 
-                          src/pool/session_impl.cpp)
+                          src/pool/session_impl.cpp
+                          src/pool/miner_connection_legacy_impl.cpp)
                     
 target_include_directories(pool
     PUBLIC 
@@ -13,4 +14,4 @@ target_include_directories(pool
     PRIVATE src
 )
 
-target_link_libraries(pool chrono network config LLP TAO api persistance reward common)
+target_link_libraries(pool spdlog chrono network config LLP TAO api persistance reward common nlohmann_json::nlohmann_json)

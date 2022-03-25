@@ -45,7 +45,7 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "update_block_hashes_interval"  // Optional, default=600, time in seconds when the found blocks should update their hashes in storage. Automatically happens during round end.
     "get_hashrate_interval"         // Optional, default=300, time in seconds requesting the current hashrate from the connected miners
     "miner_notifications"           // Optional, default=true send notification messages to miners (like pool restart, block found etc)
-
+    "legacy_mode"                   // Optional, default=false Start the pool with legacy mining protocol to mimic blackpool/hashpool (for blackminers) Not recommended to use
     "persistance"       // Option group regarding used storage for the POOL
         "type"          // which storage type the POOL uses. Currently only 'sqlite' is supported.
         "file"          // filename of the storage.

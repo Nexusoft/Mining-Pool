@@ -27,6 +27,7 @@ namespace config
 		, m_update_block_hashes_interval{600}
 		, m_hashrate_interval{300}
 		, m_miner_notifications{true}
+		, m_legacy_mode{false}
 	{
 	}
 
@@ -130,6 +131,10 @@ namespace config
 			if (j.count("miner_notifications") != 0)
 			{
 				j.at("miner_notifications").get_to(m_miner_notifications);
+			}
+			if (j.count("legacy_mode") != 0)
+			{
+				j.at("legacy_mode").get_to(m_legacy_mode);
 			}
 
 			if (j.count("logfile") != 0)
