@@ -36,7 +36,8 @@ Ensure you are on latest wallet daemon release 5.0.5 or greater. Ensure wallet h
     "local_ip"              // the ip of the POOL. If the wallet runs on the same machine (127.0.0.1) then also this ip must be set to 127.0.0.1
     "local_port" :          // port of the POOL for connecting to NXS wallet. (0 for ephemeral port)
     "public_ip" :            // public ip of the POOL which miners connect to.
-    "miner_listen_port" : 0, // port of the POOL for listening to incoming miner connections. Potential miners will use public_ip:miner_listen_port to connect to the POOL.
+    "miner_listen_port" // Optional, default = 0, port of the POOL for listening to incoming miner connections. Potential miners will use public_ip:miner_listen_port to connect to the POOL.
+    "miner_legacy_listen_port" // Optional, port of the POOL for listening to incoming miner connections using the old legacy mining protocol.
     "mining_mode" : "HASH",  // mining mode the POOL is started with. Options are 'HASH' or 'PRIME'. Changes to this config option will only take effect after round end.
     "connection_retry_interval" // retry time in seconds trying to connect to NXS wallet if a connection attempt failed.
     "get_height_interval"       // time in seconds polling for current BLOCK height of NXS wallet.
