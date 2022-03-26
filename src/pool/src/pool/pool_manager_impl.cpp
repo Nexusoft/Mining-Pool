@@ -69,6 +69,7 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 		m_config->get_update_block_hashes_interval(),
 		m_config->get_pool_config().m_fee_address)}
 	, m_listen_socket{}
+	, m_legacy_listen_socket{}
 	, m_session_registry{std::make_shared<Session_registry_impl>(
 		m_data_reader_factory->create_data_reader(), 
 		m_data_writer_factory->create_shared_data_writer(), 
@@ -79,7 +80,6 @@ Pool_manager_impl::Pool_manager_impl(std::shared_ptr<asio::io_context> io_contex
 	, m_miner_notifications{std::make_unique<Notifications>(m_session_registry, m_config->get_miner_notifications())}
 	, m_current_height{0}
 	, m_block_map_id{0}
-	, m_legacy_mode{m_config->get_legacy_mode()}
 {
 	m_session_registry_maintenance = m_timer_factory->create_timer();
 	m_end_round_timer = m_timer_factory->create_timer();
@@ -148,26 +148,40 @@ void Pool_manager_impl::start()
 	network::Endpoint local_listen_endpoint{ network::Transport_protocol::tcp, m_config->get_public_ip(), m_config->get_miner_listen_port() };
 	m_listen_socket = m_socket_factory->create_socket(local_listen_endpoint);
 
+	// Init legacy listen socket
+	if (m_config->get_miner_legacy_listen_port() != 0)
+	{
+		m_logger->info("Init additional legacy miner listen socket on port {}", m_config->get_miner_legacy_listen_port());
+		network::Endpoint local_legacy_listen_endpoint{ network::Transport_protocol::tcp, m_config->get_public_ip(), m_config->get_miner_legacy_listen_port() };
+		m_legacy_listen_socket = m_socket_factory->create_socket(local_legacy_listen_endpoint);
+
+		// on listen/accept, save created connection to pool_conenctions and call the connection_handler of created pool connection object
+		auto legacy_socket_handler = [self](network::Connection::Sptr&& connection)
+		{
+			auto const session_key = self->m_session_registry->create_session();
+			std::shared_ptr<Miner_connection> miner_connection = std::make_shared<Miner_connection_legacy_impl>(
+				self->m_logger,
+				std::move(connection),
+				self,
+				session_key,
+				self->m_session_registry,
+				self->m_timer_factory->create_timer());
+
+			auto session = self->m_session_registry->get_session(session_key);
+			session->update_connection(miner_connection);
+			session->set_update_time(std::chrono::steady_clock::now());
+
+			return miner_connection->connection_handler();
+		};
+
+		m_legacy_listen_socket->listen(legacy_socket_handler);
+	}
 	
 	// on listen/accept, save created connection to pool_conenctions and call the connection_handler of created pool connection object
 	auto socket_handler = [self](network::Connection::Sptr&& connection)
 	{
 		auto const session_key = self->m_session_registry->create_session();
-		std::shared_ptr<Miner_connection> miner_connection{};
-		if (self->m_legacy_mode)
-		{
-			miner_connection = std::make_shared<Miner_connection_legacy_impl>(
-				self->m_logger, 
-				std::move(connection), 
-				self, 
-				session_key, 
-				self->m_session_registry, 
-				self->m_timer_factory->create_timer());
-		}
-		else
-		{
-			miner_connection = create_miner_connection(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
-		}
+		auto miner_connection = create_miner_connection(self->m_logger, std::move(connection), self, session_key, self->m_session_registry);
 
 		auto session = self->m_session_registry->get_session(session_key);
 		session->update_connection(miner_connection);
@@ -181,10 +195,7 @@ void Pool_manager_impl::start()
 	m_session_registry_maintenance->start(chrono::Seconds(m_config->get_session_expiry_time()), 
 		session_registry_maintenance_handler(m_config->get_session_expiry_time()));
 
-	if (!m_legacy_mode)
-	{
-		m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
-	}
+	m_get_hashrate_timer->start(chrono::Seconds(m_config->get_hashrate_interval()), get_hashrate_handler(m_config->get_hashrate_interval()));
 }
 
 void Pool_manager_impl::stop()
