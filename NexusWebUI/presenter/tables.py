@@ -29,6 +29,7 @@ class AccountPayoutsTable(tables.Table):
     time = tables.Column(orderable=False)
     amount = tables.Column(orderable=False)
     shares = tables.Column(orderable=False)
+    round = tables.Column(orderable=False)
     hash = tables.LinkColumn('presenter:detail', args=[A('hash')], orderable=False, text=shorten_hash_text,
                              verbose_name='Hash', attrs={"a": {"target": "_blank"}})
 
