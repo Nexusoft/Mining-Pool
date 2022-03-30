@@ -1,4 +1,4 @@
-# NexusPool (BETA)
+# NexusPool  
 
 Pool for Nexus Hash and Prime channel
 
