@@ -3,7 +3,7 @@
 
 #include "pool/miner_connection.hpp"
 #include "LLP/packet.hpp"
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 #include <memory>
 #include <atomic>
 

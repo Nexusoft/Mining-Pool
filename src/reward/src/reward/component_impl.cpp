@@ -229,7 +229,11 @@ Calculate_rewards_result Component_impl::calculate_rewards(std::uint32_t round_n
 				{
 					double const pool_fee = round_data.m_total_rewards * static_cast<double>(m_pool_fee) / 100.0;
 					m_logger->debug("Pool fee payment {} NXS for {}", pool_fee, m_fee_address);
-					m_shared_data_writer->update_reward_of_payment(pool_fee, m_fee_address, round_number);
+					if (!m_shared_data_writer->update_reward_of_payment(pool_fee, m_fee_address, round_number))
+					{
+						m_logger->debug("Couldn't update pool fee");
+					}
+					continue;
 				}
 				// calculate reward for account. First reduce the total_rewards with pool_fee % 
 				auto account_reward = (round_data.m_total_rewards * (1.0 - (static_cast<double>(m_pool_fee) / 100.0))) * (payment.m_shares / round_data.m_total_shares);

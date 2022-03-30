@@ -12,4 +12,4 @@ target_include_directories(reward
     PRIVATE src
 )
 
-target_link_libraries(reward chrono LLC LLP TAO persistance nexus_http_interface)
+target_link_libraries(reward spdlog chrono LLC LLP TAO persistance nexus_http_interface)

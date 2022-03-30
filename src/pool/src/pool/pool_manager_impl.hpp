@@ -62,10 +62,9 @@ private:
     nexus_http_interface::Component::Sptr m_http_component;
     reward::Component::Uptr m_reward_component;
 
-    bool m_legacy_mode;
-
     std::shared_ptr<Wallet_connection> m_wallet_connection;     // connection to nexus wallet
-    network::Socket::Sptr m_listen_socket;
+    network::Socket::Sptr m_listen_socket;                  // Miner listen port for connections
+    network::Socket::Sptr m_legacy_listen_socket;           // Miner listen port for legacy connections (old protocol)
 
     std::shared_ptr<Session_registry> m_session_registry;    // holds all sessions -> each session contains a miner_connection
     std::unique_ptr<Notifications> m_miner_notifications;    // sends notification messages to miners

@@ -17,6 +17,7 @@ public:
     MOCK_METHOD(std::uint16_t, get_local_port, (), (const override));
     MOCK_METHOD(std::string const&, get_public_ip, (), (const override));
     MOCK_METHOD(std::uint16_t, get_miner_listen_port, (), (const override));
+    MOCK_METHOD(std::uint16_t, get_miner_legacy_listen_port, (), (const override));
     MOCK_METHOD(std::string const&, get_local_ip, (), (const override));
     MOCK_METHOD(common::Mining_mode, get_mining_mode, (), (const override));
     MOCK_METHOD(std::string const&, get_logfile, (), (const override));

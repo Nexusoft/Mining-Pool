@@ -4,7 +4,6 @@
 #include "LLP/pool_protocol.hpp"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
-#include <json/json.hpp>
 #include <string>
 
 namespace nexuspool

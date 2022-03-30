@@ -12,7 +12,7 @@
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/web/server/api/ApiController.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <mutex>
 

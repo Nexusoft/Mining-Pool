@@ -34,6 +34,7 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& cal
 		return 0.0;
 	}
 
+	double current_avg_block_reward = 0.0;
 	for (auto& block : blocks)
 	{
 		// all blocks which already have a reward for this round are filtered out
@@ -60,6 +61,23 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& cal
 		else
 		{
 			++blocks_orphaned;
+		}
+
+
+		// check for ambassador blocks (blocks with very high mint which isn't credited to the pool)
+		if (reward_data.m_reward > 250.0)
+		{
+			if (current_avg_block_reward == 0.0)
+			{
+				current_avg_block_reward = 2.0;		// TODO get this value dynamically from wallet
+			}
+
+			m_logger->warn("Ambassador block found with height {}. Cutting down block reward to {}", block.m_height, current_avg_block_reward);
+			reward_data.m_reward = current_avg_block_reward;
+		}
+		else
+		{
+			current_avg_block_reward = reward_data.m_reward;
 		}
 
 		// update block in db

@@ -4,7 +4,6 @@
 #include "LLP/pool_protocol.hpp"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
-#include <json/json.hpp>
 #include <string>
 
 namespace nexuspool
@@ -133,25 +132,11 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 			auto pool_manager_shared = m_pool_manager.lock();
 			if (pool_manager_shared)
 			{
-				std::uint64_t nonce{ 0U };
-				if (m_miner_protocol_version > POOL_PROTOCOL_VERSION)
+				std::uint64_t nonce = process_submit_block_protocol_2(packet);
+				if (nonce == 0U)
 				{
-					nonce = process_submit_block_protocol_2(packet);
-					if (nonce == 0U)
-					{
-						m_logger->error("Invalid paket for submit_block received!");
-						continue;
-					}
-				}
-				else
-				{
-					if (packet.m_length != 72)
-					{
-						m_logger->error("Invalid paket length for submit_block received! Received {} bytes", packet.m_length);
-						continue;
-					}
-					std::vector<uint8_t> block_data{ packet.m_data->begin(), packet.m_data->end() - 8 };
-					nonce = bytes2uint64(std::vector<uint8_t>(packet.m_data->end() - 8, packet.m_data->end()));
+					m_logger->error("Invalid paket for submit_block received!");
+					continue;
 				}
 
 				auto block = session->get_block();
