@@ -125,7 +125,7 @@ private:
         auto data_json = nlohmann::json::parse(response->readBodyToString()->c_str());
         common::System_info system_info;
         system_info.m_wallet_version = data_json["result"]["version"];
-        system_info.m_pool_version = "0.9";
+        system_info.m_pool_version = "1.0";     // TODO save it in db and get from there
 
         return system_info;
     }
