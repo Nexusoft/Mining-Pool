@@ -149,6 +149,7 @@ void Pool_manager_impl::start()
 	m_listen_socket = m_socket_factory->create_socket(local_listen_endpoint);
 
 	// Init legacy listen socket
+	m_logger->debug("get_miner_legacy_listen_port {}", m_config->get_miner_legacy_listen_port());
 	if (m_config->get_miner_legacy_listen_port() != 0)
 	{
 		m_logger->info("Init additional legacy miner listen socket on port {}", m_config->get_miner_legacy_listen_port());
