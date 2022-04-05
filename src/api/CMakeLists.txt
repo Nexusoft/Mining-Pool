@@ -10,7 +10,7 @@ target_include_directories(api
     PRIVATE src
 )
 
-target_link_libraries(api config persistance TAO common oatpp::oatpp oatpp::oatpp-openssl chrono)
+target_link_libraries(api spdlog config persistance TAO common oatpp chrono nlohmann_json::nlohmann_json asio)
 
 if(WIN32)
 target_link_libraries(api Ws2_32.lib)

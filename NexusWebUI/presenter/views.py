@@ -62,11 +62,16 @@ def block_overview_list(request):
             logger.info("Serving from Cache")
             print("Serving from Cache")
 
-        print(f"Meta: {block_overview_meta_json}")
-
         # Meta Table
-        pool_hashrate = round((float(block_overview_meta_json['pool_hashrate'])), 2)
         mining_mode = block_overview_meta_json['mining_mode']
+
+        if mining_mode == 'HASH':
+            pool_hashrate = float(block_overview_meta_json['pool_hashrate'])
+            pool_hashrate = round(pool_hashrate/1000000, 2)
+            pool_hash_unit = "MH/s"
+        else:
+            pool_hashrate = round((float(block_overview_meta_json['pool_hashrate'])), 2)
+            pool_hash_unit = "GI/s"
         round_duration = block_overview_meta_json['round_duration']
         fee = block_overview_meta_json['fee']
         active_miners = block_overview_meta_json['active_miners']
@@ -74,6 +79,8 @@ def block_overview_list(request):
         pool_version = block_overview_meta_json['pool_version']
         payout_time = block_overview_meta_json['payout_time']
         current_round = block_overview_meta_json['current_round']
+
+
 
         return render(request, template_name, {'table': table_data,
                                                'pool_hashrate': pool_hashrate,
@@ -84,11 +91,12 @@ def block_overview_list(request):
                                                'wallet_version': wallet_version,
                                                'pool_version': pool_version,
                                                'payout_time': payout_time,
-                                               'current_round': current_round
+                                               'current_round': current_round,
+                                               'pool_hash_unit': pool_hash_unit
                                                })
 
     except Exception as ex:
-        print(ex)
+        print(f"Exception:", ex)
         logger.error(ex)
         return redirect('presenter:error_pool')
 
@@ -410,8 +418,11 @@ def load_payout_timer(request, payout_time):
     current_date_time = datetime.datetime.now()
     time_difference = payout_time - current_date_time
 
+    # If the Time Difference is negative (no new payout scheduled), return a '-'
+    if time_difference < datetime.timedelta(0):
+        return HttpResponse("-")
+
     diff = str(datetime.timedelta(seconds=time_difference.total_seconds()))
     diff = diff.split(".", 1)[0]
 
     return HttpResponse(f'{diff}')
-    # return HttpResponse(f'test')

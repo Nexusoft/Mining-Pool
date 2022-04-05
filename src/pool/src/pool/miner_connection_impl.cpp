@@ -4,7 +4,6 @@
 #include "LLP/pool_protocol.hpp"
 #include "pool/types.hpp"
 #include <spdlog/spdlog.h>
-#include <json/json.hpp>
 #include <string>
 
 namespace nexuspool
@@ -134,7 +133,7 @@ void Miner_connection_impl::process_data(network::Shared_payload&& receive_buffe
 			if (pool_manager_shared)
 			{
 				std::uint64_t nonce{ 0U };
-				if (m_miner_protocol_version > POOL_PROTOCOL_VERSION)
+				if (m_miner_protocol_version >= POOL_PROTOCOL_VERSION)
 				{
 					nonce = process_submit_block_protocol_2(packet);
 					if (nonce == 0U)
@@ -353,10 +352,10 @@ void Miner_connection_impl::process_login(Packet login_packet, std::shared_ptr<S
 	// protocol version check
 	if (m_miner_protocol_version < POOL_PROTOCOL_VERSION)
 	{
-		login_response_json["result_code"] = Pool_protocol_result::Protocol_version_fail;
-		login_response_json["result_message"] = "Please update miner. Mandatory protocol_version " + std::to_string(POOL_PROTOCOL_VERSION);
-		send_login_fail(login_response_json.dump());
-		return;
+		login_response_json["result_code"] = Pool_protocol_result::Protocol_version_warn;
+		login_response_json["result_message"] = "Please update miner. Pool protocol_version is " + std::to_string(POOL_PROTOCOL_VERSION);
+	//	send_login_fail(login_response_json.dump());
+	//	return;
 	}
 
 	auto const nxs_address_valid = m_session_registry->valid_nxs_address(nxs_address);

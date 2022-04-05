@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "json/json.hpp"
+#include <nlohmann/json.hpp>
 #include "config/config.hpp"
 
 namespace nexuspool
@@ -23,6 +23,7 @@ public:
 	std::uint16_t get_local_port() const override  { return m_local_port; }
 	std::string const& get_public_ip() const override { return m_public_ip; }
 	std::uint16_t get_miner_listen_port() const override  { return m_miner_listen_port; }
+	std::uint16_t get_miner_legacy_listen_port() const override { return m_miner_legacy_listen_port; }
 	std::string const& get_local_ip() const override  { return m_local_ip; }
 	common::Mining_mode get_mining_mode() const override  { return m_mining_mode; }
 	std::string const& get_logfile() const override  { return m_logfile; }
@@ -44,6 +45,7 @@ private:
 	std::uint16_t m_local_port;
 	std::string  m_public_ip;
 	std::uint16_t m_miner_listen_port;
+	std::uint16_t m_miner_legacy_listen_port;
 	std::string m_local_ip;
 	common::Mining_mode	 m_mining_mode;
 	Pool_config  m_pool_config;

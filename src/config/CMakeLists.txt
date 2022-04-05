@@ -11,4 +11,4 @@ target_include_directories(config
     PRIVATE src
 )
 
-target_link_libraries(config common)
+target_link_libraries(config common nlohmann_json::nlohmann_json)

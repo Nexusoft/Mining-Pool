@@ -11,7 +11,7 @@ target_include_directories(nexus_http_interface
     PRIVATE src
 )
 
-target_link_libraries(nexus_http_interface common LLP oatpp::oatpp)
+target_link_libraries(nexus_http_interface spdlog common LLP oatpp::oatpp nlohmann_json::nlohmann_json)
 
 if(WIN32)
 target_link_libraries(nexus_http_interface Ws2_32.lib)

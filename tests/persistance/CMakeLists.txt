@@ -6,6 +6,7 @@ target_link_libraries(
   gtest_main
   persistance
   sqlite3
+  asio
 )
 
 add_custom_command(

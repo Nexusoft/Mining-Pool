@@ -15,6 +15,7 @@ namespace config
 		, m_local_port{ 0 }
 		, m_public_ip{ "127.0.0.1" }
 		, m_miner_listen_port{ 0 }
+		, m_miner_legacy_listen_port{ 0 }
 		, m_local_ip{"127.0.0.1"}
 		, m_mining_mode{ common::Mining_mode::HASH}
 		, m_pool_config{}
@@ -62,6 +63,10 @@ namespace config
 			if (j.count("miner_listen_port") != 0)
 			{
 				j.at("miner_listen_port").get_to(m_miner_listen_port);
+			}
+			if (j.count("miner_legacy_listen_port") != 0)
+			{
+				j.at("miner_legacy_listen_port").get_to(m_miner_legacy_listen_port);
 			}
 
 			std::string mining_mode = j["mining_mode"];

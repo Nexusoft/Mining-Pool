@@ -51,7 +51,6 @@ private:
     void process_data(network::Shared_payload&& receive_buffer);
 
     void retry_connect(network::Endpoint const& wallet_endpoint);
-    chrono::Timer::Handler block_resubmit_handler(std::uint16_t timer_interval);
 
     std::shared_ptr<::asio::io_context> m_io_context;
     std::shared_ptr<spdlog::logger> m_logger;
@@ -65,8 +64,6 @@ private:
     Timer_manager_wallet m_timer_manager;
     std::atomic<std::uint32_t> m_current_height;
     std::atomic<bool> m_stopped;
-
-    chrono::Timer::Uptr m_block_resubmit_timer;
 
     // get_block variables
     std::mutex m_get_block_mutex;
