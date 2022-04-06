@@ -20,7 +20,7 @@ include(${CPM_DOWNLOAD_LOCATION})
 find_package(Threads REQUIRED)
 
 #spdlog
-CPMAddPackage(NAME spdlog GITHUB_REPOSITORY gabime/spdlog VERSION 1.9.2)
+CPMAddPackage(NAME spdlog GITHUB_REPOSITORY gabime/spdlog VERSION 1.9.2 OPTIONS "SPDLOG_BUILD_SHARED OFF")
 
 #nlohmann json
 CPMAddPackage(NAME nlohmann_json GITHUB_REPOSITORY nlohmann/json  VERSION 3.10.5)
@@ -97,7 +97,8 @@ if(WIN32)
     add_definitions(-D_WIN32_WINT=0x0601 -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-find_package(oatpp 1.3.0 REQUIRED)
+CPMAddPackage(NAME oatpp GITHUB_REPOSITORY  GIT_REPOSITORY https://github.com/oatpp/oatpp.git VERSION 1.3.0  GIT_TAG "1.3.0" OPTIONS "OATPP_BUILD_TESTS OFF")
+#CPMAddPackage(NAME oatpp-openssl GITHUB_REPOSITORY  GIT_REPOSITORY https://github.com/oatpp/oatpp-openssl.git VERSION 1.3.0  GIT_TAG "1.3.0" OPTIONS "OATPP_BUILD_TESTS OFF")
 find_package(oatpp-openssl 1.3.0 REQUIRED)
 
 # add submodules
