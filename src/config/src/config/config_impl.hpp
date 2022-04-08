@@ -37,6 +37,7 @@ public:
 	std::uint16_t get_hashrate_interval() const override { return m_hashrate_interval; }
 	bool get_miner_notifications() const override { return m_miner_notifications; }
 	bool get_legacy_mode() const override { return m_legacy_mode; }
+	std::string const& get_whitefire_substitute_address() const override { return m_whitefire_substitute_address; }
 
 private:
 
@@ -61,6 +62,7 @@ private:
 	std::uint16_t m_hashrate_interval;
 	bool m_miner_notifications;
 	bool m_legacy_mode;
+	std::string m_whitefire_substitute_address;
 
 };
 

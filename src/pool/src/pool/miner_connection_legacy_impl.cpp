@@ -14,7 +14,8 @@ Miner_connection_legacy_impl::Miner_connection_legacy_impl(std::shared_ptr<spdlo
 	std::weak_ptr<Pool_manager> pool_manager,
 	Session_key session_key,
 	Session_registry::Sptr session_registry,
-	chrono::Timer::Uptr get_block_timer)
+	chrono::Timer::Uptr get_block_timer,
+	std::string const& whitefire_substitute_address)
 	: m_logger{ std::move(logger) }
 	, m_connection{ std::move(connection) }
 	, m_pool_manager{ std::move(pool_manager) }
@@ -24,6 +25,7 @@ Miner_connection_legacy_impl::Miner_connection_legacy_impl(std::shared_ptr<spdlo
 	, m_pool_nbits{ 0 }
 	, m_network_nbits{0}
 	, m_current_height{ 0U }
+	, m_whitefire_substitute_address{ whitefire_substitute_address }
 {
 }
 
@@ -255,16 +257,23 @@ void Miner_connection_legacy_impl::process_login(Packet login_packet, std::share
 	Packet login_fail_response;
 	login_fail_response = login_fail_response.get_packet(Packet::LOGIN_FAIL);
 
-	auto const nxs_address = std::string(login_packet.m_data->begin(), login_packet.m_data->end());
+	auto nxs_address = std::string(login_packet.m_data->begin(), login_packet.m_data->end());
 	auto const nxs_address_valid = m_session_registry->valid_nxs_address(nxs_address);
 	if (!nxs_address_valid)
 	{
-		m_logger->warn("Bad Account {}", nxs_address);
-		//if (m_isDDOS)
-		//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
+		if (nxs_address == "2RG4KnftZ1Y82Cq2niu1hkCsAmWVYr5TcbC6LW4GBbsieC7G3dV")	// whitefire_dev address
+		{
+			nxs_address = m_whitefire_substitute_address;
+		}
+		else
+		{
+			m_logger->warn("Bad Account {}", nxs_address);
+			//if (m_isDDOS)
+			//	m_ddos->Ban(m_logger, "Invalid Nexus Address on Login");
 
-		m_connection->transmit(login_fail_response.get_bytes());
-		return;
+			m_connection->transmit(login_fail_response.get_bytes());
+			return;
+		}
 	}
 	// check if banned ip/user
 

@@ -152,6 +152,11 @@ namespace config
 				j.at("log_level").get_to(m_log_level);
 			}
 
+			if (j.count("whitefire_substitute_address") != 0)
+			{
+				j.at("whitefire_substitute_address").get_to(m_whitefire_substitute_address);
+			}			
+
 			return true;
 		}
 		catch (std::exception& e)

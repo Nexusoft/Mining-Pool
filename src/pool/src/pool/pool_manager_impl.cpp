@@ -166,7 +166,8 @@ void Pool_manager_impl::start()
 				self,
 				session_key,
 				self->m_session_registry,
-				self->m_timer_factory->create_timer());
+				self->m_timer_factory->create_timer(),
+				self->m_config->get_whitefire_substitute_address());
 
 			auto session = self->m_session_registry->get_session(session_key);
 			session->update_connection(miner_connection);

@@ -32,6 +32,7 @@ public:
     MOCK_METHOD(std::uint16_t, get_hashrate_interval, (), (const override));
     MOCK_METHOD(bool, get_miner_notifications, (), (const override));
     MOCK_METHOD(bool, get_legacy_mode, (), (const override));
+    MOCK_METHOD(std::string const&, get_whitefire_substitute_address, (), (const override));    
 };
 
 

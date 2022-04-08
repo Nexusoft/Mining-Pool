@@ -6,6 +6,7 @@
 #include "chrono/timer.hpp"
 #include <memory>
 #include <atomic>
+#include <string>
 
 namespace nexuspool
 {
@@ -20,7 +21,8 @@ public:
         std::weak_ptr<Pool_manager> pool_manager,
         Session_key session_key,
         Session_registry::Sptr session_registry,
-        chrono::Timer::Uptr get_block_timer);
+        chrono::Timer::Uptr get_block_timer,
+        std::string const& whitefire_substitute_address);
 
     void stop() override;
     void send_work(LLP::CBlock const& block) override {}        // not supported
@@ -48,6 +50,7 @@ private:
     std::uint32_t m_pool_nbits;
     std::uint32_t m_network_nbits;
     std::atomic<std::uint32_t> m_current_height;
+    std::string m_whitefire_substitute_address;
 };
 
 }
