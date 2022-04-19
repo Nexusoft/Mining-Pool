@@ -97,7 +97,7 @@ if(WIN32)
     add_definitions(-D_WIN32_WINT=0x0601 -DNOMINMAX -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-add_subdirectory(oatpp-1.3.0)
+CPMAddPackage(NAME oatpp GITHUB_REPOSITORY  GIT_REPOSITORY https://github.com/oatpp/oatpp.git VERSION 1.3.0  GIT_TAG "1.3.0" OPTIONS "OATPP_BUILD_TESTS OFF")
 
 # add submodules
 add_subdirectory(src/chrono)
