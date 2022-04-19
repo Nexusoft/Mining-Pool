@@ -65,7 +65,7 @@ double Payout_manager::calculate_reward_of_blocks(std::uint32_t round, bool& cal
 
 
 		// check for ambassador blocks (blocks with very high mint which isn't credited to the pool)
-		if (reward_data.m_reward > 250.0)
+		if (reward_data.m_reward > 100.0)
 		{
 			if (current_avg_block_reward == 0.0)
 			{
