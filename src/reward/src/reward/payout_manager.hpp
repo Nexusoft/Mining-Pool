@@ -31,6 +31,7 @@ private:
     persistance::Shared_data_writer& m_shared_data_writer;
     persistance::Data_reader& m_data_reader;
     std::uint32_t m_not_fully_paid_round;
+    double m_current_avg_block_reward;
 };
 
 }
